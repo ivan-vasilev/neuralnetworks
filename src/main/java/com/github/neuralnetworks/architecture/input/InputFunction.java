@@ -9,5 +9,5 @@ import java.io.Serializable;
  *
  */
 public interface InputFunction extends Serializable {
-	public double calc(double[] values, double[] weights);
+	public float calc(float[] values, float[] weights);
 }

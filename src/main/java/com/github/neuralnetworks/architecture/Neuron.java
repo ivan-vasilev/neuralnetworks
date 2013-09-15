@@ -81,6 +81,14 @@ public class Neuron {
 		return result;
 	}
 
+	public IConnections[] getInboundConnectionGraphs() {
+		return inboundConnectionGraphs;
+	}
+
+	public IConnections[] getOutboundConnectionGraphs() {
+		return outboundConnectionGraphs;
+	}
+
 	/**
 	 * this method "inserts" the neuron in the network
 	 *

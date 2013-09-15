@@ -11,12 +11,12 @@ public class WeightedSum implements InputFunction {
 	private static final long serialVersionUID = 8650655018964028006L;
 
 	@Override
-	public double calc(double[] values, double[] weights) {
+	public float calc(float[] values, float[] weights) {
 		if (values == null || weights == null || values.length != weights.length) {
 			throw new IllegalArgumentException();
 		}
 
-		double result = 0;
+		float result = 0;
 		for (int i = 0; i < values.length; i++) {
 			result += values[i] * weights[i];
 		}

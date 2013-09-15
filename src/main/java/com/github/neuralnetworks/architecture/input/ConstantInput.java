@@ -7,9 +7,9 @@ public class ConstantInput implements InputFunction {
 
 	private static final long serialVersionUID = 2792702356148670315L;
 
-	private double output;
+	private float output;
 
-	public ConstantInput(double output) {
+	public ConstantInput(float output) {
 		super();
 		this.output = output;
 	}
@@ -20,7 +20,7 @@ public class ConstantInput implements InputFunction {
 	}
 
 	@Override
-	public double calc(double[] values, double[] weights) {
+	public float calc(float[] values, float[] weights) {
 		return output;
 	}
 }

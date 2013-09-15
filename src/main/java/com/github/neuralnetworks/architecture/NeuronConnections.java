@@ -4,10 +4,10 @@ package com.github.neuralnetworks.architecture;
 public class NeuronConnections {
 
 	private Neuron neuron;
-	private double[] weights;
+	private float[] weights;
 	private Neuron[] neurons;
 
-	public NeuronConnections(Neuron neuron, double[] weights, Neuron[] neurons) {
+	public NeuronConnections(Neuron neuron, float[] weights, Neuron[] neurons) {
 		super();
 		this.neuron = neuron;
 		this.weights = weights;
@@ -18,7 +18,7 @@ public class NeuronConnections {
 		return neuron;
 	}
 
-	public double[] getWeights() {
+	public float[] getWeights() {
 		return weights;
 	}
 

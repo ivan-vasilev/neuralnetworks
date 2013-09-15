@@ -6,5 +6,5 @@ package com.github.neuralnetworks.architecture.activation;
  *
  */
 public interface ActivationFunction {
-	public double value(double input);
+	public float value(float input);
 }

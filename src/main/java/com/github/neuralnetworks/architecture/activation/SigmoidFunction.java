@@ -7,7 +7,7 @@ public class SigmoidFunction implements ActivationFunction {
 	private Sigmoid sigmoid = new Sigmoid();
 
 	@Override
-	public double value(double x) {
-		return sigmoid.value(x);
+	public float value(float x) {
+		return (float) sigmoid.value(x);
 	}
 }

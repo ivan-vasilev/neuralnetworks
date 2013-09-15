@@ -1,6 +1,8 @@
 package com.github.neuralnetworks.calculation;
 
-import com.github.neuralnetworks.architecture.IConnections;
+import java.util.Map;
+
+import com.github.neuralnetworks.architecture.Neuron;
 
 /**
  *
@@ -10,10 +12,14 @@ import com.github.neuralnetworks.architecture.IConnections;
 public interface ICalculateLayer {
 
 	/**
-	 * calculates
-	 * @param precedingResult - previous layer result
-	 * @param connections - connections between the previous layer and the next
-	 * @return
+	 * @param calculatedLayers - existing results
+	 * @param layer - the layer to be calculated
 	 */
-	public CalculationResult calculate(CalculationResult precedingResult, IConnections connections);
+	public float[] calculateForward(Map<Neuron[], float[]> calculatedLayers, Neuron[] layer);
+
+	/**
+	 * @param calculatedLayers - existing layers
+	 * @param layer - the layer to be calculated
+	 */
+	public float[] calculateBackward(Map<Neuron[], float[]> calculatedLayers, Neuron[] layer);
 }

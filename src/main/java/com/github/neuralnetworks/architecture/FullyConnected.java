@@ -9,11 +9,11 @@ package com.github.neuralnetworks.architecture;
  */
 public class FullyConnected extends Connections {
 
-	protected double[][] weightMatrix;
+	protected float[][] weightMatrix;
 
 	public FullyConnected(Neuron[] inputNeurons, Neuron[] outputNeurons) {
 		super(inputNeurons, outputNeurons);
-		weightMatrix = new double[outputNeurons.length][inputNeurons.length];
+		weightMatrix = new float[outputNeurons.length][inputNeurons.length];
 	}
 
 	@Override
@@ -23,7 +23,7 @@ public class FullyConnected extends Connections {
 		if (index < outputNeurons.length && outputNeurons[index] == n) {
 			result = new NeuronConnections(n, weightMatrix[index], inputNeurons);
 		} else if (index < inputNeurons.length && inputNeurons[index] == n) {
-			double[] weights = new double[outputNeurons.length];
+			float[] weights = new float[outputNeurons.length];
 			for (int i = 0; i < outputNeurons.length; i++) {
 				weights[i] = weightMatrix[index][i];
 			}
@@ -34,11 +34,11 @@ public class FullyConnected extends Connections {
 		return result;
 	}
 
-	public double[][] getWeightMatrix() {
+	public float[][] getWeightMatrix() {
 		return weightMatrix;
 	}
 
-	public void setWeightMatrix(double[][] weightMatrix) {
+	public void setWeightMatrix(float[][] weightMatrix) {
 		this.weightMatrix = weightMatrix;
 	}
 }
