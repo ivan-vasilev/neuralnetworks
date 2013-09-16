@@ -6,28 +6,28 @@ package com.github.neuralnetworks.architecture;
  * @author hok
  *
  */
-public class NeuralNetwork implements IINputOutputNeurons {
+public class NeuralNetwork implements IINputOutputLayers {
 
-	protected Neuron[] inputNeurons;
-	protected Neuron[] outputNeurons;
+	protected Layer inputLayer;
+	protected Layer outputLayer;
 
 	public NeuralNetwork() {
 		super();
 	}
 
-	public NeuralNetwork(Neuron[] inputNeurons, Neuron[] outputNeurons) {
+	public NeuralNetwork(Layer inputLayer, Layer outputLayer) {
 		super();
-		this.inputNeurons = inputNeurons;
-		this.outputNeurons = outputNeurons;
+		this.inputLayer = inputLayer;
+		this.outputLayer = outputLayer;
 	}
 
 	@Override
-	public Neuron[] getInputNeurons() {
-		return inputNeurons;
+	public Layer getInputLayer() {
+		return inputLayer;
 	}
 
 	@Override
-	public Neuron[] getOutputNeurons() {
-		return outputNeurons;
+	public Layer getOutputLayer() {
+		return outputLayer;
 	}
 }

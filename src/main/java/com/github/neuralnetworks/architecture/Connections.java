@@ -10,28 +10,31 @@ package com.github.neuralnetworks.architecture;
 public abstract class Connections implements IConnections {
 
 	/**
-	 * represents a list of input (in terms of the neural network architecture) neurons
+	 * input layer of neurons
 	 */
-	protected Neuron[] inputNeurons;
+	protected Layer inputLayer;
 
 	/**
-	 * represents a list of output (in terms of the neural network architecture) neurons
+	 * output layer
 	 */
-	protected Neuron[] outputNeurons;
+	protected Layer outputLayer;
 
-	public Connections(Neuron[] inputNeurons, Neuron[] outputNeurons) {
+	public Connections(Layer inputLayer, Layer outputLayer) {
 		super();
-		this.inputNeurons = inputNeurons;
-		this.outputNeurons = outputNeurons;
+		this.inputLayer = inputLayer;
+		this.outputLayer = outputLayer;
+
+		inputLayer.addOutboundConnectionGraph(this);
+		outputLayer.addInboundConnectionGraph(this);
 	}
 
 	@Override
-	public Neuron[] getInputNeurons() {
-		return inputNeurons;
+	public Layer getInputLayer() {
+		return inputLayer;
 	}
 
 	@Override
-	public Neuron[] getOutputNeurons() {
-		return outputNeurons;
+	public Layer getOutputLayer() {
+		return outputLayer;
 	}
 }

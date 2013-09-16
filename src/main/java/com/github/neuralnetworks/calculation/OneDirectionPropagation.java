@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 
-import com.github.neuralnetworks.architecture.Neuron;
+import com.github.neuralnetworks.architecture.Layer;
 
 /**
  * one direction propagation (forward or backward)
@@ -12,9 +12,9 @@ import com.github.neuralnetworks.architecture.Neuron;
  */
 public class OneDirectionPropagation extends Propagation {
 
-	private Queue<Neuron[]> layers = new LinkedList<>();
+	private Queue<Layer> layers = new LinkedList<>();
 
-	public OneDirectionPropagation(Map<Neuron[], float[]> results, ICalculateLayer calculator) {
+	public OneDirectionPropagation(Map<Layer, float[]> results, ICalculateLayer calculator) {
 		super(results, calculator);
 	}
 
@@ -24,13 +24,13 @@ public class OneDirectionPropagation extends Propagation {
 	}
 
 	@Override
-	public Neuron[] getNextLayer() {
+	public Layer getNextLayer() {
 		return layers.poll();
 	}
 
 	@Override
 	public void propagateForward() {
-		Queue<Neuron[]> queue = new LinkedList<>();
+		Queue<Layer> queue = new LinkedList<>();
 		queue.addAll(results.keySet());
 
 		while (queue.size() > 0) {
@@ -42,7 +42,7 @@ public class OneDirectionPropagation extends Propagation {
 
 	@Override
 	public void propagateBackward() {
-		Queue<Neuron[]> queue = new LinkedList<>();
+		Queue<Layer> queue = new LinkedList<>();
 		queue.addAll(results.keySet());
 
 		while (queue.size() > 0) {
