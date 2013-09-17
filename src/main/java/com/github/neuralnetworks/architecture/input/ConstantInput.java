@@ -1,5 +1,9 @@
 package com.github.neuralnetworks.architecture.input;
 
+import java.util.Arrays;
+
+import com.github.neuralnetworks.architecture.IConnections;
+
 /**
  * this input function always returns constant value
  */
@@ -20,7 +24,12 @@ public class ConstantInput implements InputFunction {
 	}
 
 	@Override
-	public float calc(float[] values, float[] weights) {
-		return output;
+	public void calculateForward(IConnections graph, float[] inputValues, float[] result) {
+		Arrays.fill(result, output);
+	}
+
+	@Override
+	public void calculateBackward(IConnections graph, float[] inputValues, float[] result) {
+		Arrays.fill(result, output);
 	}
 }

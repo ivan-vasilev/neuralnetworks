@@ -10,7 +10,7 @@ import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.architecture.activation.ActivationFunction;
 import com.github.neuralnetworks.architecture.activation.RepeaterFunction;
 import com.github.neuralnetworks.architecture.input.InputFunction;
-import com.github.neuralnetworks.architecture.input.WeightedSum;
+import com.github.neuralnetworks.architecture.input.AparapiWeightedSum;
 import com.github.neuralnetworks.util.Constants;
 
 /**
@@ -41,7 +41,7 @@ public class MultiLayerPerceptron extends NeuralNetwork {
 		List<Layer> layers = new ArrayList<Layer>();
 
 		// populate input layer
-		inputLayer = new Layer(layerProperties.get(0), inputFunction instanceof WeightedSum ? inputFunction : new WeightedSum(), new RepeaterFunction());
+		inputLayer = new Layer(layerProperties.get(0), inputFunction instanceof AparapiWeightedSum ? inputFunction : new AparapiWeightedSum(), new RepeaterFunction());
 		layers.add(inputLayer);
 
 		int biasLength = addBias ? 1 : 0;

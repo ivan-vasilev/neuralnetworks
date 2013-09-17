@@ -13,20 +13,16 @@ public class ConnectionGraph implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private float[] weights;
-	private int[] neuronWeightsStartPosition;
-	private int[] neuronWeightsCount;
-	private int neuronWeightsStep;
+	private int neuronWeightsCount;
 
 	public ConnectionGraph() {
 		super();
 	}
 
-	public ConnectionGraph(float[] weights, int[] neuronWeightsStartPosition, int[] neuronWeightsCount, int neuronWeightsStep) {
+	public ConnectionGraph(float[] weights, int neuronWeightsCount) {
 		super();
 		this.weights = weights;
-		this.neuronWeightsStartPosition = neuronWeightsStartPosition;
 		this.neuronWeightsCount = neuronWeightsCount;
-		this.neuronWeightsStep = neuronWeightsStep;
 	}
 
 	/**
@@ -42,37 +38,13 @@ public class ConnectionGraph implements Serializable {
 	}
 
 	/**
-	 * @return start position of connections for each neuron in the weights
-	 *         array
-	 */
-	public int[] getNeuronWeightsStartPosition() {
-		return neuronWeightsStartPosition;
-	}
-
-	public void setNeuronWeightsStartPosition(int[] neuronWeightsStartPosition) {
-		this.neuronWeightsStartPosition = neuronWeightsStartPosition;
-	}
-
-	/**
 	 * @return count of connections for each neuron
 	 */
-	public int[] getNeuronWeightsCount() {
+	public int getNeuronWeightsCount() {
 		return neuronWeightsCount;
 	}
 
-	public void setNeuronWeightsCount(int[] neuronWeightsCount) {
+	public void setNeuronWeightsCount(int neuronWeightsCount) {
 		this.neuronWeightsCount = neuronWeightsCount;
-	}
-
-	/**
-	 * @return the step in the weights array which separates single neuron's
-	 *         weights
-	 */
-	public int getNeuronWeightsStep() {
-		return neuronWeightsStep;
-	}
-
-	public void setNeuronWeightsStep(int neuronWeightsStep) {
-		this.neuronWeightsStep = neuronWeightsStep;
 	}
 }

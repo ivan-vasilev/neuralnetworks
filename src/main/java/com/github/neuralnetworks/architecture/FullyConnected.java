@@ -1,6 +1,5 @@
 package com.github.neuralnetworks.architecture;
 
-
 /**
  *
  * represents a fully connected weight matrix between two layers of neurons
@@ -8,24 +7,15 @@ package com.github.neuralnetworks.architecture;
  */
 public class FullyConnected extends Connections {
 
-	private ConnectionGraph forwardConnections;
-	private ConnectionGraph backwardConnections;
-	private int[] inputLayerNeurons;
-	private int[] outputLayerNeurons;
+	private ConnectionGraph connectionGraph;
+	private int inputLayerStartNeuron;
+	private int outputLayerStartNeuron;
 
 	public FullyConnected(Layer inputLayer, Layer outputLayer) {
 		super(inputLayer, outputLayer);
 
 		// initialize input/output bindings
-		inputLayerNeurons = new int[inputLayer.getNeuronCount()];
-		for (int i = 0; i < inputLayerNeurons.length; i++) {
-			inputLayerNeurons[i] = i;
-		}
-
-		outputLayerNeurons = new int[outputLayer.getNeuronCount()];
-		for (int i = 0; i < outputLayerNeurons.length; i++) {
-			outputLayerNeurons[i] = i;
-		}
+		outputLayerStartNeuron = inputLayerStartNeuron = 0;
 
 		// initialize weights array
 		float[] weights = new float[inputLayer.getNeuronCount() * outputLayer.getNeuronCount()];
@@ -36,44 +26,21 @@ public class FullyConnected extends Connections {
 			neuronWeightsStartPosition[i] = outputLayer.getNeuronCount() * i;
 		}
 
-		int[] neuronWeightsCount = new int[inputLayer.getNeuronCount()];
-		for (int i = 0; i < neuronWeightsCount.length; i++) {
-			neuronWeightsCount[i] = outputLayer.getNeuronCount();
-		}
-
-		forwardConnections = new ConnectionGraph(weights, neuronWeightsStartPosition, neuronWeightsCount, 1);
-
-		// initialize backward propagation graph
-		neuronWeightsStartPosition = new int[outputLayer.getNeuronCount()];
-		for (int i = 0; i < neuronWeightsStartPosition.length; i++) {
-			neuronWeightsStartPosition[i] = outputLayer.getNeuronCount() * i;
-		}
-
-		neuronWeightsCount = new int[outputLayer.getNeuronCount()];
-		for (int i = 0; i < neuronWeightsCount.length; i++) {
-			neuronWeightsCount[i] = inputLayer.getNeuronCount();
-		}
-
-		backwardConnections = new ConnectionGraph(weights, neuronWeightsStartPosition, neuronWeightsCount, 1);
+		connectionGraph = new ConnectionGraph(weights, outputLayer.getNeuronCount());
 	}
 
 	@Override
-	public int[] getInputLayerNeurons() {
-		return inputLayerNeurons;
+	public int getInputLayerStartNeuron() {
+		return inputLayerStartNeuron;
 	}
 
 	@Override
-	public int[] getOutputLayerNeurons() {
-		return outputLayerNeurons;
+	public int getOutputLayerStartNeuron() {
+		return outputLayerStartNeuron;
 	}
 
 	@Override
-	public ConnectionGraph getForwardConnectionGraph() {
-		return forwardConnections;
-	}
-
-	@Override
-	public ConnectionGraph getBackwardConnectionGraph() {
-		return backwardConnections;
+	public ConnectionGraph getConnectionGraph() {
+		return connectionGraph;
 	}
 }

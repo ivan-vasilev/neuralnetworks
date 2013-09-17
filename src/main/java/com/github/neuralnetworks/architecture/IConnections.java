@@ -7,22 +7,17 @@ package com.github.neuralnetworks.architecture;
 public interface IConnections extends IINputOutputLayers {
 
 	/**
-	 * @return - the list of input layer neurons that are participating in this connection graph
+	 * @return the start neuron of the input layer neurons
 	 */
-	public int[] getInputLayerNeurons();
+	public int getInputLayerStartNeuron();
 
 	/**
-	 * @return - the list of output layer neurons that are participating in this connection graph
+	 * @return the start neuron of the output layer neurons
 	 */
-	public int[] getOutputLayerNeurons();
+	public int getOutputLayerStartNeuron();
 
 	/**
-	 * @return ConnectionGraph for feed-forward network
+	 * @return ConnectionGraph with weights
 	 */
-	public ConnectionGraph getForwardConnectionGraph();
-
-	/**
-	 * @return ConnectionGraph for feed-backward network
-	 */
-	public ConnectionGraph getBackwardConnectionGraph();
+	public ConnectionGraph getConnectionGraph();
 }
