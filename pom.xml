@@ -12,19 +12,12 @@
 		<maven.compiler.source>1.7</maven.compiler.source>
 		<maven.compiler.target>1.7</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<commons_math.version>3.2</commons_math.version>
 		<commons_collections.version>3.2.1</commons_collections.version>
 		<maven.test.skip>true</maven.test.skip> <!-- kompilaciqta na testovete ne raboti s maven, za tova e tova slujebno 
 			property -->
 	</properties>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-math3</artifactId>
-			<version>${commons_math.version}</version>
-		</dependency>
-
 		<!-- Aparapi dependency -->
 		<dependency>
 			<groupId>com.amd</groupId>

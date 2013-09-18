@@ -3,8 +3,8 @@ package com.github.neuralnetworks.architecture;
 import java.io.Serializable;
 import java.util.Arrays;
 
-import com.github.neuralnetworks.architecture.activation.ActivationFunction;
-import com.github.neuralnetworks.architecture.input.InputFunction;
+import com.github.neuralnetworks.activation.ActivationFunction;
+import com.github.neuralnetworks.input.InputFunction;
 
 /**
  *

@@ -9,21 +9,25 @@ public class LayerCalculator implements ICalculateLayer {
 
 	@Override
 	public float[] calculateForward(Map<Layer, float[]> calculatedLayers, Layer layer) {
-		float[] inputValues = new float[layer.getNeuronCount()];
+		float[] result = new float[layer.getNeuronCount()];
 		for (IConnections c : layer.getInboundConnectionGraphs()) {
-			layer.getInputFunction().calculateForward(c, calculatedLayers.get(c.getInputLayer()), inputValues);
+			layer.getInputFunction().calculateForward(c, calculatedLayers.get(c.getInputLayer()), result);
 		}
 
-		return layer.getActivationFunction().value(inputValues);
+		layer.getActivationFunction().value(result);
+
+		return result;
 	}
 
 	@Override
 	public float[] calculateBackward(Map<Layer, float[]> calculatedLayers, Layer layer) {
-		float[] inputValues = new float[layer.getNeuronCount()];
+		float[] result = new float[layer.getNeuronCount()];
 		for (IConnections c : layer.getOutboundConnectionGraphs()) {
-			layer.getInputFunction().calculateBackward(c, calculatedLayers.get(c.getOutputLayer()), inputValues);
+			layer.getInputFunction().calculateBackward(c, calculatedLayers.get(c.getOutputLayer()), result);
 		}
 
-		return layer.getActivationFunction().value(inputValues);
+		layer.getActivationFunction().value(result);
+
+		return result;
 	}
 }

@@ -1,6 +1,7 @@
 package com.github.neuralnetworks.calculation;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
@@ -34,7 +35,9 @@ public class OneDirectionPropagation extends Propagation {
 		queue.addAll(results.keySet());
 
 		while (queue.size() > 0) {
-			layers.addAll(getAdjacentOutputLayers(queue.poll()));
+			List<Layer> adjacent = getAdjacentOutputLayers(queue.poll());
+			queue.addAll(adjacent);
+			layers.addAll(adjacent);
 		}
 
 		super.propagateForward();
@@ -46,7 +49,9 @@ public class OneDirectionPropagation extends Propagation {
 		queue.addAll(results.keySet());
 
 		while (queue.size() > 0) {
-			queue.addAll(getAdjacentInputLayers(queue.poll()));
+			List<Layer> adjacent = getAdjacentInputLayers(queue.poll());
+			queue.addAll(adjacent);
+			layers.addAll(adjacent);
 		}
 
 		super.propagateForward();

@@ -1,4 +1,4 @@
-package com.github.neuralnetworks.architecture.activation;
+package com.github.neuralnetworks.activation;
 
 /**
  *
@@ -8,7 +8,6 @@ package com.github.neuralnetworks.architecture.activation;
 public class RepeaterFunction implements ActivationFunction {
 
 	@Override
-	public float[] value(float[] input) {
-		return input;
+	public void value(float[] input) {
 	}
 }

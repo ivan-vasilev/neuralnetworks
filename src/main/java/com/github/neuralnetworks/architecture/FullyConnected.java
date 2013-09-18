@@ -26,7 +26,7 @@ public class FullyConnected extends Connections {
 			neuronWeightsStartPosition[i] = outputLayer.getNeuronCount() * i;
 		}
 
-		connectionGraph = new ConnectionGraph(weights, outputLayer.getNeuronCount());
+		connectionGraph = new ConnectionGraph(weights, inputLayer.getNeuronCount());
 	}
 
 	@Override
