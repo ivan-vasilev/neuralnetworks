@@ -9,16 +9,16 @@ import java.util.List;
  * @author hok
  *
  */
-public class NeuralNetwork implements IINputOutputLayers {
+public class NeuralNetwork implements InputOutputLayers {
 
 	protected Layer inputLayer;
 	protected Layer outputLayer;
-	protected List<IConnections> connections;
+	protected List<Connections> connections;
 	protected List<Layer> layers;
 
 	public NeuralNetwork() {
 		super();
-		this.connections = new ArrayList<IConnections>();
+		this.connections = new ArrayList<Connections>();
 		this.layers = new ArrayList<Layer>();
 	}
 
@@ -26,7 +26,7 @@ public class NeuralNetwork implements IINputOutputLayers {
 		super();
 		this.inputLayer = inputLayer;
 		this.outputLayer = outputLayer;
-		this.connections = new ArrayList<IConnections>();
+		this.connections = new ArrayList<Connections>();
 		this.layers = new ArrayList<Layer>();
 	}
 
@@ -40,11 +40,11 @@ public class NeuralNetwork implements IINputOutputLayers {
 		return outputLayer;
 	}
 
-	public List<IConnections> getConnections() {
+	public List<Connections> getConnections() {
 		return connections;
 	}
 
-	public void setConnections(List<IConnections> connections) {
+	public void setConnections(List<Connections> connections) {
 		this.connections = connections;
 	}
 

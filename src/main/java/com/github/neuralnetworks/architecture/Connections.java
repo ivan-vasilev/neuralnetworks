@@ -1,40 +1,23 @@
 package com.github.neuralnetworks.architecture;
 
-
 /**
- * this abstract class serves as a base for all weight matrices
- *
- * @author hok
+ * the classes that implement this interface need to be able to return either inbound or outbound connections to the neuron
  *
  */
-public abstract class Connections implements IConnections {
+public interface Connections extends InputOutputLayers {
 
 	/**
-	 * input layer of neurons
+	 * @return the start neuron of the input layer neurons
 	 */
-	protected Layer inputLayer;
+	public int getInputLayerStartNeuron();
 
 	/**
-	 * output layer
+	 * @return the start neuron of the output layer neurons
 	 */
-	protected Layer outputLayer;
+	public int getOutputLayerStartNeuron();
 
-	public Connections(Layer inputLayer, Layer outputLayer) {
-		super();
-		this.inputLayer = inputLayer;
-		this.outputLayer = outputLayer;
-
-		inputLayer.addOutboundConnectionGraph(this);
-		outputLayer.addInboundConnectionGraph(this);
-	}
-
-	@Override
-	public Layer getInputLayer() {
-		return inputLayer;
-	}
-
-	@Override
-	public Layer getOutputLayer() {
-		return outputLayer;
-	}
+	/**
+	 * @return ConnectionGraph with weights
+	 */
+	public ConnectionGraph getConnectionGraph();
 }

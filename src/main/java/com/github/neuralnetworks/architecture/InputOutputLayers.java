@@ -7,7 +7,7 @@ package com.github.neuralnetworks.architecture;
  * @author hok
  *
  */
-public interface IINputOutputLayers {
+public interface InputOutputLayers {
 	public Layer getInputLayer();
 	public Layer getOutputLayer();
 }

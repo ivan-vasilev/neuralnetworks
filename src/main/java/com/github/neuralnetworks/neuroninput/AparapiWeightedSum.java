@@ -1,8 +1,8 @@
-package com.github.neuralnetworks.input;
+package com.github.neuralnetworks.neuroninput;
 
 import com.amd.aparapi.Kernel;
 import com.github.neuralnetworks.architecture.ConnectionGraph;
-import com.github.neuralnetworks.architecture.IConnections;
+import com.github.neuralnetworks.architecture.Connections;
 
 /**
  * weighted sum input function
@@ -15,7 +15,7 @@ public class AparapiWeightedSum implements InputFunction {
 	private static final long serialVersionUID = 8650655018964028006L;
 
 	@Override
-	public void calculateForward(IConnections graph, final float[] inputValues, final float[] result) {
+	public void calculateForward(Connections graph, final float[] inputValues, final float[] result) {
 		ConnectionGraph cg = graph.getConnectionGraph();
 		final float weights[] = cg.getWeights();
 		final int neuronWeightsCount = cg.getNeuronWeightsCount();
@@ -27,7 +27,6 @@ public class AparapiWeightedSum implements InputFunction {
 			public void run() {
 				int id = getGlobalId();
 				for (int i = 0; i < neuronWeightsCount; i++) {
-					System.out.println(id);
 					result[outputStartIndex + id] += inputValues[inputStartIndex + i] * weights[neuronWeightsCount * id + i];
 				}
 			}
@@ -37,7 +36,7 @@ public class AparapiWeightedSum implements InputFunction {
 	}
 
 	@Override
-	public void calculateBackward(IConnections graph, final float[] inputValues, final float[] result) {
+	public void calculateBackward(Connections graph, final float[] inputValues, final float[] result) {
 		ConnectionGraph cg = graph.getConnectionGraph();
 		final float weights[] = cg.getWeights();
 		final int neuronWeightsCount = cg.getNeuronWeightsCount();

@@ -1,8 +1,8 @@
-package com.github.neuralnetworks.input;
+package com.github.neuralnetworks.neuroninput;
 
 import java.util.Arrays;
 
-import com.github.neuralnetworks.architecture.IConnections;
+import com.github.neuralnetworks.architecture.Connections;
 
 /**
  * this input function always returns constant value
@@ -24,12 +24,12 @@ public class ConstantInput implements InputFunction {
 	}
 
 	@Override
-	public void calculateForward(IConnections graph, float[] inputValues, float[] result) {
+	public void calculateForward(Connections graph, float[] inputValues, float[] result) {
 		Arrays.fill(result, output);
 	}
 
 	@Override
-	public void calculateBackward(IConnections graph, float[] inputValues, float[] result) {
+	public void calculateBackward(Connections graph, float[] inputValues, float[] result) {
 		Arrays.fill(result, output);
 	}
 }

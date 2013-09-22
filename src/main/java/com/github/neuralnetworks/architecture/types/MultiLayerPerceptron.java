@@ -8,8 +8,8 @@ import com.github.neuralnetworks.activation.RepeaterFunction;
 import com.github.neuralnetworks.architecture.FullyConnected;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
-import com.github.neuralnetworks.input.AparapiWeightedSum;
-import com.github.neuralnetworks.input.InputFunction;
+import com.github.neuralnetworks.neuroninput.AparapiWeightedSum;
+import com.github.neuralnetworks.neuroninput.InputFunction;
 import com.github.neuralnetworks.util.Constants;
 
 /**

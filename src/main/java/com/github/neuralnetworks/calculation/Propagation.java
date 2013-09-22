@@ -4,63 +4,34 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.github.neuralnetworks.architecture.IConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.events.PropagationEvent;
 import com.github.neuralnetworks.events.PropagationEventListener;
 
 /**
  *
- * implements propagation (forward and backward) of inputs through a network
+ * implements propagation (forward and backward) through a network
  *
  */
-public abstract class Propagation {
+public class Propagation {
 
-	protected Map<Layer, float[]> results;
-	protected ICalculateLayer calculator;
+	protected Map<Layer, float[]> calculated;
+	protected LayerCalculatorProvider layerCalculatorProvider;
+	protected LayerOrderStrategy layerOrderStrategy;
 	protected List<PropagationEventListener> listeners = new ArrayList<>();
 
-	public Propagation(Map<Layer, float[]> results, ICalculateLayer calculator) {
+	public Propagation(Map<Layer, float[]> calculated, LayerCalculatorProvider layerCalculatorProvider, LayerOrderStrategy layerOrderStrategy) {
 		super();
-		this.results = results;
-		this.calculator = calculator;
+		this.calculated = calculated;
+		this.layerCalculatorProvider = layerCalculatorProvider;
+		this.layerOrderStrategy = layerOrderStrategy;
 	}
 
-	protected List<Layer> getAdjacentOutputLayers(Layer layer) {
-		List<Layer> result = new ArrayList<Layer>();
-		if (layer.getOutboundConnectionGraphs() != null) {
-			for (IConnections c : layer.getOutboundConnectionGraphs()) {
-				result.add(c.getOutputLayer());
-			}
-		}
-
-		return result;
-	}
-
-	protected List<Layer> getAdjacentInputLayers(Layer layer) {
-		List<Layer> result = new ArrayList<Layer>();
-		if (layer.getInboundConnectionGraphs() != null) {
-			for (IConnections c : layer.getInboundConnectionGraphs()) {
-				result.add(c.getOutputLayer());
-			}
-		}
-
-		return result;
-	}
-
-	public void propagateForward() {
-		while (hasMoreLayers()) {
-			Layer layer = getNextLayer();
-			results.put(layer, calculator.calculateForward(results, layer));
-			triggerEvent(new PropagationEvent(layer, results));
-		}
-	}
-
-	public void propagateBackward() {
-		while (hasMoreLayers()) {
-			Layer layer = getNextLayer();
-			results.put(layer, calculator.calculateBackward(results, layer));
-			triggerEvent(new PropagationEvent(layer, results));
+	public void propagate() {
+		Layer layer = null; layerOrderStrategy.getNextLayer();
+		while ((layer = layerOrderStrategy.getNextLayer()) != null) {
+			calculated.put(layer, layerCalculatorProvider.getCalculator(layer).calculate(calculated, layer));
+			triggerEvent(new PropagationEvent(layer, calculated));
 		}
 	}
 
@@ -72,24 +43,29 @@ public abstract class Propagation {
 		listeners.remove(listener);
 	}
 
-	public Map<Layer, float[]> getResults() {
-		return results;
+	public Map<Layer, float[]> getCalculated() {
+		return calculated;
 	}
 
-	public void setResults(Map<Layer, float[]> results) {
-		this.results = results;
+	public void setCalculated(Map<Layer, float[]> calculated) {
+		this.calculated = calculated;
 	}
 
 	public void reset() {
-		results.clear();
+		calculated.clear();
 	}
-
-	public abstract boolean hasMoreLayers();
-	public abstract Layer getNextLayer();
 
 	protected void triggerEvent(PropagationEvent event) {
 		for (PropagationEventListener l : listeners) {
 			l.handleEvent(event);
 		}
+	}
+
+	public LayerOrderStrategy getLayerOrderStrategy() {
+		return layerOrderStrategy;
+	}
+
+	public void setLayerOrderStrategy(LayerOrderStrategy layerOrderStrategy) {
+		this.layerOrderStrategy = layerOrderStrategy;
 	}
 }
