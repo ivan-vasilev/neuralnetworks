@@ -19,5 +19,15 @@ public class StochasticGradientDescentTrainer extends Trainer {
 		inputPropagation.reset();
 		inputPropagation.getCalculated().put(neuralNetwork.getInputLayer(), data.getInput());
 		inputPropagation.propagate();
+
+		float error[] = new float[neuralNetwork.getOutputLayer().getNeuronCount()];
+		float calculatedOutput[] = inputPropagation.getCalculated().get(neuralNetwork.getOutputLayer());
+		for (int i = 0; i < error.length; i++) {
+			error[i] = data.getTarget()[i] - calculatedOutput[i];
+		}
+
+		errorPropagation.reset();
+		errorPropagation.getCalculated().put(neuralNetwork.getOutputLayer(), error);
+		errorPropagation.propagate();
 	}
 }
