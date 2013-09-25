@@ -2,22 +2,27 @@ package com.github.neuralnetworks.architecture;
 
 /**
  *
- * represents a fully connected weight matrix between two layers of neurons
+ * represents a single dimension array for one-to-one link between layers (for example for use with biases)
  *
  */
-public class FullyConnected extends ConnectionsImpl {
+public class OneToOne extends ConnectionsImpl {
 
 	private ConnectionGraph connectionGraph;
 	private int inputLayerStartNeuron;
 	private int outputLayerStartNeuron;
 
-	public FullyConnected(Layer inputLayer, Layer outputLayer) {
+	public OneToOne(Layer inputLayer, Layer outputLayer) {
 		super(inputLayer, outputLayer);
 
 		// initialize input/output bindings
 		outputLayerStartNeuron = inputLayerStartNeuron = 0;
 
-		connectionGraph = new ConnectionGraph(new float[inputLayer.getNeuronCount() * outputLayer.getNeuronCount()], inputLayer.getNeuronCount());
+		if (inputLayer.getNeuronCount() != outputLayer.getNeuronCount()) {
+			throw new IllegalArgumentException("layers must have equal neurons count");
+		}
+
+		// initialize weights array
+		connectionGraph = new ConnectionGraph(new float[inputLayer.getNeuronCount()], 1);
 	}
 
 	@Override

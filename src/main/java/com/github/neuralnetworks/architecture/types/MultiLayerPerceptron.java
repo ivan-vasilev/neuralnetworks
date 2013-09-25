@@ -8,7 +8,9 @@ import com.github.neuralnetworks.activation.RepeaterFunction;
 import com.github.neuralnetworks.architecture.FullyConnected;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
+import com.github.neuralnetworks.architecture.OneToOne;
 import com.github.neuralnetworks.neuroninput.AparapiWeightedSum;
+import com.github.neuralnetworks.neuroninput.ConstantInput;
 import com.github.neuralnetworks.neuroninput.InputFunction;
 import com.github.neuralnetworks.util.Constants;
 
@@ -38,10 +40,15 @@ public class MultiLayerPerceptron extends NeuralNetwork {
 		layers.add(inputLayer);
 
 		// layers are created
-		int biasLength = addBias ? 1 : 0;
 		for (int i = 1; i < layerProperties.size(); i++) {
-			layers.add(new Layer(layerProperties.get(i) + biasLength, inputFunction, activationFunction));
+			layers.add(new Layer(layerProperties.get(i), inputFunction, activationFunction));
+			if (addBias) {
+				Layer bias = new Layer(layerProperties.get(i), new ConstantInput(1), new RepeaterFunction());
+				layers.add(bias);
+				connections.add(new OneToOne(inputLayer, bias));
+			}
 		}
+
 		outputLayer = layers.get(layers.size() - 1);
 
 		// layer connections

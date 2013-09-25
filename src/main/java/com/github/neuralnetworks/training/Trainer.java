@@ -1,5 +1,7 @@
 package com.github.neuralnetworks.training;
 
+import java.util.Map;
+
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 
 /**
@@ -11,11 +13,13 @@ public abstract class Trainer {
 
 	protected NeuralNetwork neuralNetwork;
 	protected TrainingInputProvider inputProvider;
+	protected Map<String, Object> properties;
 
-	public Trainer(NeuralNetwork neuralNetwork, TrainingInputProvider inputProvider) {
+	public Trainer(NeuralNetwork neuralNetwork, TrainingInputProvider inputProvider, Map<String, Object> properties) {
 		super();
 		this.neuralNetwork = neuralNetwork;
 		this.inputProvider = inputProvider;
+		this.properties = properties;
 	}
 
 	public void train() {
