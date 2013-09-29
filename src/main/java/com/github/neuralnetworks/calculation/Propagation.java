@@ -1,6 +1,7 @@
 package com.github.neuralnetworks.calculation;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,29 +19,53 @@ public class Propagation {
 	protected Map<Layer, float[]> calculated;
 	protected LayerCalculatorProvider layerCalculatorProvider;
 	protected LayerOrderStrategy layerOrderStrategy;
-	protected List<PropagationEventListener> listeners = new ArrayList<>();
+	protected List<PropagationEventListener> listeners;
 
-	public Propagation(Map<Layer, float[]> calculated, LayerCalculatorProvider layerCalculatorProvider, LayerOrderStrategy layerOrderStrategy) {
+	public Propagation() {
 		super();
-		this.calculated = calculated;
+	}
+
+	public Propagation(LayerCalculatorProvider layerCalculatorProvider, LayerOrderStrategy layerOrderStrategy) {
+		super();
+		this.calculated = new HashMap<Layer, float[]>();
 		this.layerCalculatorProvider = layerCalculatorProvider;
 		this.layerOrderStrategy = layerOrderStrategy;
 	}
 
-	public void propagate() {
-		Layer layer = null; layerOrderStrategy.getNextLayer();
-		while ((layer = layerOrderStrategy.getNextLayer()) != null) {
-			calculated.put(layer, layerCalculatorProvider.getCalculator(layer).calculate(calculated, layer));
+	/**
+	 * @param values - values clamped to the input layer
+	 * @param startLayer - input layer
+	 * @return - the last calculated layer (presumably the output layer)
+	 */
+	public float[] propagate(float[] values, Layer startLayer) {
+		float[] result = null;
+		calculated.clear();
+		calculated.put(startLayer, values);
+		layerOrderStrategy.setCurrentLayer(startLayer);
+
+		while (layerOrderStrategy.hasNext()) {
+			Layer layer = layerOrderStrategy.next();
+			result = new float[layer.getNeuronCount()];
+			layerCalculatorProvider.getCalculator(layer).calculate(calculated, layer, result);
+			calculated.put(layer, result);
 			triggerEvent(new PropagationEvent(layer, calculated));
 		}
+
+		return result;
 	}
 
 	public void addEventListener(PropagationEventListener listener) {
+		if (listeners == null) {
+			listeners = new ArrayList<>();
+		}
+
 		listeners.add(listener);
 	}
 
 	public void removeEventListener(PropagationEventListener listener) {
-		listeners.remove(listener);
+		if (listeners != null) {
+			listeners.remove(listener);
+		}
 	}
 
 	public Map<Layer, float[]> getCalculated() {
@@ -67,5 +92,13 @@ public class Propagation {
 
 	public void setLayerOrderStrategy(LayerOrderStrategy layerOrderStrategy) {
 		this.layerOrderStrategy = layerOrderStrategy;
+	}
+
+	public LayerCalculatorProvider getLayerCalculatorProvider() {
+		return layerCalculatorProvider;
+	}
+
+	public void setLayerCalculatorProvider(LayerCalculatorProvider layerCalculatorProvider) {
+		this.layerCalculatorProvider = layerCalculatorProvider;
 	}
 }

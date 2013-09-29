@@ -15,5 +15,5 @@ public interface LayerCalculator {
 	 * @param calculatedLayers - existing results
 	 * @param layer - the layer to be calculated
 	 */
-	public float[] calculate(Map<Layer, float[]> calculatedLayers, Layer layer);
+	public void calculate(Map<Layer, float[]> calculatedLayers, Layer layer, float[] result);
 }

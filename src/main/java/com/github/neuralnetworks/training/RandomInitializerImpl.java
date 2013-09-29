@@ -10,35 +10,45 @@ import java.util.Random;
 public class RandomInitializerImpl implements RandomInitializer {
 
 	protected Random random;
-	protected float max;
+	protected float start;
+	protected float range;
 
 	public RandomInitializerImpl() {
 		super();
 		this.random = new Random();
-		this.max = 1;
+		this.start = 0;
+		this.range = 1;
 	}
 
 	public RandomInitializerImpl(Random random) {
 		super();
 		this.random = random;
-		this.max = 1;
+		this.start = 0;
+		this.range = 1;
 	}
 
-	public RandomInitializerImpl(Random random, float max) {
+	public RandomInitializerImpl(Random random, float start, float range) {
 		super();
 		this.random = random;
-		this.max = max;
+		this.start = start;
+		this.range = range;
 	}
 
 	@Override
 	public void initialize(float[] array) {
-		if (max == 1) {
-			for (int i = 0; i < array.length; i++) {
-				array[i] = random.nextFloat();
+		if (start == 0) {
+			if (range == 1) {
+				for (int i = 0; i < array.length; i++) {
+					array[i] = random.nextFloat();
+				}
+			} else {
+				for (int i = 0; i < array.length; i++) {
+					array[i] = start + random.nextFloat();
+				}
 			}
 		} else {
 			for (int i = 0; i < array.length; i++) {
-				array[i] = random.nextFloat() * max;
+				array[i] = start + random.nextFloat() * start;
 			}
 		}
 	}
@@ -51,11 +61,19 @@ public class RandomInitializerImpl implements RandomInitializer {
 		this.random = random;
 	}
 
-	public float getMax() {
-		return max;
+	public float getStart() {
+		return start;
 	}
 
-	public void setMax(float max) {
-		this.max = max;
+	public void setStart(float start) {
+		this.start = start;
+	}
+
+	public float getRange() {
+		return range;
+	}
+
+	public void setRange(float range) {
+		this.range = range;
 	}
 }

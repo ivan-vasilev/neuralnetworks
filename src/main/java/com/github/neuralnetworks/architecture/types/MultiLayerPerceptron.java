@@ -1,7 +1,6 @@
 package com.github.neuralnetworks.architecture.types;
 
 import java.util.List;
-import java.util.Map;
 
 import com.github.neuralnetworks.activation.ActivationFunction;
 import com.github.neuralnetworks.activation.RepeaterFunction;
@@ -13,6 +12,7 @@ import com.github.neuralnetworks.neuroninput.AparapiWeightedSum;
 import com.github.neuralnetworks.neuroninput.ConstantInput;
 import com.github.neuralnetworks.neuroninput.InputFunction;
 import com.github.neuralnetworks.util.Constants;
+import com.github.neuralnetworks.util.Properties;
 
 /**
  * a Multi Layer perceptron network
@@ -25,8 +25,11 @@ public class MultiLayerPerceptron extends NeuralNetwork {
 	/**
 	 * @param layers - number of layers and number of neurons in each layer
 	 */
-	public MultiLayerPerceptron(List<Integer> layerProperties, Map<String, Object> properties) {
-		super();
+	public MultiLayerPerceptron(Properties properties) {
+		super(properties);
+
+		@SuppressWarnings("unchecked")
+		List<Integer> layerProperties = (List<Integer>) properties.get(Constants.LAYERS);
 		if (layerProperties.size() < 2) {
 			throw new IllegalArgumentException("The newtork must have at least one layer");
 		}
@@ -45,7 +48,7 @@ public class MultiLayerPerceptron extends NeuralNetwork {
 			if (addBias) {
 				Layer bias = new Layer(layerProperties.get(i), new ConstantInput(1), new RepeaterFunction());
 				layers.add(bias);
-				connections.add(new OneToOne(inputLayer, bias));
+				connections.add(new OneToOne(bias, inputLayer));
 			}
 		}
 

@@ -6,22 +6,30 @@ import java.util.Queue;
 
 import com.github.neuralnetworks.architecture.Layer;
 
-public abstract class OneDirectionLayerOrder implements LayerOrderStrategy {
+public abstract class OneDirectionLayerIterator implements LayerOrderStrategy {
 
-	private Queue<Layer> layers = new LinkedList<>();
+	private Queue<Layer> layers;
 
-	public OneDirectionLayerOrder() {
+	public OneDirectionLayerIterator(Layer layer) {
 		super();
-	}
 
-	public OneDirectionLayerOrder(Layer currentLayer) {
-		super();
-		setCurrentLayer(currentLayer);
+		layers = new LinkedList<>();
+		setCurrentLayer(layer);
 	}
 
 	@Override
-	public Layer getNextLayer() {
+	public boolean hasNext() {
+		return layers.size() > 0;
+	}
+
+	@Override
+	public Layer next() {
 		return layers.poll();
+	}
+
+	@Override
+	public void remove() {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

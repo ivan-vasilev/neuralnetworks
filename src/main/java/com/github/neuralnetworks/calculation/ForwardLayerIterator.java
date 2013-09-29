@@ -4,10 +4,14 @@ import java.util.List;
 
 import com.github.neuralnetworks.architecture.Layer;
 
-public class BackwardLayerOrder extends OneDirectionLayerOrder {
+public class ForwardLayerIterator extends OneDirectionLayerIterator {
+
+	public ForwardLayerIterator(Layer layer) {
+		super(layer);
+	}
 
 	@Override
 	protected List<Layer> getAdjacentLayers(Layer layer) {
-		return layer.getAdjacentInputLayers();
+		return layer.getAdjacentOutputLayers();
 	}
 }

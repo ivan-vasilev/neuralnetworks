@@ -3,6 +3,8 @@ package com.github.neuralnetworks.architecture;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.github.neuralnetworks.util.Properties;
+
 
 /**
  * this is the base class for all the neural networks
@@ -15,9 +17,11 @@ public class NeuralNetwork implements InputOutputLayers {
 	protected Layer outputLayer;
 	protected List<Connections> connections;
 	protected List<Layer> layers;
+	protected Properties properties;
 
-	public NeuralNetwork() {
+	public NeuralNetwork(Properties properties) {
 		super();
+		this.properties = properties;
 		this.connections = new ArrayList<Connections>();
 		this.layers = new ArrayList<Layer>();
 	}
@@ -54,5 +58,13 @@ public class NeuralNetwork implements InputOutputLayers {
 
 	public void setLayers(List<Layer> layers) {
 		this.layers = layers;
+	}
+
+	public Properties getProperties() {
+		return properties;
+	}
+
+	public void setProperties(Properties properties) {
+		this.properties = properties;
 	}
 }

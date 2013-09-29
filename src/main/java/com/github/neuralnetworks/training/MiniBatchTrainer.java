@@ -1,24 +1,27 @@
 package com.github.neuralnetworks.training;
 
 import java.util.List;
-import java.util.Map;
 
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.util.Constants;
+import com.github.neuralnetworks.util.Properties;
 
-public abstract class MiniBatchTrainer extends Trainer {
+public abstract class MiniBatchTrainer<N extends NeuralNetwork> extends Trainer<N> {
 
 	private List<TrainingInputData> currentBatch;
-	private int batchSize;
 
-	public MiniBatchTrainer(NeuralNetwork neuralNetwork, TrainingInputProvider inputProvider, Map<String, Object> properties) {
-		super(neuralNetwork, inputProvider, properties);
-		this.batchSize = (int) properties.get(Constants.BATCH_SIZE);
+	public MiniBatchTrainer() {
+		super();
+	}
+
+	public MiniBatchTrainer(Properties properties) {
+		super(properties);
 	}
 
 	@Override
 	protected void learnInput(TrainingInputData data, int index) {
 		currentBatch.add(data);
+		int batchSize = (int) properties.get(Constants.BATCH_SIZE);
 		if (index % batchSize == 0 || stopTraining(index)) {
 			learnMiniBatchInput(currentBatch, index);
 			currentBatch.clear();
