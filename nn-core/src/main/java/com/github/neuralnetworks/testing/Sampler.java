@@ -6,6 +6,8 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -18,7 +20,13 @@ import com.github.neuralnetworks.util.Util;
  *
  */
 public class Sampler {
+
 	protected List<Trainer<?>> trainingConfigurations;
+
+	public Sampler() {
+		super();
+		this.trainingConfigurations = new ArrayList<>();
+	}
 
 	public Sampler(List<Trainer<?>> trainingConfigurations) {
 		super();
@@ -26,7 +34,7 @@ public class Sampler {
 	}
 
 	public void sample() {
-		Path newFile = Paths.get(new Date().toString() + ".txt");
+		Path newFile = Paths.get(DateFormat.getDateInstance().format(new Date()) + ".txt");
 		try (BufferedWriter writer = Files.newBufferedWriter(newFile, Charset.defaultCharset())) {
 			for (Trainer<?> t : trainingConfigurations) {
 				t.train();

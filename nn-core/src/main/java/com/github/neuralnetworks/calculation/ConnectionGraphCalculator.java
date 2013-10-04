@@ -1,5 +1,6 @@
 package com.github.neuralnetworks.calculation;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import com.github.neuralnetworks.architecture.Connections;
@@ -20,14 +21,18 @@ public class ConnectionGraphCalculator implements LayerCalculator {
 	}
 
 	@Override
-	public void calculate(Map<Layer, float[]> calculatedLayers, Layer layer, float[] result) {
+	public void calculate(Map<Layer, float[]> calculatedLayers, Layer layer) {
+		if (!calculatedLayers.containsKey(layer)) {
+			calculatedLayers.put(layer, new float[layer.getNeuronCount()]);
+		} else {
+			Arrays.fill(calculatedLayers.get(layer), 0);
+		}
+
+		float[] result = calculatedLayers.get(layer);
 		if (connections.getInputLayer() == layer) {
-			result = new float[layer.getNeuronCount()];
 			layer.getInputFunction().calculateBackward(connections, calculatedLayers.get(connections.getOutputLayer()), result);
 		} else if (connections.getOutputLayer() == layer) {
-			result = new float[layer.getNeuronCount()];
 			layer.getInputFunction().calculateForward(connections, calculatedLayers.get(connections.getInputLayer()), result);
 		}
 	}
-
 }

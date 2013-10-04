@@ -23,4 +23,5 @@ public class Constants {
 	public static final String OUTPUT_ERROR = "outputError";
 	public static final String RANDOM_INITIALIZER = "randomInitializer";
 	public static final String TEST_PROPAGATION = "testPropagation";
+	public static final String LAYER_CALCULATOR = "layerCalculator";
 }

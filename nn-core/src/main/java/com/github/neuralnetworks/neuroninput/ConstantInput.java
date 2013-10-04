@@ -32,4 +32,12 @@ public class ConstantInput implements InputFunction {
 	public void calculateBackward(Connections graph, float[] inputValues, float[] result) {
 		Arrays.fill(result, output);
 	}
+
+	public float getOutput() {
+		return output;
+	}
+
+	public void setOutput(float output) {
+		this.output = output;
+	}
 }

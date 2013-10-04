@@ -92,16 +92,16 @@ public class ContrastiveDivergenceAparapiTrainer extends MiniBatchTrainer<RBM> {
 			results.put(neuralNetwork.getVisibleLayer(), posPhaseVisible);
 
 			// calculate positive phase
-			calculator.calculate(results, neuralNetwork.getHiddenLayer(), posPhaseHidden);
 			results.put(neuralNetwork.getHiddenLayer(), posPhaseHidden);
+			calculator.calculate(results, neuralNetwork.getHiddenLayer());
 
 			// Gibbs sampling
 			int gibbsSamplingCount = properties.containsKey(Constants.GIBBS_SAMPLING_COUNT) ? (int) properties.get(Constants.GIBBS_SAMPLING_COUNT) : 1;
 			for (int i = 0; i < gibbsSamplingCount; i++) {
-				calculator.calculate(results, neuralNetwork.getVisibleLayer(), negPhaseVisible);
 				results.put(neuralNetwork.getVisibleLayer(), negPhaseVisible);
-				calculator.calculate(results, neuralNetwork.getHiddenLayer(), negPhaseHidden);
+				calculator.calculate(results, neuralNetwork.getVisibleLayer());
 				results.put(neuralNetwork.getHiddenLayer(), negPhaseHidden);
+				calculator.calculate(results, neuralNetwork.getHiddenLayer());
 			}
 
 			// add to existing update

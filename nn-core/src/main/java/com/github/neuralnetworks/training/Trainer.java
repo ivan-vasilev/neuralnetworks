@@ -1,9 +1,14 @@
 package com.github.neuralnetworks.training;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.github.neuralnetworks.architecture.Connections;
+import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
+import com.github.neuralnetworks.calculation.LayerCalculator;
 import com.github.neuralnetworks.calculation.OutputError;
-import com.github.neuralnetworks.calculation.Propagation;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
 
@@ -37,16 +42,28 @@ public abstract class Trainer<N extends NeuralNetwork> {
 	public float test() {
 		TrainingInputProvider ip = getTestingInputProvider();
 		NeuralNetwork n = getNeuralNetwork();
-		Propagation p = getTestPropagation();
+		LayerCalculator c = getTestLayerCalculator();
 
 		OutputError e = getOutputError();
 		e.setTotalNetworkError(0);
 
+		Map<Layer, float[]> calculatedLayers = new HashMap<>();
 		TrainingInputData input = null;
+
 		while ((input = ip.getNextInput()) != null) {
-			p.propagate(input.getInput(), n.getInputLayer());
-			float[] networkOutput = p.getCalculated().get(n.getOutputLayer());
-			e.delta(networkOutput, input.getTarget());
+			for (float[] r : calculatedLayers.values()) {
+				Arrays.fill(r, 0);
+			}
+
+			float[] r = calculatedLayers.get(n.getInputLayer());
+			if (r == null) {
+				r = new float[n.getInputLayer().getNeuronCount()];
+				calculatedLayers.put(n.getInputLayer(), r);
+			}
+			System.arraycopy(input.getInput(), 0, r, 0, r.length);
+
+			c.calculate(calculatedLayers, n.getOutputLayer());
+			e.delta(calculatedLayers.get(n.getOutputLayer()), input.getTarget());
 		}
 
 		return e.getTotalNetworkError();
@@ -92,12 +109,12 @@ public abstract class Trainer<N extends NeuralNetwork> {
 		properties.setParameter(Constants.OUTPUT_ERROR, outputError);
 	}
 
-	public Propagation getTestPropagation() {
-		return properties.getParameter(Constants.TEST_PROPAGATION);
+	public LayerCalculator getTestLayerCalculator() {
+		return properties.getParameter(Constants.LAYER_CALCULATOR);
 	}
 
-	public void setTestPropagation(Propagation testPropagation) {
-		properties.setParameter(Constants.TEST_PROPAGATION, testPropagation);
+	public void setTestLayerCalculator(LayerCalculator layerCalculator) {
+		properties.setParameter(Constants.TEST_PROPAGATION, layerCalculator);
 	}
 
 	protected boolean stopTraining(int index) {

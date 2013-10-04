@@ -1,9 +1,7 @@
 package com.github.neuralnetworks.architecture;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import com.github.neuralnetworks.activation.ActivationFunction;
 import com.github.neuralnetworks.neuroninput.InputFunction;
@@ -20,8 +18,7 @@ public class Layer implements Serializable {
 	private int neuronCount;
 	private InputFunction inputFunction;
 	private ActivationFunction activationFunction;
-	private Connections[] inboundConnectionGraphs;
-	private Connections[] outboundConnectionGraphs;
+	private Connections[] connectionGraphs;
 
 	public Layer(int neuronCount) {
 		super();
@@ -35,13 +32,12 @@ public class Layer implements Serializable {
 		this.activationFunction = activationFunction;
 	}
 
-	public Layer(int neuronCount, InputFunction inputFunction, ActivationFunction activationFunction, Connections[] inboundConnectionGraphs, Connections[] outboundConnectionGraphs) {
+	public Layer(int neuronCount, InputFunction inputFunction, ActivationFunction activationFunction, Connections[] connectionGraphs) {
 		super();
 		this.neuronCount = neuronCount;
 		this.inputFunction = inputFunction;
 		this.activationFunction = activationFunction;
-		this.inboundConnectionGraphs = inboundConnectionGraphs;
-		this.outboundConnectionGraphs = outboundConnectionGraphs;
+		this.connectionGraphs = connectionGraphs;
 	}
 
 	public int getNeuronCount() {
@@ -68,61 +64,21 @@ public class Layer implements Serializable {
 		this.activationFunction = activationFunction;
 	}
 
-	public Connections[] getInboundConnectionGraphs() {
-		return inboundConnectionGraphs;
+	public Connections[] getConnectionGraphs() {
+		return connectionGraphs;
 	}
 
-	public void setInboundConnectionGraphs(Connections[] inboundConnectionGraphs) {
-		this.inboundConnectionGraphs = inboundConnectionGraphs;
+	public void setConnectionGraphs(Connections[] connectionGraphs) {
+		this.connectionGraphs = connectionGraphs;
 	}
 
-	public Connections[] getOutboundConnectionGraphs() {
-		return outboundConnectionGraphs;
-	}
-
-	public void setOutboundConnectionGraphs(Connections[] outboundConnectionGraphs) {
-		this.outboundConnectionGraphs = outboundConnectionGraphs;
-	}
-
-	public void addInboundConnectionGraph(Connections graph) {
-		if (inboundConnectionGraphs == null) {
-			inboundConnectionGraphs = new Connections[1];
+	public void addConnectionGraph(Connections graph) {
+		if (connectionGraphs == null) {
+			connectionGraphs = new Connections[1];
 		} else {
-			inboundConnectionGraphs = Arrays.copyOf(inboundConnectionGraphs, inboundConnectionGraphs.length + 1);
+			connectionGraphs = Arrays.copyOf(connectionGraphs, connectionGraphs.length + 1);
 		}
 
-		inboundConnectionGraphs[inboundConnectionGraphs.length - 1] = graph;
-	}
-
-	public void addOutboundConnectionGraph(Connections graph) {
-		if (outboundConnectionGraphs == null) {
-			outboundConnectionGraphs = new Connections[1];
-		} else {
-			outboundConnectionGraphs = Arrays.copyOf(outboundConnectionGraphs, outboundConnectionGraphs.length + 1);
-		}
-
-		outboundConnectionGraphs[outboundConnectionGraphs.length - 1] = graph;
-	}
-
-	public List<Layer> getAdjacentOutputLayers() {
-		List<Layer> result = new ArrayList<Layer>();
-		if (getOutboundConnectionGraphs() != null) {
-			for (Connections c : getOutboundConnectionGraphs()) {
-				result.add(c.getOutputLayer());
-			}
-		}
-
-		return result;
-	}
-
-	public List<Layer> getAdjacentInputLayers() {
-		List<Layer> result = new ArrayList<Layer>();
-		if (getInboundConnectionGraphs() != null) {
-			for (Connections c : getInboundConnectionGraphs()) {
-				result.add(c.getOutputLayer());
-			}
-		}
-
-		return result;
+		connectionGraphs[connectionGraphs.length - 1] = graph;
 	}
 }

@@ -1,6 +1,6 @@
 package com.github.neuralnetworks.calculation;
 
-public class MeanSquaredOutputError extends OutputError {
+public abstract class MeanSquaredOutputError extends OutputError {
 
 	@Override
 	protected void updateTotalNetworkError(float[] delta) {

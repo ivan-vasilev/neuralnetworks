@@ -1,18 +1,15 @@
 package com.github.neuralnetworks.training;
 
-import java.io.Serializable;
 
 /**
  *
  * training input data with target value
  *
  */
-public class TrainingInputData implements Serializable {
-
-	private static final long serialVersionUID = 4518309418687563264L;
+public class TrainingInputData {
 
 	private float[] input;
-	private float[] target;
+	private Object target;
 
 	public TrainingInputData() {
 		super();
@@ -23,16 +20,16 @@ public class TrainingInputData implements Serializable {
 		this.input = input;
 	}
 
-	public TrainingInputData(float[] input, float[] target) {
+	public TrainingInputData(float[] input, Object target) {
 		this.input = input;
 		this.target = target;
 	}
 
-	public float[] getTarget() {
+	public Object getTarget() {
 		return target;
 	}
 
-	public void setTarget(float[] target) {
+	public void setTarget(Object target) {
 		this.target = target;
 	}
 

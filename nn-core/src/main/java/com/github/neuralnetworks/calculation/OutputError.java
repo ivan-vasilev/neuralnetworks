@@ -10,15 +10,12 @@ public abstract class OutputError {
 	protected int iterations;
 	protected float totalNetworkError;
 
-	public float[] delta(float[] networkOutput, float[] targetOutput) {
-		if (networkOutput.length != targetOutput.length) {
-			throw new IllegalArgumentException("network output and target output must be with the same dimensionality");
-		}
+	public float[] delta(float[] networkOutput, Object targetOutput) {
+		float[] delta = new float[networkOutput.length];
 
-		float[] delta = new float[targetOutput.length];
-
+		float[] targetArray = targetToArray(targetOutput);
 		for (int i = 0; i < delta.length; i++) {
-			delta[i] = targetOutput[i] - networkOutput[i];
+			delta[i] = targetArray[i] - networkOutput[i];
 		}
 
 		updateTotalNetworkError(delta);
@@ -35,4 +32,5 @@ public abstract class OutputError {
 	}
 
 	protected abstract void updateTotalNetworkError(float[] delta);
+	protected abstract float[] targetToArray(Object targetOutput);
 }
