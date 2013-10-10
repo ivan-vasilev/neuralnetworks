@@ -7,9 +7,9 @@ package com.github.neuralnetworks.architecture;
  */
 public class FullyConnected extends ConnectionsImpl {
 
-	private ConnectionGraph connectionGraph;
+	private final Matrix connectionGraph;
 	private int inputLayerStartNeuron;
-	private int outputLayerStartNeuron;
+	private final int outputLayerStartNeuron;
 
 	public FullyConnected(Layer inputLayer, Layer outputLayer) {
 		super(inputLayer, outputLayer);
@@ -17,7 +17,7 @@ public class FullyConnected extends ConnectionsImpl {
 		// initialize input/output bindings
 		outputLayerStartNeuron = inputLayerStartNeuron = 0;
 
-		connectionGraph = new ConnectionGraph(new float[inputLayer.getNeuronCount() * outputLayer.getNeuronCount()], inputLayer.getNeuronCount());
+		connectionGraph = new Matrix(new float[inputLayer.getNeuronCount() * outputLayer.getNeuronCount()], inputLayer.getNeuronCount());
 	}
 
 	@Override
@@ -31,7 +31,7 @@ public class FullyConnected extends ConnectionsImpl {
 	}
 
 	@Override
-	public ConnectionGraph getConnectionGraph() {
+	public Matrix getConnectionGraph() {
 		return connectionGraph;
 	}
 }

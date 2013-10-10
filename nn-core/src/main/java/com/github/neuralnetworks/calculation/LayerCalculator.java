@@ -1,8 +1,10 @@
 package com.github.neuralnetworks.calculation;
 
 import java.util.Map;
+import java.util.Set;
 
 import com.github.neuralnetworks.architecture.Layer;
+import com.github.neuralnetworks.architecture.Matrix;
 
 /**
  *
@@ -15,5 +17,10 @@ public interface LayerCalculator {
 	 * @param calculatedLayers - existing results
 	 * @param layer - the layer to be calculated
 	 */
-	public void calculate(Map<Layer, float[]> calculatedLayers, Layer layer);
+	/**
+	 * @param calculatedLayers - calculated layers that are provided as input
+	 * @param results - where the results are written
+	 * @param layer - current layer
+	 */
+	public void calculate(Set<Layer> calculatedLayers, Map<Layer, Matrix> results, Layer layer);
 }

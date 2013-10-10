@@ -1,8 +1,9 @@
-package com.github.neuralnetworks.neuroninput;
+package com.github.neuralnetworks.neuronfunctions;
 
 import java.io.Serializable;
 
 import com.github.neuralnetworks.architecture.Connections;
+import com.github.neuralnetworks.architecture.Matrix;
 
 /**
  * this interface is implemented by neuron input functions
@@ -11,6 +12,5 @@ import com.github.neuralnetworks.architecture.Connections;
  *
  */
 public interface InputFunction extends Serializable {
-	public void calculateForward(Connections graph, float[] inputValues, float[] result);
-	public void calculateBackward(Connections graph, float[] inputValues, float[] result);
+	public void calculate(Connections graph, Matrix input, Matrix output);
 }

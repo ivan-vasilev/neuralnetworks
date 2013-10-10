@@ -3,8 +3,8 @@ package com.github.neuralnetworks.architecture;
 import java.io.Serializable;
 import java.util.Arrays;
 
-import com.github.neuralnetworks.activation.ActivationFunction;
-import com.github.neuralnetworks.neuroninput.InputFunction;
+import com.github.neuralnetworks.neuronfunctions.ActivationFunction;
+import com.github.neuralnetworks.neuronfunctions.InputFunction;
 
 /**
  *
@@ -16,7 +16,8 @@ public class Layer implements Serializable {
 	private static final long serialVersionUID = 1035633207383317489L;
 
 	private int neuronCount;
-	private InputFunction inputFunction;
+	private InputFunction forwardInputFunction;
+	private InputFunction backwardInputFunction;
 	private ActivationFunction activationFunction;
 	private Connections[] connectionGraphs;
 
@@ -25,17 +26,19 @@ public class Layer implements Serializable {
 		this.neuronCount = neuronCount;
 	}
 
-	public Layer(int neuronCount, InputFunction inputFunction, ActivationFunction activationFunction) {
+	public Layer(int neuronCount, InputFunction forwardInputFunction, InputFunction backwardInputFunction, ActivationFunction activationFunction) {
 		super();
 		this.neuronCount = neuronCount;
-		this.inputFunction = inputFunction;
+		this.forwardInputFunction = forwardInputFunction;
+		this.backwardInputFunction = backwardInputFunction;
 		this.activationFunction = activationFunction;
 	}
 
-	public Layer(int neuronCount, InputFunction inputFunction, ActivationFunction activationFunction, Connections[] connectionGraphs) {
+	public Layer(int neuronCount, InputFunction forwardInputFunction, InputFunction backwardInputFunction, ActivationFunction activationFunction, Connections[] connectionGraphs) {
 		super();
 		this.neuronCount = neuronCount;
-		this.inputFunction = inputFunction;
+		this.forwardInputFunction = forwardInputFunction;
+		this.backwardInputFunction = backwardInputFunction;
 		this.activationFunction = activationFunction;
 		this.connectionGraphs = connectionGraphs;
 	}
@@ -48,12 +51,20 @@ public class Layer implements Serializable {
 		this.neuronCount = neuronCount;
 	}
 
-	public InputFunction getInputFunction() {
-		return inputFunction;
+	public InputFunction getForwardInputFunction() {
+		return forwardInputFunction;
 	}
 
-	public void setInputFunction(InputFunction inputFunction) {
-		this.inputFunction = inputFunction;
+	public void setForwardInputFunction(InputFunction forwardInputFunction) {
+		this.forwardInputFunction = forwardInputFunction;
+	}
+
+	public InputFunction getBackwardInputFunction() {
+		return backwardInputFunction;
+	}
+
+	public void setBackwardInputFunction(InputFunction backwardInputFunction) {
+		this.backwardInputFunction = backwardInputFunction;
 	}
 
 	public ActivationFunction getActivationFunction() {

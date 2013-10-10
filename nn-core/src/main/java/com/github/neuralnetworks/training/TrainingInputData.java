@@ -1,5 +1,7 @@
 package com.github.neuralnetworks.training;
 
+import com.github.neuralnetworks.architecture.Matrix;
+
 
 /**
  *
@@ -8,36 +10,36 @@ package com.github.neuralnetworks.training;
  */
 public class TrainingInputData {
 
-	private float[] input;
-	private Object target;
+	private Matrix input;
+	private Object[] target;
 
 	public TrainingInputData() {
 		super();
 	}
 
-	public TrainingInputData(float[] input) {
+	public TrainingInputData(Matrix input) {
 		super();
 		this.input = input;
 	}
 
-	public TrainingInputData(float[] input, Object target) {
+	public TrainingInputData(Matrix input, Object[] target) {
 		this.input = input;
 		this.target = target;
 	}
 
-	public Object getTarget() {
+	public Object[] getTarget() {
 		return target;
 	}
 
-	public void setTarget(Object target) {
+	public void setTarget(Object[] target) {
 		this.target = target;
 	}
 
-	public float[] getInput() {
+	public Matrix getInput() {
 		return input;
 	}
 
-	public void setInput(float[] input) {
+	public void setInput(Matrix input) {
 		this.input = input;
 	}
 }

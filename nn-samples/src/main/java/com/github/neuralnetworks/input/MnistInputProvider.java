@@ -6,98 +6,112 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.training.TrainingInputData;
 import com.github.neuralnetworks.training.TrainingInputProvider;
 
 /**
- *
+ * 
  * MNIST data set with random order
- *
+ * 
  */
 public class MnistInputProvider implements TrainingInputProvider {
 
-	private RandomAccessFile images;
-	private RandomAccessFile labels;
-	private int rows;
-	private int cols;
-	private int inputSize;
-	private int currentIndex;
-	private List<Integer> elementsOrder;
-	private Random random;
+    private RandomAccessFile images;
+    private RandomAccessFile labels;
+    private int rows;
+    private int cols;
+    private int inputSize;
+    private final int batchSize;
+    private List<Integer> elementsOrder;
+    private Random random;
 
-	public MnistInputProvider(String imagesFile, String labelsFile) {
-		super();
-		try {
-			this.images = new RandomAccessFile(imagesFile, "r");
-			this.labels = new RandomAccessFile(labelsFile, "r");
+    public MnistInputProvider(String imagesFile, String labelsFile, int batchSize) {
+	super();
 
-			// magic numbers
-			labels.readInt();
-			labels.readInt();// read size
-			images.readInt();
-			inputSize = images.readInt();
-			rows = images.readInt();
-			cols = images.readInt();
+	this.batchSize = batchSize;
+	try {
+	    this.images = new RandomAccessFile(imagesFile, "r");
+	    this.labels = new RandomAccessFile(labelsFile, "r");
 
-			random = new Random();
-			currentIndex = 0;
-			elementsOrder = new ArrayList<Integer>(inputSize);
-			for (int i = 0; i < inputSize; i++) {
-				elementsOrder.add(i);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
+	    // magic numbers
+	    images.readInt();
+	    inputSize = images.readInt();
+	    rows = images.readInt();
+	    cols = images.readInt();
+
+	    random = new Random();
+	    elementsOrder = new ArrayList<Integer>(inputSize);
+	    for (int i = 0; i < inputSize; i++) {
+		elementsOrder.add(i);
+	    }
+	} catch (IOException e) {
+	    e.printStackTrace();
+	}
+    }
+
+    @Override
+    public TrainingInputData getNextInput() {
+	TrainingInputData result = null;
+	if (elementsOrder.size() > 0) {
+	    int length = elementsOrder.size() > batchSize ? batchSize : elementsOrder.size();
+	    int[] indexes = new int[length];
+	    for (int i = 0; i < length; i++) {
+		indexes[i] = elementsOrder.remove(random.nextInt(elementsOrder.size()));
+	    }
+
+	    result = new TrainingInputData(getImages(indexes), getLabels(indexes));
+	}
+
+	return result;
+    }
+
+    @Override
+    public int getInputSize() {
+	return inputSize;
+    }
+
+    private Matrix getImages(int[] indexes) {
+	int size = cols * rows;
+	Matrix result = new Matrix(new float[size * indexes.length], indexes.length);
+	try {
+	    for (int i = 0; i < indexes.length; i++) {
+		images.seek(16 + size * indexes[i]);
+		for (int j = 0; j < size; j++) {
+		    result.getElements()[j * indexes.length + i] = (float) (images.readUnsignedByte() / 255.0); // input
+														// between
+														// 0
+														// and
+														// 1
 		}
+	    }
+	} catch (IOException e) {
+	    e.printStackTrace();
 	}
 
-	@Override
-	public TrainingInputData getNextInput() {
-		TrainingInputData result = null;
-		if (elementsOrder.size() > 0) {
-			currentIndex = elementsOrder.remove(random.nextInt(elementsOrder.size()));
-			result = new TrainingInputData(getImage(currentIndex), getLabel(currentIndex));
-		}
+	return result;
+    }
 
-		return result;
+    private Integer[] getLabels(int indexes[]) {
+	Integer[] result = new Integer[indexes.length];
+
+	try {
+	    for (int i = 0; i < indexes.length; i++) {
+		labels.seek(8 + indexes[i]);
+		result[i] = labels.readUnsignedByte();
+	    }
+	} catch (IOException e) {
+	    e.printStackTrace();
 	}
 
-	@Override
-	public int getInputSize() {
-		return inputSize;
-	}
+	return result;
+    }
 
-	private float[] getImage(int index) {
-		int size = cols * rows;
-		float[] result = new float[size];
-		try {
-			images.seek(16 + size * index);
-			for (int i = 0; i < size; i++) {
-				result[i] = images.readUnsignedByte();
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+    public int getRows() {
+	return rows;
+    }
 
-		return result;
-	}
-
-	private int getLabel(int index) {
-		Integer result = null;
-		try {
-			labels.seek(16 + index);
-			result = labels.readUnsignedByte();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		return result;
-	}
-
-	public int getRows() {
-		return rows;
-	}
-
-	public int getCols() {
-		return cols;
-	}
+    public int getCols() {
+	return cols;
+    }
 }

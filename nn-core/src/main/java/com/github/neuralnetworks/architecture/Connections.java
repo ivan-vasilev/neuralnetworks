@@ -19,5 +19,5 @@ public interface Connections extends InputOutputLayers {
 	/**
 	 * @return ConnectionGraph with weights
 	 */
-	public ConnectionGraph getConnectionGraph();
+	public Matrix getConnectionGraph();
 }

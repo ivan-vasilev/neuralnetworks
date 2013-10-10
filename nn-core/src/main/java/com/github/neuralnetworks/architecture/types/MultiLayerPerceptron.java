@@ -2,15 +2,14 @@ package com.github.neuralnetworks.architecture.types;
 
 import java.util.List;
 
-import com.github.neuralnetworks.activation.ActivationFunction;
-import com.github.neuralnetworks.activation.RepeaterFunction;
 import com.github.neuralnetworks.architecture.FullyConnected;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.architecture.OneToOne;
-import com.github.neuralnetworks.neuroninput.AparapiWeightedSum;
-import com.github.neuralnetworks.neuroninput.ConstantInput;
-import com.github.neuralnetworks.neuroninput.InputFunction;
+import com.github.neuralnetworks.neuronfunctions.ActivationFunction;
+import com.github.neuralnetworks.neuronfunctions.ConstantInput;
+import com.github.neuralnetworks.neuronfunctions.InputFunction;
+import com.github.neuralnetworks.neuronfunctions.RepeaterFunction;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
 
@@ -34,19 +33,20 @@ public class MultiLayerPerceptron extends NeuralNetwork {
 			throw new IllegalArgumentException("The newtork must have at least one layer");
 		}
 
-		InputFunction inputFunction = properties.containsKey(Constants.INPUT_FUNCTION) ? (InputFunction) properties.get(Constants.INPUT_FUNCTION) : null;
-		ActivationFunction activationFunction = properties.containsKey(Constants.ACTIVATION_FUNCTION) ? (ActivationFunction) properties.get(Constants.ACTIVATION_FUNCTION) : null;
+		InputFunction forwardInputFunction = (InputFunction) properties.get(Constants.FORWARD_INPUT_FUNCTION);
+		InputFunction backwardInputFunction = (InputFunction) properties.get(Constants.BACKWARD_INPUT_FUNCTION);
+		ActivationFunction activationFunction = (ActivationFunction) properties.get(Constants.ACTIVATION_FUNCTION);
 		Boolean addBias = properties.containsKey(Constants.ADD_BIAS) ? (Boolean) properties.get(Constants.ADD_BIAS) : false;
 
 		// populate input layer
-		inputLayer = new Layer(layerProperties.get(0), inputFunction instanceof AparapiWeightedSum ? inputFunction : new AparapiWeightedSum(), new RepeaterFunction());
+		inputLayer = new Layer(layerProperties.get(0), forwardInputFunction, backwardInputFunction, activationFunction);
 		layers.add(inputLayer);
 
 		// layers are created
 		for (int i = 1; i < layerProperties.size(); i++) {
-			layers.add(new Layer(layerProperties.get(i), inputFunction, activationFunction));
+			layers.add(new Layer(layerProperties.get(i), forwardInputFunction, backwardInputFunction, activationFunction));
 			if (addBias) {
-				Layer bias = new Layer(layerProperties.get(i), new ConstantInput(1), new RepeaterFunction());
+				Layer bias = new Layer(layerProperties.get(i), new ConstantInput(1), new ConstantInput(1), new RepeaterFunction());
 				layers.add(bias);
 				connections.add(new OneToOne(bias, inputLayer));
 			}

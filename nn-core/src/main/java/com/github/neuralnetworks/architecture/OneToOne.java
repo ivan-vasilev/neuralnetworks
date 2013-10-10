@@ -7,7 +7,7 @@ package com.github.neuralnetworks.architecture;
  */
 public class OneToOne extends ConnectionsImpl {
 
-	private ConnectionGraph connectionGraph;
+	private Matrix connectionGraph;
 	private int inputLayerStartNeuron;
 	private int outputLayerStartNeuron;
 
@@ -22,7 +22,7 @@ public class OneToOne extends ConnectionsImpl {
 		}
 
 		// initialize weights array
-		connectionGraph = new ConnectionGraph(new float[inputLayer.getNeuronCount()], 1);
+		connectionGraph = new Matrix(new float[inputLayer.getNeuronCount()], 1);
 	}
 
 	@Override
@@ -36,7 +36,7 @@ public class OneToOne extends ConnectionsImpl {
 	}
 
 	@Override
-	public ConnectionGraph getConnectionGraph() {
+	public Matrix getConnectionGraph() {
 		return connectionGraph;
 	}
 }

@@ -1,177 +1,177 @@
 package com.github.neuralnetworks.training;
 
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import com.amd.aparapi.Kernel;
 import com.github.neuralnetworks.architecture.Layer;
+import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.types.RBM;
-import com.github.neuralnetworks.calculation.ConnectionGraphCalculator;
+import com.github.neuralnetworks.calculation.LayerCalculatorImpl;
+import com.github.neuralnetworks.util.AparapiExecutionMode;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
+import com.github.neuralnetworks.util.Util;
 
-public class ContrastiveDivergenceAparapiTrainer extends MiniBatchTrainer<RBM> {
+public class ContrastiveDivergenceAparapiTrainer extends Trainer<RBM> {
 
-	private float[] posPhaseVisible;
-	private float[] negPhaseVisible;
-	private float[] posPhaseHidden;
-	private float[] negPhaseHidden;
-	private float[] weightUpdates;
-	private float[] visibleBiasUpdates;
-	private float[] hiddenBiasUpdates;
+    private Matrix posPhaseVisible;
+    private Matrix negPhaseVisible;
+    private Matrix posPhaseHidden;
+    private Matrix negPhaseHidden;
+    private float[] weightUpdates;
+    private float[] visibleBiasUpdates;
+    private float[] hiddenBiasUpdates;
+    private Kernel weightUpdatesKernel;
+    private Kernel visibleBiasUpdatesKernel;
+    private Kernel hiddenBiasUpdatesKernel;
 
-	public ContrastiveDivergenceAparapiTrainer() {
-		super();
+    public ContrastiveDivergenceAparapiTrainer() {
+	super();
+    }
+
+    public ContrastiveDivergenceAparapiTrainer(Properties properties) {
+	super(properties);
+	init();
+    }
+
+    /**
+     * initialize
+     */
+    protected void init() {
+	RBM neuralNetwork = getNeuralNetwork();
+	posPhaseVisible = new Matrix(neuralNetwork.getVisibleLayer().getNeuronCount(), getMiniBatchSize());
+	negPhaseVisible = new Matrix(neuralNetwork.getVisibleLayer().getNeuronCount(), getMiniBatchSize());
+	posPhaseHidden = new Matrix(neuralNetwork.getHiddenLayer().getNeuronCount(), getMiniBatchSize());
+	negPhaseHidden = new Matrix(neuralNetwork.getHiddenLayer().getNeuronCount(), getMiniBatchSize());
+	weightUpdates = new float[neuralNetwork.getMainConnections().getConnectionGraph().getElements().length];
+
+	if (neuralNetwork.getVisibleBiasConnections() != null) {
+	    visibleBiasUpdates = new float[neuralNetwork.getVisibleBiasConnections().getConnectionGraph().getElements().length];
 	}
 
-	public ContrastiveDivergenceAparapiTrainer(Properties properties) {
-		super(properties);
-		init();
+	if (neuralNetwork.getHiddenBiasConnections() != null) {
+	    hiddenBiasUpdates = new float[neuralNetwork.getHiddenBiasConnections().getConnectionGraph().getElements().length];
+	}
+    }
+
+    @Override
+    protected void learnInput(TrainingInputData data) {
+	RBM rbm = getNeuralNetwork();
+
+	// required for aparapi
+	final int miniBatchSize = data.getInput().getColumns();
+	final float[] posPhaseVisible = this.posPhaseVisible.getElements();
+	final float[] negPhaseVisible = this.negPhaseVisible.getElements();
+	final float[] posPhaseHidden = this.posPhaseHidden.getElements();
+	final float[] negPhaseHidden = this.negPhaseHidden.getElements();
+	final float[] weights = rbm.getMainConnections().getConnectionGraph().getElements();
+	final float learningRate = (float) properties.get(Constants.LEARNING_RATE);
+	Set<Layer> calculatedLayers = new HashSet<Layer>();
+
+	// nullify weights
+	Util.fillArray(weightUpdates, 0);
+
+	if (rbm.getVisibleBiasConnections() != null) {
+	    Util.fillArray(visibleBiasUpdates, 0);
 	}
 
-	/**
-	 * initialize
-	 */
-	protected void init() {
-		RBM neuralNetwork = getNeuralNetwork();
-		posPhaseVisible = new float[neuralNetwork.getVisibleLayer().getNeuronCount()];
-		negPhaseVisible = new float[neuralNetwork.getVisibleLayer().getNeuronCount()];
-		posPhaseHidden = new float[neuralNetwork.getHiddenLayer().getNeuronCount()];
-		negPhaseHidden = new float[neuralNetwork.getHiddenLayer().getNeuronCount()];
-		weightUpdates = new float[neuralNetwork.getMainConnections().getConnectionGraph().getWeights().length];
-
-		if (neuralNetwork.getVisibleBiasConnections() != null) {
-			visibleBiasUpdates = new float[neuralNetwork.getVisibleBiasConnections().getConnectionGraph().getWeights().length];
-		}
-
-		if (neuralNetwork.getHiddenBiasConnections() != null) {
-			hiddenBiasUpdates = new float[neuralNetwork.getHiddenBiasConnections().getConnectionGraph().getWeights().length];
-		}
+	if (rbm.getHiddenBiasConnections() != null) {
+	    Util.fillArray(hiddenBiasUpdates, 0);
 	}
 
-	@Override
-	protected void learnMiniBatchInput(List<TrainingInputData> data, int index) {
-		RBM neuralNetwork = getNeuralNetwork();
+	LayerCalculatorImpl calculator = new LayerCalculatorImpl();
+	Map<Layer, Matrix> results = new HashMap<>();
+	final int neuronWeightsCount = rbm.getMainConnections().getConnectionGraph().getColumns();
 
-		// nullify weights
-		new Kernel() {
-			@Override
-			public void run() {
-				weightUpdates[getGlobalId()] = 0;
-			}
-		}.execute(weightUpdates.length);
+	results.clear();
 
-		if (neuralNetwork.getVisibleBiasConnections() != null) {
-			new Kernel() {
-				@Override
-				public void run() {
-					visibleBiasUpdates[getGlobalId()] = 0;
-				}
-			}.execute(visibleBiasUpdates.length);
-		}
+	// clamp results to visible layer
+	System.arraycopy(data.getInput().getElements(), 0, posPhaseVisible, 0, posPhaseVisible.length);
+	results.put(rbm.getVisibleLayer(), this.posPhaseVisible);
 
-		if (neuralNetwork.getHiddenBiasConnections() != null) {
-			new Kernel() {
-				@Override
-				public void run() {
-					hiddenBiasUpdates[getGlobalId()] = 0;
-				}
-			}.execute(hiddenBiasUpdates.length);
-		}
+	// calculate positive phase
+	results.put(rbm.getHiddenLayer(), this.posPhaseHidden);
+	calculatedLayers.add(rbm.getVisibleLayer());
+	calculator.calculate(calculatedLayers, results, rbm.getHiddenLayer());
 
-		ConnectionGraphCalculator calculator = new ConnectionGraphCalculator(neuralNetwork.getConnections().get(0));
-		Map<Layer, float[]> results = new HashMap<Layer, float[]>();
-		final int neuronWeightsCount = neuralNetwork.getMainConnections().getConnectionGraph().getNeuronWeightsCount();
-
-		for (TrainingInputData d : data) {
-			results.clear();
-
-			// clamp results to visible layer
-			System.arraycopy(d.getInput(), 0, posPhaseVisible, 0, posPhaseVisible.length);
-			results.put(neuralNetwork.getVisibleLayer(), posPhaseVisible);
-
-			// calculate positive phase
-			results.put(neuralNetwork.getHiddenLayer(), posPhaseHidden);
-			calculator.calculate(results, neuralNetwork.getHiddenLayer());
-
-			// Gibbs sampling
-			int gibbsSamplingCount = properties.containsKey(Constants.GIBBS_SAMPLING_COUNT) ? (int) properties.get(Constants.GIBBS_SAMPLING_COUNT) : 1;
-			for (int i = 0; i < gibbsSamplingCount; i++) {
-				results.put(neuralNetwork.getVisibleLayer(), negPhaseVisible);
-				calculator.calculate(results, neuralNetwork.getVisibleLayer());
-				results.put(neuralNetwork.getHiddenLayer(), negPhaseHidden);
-				calculator.calculate(results, neuralNetwork.getHiddenLayer());
-			}
-
-			// add to existing update
-			new Kernel() {
-				@Override
-				public void run() {
-					int id = getGlobalId();
-					int visibleId = id / neuronWeightsCount;
-					int hiddenId = id % neuronWeightsCount;
-					weightUpdates[id] = weightUpdates[id] + posPhaseHidden[hiddenId] * posPhaseVisible[visibleId] - negPhaseHidden[hiddenId] * negPhaseVisible[visibleId];
-				}
-			}.execute(neuralNetwork.getMainConnections().getConnectionGraph().getWeights().length);
-
-			// visible bias
-			if (neuralNetwork.getVisibleBiasConnections() != null) {
-				new Kernel() {
-					@Override
-					public void run() {
-						int id = getGlobalId();
-						visibleBiasUpdates[id] = visibleBiasUpdates[id] + posPhaseVisible[id] - negPhaseVisible[id];
-					}
-				}.execute(neuralNetwork.getVisibleBiasConnections().getConnectionGraph().getWeights().length);
-			}
-
-			// hidden bias
-			if (neuralNetwork.getHiddenBiasConnections() != null) {
-				new Kernel() {
-					@Override
-					public void run() {
-						int id = getGlobalId();
-						hiddenBiasUpdates[id] = hiddenBiasUpdates[id] + posPhaseHidden[id] - negPhaseHidden[id];
-					}
-				}.execute(neuralNetwork.getHiddenBiasConnections().getConnectionGraph().getWeights().length);
-			}
-		}
-
-		// update weights
-		final int miniBatchSize = data.size();
-		final float[] weights = neuralNetwork.getMainConnections().getConnectionGraph().getWeights();
-		final float learningRate = (float) properties.get(Constants.LEARNING_RATE);
-		new Kernel() {
-			@Override
-			public void run() {
-				int id = getGlobalId();
-				weights[id] = weights[id] + learningRate * (weightUpdates[id] / miniBatchSize);
-			}
-		}.execute(weights.length);
-
-		// update visible bias
-		if (neuralNetwork.getVisibleBiasConnections() != null) {
-			final float[] visibleBiasWeights = neuralNetwork.getVisibleBiasConnections().getConnectionGraph().getWeights();
-			new Kernel() {
-				@Override
-				public void run() {
-					int id = getGlobalId();
-					visibleBiasWeights[id] = visibleBiasWeights[id] + learningRate * visibleBiasUpdates[id];
-				}
-			}.execute(neuralNetwork.getVisibleBiasConnections().getConnectionGraph().getWeights().length);
-		}
-
-		// update hidden bias
-		if (neuralNetwork.getHiddenBiasConnections() != null) {
-			final float[] hiddenBiasWeights = neuralNetwork.getHiddenBiasConnections().getConnectionGraph().getWeights();
-			new Kernel() {
-				@Override
-				public void run() {
-					int id = getGlobalId();
-					hiddenBiasWeights[id] = hiddenBiasWeights[id] + learningRate * hiddenBiasUpdates[id];
-				}
-			}.execute(neuralNetwork.getHiddenBiasConnections().getConnectionGraph().getWeights().length);
-		}
+	// Gibbs sampling
+	int gibbsSamplingCount = properties.containsKey(Constants.GIBBS_SAMPLING_COUNT) ? (int) properties.get(Constants.GIBBS_SAMPLING_COUNT) : 1;
+	for (int i = 0; i < gibbsSamplingCount; i++) {
+	    results.put(rbm.getVisibleLayer(), this.negPhaseVisible);
+	    calculatedLayers.clear();
+	    calculatedLayers.add(rbm.getHiddenLayer());
+	    calculator.calculate(calculatedLayers, results, rbm.getVisibleLayer());
+	    results.put(rbm.getHiddenLayer(), this.negPhaseHidden);
+	    calculatedLayers.add(rbm.getVisibleLayer());
+	    calculator.calculate(calculatedLayers, results, rbm.getHiddenLayer());
 	}
+
+	// update weights
+	if (weightUpdatesKernel == null) {
+	    final float[] weightUpdates = this.weightUpdates;
+	    weightUpdatesKernel = new Kernel() {
+		@Override
+		public void run() {
+		    int id = getGlobalId();
+		    int visibleId = (id / neuronWeightsCount) * miniBatchSize;
+		    int hiddenId = (id % neuronWeightsCount) * miniBatchSize;
+		    for (int i = 0; i < miniBatchSize; i++) {
+			weightUpdates[id] += posPhaseHidden[hiddenId + i] * posPhaseVisible[visibleId + i] - negPhaseHidden[hiddenId + i] * negPhaseVisible[visibleId + i];
+		    }
+
+		    weights[id] += learningRate * (weightUpdates[id] / miniBatchSize);
+		}
+	    };
+	}
+	weightUpdatesKernel.setExecutionMode(AparapiExecutionMode.getInstance().getExecutionMode());
+	weightUpdatesKernel.execute(weights.length);
+
+	// update visible bias
+	if (rbm.getVisibleBiasConnections() != null) {
+	    final float[] visibleBiasWeights = rbm.getVisibleBiasConnections().getConnectionGraph().getElements();
+	    final float[] visibleBiasUpdates = this.visibleBiasUpdates;
+	    if (visibleBiasUpdatesKernel == null) {
+		visibleBiasUpdatesKernel = new Kernel() {
+		    @Override
+		    public void run() {
+			int id = getGlobalId();
+			for (int i = 0; i < miniBatchSize; i++) {
+			    visibleBiasUpdates[id] += posPhaseVisible[id] - negPhaseVisible[id];
+			}
+
+			visibleBiasWeights[id] += learningRate * (visibleBiasUpdates[id] / miniBatchSize);
+		    }
+		};
+	    }
+
+	    visibleBiasUpdatesKernel.setExecutionMode(AparapiExecutionMode.getInstance().getExecutionMode());
+	    visibleBiasUpdatesKernel.execute(visibleBiasWeights.length);
+	}
+
+	// update hidden bias
+	if (rbm.getHiddenBiasConnections() != null) {
+	    final float[] hiddenBiasWeights = rbm.getHiddenBiasConnections().getConnectionGraph().getElements();
+	    final float[] hiddenBiasUpdates = this.visibleBiasUpdates;
+
+	    if (hiddenBiasUpdatesKernel == null) {
+		hiddenBiasUpdatesKernel = new Kernel() {
+		    @Override
+		    public void run() {
+			int id = getGlobalId();
+			for (int i = 0; i < miniBatchSize; i++) {
+			    hiddenBiasUpdates[id] += posPhaseHidden[id * miniBatchSize + i] - negPhaseHidden[id * miniBatchSize + i];
+			}
+
+			hiddenBiasWeights[id] += learningRate * (hiddenBiasUpdates[id] / miniBatchSize);
+		    }
+		};
+	    }
+
+	    hiddenBiasUpdatesKernel.setExecutionMode(AparapiExecutionMode.getInstance().getExecutionMode());
+	    hiddenBiasUpdatesKernel.execute(hiddenBiasWeights.length);
+	}
+    }
 }

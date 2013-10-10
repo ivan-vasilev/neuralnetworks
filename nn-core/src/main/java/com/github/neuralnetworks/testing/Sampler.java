@@ -38,6 +38,7 @@ public class Sampler {
 		try (BufferedWriter writer = Files.newBufferedWriter(newFile, Charset.defaultCharset())) {
 			for (Trainer<?> t : trainingConfigurations) {
 				t.train();
+				t.test();
 				writer.append(Util.propertiesToString(t.getProperties()));
 				writer.newLine();
 				writer.append("========================================================================================================");

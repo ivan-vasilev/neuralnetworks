@@ -1,17 +1,33 @@
 package com.github.neuralnetworks.outputerror;
 
-import com.github.neuralnetworks.calculation.MeanSquaredOutputError;
+import com.github.neuralnetworks.architecture.Matrix;
+import com.github.neuralnetworks.calculation.OutputError;
 
-public class MnistOutputError extends MeanSquaredOutputError {
+public class MnistOutputError implements OutputError {
 
-	private float[] targetArray = new float[10];
+    private float totalNetworkError;
+    private int count;
 
-	@Override
-	protected float[] targetToArray(Object targetOutput) {
-		for (int i = 0; i < targetArray.length; i++) {
-			targetArray[i] = (int) targetOutput == i ? i : 0;
+    @Override
+    public void addItem(Matrix networkOutput, Object[] targetOutput) {
+	count++;
+
+	for (int i = 0; i < targetOutput.length; i++, count++) {
+	    int maxIndex = 0;
+	    int max = 0;
+	    for (int j = 1; j < networkOutput.getRows(); j++) {
+		if (networkOutput.getElements()[j * targetOutput.length + i] > networkOutput.getElements()[maxIndex]) {
+		    maxIndex = j * targetOutput.length + i;
+		    max = j;
 		}
+	    }
 
-		return targetArray;
+	    totalNetworkError += (max != (int) targetOutput[maxIndex] ? 1 : 0);
 	}
+    }
+
+    @Override
+    public float getTotalNetworkError() {
+	return count > 0 ? totalNetworkError / count : 0;
+    }
 }
