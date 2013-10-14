@@ -23,5 +23,8 @@ public class Constants {
 	public static final String NEURAL_NETWORK = "neuralNetwork";
 	public static final String OUTPUT_ERROR = "outputError";
 	public static final String RANDOM_INITIALIZER = "randomInitializer";
-	public static final String LAYER_CALCULATOR = "layerCalculator";
+	public static final String FORWARD_CALCULATOR = "forwardCalculator";
+	public static final String ERROR_CALCULATOR = "errorCalculator";
+	public static final String TEST_LAYER_CALCULATOR = "testLayerCalculator";
+	public static final String BACKPROPAGATION = "backpropagation";
 }

@@ -1,4 +1,4 @@
-package com.github.neuralnetworks.input;
+package com.github.neuralnetworks.input.mnist;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import com.github.neuralnetworks.architecture.Matrix;
+import com.github.neuralnetworks.input.InputConverter;
 import com.github.neuralnetworks.training.TrainingInputData;
 import com.github.neuralnetworks.training.TrainingInputProvider;
 
@@ -25,11 +25,17 @@ public class MnistInputProvider implements TrainingInputProvider {
     private final int batchSize;
     private List<Integer> elementsOrder;
     private Random random;
+    private final InputConverter inputConverter;
+    private final InputConverter targetConverter;
+    private Integer[][] tempImages;
 
-    public MnistInputProvider(String imagesFile, String labelsFile, int batchSize) {
+    public MnistInputProvider(String imagesFile, String labelsFile, int batchSize, InputConverter inputConverter, InputConverter targetConverter) {
 	super();
 
 	this.batchSize = batchSize;
+	this.inputConverter = inputConverter;
+	this.targetConverter = targetConverter;
+
 	try {
 	    this.images = new RandomAccessFile(imagesFile, "r");
 	    this.labels = new RandomAccessFile(labelsFile, "r");
@@ -60,7 +66,7 @@ public class MnistInputProvider implements TrainingInputProvider {
 		indexes[i] = elementsOrder.remove(random.nextInt(elementsOrder.size()));
 	    }
 
-	    result = new TrainingInputData(getImages(indexes), getLabels(indexes));
+	    result = new TrainingInputData(getImages(indexes), getLabels(indexes), inputConverter, targetConverter);
 	}
 
 	return result;
@@ -71,25 +77,24 @@ public class MnistInputProvider implements TrainingInputProvider {
 	return inputSize;
     }
 
-    private Matrix getImages(int[] indexes) {
+    private Integer[][] getImages(int[] indexes) {
 	int size = cols * rows;
-	Matrix result = new Matrix(new float[size * indexes.length], indexes.length);
+	if (tempImages == null || tempImages.length != indexes.length) {
+	    tempImages = new Integer[indexes.length][size];
+	}
+
 	try {
 	    for (int i = 0; i < indexes.length; i++) {
 		images.seek(16 + size * indexes[i]);
 		for (int j = 0; j < size; j++) {
-		    result.getElements()[j * indexes.length + i] = (float) (images.readUnsignedByte() / 255.0); // input
-														// between
-														// 0
-														// and
-														// 1
+		    tempImages[i][j] = images.readUnsignedByte();
 		}
 	    }
 	} catch (IOException e) {
 	    e.printStackTrace();
 	}
 
-	return result;
+	return tempImages;
     }
 
     private Integer[] getLabels(int indexes[]) {

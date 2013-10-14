@@ -61,7 +61,7 @@ public abstract class Trainer<N extends NeuralNetwork> {
 		Util.fillArray(m.getElements(), 0);
 	    }
 
-	    results.put(n.getInputLayer(), input.getInput());
+	    results.put(n.getInputLayer(), input.getConvertedInput());
 
 	    c.calculate(calculatedLayers, results, n.getOutputLayer());
 	    e.addItem(results.get(n.getOutputLayer()), input.getTarget());
@@ -111,11 +111,11 @@ public abstract class Trainer<N extends NeuralNetwork> {
     }
 
     public LayerCalculator getTestLayerCalculator() {
-	return properties.getParameter(Constants.LAYER_CALCULATOR);
+	return properties.getParameter(Constants.TEST_LAYER_CALCULATOR);
     }
 
     public void setTestLayerCalculator(LayerCalculator layerCalculator) {
-	properties.setParameter(Constants.LAYER_CALCULATOR, layerCalculator);
+	properties.setParameter(Constants.TEST_LAYER_CALCULATOR, layerCalculator);
     }
 
     protected boolean stopTraining(int index) {

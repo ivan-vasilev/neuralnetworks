@@ -61,8 +61,10 @@ public class ContrastiveDivergenceAparapiTrainer extends Trainer<RBM> {
     protected void learnInput(TrainingInputData data) {
 	RBM rbm = getNeuralNetwork();
 
+	Matrix input = data.getConvertedInput();
+
 	// required for aparapi
-	final int miniBatchSize = data.getInput().getColumns();
+	final int miniBatchSize = input.getColumns();
 	final float[] posPhaseVisible = this.posPhaseVisible.getElements();
 	final float[] negPhaseVisible = this.negPhaseVisible.getElements();
 	final float[] posPhaseHidden = this.posPhaseHidden.getElements();
@@ -83,13 +85,14 @@ public class ContrastiveDivergenceAparapiTrainer extends Trainer<RBM> {
 	}
 
 	LayerCalculatorImpl calculator = new LayerCalculatorImpl();
+
+	// TODO member
 	Map<Layer, Matrix> results = new HashMap<>();
-	final int neuronWeightsCount = rbm.getMainConnections().getConnectionGraph().getColumns();
 
 	results.clear();
 
 	// clamp results to visible layer
-	System.arraycopy(data.getInput().getElements(), 0, posPhaseVisible, 0, posPhaseVisible.length);
+	System.arraycopy(input.getElements(), 0, posPhaseVisible, 0, posPhaseVisible.length);
 	results.put(rbm.getVisibleLayer(), this.posPhaseVisible);
 
 	// calculate positive phase
@@ -112,12 +115,13 @@ public class ContrastiveDivergenceAparapiTrainer extends Trainer<RBM> {
 	// update weights
 	if (weightUpdatesKernel == null) {
 	    final float[] weightUpdates = this.weightUpdates;
+	    final int neuronWeightsColumns = rbm.getMainConnections().getConnectionGraph().getColumns();
 	    weightUpdatesKernel = new Kernel() {
 		@Override
 		public void run() {
 		    int id = getGlobalId();
-		    int visibleId = (id / neuronWeightsCount) * miniBatchSize;
-		    int hiddenId = (id % neuronWeightsCount) * miniBatchSize;
+		    int visibleId = (id % neuronWeightsColumns) * miniBatchSize;
+		    int hiddenId = (id / neuronWeightsColumns) * miniBatchSize;
 		    for (int i = 0; i < miniBatchSize; i++) {
 			weightUpdates[id] += posPhaseHidden[hiddenId + i] * posPhaseVisible[visibleId + i] - negPhaseHidden[hiddenId + i] * negPhaseVisible[visibleId + i];
 		    }
@@ -139,7 +143,7 @@ public class ContrastiveDivergenceAparapiTrainer extends Trainer<RBM> {
 		    public void run() {
 			int id = getGlobalId();
 			for (int i = 0; i < miniBatchSize; i++) {
-			    visibleBiasUpdates[id] += posPhaseVisible[id] - negPhaseVisible[id];
+			    visibleBiasUpdates[id] += posPhaseVisible[id * miniBatchSize + i] - negPhaseVisible[id * miniBatchSize + i];
 			}
 
 			visibleBiasWeights[id] += learningRate * (visibleBiasUpdates[id] / miniBatchSize);

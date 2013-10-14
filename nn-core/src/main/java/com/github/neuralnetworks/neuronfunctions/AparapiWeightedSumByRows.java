@@ -53,7 +53,7 @@ public class AparapiWeightedSumByRows extends Kernel implements InputFunction {
     }
 
     /**
-     * @param outputIndex - index within the ouptut array
+     * @param outputIndex - index within the output array
      */
     protected void outputCalculated(int outputIndex) {
     }

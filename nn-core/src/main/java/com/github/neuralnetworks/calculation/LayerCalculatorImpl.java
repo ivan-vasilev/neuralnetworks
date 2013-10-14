@@ -1,5 +1,6 @@
 package com.github.neuralnetworks.calculation;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -16,7 +17,9 @@ import com.github.neuralnetworks.neuronfunctions.ConstantInput;
 import com.github.neuralnetworks.neuronfunctions.InputFunction;
 import com.github.neuralnetworks.util.Util;
 
-public class LayerCalculatorImpl implements LayerCalculator {
+public class LayerCalculatorImpl implements LayerCalculator, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     protected List<PropagationEventListener> listeners;
 
@@ -30,7 +33,7 @@ public class LayerCalculatorImpl implements LayerCalculator {
 	    inProgressLayers.add(currentLayer);
 	    for (Connections c : currentLayer.getConnectionGraphs()) {
 		Layer opposite = c.getInputLayer() != currentLayer ? c.getInputLayer() : c.getOutputLayer();
-		InputFunction inputFunction = c.getInputLayer() != currentLayer ? currentLayer.getForwardInputFunction() : currentLayer.getBackwardInputFunction();
+		InputFunction inputFunction = getInputFunction(c, currentLayer);
 
 		if (inputFunction instanceof ConstantInput) {
 		    Matrix output = results.get(currentLayer);
@@ -48,7 +51,7 @@ public class LayerCalculatorImpl implements LayerCalculator {
 
 		    Matrix output = results.get(currentLayer);
 		    if (output == null) {
-			output = new Matrix(currentLayer.getNeuronCount() * input.getColumns(), input.getColumns());
+			output = new Matrix(currentLayer.getNeuronCount(), input.getColumns());
 			results.put(currentLayer, output);
 		    }
 
@@ -56,13 +59,19 @@ public class LayerCalculatorImpl implements LayerCalculator {
 		}
 	    }
 
-	    currentLayer.getActivationFunction().value(results.get(currentLayer));
+	    if (currentLayer.getActivationFunction() != null) {
+		currentLayer.getActivationFunction().value(results.get(currentLayer));
+	    }
 
 	    inProgressLayers.remove(currentLayer);
 	    calculatedLayers.add(currentLayer);
 
 	    triggerEvent(new PropagationEvent(currentLayer, results));
 	}
+    }
+
+    protected InputFunction getInputFunction(Connections connection, Layer layer ){
+	return connection.getInputLayer() != layer ? layer.getForwardInputFunction() : layer.getBackwardInputFunction();
     }
 
     private Integer getInputColumns(Collection<Matrix> results) {

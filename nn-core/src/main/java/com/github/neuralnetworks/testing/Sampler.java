@@ -6,7 +6,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -15,45 +15,52 @@ import com.github.neuralnetworks.training.Trainer;
 import com.github.neuralnetworks.util.Util;
 
 /**
- *
+ * 
  * implementations of this class
- *
+ * 
  */
 public class Sampler {
 
-	protected List<Trainer<?>> trainingConfigurations;
+    protected List<Trainer<?>> trainingConfigurations;
 
-	public Sampler() {
-		super();
-		this.trainingConfigurations = new ArrayList<>();
-	}
+    public Sampler() {
+	super();
+	this.trainingConfigurations = new ArrayList<>();
+    }
 
-	public Sampler(List<Trainer<?>> trainingConfigurations) {
-		super();
-		this.trainingConfigurations = trainingConfigurations;
-	}
+    public Sampler(List<Trainer<?>> trainingConfigurations) {
+	super();
+	this.trainingConfigurations = trainingConfigurations;
+    }
 
-	public void sample() {
-		Path newFile = Paths.get(DateFormat.getDateInstance().format(new Date()) + ".txt");
-		try (BufferedWriter writer = Files.newBufferedWriter(newFile, Charset.defaultCharset())) {
-			for (Trainer<?> t : trainingConfigurations) {
-				t.train();
-				t.test();
-				writer.append(Util.propertiesToString(t.getProperties()));
-				writer.newLine();
-				writer.append("========================================================================================================");
-				writer.newLine();
-			}
-		} catch (IOException exception) {
-			System.out.println("Error writing to file");
-		}
+    public void sample() {
+	Path newFile = Paths.get("results/" + new SimpleDateFormat("dd-MM-yyyyy HH-mm").format(new Date()) + ".txt");
+	try (BufferedWriter writer = Files.newBufferedWriter(newFile, Charset.defaultCharset())) {
+	    for (Trainer<?> t : trainingConfigurations) {
+		long start = System.currentTimeMillis();
+		t.train();
+		long trainingTime = System.currentTimeMillis();
+		writer.append("Training time: " + (trainingTime - start) / 1000 + "s");
+		writer.newLine();
+		t.test();
+		long testingTime = System.currentTimeMillis();
+		writer.append("Testing time: " + (testingTime - trainingTime) / 1000 + "s");
+		writer.newLine();
+		writer.append(Util.propertiesToString(t.getProperties()));
+		writer.newLine();
+		writer.append("========================================================================================================");
+		writer.newLine();
+	    }
+	} catch (IOException exception) {
+	    System.out.println("Error writing to file");
 	}
+    }
 
-	public List<Trainer<?>> getTrainingConfigurations() {
-		return trainingConfigurations;
-	}
+    public List<Trainer<?>> getTrainingConfigurations() {
+	return trainingConfigurations;
+    }
 
-	public void setTrainingConfigurations(List<Trainer<?>> trainingConfigurations) {
-		this.trainingConfigurations = trainingConfigurations;
-	}
+    public void setTrainingConfigurations(List<Trainer<?>> trainingConfigurations) {
+	this.trainingConfigurations = trainingConfigurations;
+    }
 }
