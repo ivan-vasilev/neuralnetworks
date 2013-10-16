@@ -19,7 +19,7 @@ public class MnistOutputError implements OutputError {
 	    }
 
 	    for (int j = 0; j < networkOutput.getRows(); j++) {
-		if (networkOutput.get(j, i) > networkOutput.get(val, i)) {
+		if (Math.abs(networkOutput.get(j, i)) > Math.abs(networkOutput.get(val, i))) {
 		    totalNetworkError++;
 		    break;
 		}

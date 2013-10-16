@@ -27,7 +27,7 @@ public class Util {
 		    sb	.append(l.getNeuronCount()).append(" neurons; ")
 		    	.append(l.getForwardInputFunction().getClass().getSimpleName()).append(" forward input; ")
 		    	.append(l.getBackwardInputFunction().getClass().getSimpleName()).append(" backward input; ")
-		    	.append(l.getActivationFunction().getClass().getSimpleName()).append(" activation function; ")
+		    	.append(l.getActivationFunction() != null ? l.getActivationFunction().getClass().getSimpleName() : "No").append(" activation function; ")
 		    	.append(System.getProperty("line.separator"));
 		}
 		break;
@@ -40,7 +40,7 @@ public class Util {
 		OutputError error = (OutputError) e.getValue();
 		NumberFormat n = NumberFormat.getInstance();
 		n.setMaximumFractionDigits(5);
-		sb.append(error.getClass().getCanonicalName()).append(" - ").append(n.format(error.getTotalNetworkError()));
+		sb.append(error.getClass().getSimpleName()).append(" - ").append(n.format(error.getTotalNetworkError()));
 		break;
 	    default:
 		sb.append(e.getValue());

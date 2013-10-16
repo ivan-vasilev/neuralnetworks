@@ -10,7 +10,6 @@ import com.github.neuralnetworks.input.mnist.MnistInputProvider;
 import com.github.neuralnetworks.input.mnist.MnistTargetConverter;
 import com.github.neuralnetworks.neuronfunctions.AparapiSigmoidByRows;
 import com.github.neuralnetworks.neuronfunctions.AparapiSigmoidByRows.AparapiSigmoidByColumns;
-import com.github.neuralnetworks.neuronfunctions.RepeaterFunction;
 import com.github.neuralnetworks.outputerror.MnistOutputError;
 import com.github.neuralnetworks.testing.Sampler;
 import com.github.neuralnetworks.training.ContrastiveDivergenceAparapiTrainer;
@@ -36,23 +35,14 @@ public class RBMSampler extends Sampler {
 	MnistInputProvider training = new MnistInputProvider("train-images.idx3-ubyte", "train-labels.idx1-ubyte", 10, inputTrainingConverter, targetConverter);
 	MnistInputProvider testing = new MnistInputProvider("t10k-images.idx3-ubyte", "t10k-labels.idx1-ubyte", 1, inputTestingConverter, targetConverter);
 
-	Properties rbmProperties = new Properties();
-	rbmProperties.setParameter(Constants.HIDDEN_COUNT, 10);
-	rbmProperties.setParameter(Constants.VISIBLE_COUNT, training.getRows() * training.getCols());
-	rbmProperties.setParameter(Constants.FORWARD_INPUT_FUNCTION, new AparapiSigmoidByRows());
-	rbmProperties.setParameter(Constants.BACKWARD_INPUT_FUNCTION, new AparapiSigmoidByColumns());
-	rbmProperties.setParameter(Constants.ACTIVATION_FUNCTION, new RepeaterFunction());
-	rbmProperties.setParameter(Constants.ADD_BIAS, true);
-	RBM rbm = new RBM(new Layer(training.getRows() * training.getCols(), new AparapiSigmoidByRows(), new AparapiSigmoidByColumns(), null),
-			new Layer(training.getRows() * training.getCols(), new AparapiSigmoidByRows(), new AparapiSigmoidByColumns(), null), false, false);
+	RBM rbm = new RBM(new Layer(training.getRows() * training.getCols(), new AparapiSigmoidByRows(), new AparapiSigmoidByColumns(), null), new Layer(10, new AparapiSigmoidByRows(), new AparapiSigmoidByColumns(), null), false, false);
 
 	Properties trainerProperties = new Properties();
 	trainerProperties.setParameter(Constants.NEURAL_NETWORK, rbm);
 	trainerProperties.setParameter(Constants.TRAINING_INPUT_PROVIDER, training);
 	trainerProperties.setParameter(Constants.TESTING_INPUT_PROVIDER, testing);
 	trainerProperties.setParameter(Constants.LAYER_CALCULATOR, new LayerCalculatorImpl());
-	trainerProperties.setParameter(Constants.MINI_BATCH_SIZE, 10);
-	trainerProperties.setParameter(Constants.LEARNING_RATE, 0.001f);
+	trainerProperties.setParameter(Constants.LEARNING_RATE, 0.01f);
 	trainerProperties.setParameter(Constants.OUTPUT_ERROR, new MnistOutputError());
 	trainerProperties.setParameter(Constants.RANDOM_INITIALIZER, new MersenneTwisterRandomInitializer(-0.1f, 0.2f));
 	ContrastiveDivergenceAparapiTrainer trainer = new ContrastiveDivergenceAparapiTrainer(trainerProperties);

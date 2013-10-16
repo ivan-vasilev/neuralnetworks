@@ -36,20 +36,8 @@ public class RandomInitializerImpl implements RandomInitializer {
 
     @Override
     public void initialize(float[] array) {
-	if (start == 0) {
-	    if (range == 1) {
-		for (int i = 0; i < array.length; i++) {
-		    array[i] = random.nextFloat();
-		}
-	    } else {
-		for (int i = 0; i < array.length; i++) {
-		    array[i] = start + random.nextFloat();
-		}
-	    }
-	} else {
-	    for (int i = 0; i < array.length; i++) {
-		array[i] = start + random.nextFloat() * start;
-	    }
+	for (int i = 0; i < array.length; i++) {
+	    array[i] = start + random.nextFloat() * range;
 	}
     }
 

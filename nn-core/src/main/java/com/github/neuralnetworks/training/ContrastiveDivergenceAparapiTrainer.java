@@ -27,6 +27,7 @@ public class ContrastiveDivergenceAparapiTrainer extends Trainer<RBM> {
     private Kernel weightUpdatesKernel;
     private Kernel visibleBiasUpdatesKernel;
     private Kernel hiddenBiasUpdatesKernel;
+    private int miniBatchSize;
 
     public ContrastiveDivergenceAparapiTrainer() {
 	super();
@@ -34,31 +35,15 @@ public class ContrastiveDivergenceAparapiTrainer extends Trainer<RBM> {
 
     public ContrastiveDivergenceAparapiTrainer(Properties properties) {
 	super(properties);
-	init();
-    }
-
-    /**
-     * initialize
-     */
-    protected void init() {
-	RBM neuralNetwork = getNeuralNetwork();
-	posPhaseVisible = new Matrix(neuralNetwork.getVisibleLayer().getNeuronCount(), getMiniBatchSize());
-	negPhaseVisible = new Matrix(neuralNetwork.getVisibleLayer().getNeuronCount(), getMiniBatchSize());
-	posPhaseHidden = new Matrix(neuralNetwork.getHiddenLayer().getNeuronCount(), getMiniBatchSize());
-	negPhaseHidden = new Matrix(neuralNetwork.getHiddenLayer().getNeuronCount(), getMiniBatchSize());
-	weightUpdates = new float[neuralNetwork.getMainConnections().getConnectionGraph().getElements().length];
-
-	if (neuralNetwork.getVisibleBiasConnections() != null) {
-	    visibleBiasUpdates = new float[neuralNetwork.getVisibleBiasConnections().getConnectionGraph().getElements().length];
-	}
-
-	if (neuralNetwork.getHiddenBiasConnections() != null) {
-	    hiddenBiasUpdates = new float[neuralNetwork.getHiddenBiasConnections().getConnectionGraph().getElements().length];
-	}
     }
 
     @Override
     protected void learnInput(TrainingInputData data) {
+	if (miniBatchSize != data.getInput().getColumns()) {
+	    miniBatchSize = data.getInput().getColumns();
+	    init();
+	}
+
 	RBM rbm = getNeuralNetwork();
 
 	Matrix input = data.getInput();
@@ -176,6 +161,23 @@ public class ContrastiveDivergenceAparapiTrainer extends Trainer<RBM> {
 
 	    hiddenBiasUpdatesKernel.setExecutionMode(AparapiExecutionMode.getInstance().getExecutionMode());
 	    hiddenBiasUpdatesKernel.execute(hiddenBiasWeights.length);
+	}
+    }
+
+    protected void init() {
+	RBM neuralNetwork = getNeuralNetwork();
+	posPhaseVisible = new Matrix(neuralNetwork.getVisibleLayer().getNeuronCount(), miniBatchSize);
+	negPhaseVisible = new Matrix(neuralNetwork.getVisibleLayer().getNeuronCount(), miniBatchSize);
+	posPhaseHidden = new Matrix(neuralNetwork.getHiddenLayer().getNeuronCount(), miniBatchSize);
+	negPhaseHidden = new Matrix(neuralNetwork.getHiddenLayer().getNeuronCount(), miniBatchSize);
+	weightUpdates = new float[neuralNetwork.getMainConnections().getConnectionGraph().getElements().length];
+
+	if (neuralNetwork.getVisibleBiasConnections() != null) {
+	    visibleBiasUpdates = new float[neuralNetwork.getVisibleBiasConnections().getConnectionGraph().getElements().length];
+	}
+
+	if (neuralNetwork.getHiddenBiasConnections() != null) {
+	    hiddenBiasUpdates = new float[neuralNetwork.getHiddenBiasConnections().getConnectionGraph().getElements().length];
 	}
     }
 }

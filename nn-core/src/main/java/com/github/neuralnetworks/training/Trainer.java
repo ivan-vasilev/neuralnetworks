@@ -122,14 +122,6 @@ public abstract class Trainer<N extends NeuralNetwork> {
 	return index >= getTestingInputProvider().getInputSize();
     }
 
-    public int getMiniBatchSize() {
-	return properties.getParameter(Constants.MINI_BATCH_SIZE);
-    }
-
-    public void setMiniBatchSize(int miniBatchSize) {
-	properties.setParameter(Constants.MINI_BATCH_SIZE, miniBatchSize);
-    }
-
     protected void initializeWithRandom() {
 	if (properties.containsKey(Constants.RANDOM_INITIALIZER)) {
 	    N nn = getNeuralNetwork();

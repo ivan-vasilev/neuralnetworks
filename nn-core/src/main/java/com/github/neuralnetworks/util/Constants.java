@@ -13,7 +13,6 @@ public class Constants {
 	public static final String ADD_BIAS = "addBias";
 	public static final String LEARNING_RATE = "learning_rate";
 	public static final String MOMENTUM = "momentum";
-	public static final String MINI_BATCH_SIZE = "miniBatchSize";
 	public static final String VISIBLE_COUNT = "visibleCount";
 	public static final String HIDDEN_COUNT = "hiddenCount";
 	public static final String GIBBS_SAMPLING_COUNT = "gibbsSamplingCount";
