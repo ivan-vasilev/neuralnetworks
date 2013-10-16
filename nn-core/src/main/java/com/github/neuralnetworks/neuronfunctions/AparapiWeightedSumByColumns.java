@@ -34,6 +34,14 @@ public class AparapiWeightedSumByColumns extends Kernel implements InputFunction
 
     @Override
     public void calculate(Connections graph, Matrix inputMatrix, Matrix outputMatrix) {
+	init(graph, inputMatrix, outputMatrix);
+	execute(outputMatrix.getRows());
+    }
+
+    /**
+     * initialization before the actual calculation
+     */
+    protected void init(Connections graph, Matrix inputMatrix, Matrix outputMatrix) {
 	Matrix cg = graph.getConnectionGraph();
 
 	if (inputMatrix.getColumns() != outputMatrix.getColumns() || (outputMatrix.getRows() != cg.getColumns() && cg.getColumns() != 1)) {
@@ -51,7 +59,6 @@ public class AparapiWeightedSumByColumns extends Kernel implements InputFunction
 	this.inputStartIndex = graph.getInputLayerStartNeuron();
 
 	setExecutionMode(AparapiExecutionMode.getInstance().getExecutionMode());
-	this.execute(outputMatrix.getRows());
     }
 
     /**

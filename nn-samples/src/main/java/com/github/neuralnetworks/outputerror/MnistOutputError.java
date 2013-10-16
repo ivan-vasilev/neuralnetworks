@@ -9,9 +9,15 @@ public class MnistOutputError implements OutputError {
     private int count;
 
     @Override
-    public void addItem(Matrix networkOutput, Object[] targetOutput) {
-	for (int i = 0; i < targetOutput.length; i++, count++) {
-	    int val = (int) targetOutput[i];
+    public void addItem(Matrix networkOutput, Matrix targetOutput) {
+	for (int i = 0; i < targetOutput.getColumns(); i++, count++) {
+	    int val = 0;
+	    for (; val < 10; val++) {
+		if (targetOutput.get(val, i) == 1) {
+		    break;
+		}
+	    }
+
 	    for (int j = 0; j < networkOutput.getRows(); j++) {
 		if (networkOutput.get(j, i) > networkOutput.get(val, i)) {
 		    totalNetworkError++;

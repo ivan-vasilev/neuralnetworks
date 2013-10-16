@@ -15,19 +15,41 @@ import com.github.neuralnetworks.neuronfunctions.AparapiWeightedSumByRows;
 import com.github.neuralnetworks.neuronfunctions.InputFunction;
 import com.github.neuralnetworks.util.Util;
 
-public class BackPropagationAparapiImpl implements BackPropagation {
+/**
+ * Aparapi implementation of the backpropagation algorithm
+ * 
+ */
+public class BackPropagationAparapiImpl extends LayerCalculatorImpl implements BackPropagation {
 
-    private BackPropagationLayerCalculator layerCalculator;
+    private static final long serialVersionUID = 1L;
+
     private Map<Layer, Matrix> results;
+    private Map<Layer, Matrix> activations;
+    private AparapiRmsDerivativeByRows forward;
+    private AparapiRmsDerivativeByColumns backward;
 
-    public BackPropagationAparapiImpl(float learningRate) {
+    public BackPropagationAparapiImpl(float learningRate, float momentum) {
 	super();
-	this.layerCalculator = new BackPropagationLayerCalculator(learningRate);
 	this.results = new HashMap<Layer, Matrix>();
+	forward = new AparapiRmsDerivativeByRows();
+	backward = new AparapiRmsDerivativeByColumns();
+	forward.learningRate = backward.learningRate = learningRate;
+	forward.momentum = backward.momentum = momentum;
     }
 
     @Override
-    public void backPropagate(Matrix outputError, InputOutputLayers layers) {
+    protected InputFunction getInputFunction(Connections connection, Layer layer) {
+	if (layer != connection.getInputLayer()) {
+	    forward.activation = activations.get(layer).getElements();
+	    return forward;
+	} else {
+	    backward.activation = activations.get(layer).getElements();
+	    return backward;
+	}
+    }
+
+    @Override
+    public void backPropagate(Map<Layer, Matrix> activations, Matrix outputError, InputOutputLayers layers) {
 	Set<Layer> calculatedLayers = new HashSet<Layer>();
 	calculatedLayers.add(layers.getOutputLayer());
 	for (Matrix m : results.values()) {
@@ -35,60 +57,55 @@ public class BackPropagationAparapiImpl implements BackPropagation {
 	}
 
 	results.put(layers.getOutputLayer(), outputError);
-	layerCalculator.calculate(calculatedLayers, results, layers.getInputLayer());
+	this.activations = activations;
+
+	calculate(calculatedLayers, results, layers.getInputLayer());
     }
 
     @Override
-    public Matrix getOutputErrorDerivative(Matrix actual, Matrix target) {
-	if (actual.getElements().length != target.getElements().length || actual.getColumns() != target.getColumns()) {
+    public Matrix getOutputErrorDerivative(Matrix activation, Matrix target) {
+	if (activation.getElements().length != target.getElements().length || activation.getColumns() != target.getColumns()) {
 	    throw new IllegalArgumentException("Matrices are not the same");
 	}
 
-	Matrix result = new Matrix(actual);
-	for (int i = 0; i < actual.getElements().length; i++) {
-	    result.getElements()[i] = (target.getElements()[i] - actual.getElements()[i]) * actual.getElements()[i] * (actual.getElements()[i] - 1);
+	Matrix result = new Matrix(activation);
+	for (int i = 0; i < activation.getElements().length; i++) {
+	    result.getElements()[i] = (target.getElements()[i] - activation.getElements()[i]) * activation.getElements()[i] * (activation.getElements()[i] - 1);
 	}
 
 	return result;
-    }
-
-    private static class BackPropagationLayerCalculator extends LayerCalculatorImpl {
-
-	private static final long serialVersionUID = 1L;
-
-	private final AparapiRmsDerivativeByRows forward;
-	private final AparapiRmsDerivativeByColumns backward;
-
-	public BackPropagationLayerCalculator(float learningRate) {
-	    super();
-	    forward = new AparapiRmsDerivativeByRows();
-	    backward = new AparapiRmsDerivativeByColumns();
-	    forward.learningRate = backward.learningRate = learningRate;
-	}
-
-	@Override
-	protected InputFunction getInputFunction(Connections connection, Layer layer) {
-	    return connection.getInputLayer() != layer ? forward : backward;
-	}
     }
 
     private static class AparapiRmsDerivativeByRows extends AparapiWeightedSumByRows {
 
 	private static final long serialVersionUID = -5101971690861270462L;
 
-	private float[] actual;
+	private float[] activation;
+	private float[] weightUpdates;
 	private float learningRate;
+	private float momentum;
+
+	@Override
+	protected void init(Connections graph, Matrix inputMatrix, Matrix outputMatrix) {
+	    super.init(graph, inputMatrix, outputMatrix);
+	    if (weightUpdates == null || weightUpdates.length != graph.getConnectionGraph().getElements().length) {
+		weightUpdates = new float[graph.getConnectionGraph().getElements().length];
+	    }
+	}
 
 	@Override
 	protected void outputCalculated(int outputIndex) {
 	    int id = getGlobalId();
 	    for (int i = 0; i < inputOutputColumns; i++) {
 		int outputIdx = (outputStartIndex + id) * inputOutputColumns + i;
-		output[outputIdx] *= actual[outputIdx] * (actual[outputIdx] - 1);
+		output[outputIdx] *= activation[outputIdx] * (activation[outputIdx] - 1);
 
 		int weightStart = id * weightsColumns;
 		for (int j = 0; j < weightsColumns; j++) {
-		    weights[weightStart + j] += learningRate * output[outputIdx] * actual[outputIdx];
+		    int weightIdx = weightStart + j;
+		    float currentUpdate = learningRate * output[outputIdx] * input[(inputStartIndex + j) * inputOutputColumns + i] + momentum * weightUpdates[weightIdx];
+		    weights[weightIdx] += currentUpdate;
+		    weightUpdates[weightIdx] = currentUpdate;
 		}
 	    }
 	}
@@ -98,18 +115,31 @@ public class BackPropagationAparapiImpl implements BackPropagation {
 
 	private static final long serialVersionUID = -5101971690861270462L;
 
-	private float[] actual;
+	private float[] activation;
+	private float[] weightUpdates;
 	private float learningRate;
+	private float momentum;
+
+	@Override
+	protected void init(Connections graph, Matrix inputMatrix, Matrix outputMatrix) {
+	    super.init(graph, inputMatrix, outputMatrix);
+	    if (weightUpdates == null || weightUpdates.length != graph.getConnectionGraph().getElements().length) {
+		weightUpdates = new float[graph.getConnectionGraph().getElements().length];
+	    }
+	}
 
 	@Override
 	protected void outputCalculated(int outputIndex) {
 	    int id = getGlobalId();
 	    for (int i = 0; i < inputOutputColumns; i++) {
 		int outputIdx = (inputStartIndex + id) * inputOutputColumns + i;
-		output[outputIdx] *= actual[outputIdx] * (actual[outputIdx] - 1);
+		output[outputIdx] *= activation[outputIdx] * (activation[outputIdx] - 1);
 
 		for (int j = 0; j < weightsRows; j++) {
-		    weights[j * weightsColumns + id] += learningRate * output[outputIdx] * actual[outputIdx];
+		    int weightIdx = j * weightsColumns + id;
+		    float currentUpdate = learningRate * output[outputIdx] * input[(outputStartIndex + j) * inputOutputColumns + i] + momentum * weightUpdates[weightIdx];
+		    weights[weightIdx] += currentUpdate;
+		    weightUpdates[weightIdx] = currentUpdate;
 		}
 	    }
 	}

@@ -8,6 +8,7 @@ import java.util.Random;
 
 import com.github.neuralnetworks.input.InputConverter;
 import com.github.neuralnetworks.training.TrainingInputData;
+import com.github.neuralnetworks.training.TrainingInputDataImpl;
 import com.github.neuralnetworks.training.TrainingInputProvider;
 
 /**
@@ -66,7 +67,7 @@ public class MnistInputProvider implements TrainingInputProvider {
 		indexes[i] = elementsOrder.remove(random.nextInt(elementsOrder.size()));
 	    }
 
-	    result = new TrainingInputData(getImages(indexes), getLabels(indexes), inputConverter, targetConverter);
+	    result = new TrainingInputDataImpl(getImages(indexes), getLabels(indexes), inputConverter, targetConverter);
 	}
 
 	return result;

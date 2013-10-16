@@ -61,7 +61,7 @@ public class ContrastiveDivergenceAparapiTrainer extends Trainer<RBM> {
     protected void learnInput(TrainingInputData data) {
 	RBM rbm = getNeuralNetwork();
 
-	Matrix input = data.getConvertedInput();
+	Matrix input = data.getInput();
 
 	// required for aparapi
 	final int miniBatchSize = input.getColumns();

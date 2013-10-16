@@ -7,10 +7,10 @@ import com.github.neuralnetworks.architecture.Matrix;
 
 /**
  * this interface is implemented by neuron input functions
- *
+ * 
  * @author hok
- *
+ * 
  */
 public interface InputFunction extends Serializable {
-	public void calculate(Connections graph, Matrix input, Matrix output);
+    public void calculate(Connections graph, Matrix input, Matrix output);
 }

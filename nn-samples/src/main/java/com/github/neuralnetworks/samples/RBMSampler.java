@@ -1,5 +1,6 @@
 package com.github.neuralnetworks.samples;
 
+import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.types.RBM;
 import com.github.neuralnetworks.calculation.LayerCalculatorImpl;
 import com.github.neuralnetworks.input.MeanInputModifier;
@@ -42,13 +43,14 @@ public class RBMSampler extends Sampler {
 	rbmProperties.setParameter(Constants.BACKWARD_INPUT_FUNCTION, new AparapiSigmoidByColumns());
 	rbmProperties.setParameter(Constants.ACTIVATION_FUNCTION, new RepeaterFunction());
 	rbmProperties.setParameter(Constants.ADD_BIAS, true);
-	RBM rbm = new RBM(rbmProperties);
+	RBM rbm = new RBM(new Layer(training.getRows() * training.getCols(), new AparapiSigmoidByRows(), new AparapiSigmoidByColumns(), null),
+			new Layer(training.getRows() * training.getCols(), new AparapiSigmoidByRows(), new AparapiSigmoidByColumns(), null), false, false);
 
 	Properties trainerProperties = new Properties();
 	trainerProperties.setParameter(Constants.NEURAL_NETWORK, rbm);
 	trainerProperties.setParameter(Constants.TRAINING_INPUT_PROVIDER, training);
 	trainerProperties.setParameter(Constants.TESTING_INPUT_PROVIDER, testing);
-	trainerProperties.setParameter(Constants.TEST_LAYER_CALCULATOR, new LayerCalculatorImpl());
+	trainerProperties.setParameter(Constants.LAYER_CALCULATOR, new LayerCalculatorImpl());
 	trainerProperties.setParameter(Constants.MINI_BATCH_SIZE, 10);
 	trainerProperties.setParameter(Constants.LEARNING_RATE, 0.001f);
 	trainerProperties.setParameter(Constants.OUTPUT_ERROR, new MnistOutputError());

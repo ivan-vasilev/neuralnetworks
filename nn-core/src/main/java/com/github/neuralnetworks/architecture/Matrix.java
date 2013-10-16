@@ -12,8 +12,8 @@ public class Matrix implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    public float[] elements;
-    public int columns;
+    private float[] elements;
+    private int columns;
 
     public Matrix() {
 	super();

@@ -9,30 +9,30 @@ import com.github.neuralnetworks.util.Util;
  */
 public class ConstantInput implements InputFunction {
 
-	private static final long serialVersionUID = 2792702356148670315L;
+    private static final long serialVersionUID = 2792702356148670315L;
 
-	private float output;
+    private float output;
 
-	public ConstantInput(float output) {
-		super();
-		this.output = output;
-	}
+    public ConstantInput(float output) {
+	super();
+	this.output = output;
+    }
 
-	public ConstantInput() {
-		super();
-		this.output = 1;
-	}
+    public ConstantInput() {
+	super();
+	this.output = 1;
+    }
 
-	public float getOutput() {
-		return output;
-	}
+    public float getOutput() {
+	return output;
+    }
 
-	public void setOutput(float output) {
-		this.output = output;
-	}
+    public void setOutput(float output) {
+	this.output = output;
+    }
 
-	@Override
-	public void calculate(Connections graph, Matrix inputValues, Matrix result) {
-		Util.fillArray(result.getElements(), output);
-	}
+    @Override
+    public void calculate(Connections graph, Matrix inputValues, Matrix result) {
+	Util.fillArray(result.getElements(), output);
+    }
 }

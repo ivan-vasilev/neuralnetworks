@@ -1,70 +1,67 @@
 package com.github.neuralnetworks.architecture;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.github.neuralnetworks.util.Properties;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * this is the base class for all the neural networks
- * 
- * @author hok
- * 
  */
 public class NeuralNetwork implements InputOutputLayers {
 
-    protected Layer inputLayer;
-    protected Layer outputLayer;
-    protected List<Connections> connections;
-    protected List<Layer> layers;
-    protected Properties properties;
+    private Set<Layer> layers;
 
-    public NeuralNetwork(Properties properties) {
+    public NeuralNetwork() {
 	super();
-	this.properties = properties;
-	this.connections = new ArrayList<Connections>();
-	this.layers = new ArrayList<Layer>();
-    }
-
-    public NeuralNetwork(Layer inputLayer, Layer outputLayer) {
-	super();
-	this.inputLayer = inputLayer;
-	this.outputLayer = outputLayer;
-	this.connections = new ArrayList<Connections>();
-	this.layers = new ArrayList<Layer>();
+	this.layers = new HashSet<Layer>();
     }
 
     @Override
     public Layer getInputLayer() {
-	return inputLayer;
+	hasInboundConnections:
+	for (Layer l : layers) {
+	    for (Connections c : l.getConnections()) {
+		if (l == c.getOutputLayer()) {
+		    continue hasInboundConnections;
+		}
+	    }
+
+	    return l;
+	}
+
+	return null;
     }
 
     @Override
     public Layer getOutputLayer() {
-	return outputLayer;
+	hasOutboundConnections:
+	for (Layer l : layers) {
+	    for (Connections c : l.getConnections()) {
+		if (l == c.getInputLayer()) {
+		    continue hasOutboundConnections;
+		}
+	    }
+
+	    return l;
+	}
+
+	return null;
     }
 
-    public List<Connections> getConnections() {
-	return connections;
+    public Set<Connections> getConnections() {
+	Set<Connections> result = new HashSet<>();
+	for (Layer l : layers) {
+	    result.addAll(l.getConnections());
+	}
+
+	return result;
     }
 
-    public void setConnections(List<Connections> connections) {
-	this.connections = connections;
+    public void addConnection(Connections c) {
+	layers.add(c.getInputLayer());
+	layers.add(c.getOutputLayer());
     }
 
-    public List<Layer> getLayers() {
+    public Set<Layer> getLayers() {
 	return layers;
-    }
-
-    public void setLayers(List<Layer> layers) {
-	this.layers = layers;
-    }
-
-    public Properties getProperties() {
-	return properties;
-    }
-
-    public void setProperties(Properties properties) {
-	this.properties = properties;
     }
 }

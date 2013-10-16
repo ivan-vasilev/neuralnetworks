@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
 
+import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.calculation.OutputError;
 
@@ -20,9 +21,15 @@ public class Util {
 	    sb.append(e.getKey()).append(": ");
 	    switch (e.getKey()) {
 	    case Constants.NEURAL_NETWORK:
-		sb.append(System.getProperty("line.separator"));
 		NeuralNetwork nn = (NeuralNetwork) e.getValue();
-		sb.append(nn.getClass().getCanonicalName()).append(": ").append(System.getProperty("line.separator")).append(propertiesToString(nn.getProperties()));
+		sb.append(System.getProperty("line.separator")).append(nn.getClass().getSimpleName()).append( " layers:").append(System.getProperty("line.separator"));
+		for (Layer l : nn.getLayers()) {
+		    sb	.append(l.getNeuronCount()).append(" neurons; ")
+		    	.append(l.getForwardInputFunction().getClass().getSimpleName()).append(" forward input; ")
+		    	.append(l.getBackwardInputFunction().getClass().getSimpleName()).append(" backward input; ")
+		    	.append(l.getActivationFunction().getClass().getSimpleName()).append(" activation function; ")
+		    	.append(System.getProperty("line.separator"));
+		}
 		break;
 	    case Constants.LAYERS:
 		@SuppressWarnings("unchecked")

@@ -31,7 +31,7 @@ public class LayerCalculatorImpl implements LayerCalculator, Serializable {
     protected void calculate(Set<Layer> calculatedLayers, Set<Layer> inProgressLayers, Map<Layer, Matrix> results, Layer currentLayer) {
 	if (!calculatedLayers.contains(currentLayer) && !inProgressLayers.contains(currentLayer)) {
 	    inProgressLayers.add(currentLayer);
-	    for (Connections c : currentLayer.getConnectionGraphs()) {
+	    for (Connections c : currentLayer.getConnections()) {
 		Layer opposite = c.getInputLayer() != currentLayer ? c.getInputLayer() : c.getOutputLayer();
 		InputFunction inputFunction = getInputFunction(c, currentLayer);
 

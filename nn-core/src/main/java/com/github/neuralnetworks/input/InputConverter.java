@@ -8,9 +8,10 @@ import com.github.neuralnetworks.architecture.Matrix;
 /**
  * 
  * Class for converting input values to matrices
- *
+ * 
  */
 public abstract class InputConverter {
+
     private List<InputModifier> modifiers;
     private Matrix convertedInput;
     private Object[] notConvertedInput;

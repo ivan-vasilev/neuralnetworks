@@ -23,8 +23,8 @@ public abstract class ConnectionsImpl implements Connections {
 	this.inputLayer = inputLayer;
 	this.outputLayer = outputLayer;
 
-	inputLayer.addConnectionGraph(this);
-	outputLayer.addConnectionGraph(this);
+	inputLayer.addConnection(this);
+	outputLayer.addConnection(this);
     }
 
     @Override
