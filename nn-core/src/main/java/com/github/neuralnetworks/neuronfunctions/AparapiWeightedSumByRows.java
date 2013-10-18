@@ -1,67 +1,40 @@
 package com.github.neuralnetworks.neuronfunctions;
 
-import com.amd.aparapi.Kernel;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Matrix;
-import com.github.neuralnetworks.util.AparapiExecutionMode;
 
-public class AparapiWeightedSumByRows extends Kernel implements InputFunction {
+public class AparapiWeightedSumByRows extends AparapiBaseFunction implements InputFunction {
 
     private static final long serialVersionUID = 8288998425211708411L;
-
-    protected float weights[];
-    protected float[] input;
-    protected float[] output;
-    protected int weightsColumns;
-    protected int inputOutputColumns;
-    protected int inputStartIndex;
-    protected int outputStartIndex;
 
     @Override
     public void run() {
 	int id = getGlobalId();
+
 	for (int i = 0; i < inputOutputColumns; i++) {
-	    int outputIdx = (outputStartIndex + id) * inputOutputColumns + i;
-	    int weightsStartIdx = weightsColumns * id;
 	    for (int j = 0; j < weightsColumns; j++) {
-		output[outputIdx] += input[(inputStartIndex + j) * inputOutputColumns + i] * weights[weightsStartIdx + j];
+		output[outputIndex(id, i)] += input[inputIndex(j, i)] * weights[weightIndex(id, j)];
 	    }
 
-	    outputCalculated(outputIdx);
+	    outputCalculated(id, i);
 	}
-    }
-
-    @Override
-    public void calculate(Connections graph, Matrix inputMatrix, Matrix outputMatrix) {
-	init(graph, inputMatrix, outputMatrix);
-	execute(outputMatrix.getRows());
     }
 
     /**
      * initialization before the actual calculation
      */
+    @Override
     protected void init(Connections graph, Matrix inputMatrix, Matrix outputMatrix) {
-	Matrix cg = graph.getConnectionGraph();
+	super.init(graph, inputMatrix, outputMatrix);
 
-	if (inputMatrix.getColumns() != outputMatrix.getColumns() || outputMatrix.getRows() != cg.getRows()) {
+	if (inputMatrix.getColumns() != outputMatrix.getColumns() || outputMatrix.getRows() != graph.getConnectionGraph().getRows()) {
 	    throw new IllegalArgumentException("matrices do not match");
 	}
-
-	this.weights = cg.getElements();
-	this.input = inputMatrix.getElements();
-	this.output = outputMatrix.getElements();
-
-	this.weightsColumns = cg.getColumns();
-	this.inputOutputColumns = inputMatrix.getColumns();
-	this.outputStartIndex = graph.getOutputLayerStartNeuron();
-	this.inputStartIndex = graph.getInputLayerStartNeuron();
-
-	setExecutionMode(AparapiExecutionMode.getInstance().getExecutionMode());
     }
 
     /**
      * @param outputIndex - index within the output array
      */
-    protected void outputCalculated(int outputIndex) {
+    protected void outputCalculated(int row, int column) {
     }
 }

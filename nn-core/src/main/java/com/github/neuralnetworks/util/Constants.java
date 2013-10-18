@@ -16,7 +16,6 @@ public class Constants {
 	public static final String VISIBLE_COUNT = "visibleCount";
 	public static final String HIDDEN_COUNT = "hiddenCount";
 	public static final String GIBBS_SAMPLING_COUNT = "gibbsSamplingCount";
-	public static final String LAYERS = "layers";
 	public static final String TRAINING_INPUT_PROVIDER = "trainingInputProvider";
 	public static final String TESTING_INPUT_PROVIDER = "testingInputProvider";
 	public static final String NEURAL_NETWORK = "neuralNetwork";

@@ -1,8 +1,6 @@
 package com.github.neuralnetworks.util;
 
 import java.text.NumberFormat;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map.Entry;
 
 import com.github.neuralnetworks.architecture.Layer;
@@ -25,16 +23,11 @@ public class Util {
 		sb.append(System.getProperty("line.separator")).append(nn.getClass().getSimpleName()).append( " layers:").append(System.getProperty("line.separator"));
 		for (Layer l : nn.getLayers()) {
 		    sb	.append(l.getNeuronCount()).append(" neurons; ")
-		    	.append(l.getForwardInputFunction().getClass().getSimpleName()).append(" forward input; ")
-		    	.append(l.getBackwardInputFunction().getClass().getSimpleName()).append(" backward input; ")
+		    	.append(l.getForwardInputFunction() != null ? l.getForwardInputFunction().getClass().getSimpleName() : "No").append(" forward input; ")
+		    	.append(l.getBackwardInputFunction() != null ? l.getBackwardInputFunction().getClass().getSimpleName() : "No").append(" backward input; ")
 		    	.append(l.getActivationFunction() != null ? l.getActivationFunction().getClass().getSimpleName() : "No").append(" activation function; ")
 		    	.append(System.getProperty("line.separator"));
 		}
-		break;
-	    case Constants.LAYERS:
-		@SuppressWarnings("unchecked")
-		List<Integer> layers = (List<Integer>) e.getValue();
-		sb.append(Arrays.toString(layers.toArray()));
 		break;
 	    case Constants.OUTPUT_ERROR:
 		OutputError error = (OutputError) e.getValue();

@@ -1,7 +1,8 @@
 package com.github.neuralnetworks.architecture;
 
-import java.util.HashSet;
 import java.util.Set;
+
+import com.github.neuralnetworks.util.UniqueList;
 
 /**
  * this is the base class for all the neural networks
@@ -12,7 +13,7 @@ public class NeuralNetwork implements InputOutputLayers {
 
     public NeuralNetwork() {
 	super();
-	this.layers = new HashSet<Layer>();
+	this.layers = new UniqueList<Layer>();
     }
 
     @Override
@@ -48,7 +49,7 @@ public class NeuralNetwork implements InputOutputLayers {
     }
 
     public Set<Connections> getConnections() {
-	Set<Connections> result = new HashSet<>();
+	Set<Connections> result = new UniqueList<>();
 	for (Layer l : layers) {
 	    result.addAll(l.getConnections());
 	}
@@ -57,8 +58,13 @@ public class NeuralNetwork implements InputOutputLayers {
     }
 
     public void addConnection(Connections c) {
-	layers.add(c.getInputLayer());
-	layers.add(c.getOutputLayer());
+	if (!layers.contains(c.getInputLayer())) {
+	    layers.add(c.getInputLayer());
+	}
+
+	if (!layers.contains(c.getOutputLayer())) {
+	    layers.add(c.getOutputLayer());
+	}
     }
 
     public Set<Layer> getLayers() {

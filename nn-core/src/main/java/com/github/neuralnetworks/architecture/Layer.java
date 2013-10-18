@@ -1,11 +1,11 @@
 package com.github.neuralnetworks.architecture;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Set;
 
 import com.github.neuralnetworks.neuronfunctions.ActivationFunction;
 import com.github.neuralnetworks.neuronfunctions.InputFunction;
+import com.github.neuralnetworks.util.UniqueList;
 
 /**
  * 
@@ -25,7 +25,7 @@ public class Layer implements Serializable {
     public Layer(int neuronCount) {
 	super();
 	this.neuronCount = neuronCount;
-	this.connections = new HashSet<>();
+	this.connections = new UniqueList<>();
     }
 
     public Layer(int neuronCount, InputFunction forwardInputFunction, InputFunction backwardInputFunction, ActivationFunction activationFunction) {
@@ -34,16 +34,7 @@ public class Layer implements Serializable {
 	this.forwardInputFunction = forwardInputFunction;
 	this.backwardInputFunction = backwardInputFunction;
 	this.activationFunction = activationFunction;
-	this.connections = new HashSet<>();
-    }
-
-    public Layer(int neuronCount, InputFunction forwardInputFunction, InputFunction backwardInputFunction, ActivationFunction activationFunction, Set<Connections> connections) {
-	super();
-	this.neuronCount = neuronCount;
-	this.forwardInputFunction = forwardInputFunction;
-	this.backwardInputFunction = backwardInputFunction;
-	this.activationFunction = activationFunction;
-	this.connections = connections;
+	this.connections = new UniqueList<>();
     }
 
     public int getNeuronCount() {
@@ -88,7 +79,7 @@ public class Layer implements Serializable {
 
     public void addConnection(Connections connection) {
 	if (connections == null) {
-	    connections = new HashSet<>();
+	    connections = new UniqueList<>();
 	}
 
 	connections.add(connection);

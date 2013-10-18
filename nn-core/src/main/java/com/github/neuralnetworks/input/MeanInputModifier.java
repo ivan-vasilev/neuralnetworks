@@ -18,7 +18,9 @@ public class MeanInputModifier implements InputModifier {
 	float mean = getMean(input);
 	float[] elements = input.getElements();
 	for (int i = 0; i < elements.length; i++) {
-	    elements[i] -= mean;
+	    if (elements[i] != 0) {
+		elements[i] -= mean;
+	    }
 	}
 
 	return input;

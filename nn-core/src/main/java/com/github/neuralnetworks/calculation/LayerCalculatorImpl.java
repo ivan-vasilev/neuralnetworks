@@ -2,10 +2,9 @@ package com.github.neuralnetworks.calculation;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import com.github.neuralnetworks.architecture.Connections;
@@ -15,6 +14,7 @@ import com.github.neuralnetworks.events.PropagationEvent;
 import com.github.neuralnetworks.events.PropagationEventListener;
 import com.github.neuralnetworks.neuronfunctions.ConstantInput;
 import com.github.neuralnetworks.neuronfunctions.InputFunction;
+import com.github.neuralnetworks.util.UniqueList;
 import com.github.neuralnetworks.util.Util;
 
 public class LayerCalculatorImpl implements LayerCalculator, Serializable {
@@ -25,7 +25,7 @@ public class LayerCalculatorImpl implements LayerCalculator, Serializable {
 
     @Override
     public void calculate(Set<Layer> calculatedLayers, Map<Layer, Matrix> results, Layer layer) {
-	calculate(calculatedLayers, new HashSet<Layer>(), results, layer);
+	calculate(calculatedLayers, new UniqueList<Layer>(), results, layer);
     }
 
     protected void calculate(Set<Layer> calculatedLayers, Set<Layer> inProgressLayers, Map<Layer, Matrix> results, Layer currentLayer) {
@@ -37,8 +37,8 @@ public class LayerCalculatorImpl implements LayerCalculator, Serializable {
 
 		if (inputFunction instanceof ConstantInput) {
 		    Matrix output = results.get(currentLayer);
-		    if (output == null) {
-			int columns = getInputColumns(results.values());
+		    int columns = getInputColumns(calculatedLayers, results);
+		    if (output == null || output.getColumns() != columns) {
 			output = new Matrix(currentLayer.getNeuronCount(), columns);
 			results.put(currentLayer, output);
 		    }
@@ -50,7 +50,7 @@ public class LayerCalculatorImpl implements LayerCalculator, Serializable {
 		    Matrix input = results.get(opposite);
 
 		    Matrix output = results.get(currentLayer);
-		    if (output == null) {
+		    if (output == null || input.getColumns() != output.getColumns()) {
 			output = new Matrix(currentLayer.getNeuronCount(), input.getColumns());
 			results.put(currentLayer, output);
 		    }
@@ -74,10 +74,10 @@ public class LayerCalculatorImpl implements LayerCalculator, Serializable {
 	return connection.getInputLayer() != layer ? layer.getForwardInputFunction() : layer.getBackwardInputFunction();
     }
 
-    private Integer getInputColumns(Collection<Matrix> results) {
-	for (Matrix m : results) {
-	    if (m != null) {
-		return m.getColumns();
+    private Integer getInputColumns(Set<Layer> calculatedLayers, Map<Layer, Matrix> results) {
+	for (Entry<Layer, Matrix> e : results.entrySet()) {
+	    if (calculatedLayers.contains(e.getKey())) {
+		return e.getValue().getColumns();
 	    }
 	}
 

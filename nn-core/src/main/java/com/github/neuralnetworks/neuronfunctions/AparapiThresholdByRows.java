@@ -17,11 +17,11 @@ public class AparapiThresholdByRows extends AparapiWeightedSumByRows {
     }
 
     @Override
-    protected void outputCalculated(int outputIndex) {
-	if (output[outputIndex] < threshold) {
-	    output[outputIndex] = 0;
+    protected void outputCalculated(int row, int column) {
+	if (output[outputIndex(row, column)] < threshold) {
+	    output[outputIndex(row, column)] = 0;
 	} else {
-	    output[outputIndex] = 1;
+	    output[outputIndex(row, column)] = 1;
 	}
     }
 
@@ -37,11 +37,17 @@ public class AparapiThresholdByRows extends AparapiWeightedSumByRows {
 	}
 
 	@Override
-	protected void outputCalculated(int outputIndex) {
-	    if (output[outputIndex] < threshold) {
-		output[outputIndex] = 0;
+	protected void outputCalculated(int row, int column) {
+	    // if (output[outputIndex] < threshold) {
+	    // output[outputIndex] = 0;
+	    // } else {
+	    // output[outputIndex] = 1;
+	    // }
+
+	    if (output[outputIndex(row, column)] < threshold) {
+		output[outputIndex(row, column)] = 0;
 	    } else {
-		output[outputIndex] = 1;
+		output[outputIndex(row, column)] = 1;
 	    }
 	}
     }

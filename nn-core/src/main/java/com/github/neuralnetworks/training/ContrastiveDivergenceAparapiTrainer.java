@@ -1,7 +1,6 @@
 package com.github.neuralnetworks.training;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -13,6 +12,7 @@ import com.github.neuralnetworks.calculation.LayerCalculatorImpl;
 import com.github.neuralnetworks.util.AparapiExecutionMode;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
+import com.github.neuralnetworks.util.UniqueList;
 import com.github.neuralnetworks.util.Util;
 
 public class ContrastiveDivergenceAparapiTrainer extends Trainer<RBM> {
@@ -56,7 +56,7 @@ public class ContrastiveDivergenceAparapiTrainer extends Trainer<RBM> {
 	final float[] negPhaseHidden = this.negPhaseHidden.getElements();
 	final float[] weights = rbm.getMainConnections().getConnectionGraph().getElements();
 	final float learningRate = (float) properties.get(Constants.LEARNING_RATE);
-	Set<Layer> calculatedLayers = new HashSet<Layer>();
+	Set<Layer> calculatedLayers = new UniqueList<Layer>();
 
 	// nullify weights
 	Util.fillArray(weightUpdates, 0);

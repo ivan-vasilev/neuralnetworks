@@ -1,7 +1,6 @@
 package com.github.neuralnetworks.training;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -13,6 +12,7 @@ import com.github.neuralnetworks.calculation.LayerCalculator;
 import com.github.neuralnetworks.calculation.OutputError;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
+import com.github.neuralnetworks.util.UniqueList;
 import com.github.neuralnetworks.util.Util;
 
 /**
@@ -50,21 +50,20 @@ public abstract class Trainer<N extends NeuralNetwork> {
 
 	OutputError e = getOutputError();
 
-	Set<Layer> calculatedLayers = new HashSet<>();
-	calculatedLayers.add(n.getInputLayer());
-
+	Set<Layer> calculatedLayers = new UniqueList<>();
 	Map<Layer, Matrix> results = new HashMap<>();
 	TrainingInputData input = null;
 
 	while ((input = ip.getNextInput()) != null) {
+	    calculatedLayers.clear();
+	    calculatedLayers.add(n.getInputLayer());
+	    results.put(n.getInputLayer(), input.getInput());
+	    c.calculate(calculatedLayers, results, n.getOutputLayer());
+	    e.addItem(results.get(n.getOutputLayer()), input.getTarget());
+
 	    for (Matrix m : results.values()) {
 		Util.fillArray(m.getElements(), 0);
 	    }
-
-	    results.put(n.getInputLayer(), input.getInput());
-
-	    c.calculate(calculatedLayers, results, n.getOutputLayer());
-	    e.addItem(results.get(n.getOutputLayer()), input.getTarget());
 	}
 
 	return e.getTotalNetworkError();

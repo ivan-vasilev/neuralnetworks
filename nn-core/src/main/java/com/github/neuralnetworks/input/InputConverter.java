@@ -13,17 +13,13 @@ import com.github.neuralnetworks.architecture.Matrix;
 public abstract class InputConverter {
 
     private List<InputModifier> modifiers;
-    private Matrix convertedInput;
-    private Object[] notConvertedInput;
+    protected Matrix convertedInput;
 
     public Matrix getConvertedInput(Object[] input) {
-	if (notConvertedInput != input) {
-	    notConvertedInput = input;
-	    convertedInput = convert(input);
-	    if (modifiers != null) {
-		for (InputModifier m : modifiers) {
-		    m.modify(convertedInput);
-		}
+	convertedInput = convert(input);
+	if (modifiers != null) {
+	    for (InputModifier m : modifiers) {
+		m.modify(convertedInput);
 	    }
 	}
 

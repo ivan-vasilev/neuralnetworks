@@ -13,7 +13,7 @@ public class MersenneTwisterRandomInitializer extends RandomInitializerImpl {
 	super(new MersenneTwisterRNG());
     }
 
-    public MersenneTwisterRandomInitializer(float start, float range) {
-	super(new MersenneTwisterRNG(), start, range);
+    public MersenneTwisterRandomInitializer(float start, float end) {
+	super(new MersenneTwisterRNG(), start, end);
     }
 }

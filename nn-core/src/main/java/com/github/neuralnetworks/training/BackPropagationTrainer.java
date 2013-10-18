@@ -1,15 +1,16 @@
 package com.github.neuralnetworks.training;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
+import com.github.neuralnetworks.calculation.LayerCalculator;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
+import com.github.neuralnetworks.util.UniqueList;
 
 public class BackPropagationTrainer extends Trainer<NeuralNetwork> {
 
@@ -17,15 +18,11 @@ public class BackPropagationTrainer extends Trainer<NeuralNetwork> {
 
     public BackPropagationTrainer() {
 	super();
-	init();
+	results = new HashMap<Layer, Matrix>();
     }
 
     public BackPropagationTrainer(Properties properties) {
 	super(properties);
-	init();
-    }
-
-    protected void init() {
 	results = new HashMap<Layer, Matrix>();
     }
 
@@ -34,9 +31,10 @@ public class BackPropagationTrainer extends Trainer<NeuralNetwork> {
 	NeuralNetwork nn = getNeuralNetwork();
 
 	results.put(nn.getInputLayer(), data.getInput());
-	Set<Layer> calculatedLayers = new HashSet<Layer>();
+	Set<Layer> calculatedLayers = new UniqueList<Layer>();
 	calculatedLayers.add(nn.getInputLayer());
-	getLayerCalculator().calculate(calculatedLayers, results, nn.getOutputLayer());
+	LayerCalculator lc = getLayerCalculator();
+	lc.calculate(calculatedLayers, results, nn.getOutputLayer());
 
 	BackPropagation bp = getProperties().getParameter(Constants.BACKPROPAGATION);
 	Matrix outputErrorDerivative = bp.getOutputErrorDerivative(results.get(nn.getOutputLayer()), data.getTarget());

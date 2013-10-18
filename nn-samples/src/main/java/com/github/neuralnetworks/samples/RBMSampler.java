@@ -7,10 +7,10 @@ import com.github.neuralnetworks.input.MeanInputModifier;
 import com.github.neuralnetworks.input.ScalingInputModifier;
 import com.github.neuralnetworks.input.mnist.MnistInputConverter;
 import com.github.neuralnetworks.input.mnist.MnistInputProvider;
-import com.github.neuralnetworks.input.mnist.MnistTargetConverter;
+import com.github.neuralnetworks.input.mnist.MnistTargetMultiNeuronOutputConverter;
 import com.github.neuralnetworks.neuronfunctions.AparapiSigmoidByRows;
 import com.github.neuralnetworks.neuronfunctions.AparapiSigmoidByRows.AparapiSigmoidByColumns;
-import com.github.neuralnetworks.outputerror.MnistOutputError;
+import com.github.neuralnetworks.outputerror.MnistMultipleNeuronsOutputError;
 import com.github.neuralnetworks.testing.Sampler;
 import com.github.neuralnetworks.training.ContrastiveDivergenceAparapiTrainer;
 import com.github.neuralnetworks.training.MersenneTwisterRandomInitializer;
@@ -31,7 +31,7 @@ public class RBMSampler extends Sampler {
 	inputTestingConverter.addModifier(new MeanInputModifier());
 	inputTestingConverter.addModifier(new ScalingInputModifier(255));
 
-	MnistTargetConverter targetConverter = new MnistTargetConverter();
+	MnistTargetMultiNeuronOutputConverter targetConverter = new MnistTargetMultiNeuronOutputConverter();
 	MnistInputProvider training = new MnistInputProvider("train-images.idx3-ubyte", "train-labels.idx1-ubyte", 10, inputTrainingConverter, targetConverter);
 	MnistInputProvider testing = new MnistInputProvider("t10k-images.idx3-ubyte", "t10k-labels.idx1-ubyte", 1, inputTestingConverter, targetConverter);
 
@@ -43,7 +43,7 @@ public class RBMSampler extends Sampler {
 	trainerProperties.setParameter(Constants.TESTING_INPUT_PROVIDER, testing);
 	trainerProperties.setParameter(Constants.LAYER_CALCULATOR, new LayerCalculatorImpl());
 	trainerProperties.setParameter(Constants.LEARNING_RATE, 0.01f);
-	trainerProperties.setParameter(Constants.OUTPUT_ERROR, new MnistOutputError());
+	trainerProperties.setParameter(Constants.OUTPUT_ERROR, new MnistMultipleNeuronsOutputError());
 	trainerProperties.setParameter(Constants.RANDOM_INITIALIZER, new MersenneTwisterRandomInitializer(-0.1f, 0.2f));
 	ContrastiveDivergenceAparapiTrainer trainer = new ContrastiveDivergenceAparapiTrainer(trainerProperties);
 	trainingConfigurations.add(trainer);
