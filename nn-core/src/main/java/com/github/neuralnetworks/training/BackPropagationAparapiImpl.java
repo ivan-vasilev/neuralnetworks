@@ -62,7 +62,7 @@ public class BackPropagationAparapiImpl extends LayerCalculatorImpl implements B
 
 	Matrix result = new Matrix(activation);
 	for (int i = 0; i < activation.getElements().length; i++) {
-	    result.getElements()[i] = (target.getElements()[i] - activation.getElements()[i]) * activation.getElements()[i] * (activation.getElements()[i] - 1);
+	    result.getElements()[i] = (target.getElements()[i] - activation.getElements()[i]) * activation.getElements()[i] * (1 - activation.getElements()[i]);
 	}
 
 	return result;
@@ -73,7 +73,6 @@ public class BackPropagationAparapiImpl extends LayerCalculatorImpl implements B
 	private static final long serialVersionUID = -5101971690861270462L;
 
 	private float[] outputActivation;
-	private float[] inputActivation;
 	private float[] weightUpdates;
 	private float learningRate;
 	private float momentum;
@@ -86,16 +85,15 @@ public class BackPropagationAparapiImpl extends LayerCalculatorImpl implements B
 		weightUpdates = new float[graph.getConnectionGraph().getElements().length];
 	    }
 
-	    inputActivation = activations.get(graph.getInputLayer()).getElements();
 	    outputActivation = activations.get(graph.getOutputLayer()).getElements();
 	}
 
 	@Override
 	protected void outputCalculated(int row, int column) {
-	    output[outputIndex(row, column)] *= outputActivation[outputIndex(row, column)] * (outputActivation[outputIndex(row, column)] - 1);
+	    output[outputIndex(row, column)] *= outputActivation[outputIndex(row, column)] * (1 - outputActivation[outputIndex(row, column)]);
 
 	    for (int j = 0; j < weightsColumns; j++) {
-		float weightUpdate = learningRate * output[outputIndex(row, column)] * inputActivation[inputIndex(j, column)] + momentum * weightUpdates[weightIndex(row, j)];
+		float weightUpdate = learningRate * input[inputIndex(j, column)] * outputActivation[outputIndex(row, column)] + momentum * weightUpdates[weightIndex(row, j)];
 		weights[weightIndex(row, j)] += weightUpdate;
 		weightUpdates[weightIndex(row, j)] = weightUpdate;
 	    }
@@ -107,7 +105,6 @@ public class BackPropagationAparapiImpl extends LayerCalculatorImpl implements B
 	private static final long serialVersionUID = -5101971690861270462L;
 
 	private float[] outputActivation;
-	private float[] inputActivation;
 	private float[] weightUpdates;
 	private float learningRate;
 	private float momentum;
@@ -120,16 +117,15 @@ public class BackPropagationAparapiImpl extends LayerCalculatorImpl implements B
 		weightUpdates = new float[graph.getConnectionGraph().getElements().length];
 	    }
 
-	    inputActivation = activations.get(graph.getOutputLayer()).getElements();
 	    outputActivation = activations.get(graph.getInputLayer()).getElements();
 	}
 
 	@Override
 	protected void outputCalculated(int row, int column) {
-	    output[outputIndex(row, column)] *= outputActivation[outputIndex(row, column)] * (outputActivation[outputIndex(row, column)] - 1);
+	    output[outputIndex(row, column)] *= outputActivation[outputIndex(row, column)] * (1 - outputActivation[outputIndex(row, column)]);
 
 	    for (int j = 0; j < weightsRows; j++) {
-		float weightUpdate = learningRate * output[outputIndex(row, column)] * inputActivation[inputIndex(j, column)] + momentum * weightUpdates[weightIndex(j, row)];
+		float weightUpdate = learningRate * input[inputIndex(j, column)] * outputActivation[inputIndex(row, column)] + momentum * weightUpdates[weightIndex(j, row)];
 		weights[weightIndex(j, row)] += weightUpdate;
 		weightUpdates[weightIndex(j, row)] = weightUpdate;
 	    }
