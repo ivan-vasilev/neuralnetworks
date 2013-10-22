@@ -1,6 +1,8 @@
 package com.github.neuralnetworks.training;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -10,6 +12,8 @@ import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.calculation.LayerCalculator;
 import com.github.neuralnetworks.calculation.OutputError;
+import com.github.neuralnetworks.events.TrainingEvent;
+import com.github.neuralnetworks.events.TrainingEventListener;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
 import com.github.neuralnetworks.util.UniqueList;
@@ -23,6 +27,7 @@ import com.github.neuralnetworks.util.Util;
 public abstract class Trainer<N extends NeuralNetwork> {
 
     protected Properties properties;
+    protected List<TrainingEventListener> listeners;
 
     public Trainer() {
 	super();
@@ -40,7 +45,10 @@ public abstract class Trainer<N extends NeuralNetwork> {
 	TrainingInputData input = null;
 	while ((input = getTrainingInputProvider().getNextInput()) != null) {
 	    learnInput(input);
+	    triggerEvent(new SampleFinishedEvent(this, input));
 	}
+
+	triggerEvent(new TrainingFinishedEvent(this));
     }
 
     public float test() {
@@ -64,7 +72,11 @@ public abstract class Trainer<N extends NeuralNetwork> {
 	    for (Matrix m : results.values()) {
 		Util.fillArray(m.getElements(), 0);
 	    }
+
+	    triggerEvent(new SampleFinishedEvent(this, input));
 	}
+
+	triggerEvent(new TestingFinishedEvent(this));
 
 	return e.getTotalNetworkError();
     }
@@ -117,6 +129,28 @@ public abstract class Trainer<N extends NeuralNetwork> {
 	properties.setParameter(Constants.LAYER_CALCULATOR, layerCalculator);
     }
 
+    public void addEventListener(TrainingEventListener listener) {
+	if (listeners == null) {
+	    listeners = new ArrayList<>();
+	}
+
+	listeners.add(listener);
+    }
+
+    public void removeEventListener(TrainingEventListener listener) {
+	if (listeners != null) {
+	    listeners.remove(listener);
+	}
+    }
+
+    protected void triggerEvent(TrainingEvent event) {
+	if (listeners != null) {
+	    for (TrainingEventListener l : listeners) {
+		l.handleEvent(event);
+	    }
+	}
+    }
+
     protected boolean stopTraining(int index) {
 	return index >= getTestingInputProvider().getInputSize();
     }
@@ -132,4 +166,34 @@ public abstract class Trainer<N extends NeuralNetwork> {
     }
 
     protected abstract void learnInput(TrainingInputData data);
+
+    public static class TrainingFinishedEvent extends TrainingEvent {
+
+	private static final long serialVersionUID = -5239379347414855784L;
+
+	public TrainingFinishedEvent(Trainer<?> source) {
+	    super(source);
+	}
+    }
+
+    public static class SampleFinishedEvent extends TrainingEvent {
+
+	private static final long serialVersionUID = -5239379347414855784L;
+
+	public TrainingInputData data;
+
+	public SampleFinishedEvent(Trainer<?> source, TrainingInputData data) {
+	    super(source);
+	    this.data = data;
+	}
+    }
+
+    public static class TestingFinishedEvent extends TrainingEvent {
+
+	private static final long serialVersionUID = -5239379347414855784L;
+
+	public TestingFinishedEvent(Trainer<?> source) {
+	    super(source);
+	}
+    }
 }

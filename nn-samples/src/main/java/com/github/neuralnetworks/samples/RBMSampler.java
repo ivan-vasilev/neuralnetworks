@@ -2,14 +2,14 @@ package com.github.neuralnetworks.samples;
 
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.types.RBM;
+import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.calculation.LayerCalculatorImpl;
+import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSigmoidConnectionCalculator;
 import com.github.neuralnetworks.input.MeanInputModifier;
 import com.github.neuralnetworks.input.ScalingInputModifier;
 import com.github.neuralnetworks.input.mnist.MnistInputConverter;
 import com.github.neuralnetworks.input.mnist.MnistInputProvider;
 import com.github.neuralnetworks.input.mnist.MnistTargetMultiNeuronOutputConverter;
-import com.github.neuralnetworks.neuronfunctions.AparapiSigmoidByRows;
-import com.github.neuralnetworks.neuronfunctions.AparapiSigmoidByRows.AparapiSigmoidByColumns;
 import com.github.neuralnetworks.outputerror.MnistMultipleNeuronsOutputError;
 import com.github.neuralnetworks.testing.Sampler;
 import com.github.neuralnetworks.training.ContrastiveDivergenceAparapiTrainer;
@@ -35,7 +35,8 @@ public class RBMSampler extends Sampler {
 	MnistInputProvider training = new MnistInputProvider("train-images.idx3-ubyte", "train-labels.idx1-ubyte", 10, inputTrainingConverter, targetConverter);
 	MnistInputProvider testing = new MnistInputProvider("t10k-images.idx3-ubyte", "t10k-labels.idx1-ubyte", 1, inputTestingConverter, targetConverter);
 
-	RBM rbm = new RBM(new Layer(training.getRows() * training.getCols(), new AparapiSigmoidByRows(), new AparapiSigmoidByColumns(), null), new Layer(10, new AparapiSigmoidByRows(), new AparapiSigmoidByColumns(), null), false, false);
+	ConnectionCalculator cc = new AparapiSigmoidConnectionCalculator();
+	RBM rbm = new RBM(new Layer(training.getRows() * training.getCols(), cc), new Layer(10, cc), false, false);
 
 	Properties trainerProperties = new Properties();
 	trainerProperties.setParameter(Constants.NEURAL_NETWORK, rbm);

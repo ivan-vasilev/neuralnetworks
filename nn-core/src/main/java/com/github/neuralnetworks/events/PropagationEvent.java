@@ -8,22 +8,22 @@ import com.github.neuralnetworks.architecture.Matrix;
 
 /**
  * This event is triggered when a propagation step is finished
- *
+ * 
  * @author hok
- *
+ * 
  */
 public class PropagationEvent extends EventObject {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private Map<Layer, Matrix> results;
+    private Map<Layer, Matrix> results;
 
-	public PropagationEvent(Layer layer, Map<Layer, Matrix> results) {
-		super(layer);
-		this.results = results;
-	}
+    public PropagationEvent(Layer layer, Map<Layer, Matrix> results) {
+	super(layer);
+	this.results = results;
+    }
 
-	public Map<Layer, Matrix> getResults() {
-		return results;
-	}
+    public Map<Layer, Matrix> getResults() {
+	return results;
+    }
 }

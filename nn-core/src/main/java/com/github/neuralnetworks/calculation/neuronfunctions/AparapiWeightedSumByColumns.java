@@ -1,4 +1,4 @@
-package com.github.neuralnetworks.neuronfunctions;
+package com.github.neuralnetworks.calculation.neuronfunctions;
 
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Matrix;
@@ -15,11 +15,13 @@ public class AparapiWeightedSumByColumns extends AparapiBaseFunction implements 
 	int id = getGlobalId();
 
 	for (int i = 0; i < inputOutputColumns; i++) {
+	    before(id, i);
+
 	    for (int j = 0; j < weightsRows; j++) {
 		output[outputIndex(id, i)] += input[inputIndex(j, i)] * weights[weightIndex(j, id)];
 	    }
 
-	    outputCalculated(id, i);
+	    after(id, i);
 	}
     }
 
@@ -38,7 +40,10 @@ public class AparapiWeightedSumByColumns extends AparapiBaseFunction implements 
 
 	this.weightsRows = graph instanceof OneToOne ? 1 : cg.getRows();
     }
+    
+    protected void before(int row, int column) {
+    }
 
-    protected void outputCalculated(int row, int column) {
+    protected void after(int row, int column) {
     }
 }

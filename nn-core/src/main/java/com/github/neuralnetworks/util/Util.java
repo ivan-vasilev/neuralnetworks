@@ -23,9 +23,7 @@ public class Util {
 		sb.append(System.getProperty("line.separator")).append(nn.getClass().getSimpleName()).append( " layers:").append(System.getProperty("line.separator"));
 		for (Layer l : nn.getLayers()) {
 		    sb	.append(l.getNeuronCount()).append(" neurons; ")
-		    	.append(l.getForwardInputFunction() != null ? l.getForwardInputFunction().getClass().getSimpleName() : "No").append(" forward input; ")
-		    	.append(l.getBackwardInputFunction() != null ? l.getBackwardInputFunction().getClass().getSimpleName() : "No").append(" backward input; ")
-		    	.append(l.getActivationFunction() != null ? l.getActivationFunction().getClass().getSimpleName() : "No").append(" activation function; ")
+		    	.append(l.getConnectionCalculator() != null ? l.getConnectionCalculator().getClass().getSimpleName() : "No").append(" connection calculator; ")
 		    	.append(System.getProperty("line.separator"));
 		}
 		break;

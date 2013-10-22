@@ -1,4 +1,4 @@
-package com.github.neuralnetworks.neuronfunctions;
+package com.github.neuralnetworks.calculation.neuronfunctions;
 
 /**
  * 
@@ -17,7 +17,7 @@ public class AparapiThresholdByRows extends AparapiWeightedSumByRows {
     }
 
     @Override
-    protected void outputCalculated(int row, int column) {
+    protected void after(int row, int column) {
 	if (output[outputIndex(row, column)] < threshold) {
 	    output[outputIndex(row, column)] = 0;
 	} else {
@@ -37,13 +37,7 @@ public class AparapiThresholdByRows extends AparapiWeightedSumByRows {
 	}
 
 	@Override
-	protected void outputCalculated(int row, int column) {
-	    // if (output[outputIndex] < threshold) {
-	    // output[outputIndex] = 0;
-	    // } else {
-	    // output[outputIndex] = 1;
-	    // }
-
+	protected void after(int row, int column) {
 	    if (output[outputIndex(row, column)] < threshold) {
 		output[outputIndex(row, column)] = 0;
 	    } else {

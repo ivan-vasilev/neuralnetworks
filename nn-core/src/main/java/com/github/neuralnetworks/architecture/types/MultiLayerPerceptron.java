@@ -4,8 +4,7 @@ import com.github.neuralnetworks.architecture.FullyConnected;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.architecture.OneToOne;
-import com.github.neuralnetworks.neuronfunctions.ConstantInput;
-import com.github.neuralnetworks.neuronfunctions.RepeaterFunction;
+import com.github.neuralnetworks.calculation.neuronfunctions.ConstantConnectionCalculator;
 
 /**
  * a Multi Layer perceptron network
@@ -20,7 +19,7 @@ public class MultiLayerPerceptron extends NeuralNetwork {
 	}
 
 	if (addBias) {
-	    addConnection(new OneToOne(new Layer(layer.getNeuronCount(), new ConstantInput(1), new ConstantInput(1), new RepeaterFunction()), layer));
+	    addConnection(new OneToOne(new Layer(layer.getNeuronCount(), new ConstantConnectionCalculator(1)), layer));
 	}
     }
 }

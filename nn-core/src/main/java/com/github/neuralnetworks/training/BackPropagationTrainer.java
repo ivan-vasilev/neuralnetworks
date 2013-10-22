@@ -14,30 +14,35 @@ import com.github.neuralnetworks.util.UniqueList;
 
 public class BackPropagationTrainer extends Trainer<NeuralNetwork> {
 
-    private Map<Layer, Matrix> results;
+    private Map<Layer, Matrix> activations;
 
     public BackPropagationTrainer() {
 	super();
-	results = new HashMap<Layer, Matrix>();
+	activations = new HashMap<Layer, Matrix>();
     }
 
     public BackPropagationTrainer(Properties properties) {
 	super(properties);
-	results = new HashMap<Layer, Matrix>();
+	activations = new HashMap<Layer, Matrix>();
     }
 
     @Override
     protected void learnInput(TrainingInputData data) {
 	NeuralNetwork nn = getNeuralNetwork();
 
-	results.put(nn.getInputLayer(), data.getInput());
+//	for (Matrix m : activations.values()) {
+//	    Util.fillArray(m.getElements(), 0);
+//	}
+
+	activations.put(nn.getInputLayer(), data.getInput());
+
 	Set<Layer> calculatedLayers = new UniqueList<Layer>();
 	calculatedLayers.add(nn.getInputLayer());
 	LayerCalculator lc = getLayerCalculator();
-	lc.calculate(calculatedLayers, results, nn.getOutputLayer());
+	lc.calculate(calculatedLayers, activations, nn.getOutputLayer());
 
 	BackPropagation bp = getProperties().getParameter(Constants.BACKPROPAGATION);
-	Matrix outputErrorDerivative = bp.getOutputErrorDerivative(results.get(nn.getOutputLayer()), data.getTarget());
-	bp.backPropagate(results, outputErrorDerivative, nn);
+	Matrix outputErrorDerivative = bp.getOutputErrorDerivative(activations.get(nn.getOutputLayer()), data.getTarget());
+	bp.backPropagate(activations, outputErrorDerivative, nn);
     }
 }

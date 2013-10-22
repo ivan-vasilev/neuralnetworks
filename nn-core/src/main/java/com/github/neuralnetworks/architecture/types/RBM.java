@@ -5,8 +5,7 @@ import com.github.neuralnetworks.architecture.FullyConnected;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.architecture.OneToOne;
-import com.github.neuralnetworks.neuronfunctions.ConstantInput;
-import com.github.neuralnetworks.neuronfunctions.RepeaterFunction;
+import com.github.neuralnetworks.calculation.neuronfunctions.ConstantConnectionCalculator;
 
 /**
  * 
@@ -25,11 +24,11 @@ public class RBM extends NeuralNetwork {
 	addConnection(mainConnections = new FullyConnected(hiddenLayer, visibleLayer));
 
 	if (addVisibleBias) {
-	    addConnection(visibleBiasConnections = new OneToOne(visibleLayer, new Layer(visibleLayer.getNeuronCount(), new ConstantInput(1), new ConstantInput(1), new RepeaterFunction())));
+	    addConnection(visibleBiasConnections = new OneToOne(visibleLayer, new Layer(visibleLayer.getNeuronCount(), new ConstantConnectionCalculator(1))));
 	}
 
 	if (addHiddenBias) {
-	    addConnection(hiddenBiasConnections = new OneToOne(new Layer(hiddenLayer.getNeuronCount(), new ConstantInput(1), new ConstantInput(1), new RepeaterFunction()), hiddenLayer));
+	    addConnection(hiddenBiasConnections = new OneToOne(new Layer(hiddenLayer.getNeuronCount(), new ConstantConnectionCalculator(1)), hiddenLayer));
 	}
     }
 

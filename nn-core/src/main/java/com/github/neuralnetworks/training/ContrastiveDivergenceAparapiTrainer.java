@@ -9,7 +9,7 @@ import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.types.RBM;
 import com.github.neuralnetworks.calculation.LayerCalculatorImpl;
-import com.github.neuralnetworks.util.AparapiExecutionMode;
+import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
 import com.github.neuralnetworks.util.UniqueList;
@@ -115,7 +115,7 @@ public class ContrastiveDivergenceAparapiTrainer extends Trainer<RBM> {
 		}
 	    };
 	}
-	weightUpdatesKernel.setExecutionMode(AparapiExecutionMode.getInstance().getExecutionMode());
+	weightUpdatesKernel.setExecutionMode(Environment.getInstance().getExecutionMode());
 	weightUpdatesKernel.execute(weights.length);
 
 	// update visible bias
@@ -136,7 +136,7 @@ public class ContrastiveDivergenceAparapiTrainer extends Trainer<RBM> {
 		};
 	    }
 
-	    visibleBiasUpdatesKernel.setExecutionMode(AparapiExecutionMode.getInstance().getExecutionMode());
+	    visibleBiasUpdatesKernel.setExecutionMode(Environment.getInstance().getExecutionMode());
 	    visibleBiasUpdatesKernel.execute(visibleBiasWeights.length);
 	}
 
@@ -159,7 +159,7 @@ public class ContrastiveDivergenceAparapiTrainer extends Trainer<RBM> {
 		};
 	    }
 
-	    hiddenBiasUpdatesKernel.setExecutionMode(AparapiExecutionMode.getInstance().getExecutionMode());
+	    hiddenBiasUpdatesKernel.setExecutionMode(Environment.getInstance().getExecutionMode());
 	    hiddenBiasUpdatesKernel.execute(hiddenBiasWeights.length);
 	}
     }

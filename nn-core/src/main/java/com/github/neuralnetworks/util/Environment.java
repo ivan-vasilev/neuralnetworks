@@ -7,13 +7,15 @@ import com.amd.aparapi.Kernel.EXECUTION_MODE;
  * Singleton for execution mode (can be used for debugging)
  *
  */
-public class AparapiExecutionMode {
+public class Environment {
 
-    private static AparapiExecutionMode singleton = new AparapiExecutionMode();
+    private static Environment singleton = new Environment();
     private EXECUTION_MODE executionMode;
+    private boolean debug;
 
-    private AparapiExecutionMode() {
+    private Environment() {
 	executionMode = EXECUTION_MODE.GPU;
+	debug = true;
     }
 
     public EXECUTION_MODE getExecutionMode() {
@@ -24,7 +26,15 @@ public class AparapiExecutionMode {
         this.executionMode = executionMode;
     }
 
-    public static AparapiExecutionMode getInstance() {
+    public static Environment getInstance() {
 	return singleton;
+    }
+
+    public boolean isDebug() {
+        return debug;
+    }
+
+    public void setDebug(boolean debug) {
+        this.debug = debug;
     }
 }

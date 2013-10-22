@@ -1,9 +1,9 @@
-package com.github.neuralnetworks.neuronfunctions;
+package com.github.neuralnetworks.calculation.neuronfunctions;
 
 import com.amd.aparapi.Kernel;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Matrix;
-import com.github.neuralnetworks.util.AparapiExecutionMode;
+import com.github.neuralnetworks.util.Environment;
 
 /**
  * base class for input functions
@@ -41,7 +41,7 @@ public abstract class AparapiBaseFunction extends Kernel implements InputFunctio
 	this.inputStartIndex = graph.getInputLayerStartNeuron();
 	this.outputStartIndex = graph.getOutputLayerStartNeuron();
 
-	setExecutionMode(AparapiExecutionMode.getInstance().getExecutionMode());
+	setExecutionMode(Environment.getInstance().getExecutionMode());
     };
 
     protected int weightIndex(int row, int column) {

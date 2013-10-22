@@ -1,4 +1,4 @@
-package com.github.neuralnetworks.neuronfunctions;
+package com.github.neuralnetworks.calculation.neuronfunctions;
 
 import java.io.Serializable;
 

@@ -8,17 +8,17 @@ import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.InputOutputLayers;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
+import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.calculation.LayerCalculatorImpl;
-import com.github.neuralnetworks.neuronfunctions.AparapiWeightedSumByColumns;
-import com.github.neuralnetworks.neuronfunctions.AparapiWeightedSumByRows;
-import com.github.neuralnetworks.neuronfunctions.InputFunction;
+import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSumByColumns;
+import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSumByRows;
 import com.github.neuralnetworks.util.UniqueList;
 import com.github.neuralnetworks.util.Util;
 
 /**
  * Aparapi implementation of the backpropagation algorithm
  */
-public class BackPropagationAparapiImpl extends LayerCalculatorImpl implements BackPropagation {
+public class BackPropagationAparapiImpl extends LayerCalculatorImpl implements BackPropagation, ConnectionCalculator {
 
     private static final long serialVersionUID = 1L;
 
@@ -36,11 +36,6 @@ public class BackPropagationAparapiImpl extends LayerCalculatorImpl implements B
     }
 
     @Override
-    protected InputFunction getInputFunction(Connections connection, Layer layer) {
-	return connection.getInputLayer() != layer ? forward : backward;
-    }
-
-    @Override
     public void backPropagate(Map<Layer, Matrix> activations, Matrix outputError, InputOutputLayers layers) {
 	Set<Layer> calculatedLayers = new UniqueList<Layer>();
 	calculatedLayers.add(layers.getOutputLayer());
@@ -52,6 +47,20 @@ public class BackPropagationAparapiImpl extends LayerCalculatorImpl implements B
 	forward.activations = backward.activations = activations;
 
 	calculate(calculatedLayers, results, layers.getInputLayer());
+    }
+
+    @Override
+    protected ConnectionCalculator getConnectionCalculator(Connections connection, Layer layer ){
+	return this;
+    }
+
+    @Override
+    public void calculate(Connections connection, Matrix input, Matrix output, Layer targetLayer) {
+	if (connection.getOutputLayer() == targetLayer) {
+	    forward.calculate(connection, input, output);
+	} else {
+	    backward.calculate(connection, input, output);
+	}
     }
 
     @Override
@@ -74,6 +83,7 @@ public class BackPropagationAparapiImpl extends LayerCalculatorImpl implements B
 
 	private float[] outputActivation;
 	private float[] weightUpdates;
+	private Map<Connections, float[]> storedWeightUpdates = new HashMap<>();
 	private float learningRate;
 	private float momentum;
 	private Map<Layer, Matrix> activations;
@@ -81,15 +91,19 @@ public class BackPropagationAparapiImpl extends LayerCalculatorImpl implements B
 	@Override
 	protected void init(Connections graph, Matrix inputMatrix, Matrix outputMatrix) {
 	    super.init(graph, inputMatrix, outputMatrix);
-	    if (weightUpdates == null || weightUpdates.length != graph.getConnectionGraph().getElements().length) {
+
+	    weightUpdates = storedWeightUpdates.get(graph);
+
+	    if (weightUpdates == null) {
 		weightUpdates = new float[graph.getConnectionGraph().getElements().length];
+		storedWeightUpdates.put(graph, weightUpdates);
 	    }
 
 	    outputActivation = activations.get(graph.getOutputLayer()).getElements();
 	}
 
 	@Override
-	protected void outputCalculated(int row, int column) {
+	protected void after(int row, int column) {
 	    output[outputIndex(row, column)] *= outputActivation[outputIndex(row, column)] * (1 - outputActivation[outputIndex(row, column)]);
 
 	    for (int j = 0; j < weightsColumns; j++) {
@@ -105,6 +119,7 @@ public class BackPropagationAparapiImpl extends LayerCalculatorImpl implements B
 	private static final long serialVersionUID = -5101971690861270462L;
 
 	private float[] outputActivation;
+	private Map<Connections, float[]> storedWeightUpdates = new HashMap<>();
 	private float[] weightUpdates;
 	private float learningRate;
 	private float momentum;
@@ -113,15 +128,29 @@ public class BackPropagationAparapiImpl extends LayerCalculatorImpl implements B
 	@Override
 	protected void init(Connections graph, Matrix inputMatrix, Matrix outputMatrix) {
 	    super.init(graph, inputMatrix, outputMatrix);
-	    if (weightUpdates == null || weightUpdates.length != graph.getConnectionGraph().getElements().length) {
+
+	    weightUpdates = storedWeightUpdates.get(graph);
+
+	    if (weightUpdates == null) {
 		weightUpdates = new float[graph.getConnectionGraph().getElements().length];
+		storedWeightUpdates.put(graph, weightUpdates);
 	    }
 
 	    outputActivation = activations.get(graph.getInputLayer()).getElements();
 	}
 
+// Although wrong this implementation also works
+//	@Override
+//	protected void before(int row, int column) {
+//	    for (int j = 0; j < weightsRows; j++) {
+//		float weightUpdate = learningRate * input[inputIndex(j, column)] * outputActivation[inputIndex(row, column)] + momentum * weightUpdates[weightIndex(j, row)];
+//		weights[weightIndex(j, row)] += weightUpdate;
+//		weightUpdates[weightIndex(j, row)] = weightUpdate;
+//	    }
+//	}
+
 	@Override
-	protected void outputCalculated(int row, int column) {
+	protected void after(int row, int column) {
 	    output[outputIndex(row, column)] *= outputActivation[outputIndex(row, column)] * (1 - outputActivation[outputIndex(row, column)]);
 
 	    for (int j = 0; j < weightsRows; j++) {

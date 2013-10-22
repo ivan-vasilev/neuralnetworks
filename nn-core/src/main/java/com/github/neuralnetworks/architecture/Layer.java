@@ -3,8 +3,7 @@ package com.github.neuralnetworks.architecture;
 import java.io.Serializable;
 import java.util.Set;
 
-import com.github.neuralnetworks.neuronfunctions.ActivationFunction;
-import com.github.neuralnetworks.neuronfunctions.InputFunction;
+import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.util.UniqueList;
 
 /**
@@ -17,9 +16,7 @@ public class Layer implements Serializable {
     private static final long serialVersionUID = 1035633207383317489L;
 
     private int neuronCount;
-    private InputFunction forwardInputFunction;
-    private InputFunction backwardInputFunction;
-    private ActivationFunction activationFunction;
+    private ConnectionCalculator connectionCalculator;
     private Set<Connections> connections;
 
     public Layer(int neuronCount) {
@@ -28,12 +25,10 @@ public class Layer implements Serializable {
 	this.connections = new UniqueList<>();
     }
 
-    public Layer(int neuronCount, InputFunction forwardInputFunction, InputFunction backwardInputFunction, ActivationFunction activationFunction) {
+    public Layer(int neuronCount, ConnectionCalculator connectionCalculator) {
 	super();
 	this.neuronCount = neuronCount;
-	this.forwardInputFunction = forwardInputFunction;
-	this.backwardInputFunction = backwardInputFunction;
-	this.activationFunction = activationFunction;
+	this.connectionCalculator = connectionCalculator;
 	this.connections = new UniqueList<>();
     }
 
@@ -45,28 +40,12 @@ public class Layer implements Serializable {
 	this.neuronCount = neuronCount;
     }
 
-    public InputFunction getForwardInputFunction() {
-	return forwardInputFunction;
+    public ConnectionCalculator getConnectionCalculator() {
+	return connectionCalculator;
     }
 
-    public void setForwardInputFunction(InputFunction forwardInputFunction) {
-	this.forwardInputFunction = forwardInputFunction;
-    }
-
-    public InputFunction getBackwardInputFunction() {
-	return backwardInputFunction;
-    }
-
-    public void setBackwardInputFunction(InputFunction backwardInputFunction) {
-	this.backwardInputFunction = backwardInputFunction;
-    }
-
-    public ActivationFunction getActivationFunction() {
-	return activationFunction;
-    }
-
-    public void setActivationFunction(ActivationFunction activationFunction) {
-	this.activationFunction = activationFunction;
+    public void setConnectionCalculator(ConnectionCalculator connectionCalculator) {
+	this.connectionCalculator = connectionCalculator;
     }
 
     public Set<Connections> getConnections() {

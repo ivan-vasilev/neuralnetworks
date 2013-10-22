@@ -1,4 +1,4 @@
-package com.github.neuralnetworks.neuronfunctions;
+package com.github.neuralnetworks.calculation.neuronfunctions;
 
 /**
  * Rectified linear unit activation function
@@ -8,7 +8,7 @@ public class AparapiReLUByRows extends AparapiWeightedSumByRows {
     private static final long serialVersionUID = 2572354641295173835L;
 
     @Override
-    protected void outputCalculated(int row, int column) {
+    protected void after(int row, int column) {
 	//output[outputIndex] = log(1 + exp(output[outputIndex]));
 	output[outputIndex(row, column)] = log(1 + exp(output[outputIndex(row, column)]));
     }
@@ -18,7 +18,7 @@ public class AparapiReLUByRows extends AparapiWeightedSumByRows {
 	private static final long serialVersionUID = 2572354641295173835L;
 
 	@Override
-	protected void outputCalculated(int row, int column) {
+	protected void after(int row, int column) {
 	    //output[outputIndex] = log(1 + exp(output[outputIndex]));
 	    output[outputIndex(row, column)] = log(1 + exp(output[outputIndex(row, column)]));
 	}

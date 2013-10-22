@@ -12,10 +12,7 @@ import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.events.PropagationEvent;
 import com.github.neuralnetworks.events.PropagationEventListener;
-import com.github.neuralnetworks.neuronfunctions.ConstantInput;
-import com.github.neuralnetworks.neuronfunctions.InputFunction;
 import com.github.neuralnetworks.util.UniqueList;
-import com.github.neuralnetworks.util.Util;
 
 public class LayerCalculatorImpl implements LayerCalculator, Serializable {
 
@@ -31,36 +28,25 @@ public class LayerCalculatorImpl implements LayerCalculator, Serializable {
     protected void calculate(Set<Layer> calculatedLayers, Set<Layer> inProgressLayers, Map<Layer, Matrix> results, Layer currentLayer) {
 	if (!calculatedLayers.contains(currentLayer) && !inProgressLayers.contains(currentLayer)) {
 	    inProgressLayers.add(currentLayer);
+	    int columns = getInputColumns(calculatedLayers, results);
+
 	    for (Connections c : currentLayer.getConnections()) {
 		Layer opposite = c.getInputLayer() != currentLayer ? c.getInputLayer() : c.getOutputLayer();
-		InputFunction inputFunction = getInputFunction(c, currentLayer);
+		if (!inProgressLayers.contains(opposite)) {
+		    calculate(calculatedLayers, inProgressLayers, results, opposite);
+		    Matrix input = results.get(opposite);
 
-		if (inputFunction instanceof ConstantInput) {
 		    Matrix output = results.get(currentLayer);
-		    int columns = getInputColumns(calculatedLayers, results);
 		    if (output == null || output.getColumns() != columns) {
 			output = new Matrix(currentLayer.getNeuronCount(), columns);
 			results.put(currentLayer, output);
 		    }
 
-		    Util.fillArray(output.getElements(), ((ConstantInput) inputFunction).getOutput());
-		    break;
-		} else if (!inProgressLayers.contains(opposite)) {
-		    calculate(calculatedLayers, inProgressLayers, results, opposite);
-		    Matrix input = results.get(opposite);
-
-		    Matrix output = results.get(currentLayer);
-		    if (output == null || input.getColumns() != output.getColumns()) {
-			output = new Matrix(currentLayer.getNeuronCount(), input.getColumns());
-			results.put(currentLayer, output);
+		    ConnectionCalculator cc = getConnectionCalculator(c, currentLayer);
+		    if (cc != null) {
+			cc.calculate(c, input, output, currentLayer);
 		    }
-
-		    inputFunction.calculate(c, input, output);
 		}
-	    }
-
-	    if (currentLayer.getActivationFunction() != null) {
-		currentLayer.getActivationFunction().value(results.get(currentLayer));
 	    }
 
 	    inProgressLayers.remove(currentLayer);
@@ -70,8 +56,8 @@ public class LayerCalculatorImpl implements LayerCalculator, Serializable {
 	}
     }
 
-    protected InputFunction getInputFunction(Connections connection, Layer layer ){
-	return connection.getInputLayer() != layer ? layer.getForwardInputFunction() : layer.getBackwardInputFunction();
+    protected ConnectionCalculator getConnectionCalculator(Connections connection, Layer layer ){
+	return layer.getConnectionCalculator();
     }
 
     private Integer getInputColumns(Set<Layer> calculatedLayers, Map<Layer, Matrix> results) {

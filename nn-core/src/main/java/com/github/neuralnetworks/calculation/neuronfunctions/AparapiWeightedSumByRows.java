@@ -1,4 +1,4 @@
-package com.github.neuralnetworks.neuronfunctions;
+package com.github.neuralnetworks.calculation.neuronfunctions;
 
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Matrix;
@@ -12,11 +12,13 @@ public class AparapiWeightedSumByRows extends AparapiBaseFunction implements Inp
 	int id = getGlobalId();
 
 	for (int i = 0; i < inputOutputColumns; i++) {
+	    before(id, i);
+	    
 	    for (int j = 0; j < weightsColumns; j++) {
 		output[outputIndex(id, i)] += input[inputIndex(j, i)] * weights[weightIndex(id, j)];
 	    }
 
-	    outputCalculated(id, i);
+	    after(id, i);
 	}
     }
 
@@ -31,10 +33,16 @@ public class AparapiWeightedSumByRows extends AparapiBaseFunction implements Inp
 	    throw new IllegalArgumentException("matrices do not match");
 	}
     }
+    
+    /**
+     * @param row, column - index within the output array
+     */
+    protected void before(int row, int column) {
+    }
 
     /**
-     * @param outputIndex - index within the output array
+     * @param row, column - index within the output array
      */
-    protected void outputCalculated(int row, int column) {
+    protected void after(int row, int column) {
     }
 }

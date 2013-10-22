@@ -9,9 +9,11 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.EventListener;
 import java.util.List;
 
 import com.github.neuralnetworks.training.Trainer;
+import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.Util;
 
 /**
@@ -22,6 +24,7 @@ import com.github.neuralnetworks.util.Util;
 public class Sampler {
 
     protected List<Trainer<?>> trainingConfigurations;
+    protected List<EventListener> listeners;
 
     public Sampler() {
 	super();
@@ -50,12 +53,30 @@ public class Sampler {
 		writer.newLine();
 		writer.append("========================================================================================================");
 		writer.newLine();
+
+		if (Environment.getInstance().isDebug()) {
+		    System.out.println("Output error: " + t.getOutputError().getTotalNetworkError());
+		}
 	    }
 	} catch (IOException exception) {
 	    System.out.println("Error writing to file");
 	}
     }
 
+    public void addEventListener(EventListener listener) {
+	if (listeners == null) {
+	    listeners = new ArrayList<>();
+	}
+
+	listeners.add(listener);
+    }
+
+    public void removeEventListener(EventListener listener) {
+	if (listeners != null) {
+	    listeners.remove(listener);
+	}
+    }
+    
     public List<Trainer<?>> getTrainingConfigurations() {
 	return trainingConfigurations;
     }
