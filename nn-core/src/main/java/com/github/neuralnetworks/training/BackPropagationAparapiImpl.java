@@ -12,6 +12,7 @@ import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.calculation.LayerCalculatorImpl;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSumByColumns;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSumByRows;
+import com.github.neuralnetworks.calculation.neuronfunctions.ConstantConnectionCalculator;
 import com.github.neuralnetworks.util.UniqueList;
 import com.github.neuralnetworks.util.Util;
 
@@ -56,9 +57,15 @@ public class BackPropagationAparapiImpl extends LayerCalculatorImpl implements B
 
     @Override
     public void calculate(Connections connection, Matrix input, Matrix output, Layer targetLayer) {
-	if (connection.getOutputLayer() == targetLayer) {
+	if (connection.getInputLayer().getConnectionCalculator() instanceof ConstantConnectionCalculator) {
+	    connection.getInputLayer().getConnectionCalculator().calculate(connection, output, input, targetLayer);
+	    backward.calculate(connection, input, output);
+	} else if (connection.getOutputLayer().getConnectionCalculator() instanceof ConstantConnectionCalculator) {
+	    connection.getOutputLayer().getConnectionCalculator().calculate(connection, output, input, targetLayer);
 	    forward.calculate(connection, input, output);
-	} else {
+	} else if (targetLayer == connection.getOutputLayer()) {
+	    forward.calculate(connection, input, output);
+	} else if (targetLayer == connection.getInputLayer()) {
 	    backward.calculate(connection, input, output);
 	}
     }

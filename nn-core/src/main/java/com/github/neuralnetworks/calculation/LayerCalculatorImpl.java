@@ -13,6 +13,7 @@ import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.events.PropagationEvent;
 import com.github.neuralnetworks.events.PropagationEventListener;
 import com.github.neuralnetworks.util.UniqueList;
+import com.github.neuralnetworks.util.Util;
 
 public class LayerCalculatorImpl implements LayerCalculator, Serializable {
 
@@ -37,7 +38,7 @@ public class LayerCalculatorImpl implements LayerCalculator, Serializable {
 	    }
 
 	    for (Connections c : currentLayer.getConnections()) {
-		Layer opposite = c.getInputLayer() != currentLayer ? c.getInputLayer() : c.getOutputLayer();
+		Layer opposite = Util.getOppositeLayer(c, currentLayer);
 		if (!inProgressLayers.contains(opposite)) {
 		    calculate(calculatedLayers, inProgressLayers, results, opposite);
 		    ConnectionCalculator cc = getConnectionCalculator(c, currentLayer);

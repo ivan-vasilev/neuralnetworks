@@ -3,6 +3,7 @@ package com.github.neuralnetworks.util;
 import java.text.NumberFormat;
 import java.util.Map.Entry;
 
+import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.calculation.OutputError;
@@ -52,5 +53,9 @@ public class Util {
 	for (int i = 1; i < len; i += i) {
 	    System.arraycopy(array, 0, array, i, ((len - i) < i) ? (len - i) : i);
 	}
+    }
+
+    public static Layer getOppositeLayer(Connections connection, Layer layer) {
+	return connection.getInputLayer() != layer ? connection.getInputLayer() : connection.getOutputLayer();
     }
 }
