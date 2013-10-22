@@ -30,21 +30,19 @@ public class LayerCalculatorImpl implements LayerCalculator, Serializable {
 	    inProgressLayers.add(currentLayer);
 	    int columns = getInputColumns(calculatedLayers, results);
 
+	    Matrix output = results.get(currentLayer);
+	    if (output == null || output.getColumns() != columns) {
+		output = new Matrix(currentLayer.getNeuronCount(), columns);
+		results.put(currentLayer, output);
+	    }
+
 	    for (Connections c : currentLayer.getConnections()) {
 		Layer opposite = c.getInputLayer() != currentLayer ? c.getInputLayer() : c.getOutputLayer();
 		if (!inProgressLayers.contains(opposite)) {
 		    calculate(calculatedLayers, inProgressLayers, results, opposite);
-		    Matrix input = results.get(opposite);
-
-		    Matrix output = results.get(currentLayer);
-		    if (output == null || output.getColumns() != columns) {
-			output = new Matrix(currentLayer.getNeuronCount(), columns);
-			results.put(currentLayer, output);
-		    }
-
 		    ConnectionCalculator cc = getConnectionCalculator(c, currentLayer);
 		    if (cc != null) {
-			cc.calculate(c, input, output, currentLayer);
+			cc.calculate(c, results.get(opposite), output, currentLayer);
 		    }
 		}
 	    }
