@@ -5,6 +5,8 @@ import com.github.neuralnetworks.calculation.neuronfunctions.AparapiReLUByRows.A
 
 public class AparapiReLUConnectionCalculator extends ConnectionCalculatorImpl {
 
+    private static final long serialVersionUID = -6602713983386107132L;
+
     public AparapiReLUConnectionCalculator() {
 	super(new AparapiReLUByRows(), new AparapiReLUByColumns(), null);
     }

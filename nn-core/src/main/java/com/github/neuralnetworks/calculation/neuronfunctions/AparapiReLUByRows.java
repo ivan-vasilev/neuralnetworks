@@ -9,8 +9,7 @@ public class AparapiReLUByRows extends AparapiWeightedSumByRows {
 
     @Override
     protected void after(int row, int column) {
-	//output[outputIndex] = log(1 + exp(output[outputIndex]));
-	output[outputIndex(row, column)] = log(1 + exp(output[outputIndex(row, column)]));
+	output[outputBaseIndex(row, column)] = log(1 + exp(output[outputBaseIndex(row, column)]));
     }
 
     public static class AparapiReLUByColumns extends AparapiWeightedSumByColumns {
@@ -19,8 +18,7 @@ public class AparapiReLUByRows extends AparapiWeightedSumByRows {
 
 	@Override
 	protected void after(int row, int column) {
-	    //output[outputIndex] = log(1 + exp(output[outputIndex]));
-	    output[outputIndex(row, column)] = log(1 + exp(output[outputIndex(row, column)]));
+	    output[outputBaseIndex(row, column)] = log(1 + exp(output[outputBaseIndex(row, column)]));
 	}
     }
 }

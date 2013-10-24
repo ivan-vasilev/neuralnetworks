@@ -11,8 +11,7 @@ public class AparapiSigmoidByRows extends AparapiWeightedSumByRows {
 
     @Override
     protected void after(int row, int column) {
-	//output[outputIndex] = 1 / (1 + exp(-output[outputIndex]));
-	output[outputIndex(row, column)] = 1 / (1 + exp(-output[outputIndex(row, column)]));
+	output[outputBaseIndex(row, column)] = 1 / (1 + exp(-output[outputBaseIndex(row, column)]));
     }
 
     public static class AparapiSigmoidByColumns extends AparapiWeightedSumByColumns {
@@ -21,8 +20,7 @@ public class AparapiSigmoidByRows extends AparapiWeightedSumByRows {
 
 	@Override
 	protected void after(int row, int column) {
-	    //output[outputIndex] = 1 / (1 + exp(-output[outputIndex]));
-	    output[outputIndex(row, column)] = 1 / (1 + exp(-output[outputIndex(row, column)]));
+	    output[outputBaseIndex(row, column)] = 1 / (1 + exp(-output[outputBaseIndex(row, column)]));
 	}
     }
 }

@@ -2,6 +2,7 @@ package com.github.neuralnetworks.calculation;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -29,23 +30,28 @@ public class LayerCalculatorImpl implements LayerCalculator, Serializable {
     protected void calculate(Set<Layer> calculatedLayers, Set<Layer> inProgressLayers, Map<Layer, Matrix> results, Layer currentLayer) {
 	if (!calculatedLayers.contains(currentLayer) && !inProgressLayers.contains(currentLayer)) {
 	    inProgressLayers.add(currentLayer);
-	    int columns = getInputColumns(calculatedLayers, results);
+	    ConnectionCalculator cc = getConnectionCalculator(currentLayer);
 
-	    Matrix output = results.get(currentLayer);
-	    if (output == null || output.getColumns() != columns) {
-		output = new Matrix(currentLayer.getNeuronCount(), columns);
-		results.put(currentLayer, output);
-	    }
-
-	    for (Connections c : currentLayer.getConnections()) {
-		Layer opposite = Util.getOppositeLayer(c, currentLayer);
-		if (!inProgressLayers.contains(opposite)) {
-		    calculate(calculatedLayers, inProgressLayers, results, opposite);
-		    ConnectionCalculator cc = getConnectionCalculator(c, currentLayer);
-		    if (cc != null) {
-			cc.calculate(c, results.get(opposite), output, currentLayer);
+	    if (cc != null) {
+		int columns = getInputColumns(calculatedLayers, results);
+		
+		Matrix output = results.get(currentLayer);
+		if (output == null || output.getColumns() != columns) {
+		    output = new Matrix(currentLayer.getNeuronCount(), columns);
+		    results.put(currentLayer, output);
+		}
+		
+		Map<Connections, Matrix> connections = new HashMap<Connections, Matrix>();
+		
+		for (Connections c : currentLayer.getConnections()) {
+		    Layer opposite = Util.getOppositeLayer(c, currentLayer);
+		    if (!inProgressLayers.contains(opposite)) {
+			calculate(calculatedLayers, inProgressLayers, results, opposite);
+			connections.put(c, results.get(opposite));
 		    }
 		}
+
+		cc.calculate(connections, output, currentLayer);
 	    }
 
 	    inProgressLayers.remove(currentLayer);
@@ -55,7 +61,7 @@ public class LayerCalculatorImpl implements LayerCalculator, Serializable {
 	}
     }
 
-    protected ConnectionCalculator getConnectionCalculator(Connections connection, Layer layer ){
+    protected ConnectionCalculator getConnectionCalculator(Layer layer){
 	return layer.getConnectionCalculator();
     }
 

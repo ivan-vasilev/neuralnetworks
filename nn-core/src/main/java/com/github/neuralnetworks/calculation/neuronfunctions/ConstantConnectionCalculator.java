@@ -1,5 +1,7 @@
 package com.github.neuralnetworks.calculation.neuronfunctions;
 
+import java.util.Map;
+
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
@@ -7,6 +9,8 @@ import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.util.Util;
 
 public class ConstantConnectionCalculator implements ConnectionCalculator {
+
+    private static final long serialVersionUID = -512468674234271624L;
 
     private float value;
     
@@ -16,7 +20,7 @@ public class ConstantConnectionCalculator implements ConnectionCalculator {
     }
 
     @Override
-    public void calculate(Connections connection, Matrix input, Matrix output, Layer targetLayer) {
+    public void calculate(Map<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
 	Util.fillArray(output.getElements(), value);
     }
 }
