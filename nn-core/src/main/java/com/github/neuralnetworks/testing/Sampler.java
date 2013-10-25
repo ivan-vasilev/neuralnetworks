@@ -56,6 +56,8 @@ public class Sampler {
 
 		if (Environment.getInstance().isDebug()) {
 		    System.out.println("Output error: " + t.getOutputError().getTotalNetworkError());
+		    System.out.println("Training time: " + (trainingTime - start) / 1000 + "s");
+		    System.out.println("Testing time: " + (testingTime - trainingTime) / 1000 + "s");
 		}
 	    }
 	} catch (IOException exception) {

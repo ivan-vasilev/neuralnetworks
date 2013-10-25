@@ -167,22 +167,22 @@ public class BackPropagationAparapiImpl extends LayerCalculatorImpl implements B
 	protected void after(int row, int column) {
 	    output[outputBaseIndex(row, column)] *= outputActivation[outputBaseIndex(row, column)] * (1 - outputActivation[outputBaseIndex(row, column)]);
 
-	    for (int j = 0; j < weightsColumns; j++) {
+	    for (int j = 0; j < weightsColumns[0]; j++) {
 		float weightUpdate = learningRate * input[inputIndex(j, column, 0)] * outputActivation[outputIndex(row, column, 0)] + momentum * weightUpdates[weightIndex(row, j, 0)];
 		weights[weightIndex(row, j, 0)] += weightUpdate;
 		weightUpdates[weightIndex(row, j, 0)] = weightUpdate;
 	    }
 
-	    if (series >= 1) {
-		for (int j = 0; j < weightsColumns1; j++) {
+	    if (series >= 2) {
+		for (int j = 0; j < weightsColumns[1]; j++) {
 		    float weightUpdate = learningRate * input1[inputIndex(j, column, 1)] * outputActivation[outputIndex(row, column, 1)] + momentum * weightUpdates1[weightIndex(row, j, 1)];
 		    weights1[weightIndex(row, j, 1)] += weightUpdate;
 		    weightUpdates1[weightIndex(row, j, 1)] = weightUpdate;
 		}
 	    }
 
-	    if (series >= 2) {
-		for (int j = 0; j < weightsColumns2; j++) {
+	    if (series >= 3) {
+		for (int j = 0; j < weightsColumns[2]; j++) {
 		    float weightUpdate = learningRate * input2[inputIndex(j, column, 2)] * outputActivation[outputIndex(row, column, 2)] + momentum * weightUpdates2[weightIndex(row, j, 2)];
 		    weights2[weightIndex(row, j, 2)] += weightUpdate;
 		    weightUpdates2[weightIndex(row, j, 2)] = weightUpdate;
@@ -253,27 +253,30 @@ public class BackPropagationAparapiImpl extends LayerCalculatorImpl implements B
 	protected void after(int row, int column) {
 	    output[outputBaseIndex(row, column)] *= outputActivation[outputBaseIndex(row, column)] * (1 - outputActivation[outputBaseIndex(row, column)]);
 
-	    for (int j = 0; j < weightsRows; j++) {
-		float weightUpdate = learningRate * input[inputIndex(j, column, 0)] * outputActivation[outputIndex(row, column, 0)] + momentum * weightUpdates[weightIndex(j, row, 0)];
-		weights[weightIndex(j, row, 0)] += weightUpdate;
-		weightUpdates[weightIndex(j, row, 0)] = weightUpdate;
+	    for (int j = 0; j < weightsRows[0]; j++) {
+		int weightIndex = weightIndex(j, row, 0);
+		float weightUpdate = learningRate * input[inputIndex(j, column, 0)] * outputActivation[outputIndex(row, column, 0)] + momentum * weightUpdates[weightIndex];
+		weights[weightIndex] += weightUpdate;
+		weightUpdates[weightIndex] = weightUpdate;
 	    }
 
-	    if (series >= 1) {
-		for (int j = 0; j < weightsRows1; j++) {
-		    float weightUpdate = learningRate * input1[inputIndex(j, column, 1)] * outputActivation[outputIndex(row, column, 1)] + momentum * weightUpdates1[weightIndex(j, row, 1)];
-		    weights1[weightIndex(j, row, 1)] += weightUpdate;
-		    weightUpdates1[weightIndex(j, row, 1)] = weightUpdate;
-		}
-	    }
-
-	    if (series >= 2) {
-		for (int j = 0; j < weightsRows2; j++) {
-		    float weightUpdate = learningRate * input2[inputIndex(j, column, 2)] * outputActivation[outputIndex(row, column, 2)] + momentum * weightUpdates2[weightIndex(j, row, 2)];
-		    weights2[weightIndex(j, row, 2)] += weightUpdate;
-		    weightUpdates2[weightIndex(j, row, 2)] = weightUpdate;
-		}
-	    }
+//	    if (series >= 2) {
+//		for (int j = 0; j < weightsRows[1]; j++) {
+//		    int weightIndex = weightIndex(j, row, 1);
+//		    float weightUpdate = learningRate * input1[inputIndex(j, column, 1)] * outputActivation[outputIndex(row, column, 1)] + momentum * weightUpdates1[weightIndex];
+//		    weights1[weightIndex] += weightUpdate;
+//		    weightUpdates1[weightIndex] = weightUpdate;
+//		}
+//	    }
+//
+//	    if (series >= 3) {
+//		for (int j = 0; j < weightsRows[2]; j++) {
+//		    int weightIndex = weightIndex(j, row, 2);
+//		    float weightUpdate = learningRate * input2[inputIndex(j, column, 2)] * outputActivation[outputIndex(row, column, 2)] + momentum * weightUpdates2[weightIndex];
+//		    weights2[weightIndex] += weightUpdate;
+//		    weightUpdates2[weightIndex] = weightUpdate;
+//		}
+//	    }
 	}
     }
 }

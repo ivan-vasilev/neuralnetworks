@@ -11,9 +11,7 @@ public class AparapiWeightedSumByColumns extends AparapiBaseFunction {
 
     private static final long serialVersionUID = 8288998425211708411L;
 
-    protected int weightsRows;
-    protected int weightsRows1;
-    protected int weightsRows2;
+    protected int[] weightsRows;
 
     @Override
     public void run() {
@@ -22,21 +20,21 @@ public class AparapiWeightedSumByColumns extends AparapiBaseFunction {
 	for (int i = 0; i < inputOutputColumns; i++) {
 	    before(id, i);
 
-	    for (int j = 0; j < weightsRows; j++) {
+	    for (int j = 0; j < weightsRows[0]; j++) {
 		output[outputIndex(id, i, 0)] += input[inputIndex(j, i, 0)] * weights[weightIndex(j, id, 0)];
 	    }
 
-	    if (series >= 1) {
-		for (int j = 0; j < weightsRows1; j++) {
-		    output[outputIndex(id, i, 1)] += input1[inputIndex(j, i, 1)] * weights1[weightIndex(j, id, 1)];
-		}
-	    }
-
-	    if (series >= 2) {
-		for (int j = 0; j < weightsRows2; j++) {
-		    output[outputIndex(id, i, 2)] += input2[inputIndex(j, i, 2)] * weights2[weightIndex(j, id, 2)];
-		}
-	    }
+//	    if (series >= 2) {
+//		for (int j = 0; j < weightsRows[1]; j++) {
+//		    output[outputIndex(id, i, 1)] += input1[inputIndex(j, i, 1)] * weights1[weightIndex(j, id, 1)];
+//		}
+//	    }
+//
+//	    if (series >= 3) {
+//		for (int j = 0; j < weightsRows[2]; j++) {
+//		    output[outputIndex(id, i, 2)] += input2[inputIndex(j, i, 2)] * weights2[weightIndex(j, id, 2)];
+//		}
+//	    }
 
 	    after(id, i);
 	}
@@ -49,6 +47,8 @@ public class AparapiWeightedSumByColumns extends AparapiBaseFunction {
     protected void init(Map<Connections, Matrix> input, Matrix outputMatrix, Layer targetLayer) {
 	super.init(input, outputMatrix, targetLayer);
 
+	weightsRows = new int[series];
+
 	int i = 0;
 	for (java.util.Map.Entry<Connections, Matrix> e : input.entrySet()) {
 	    Connections graph = e.getKey();
@@ -59,27 +59,7 @@ public class AparapiWeightedSumByColumns extends AparapiBaseFunction {
 		throw new IllegalArgumentException("matrices do not match");
 	    }
 
-	    switch (i) {
-	    case 0:
-		this.weightsRows = graph instanceof OneToOne ? 1 : cg.getRows();
-		break;
-	    case 1:
-		this.weightsRows1 = graph instanceof OneToOne ? 1 : cg.getRows();
-		break;
-	    case 2:
-		this.weightsRows2 = graph instanceof OneToOne ? 1 : cg.getRows();
-		break;
-	    }
-
-	    i++;
-	}
-
-	if (series < 2) {
-	    weightsRows1 = 0;
-	}
-
-	if (series < 3) {
-	    weightsRows2 = 0;
+	    weightsRows[i++] = graph instanceof OneToOne ? 1 : cg.getRows();
 	}
     }
 
