@@ -17,10 +17,8 @@ public class AparapiWeightedSumByRows extends AparapiBaseFunction {
 	for (int i = 0; i < inputOutputColumns; i++) {
 	    before(id, i);
 
-	    if (series >= 1) {
-		for (int j = 0; j < weightsColumns; j++) {
-		    output[outputIndex(id, i, 0)] += input[inputIndex(j, i, 0)] * weights[weightIndex(id, j, 0)];
-		}
+	    for (int j = 0; j < weightsColumns; j++) {
+		output[outputIndex(id, i, 0)] += input[inputIndex(j, i, 0)] * weights[weightIndex(id, j, 0)];
 	    }
 
 	    if (series >= 2) {

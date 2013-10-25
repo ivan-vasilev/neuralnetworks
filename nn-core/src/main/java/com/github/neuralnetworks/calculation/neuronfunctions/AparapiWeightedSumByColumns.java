@@ -22,20 +22,17 @@ public class AparapiWeightedSumByColumns extends AparapiBaseFunction {
 	for (int i = 0; i < inputOutputColumns; i++) {
 	    before(id, i);
 
-	    if (series >= 1) {
-		for (int j = 0; j < weightsRows; j++) {
-		    output[outputIndex(id, i, 0)] += input[inputIndex(j, i, 0)] * weights[weightIndex(j, id, 0)];
-		}
+	    for (int j = 0; j < weightsRows; j++) {
+		output[outputIndex(id, i, 0)] += input[inputIndex(j, i, 0)] * weights[weightIndex(j, id, 0)];
 	    }
 
-	    if (series >= 2) {
-
+	    if (series >= 1) {
 		for (int j = 0; j < weightsRows1; j++) {
 		    output[outputIndex(id, i, 1)] += input1[inputIndex(j, i, 1)] * weights1[weightIndex(j, id, 1)];
 		}
 	    }
 
-	    if (series >= 3) {
+	    if (series >= 2) {
 		for (int j = 0; j < weightsRows2; j++) {
 		    output[outputIndex(id, i, 2)] += input2[inputIndex(j, i, 2)] * weights2[weightIndex(j, id, 2)];
 		}
@@ -75,6 +72,14 @@ public class AparapiWeightedSumByColumns extends AparapiBaseFunction {
 	    }
 
 	    i++;
+	}
+
+	if (series < 2) {
+	    weightsRows1 = 0;
+	}
+
+	if (series < 3) {
+	    weightsRows2 = 0;
 	}
     }
 

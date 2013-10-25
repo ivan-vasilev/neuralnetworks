@@ -38,16 +38,14 @@ public class ConnectionCalculatorImpl implements ConnectionCalculator {
 	    Connections c = e.getKey();
 	    Matrix input = e.getValue();
 	    // bias layer scenarios
-	    if (c.getInputLayer().getConnectionCalculator() instanceof ConstantConnectionCalculator || c.getOutputLayer().getConnectionCalculator() instanceof ConstantConnectionCalculator) {
-		c.getInputLayer().getConnectionCalculator().calculate(connections, input, targetLayer);
+	    if (c.getOutputLayer() == targetLayer ||
+		c.getInputLayer().getConnectionCalculator() instanceof ConstantConnectionCalculator ||
+		c.getOutputLayer().getConnectionCalculator() instanceof ConstantConnectionCalculator) {
+		forward.put(c, input);
 	    }
 
 	    if (c.getInputLayer() == targetLayer) {
 		backward.put(c, input);
-	    }
-
-	    if (c.getOutputLayer() == targetLayer) {
-		forward.put(c, input);
 	    }
 	}
 
@@ -56,7 +54,7 @@ public class ConnectionCalculatorImpl implements ConnectionCalculator {
 	}
 	
 	if (backward.size() > 0) {
-	    backwardInputFunction.calculate(forward, output, targetLayer);
+	    backwardInputFunction.calculate(backward, output, targetLayer);
 	}
 
 	if (activationFunction != null) {

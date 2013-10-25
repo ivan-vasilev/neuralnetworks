@@ -1,6 +1,5 @@
 package com.github.neuralnetworks.calculation.neuronfunctions;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -8,6 +7,7 @@ import com.amd.aparapi.Kernel;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
+import com.github.neuralnetworks.architecture.OneToOne;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.util.Environment;
 
@@ -42,8 +42,10 @@ public abstract class AparapiBaseFunction extends Kernel implements ConnectionCa
 
     @Override
     public void calculate(Map<Connections, Matrix> input, Matrix outputMatrix, Layer targetLayer) {
-	init(input, outputMatrix, targetLayer);
-	execute(outputMatrix.getRows());
+	if (input.size() > 0) {
+	    init(input, outputMatrix, targetLayer);
+	    execute(outputMatrix.getRows());
+	}
     }
 
     /**
@@ -53,16 +55,18 @@ public abstract class AparapiBaseFunction extends Kernel implements ConnectionCa
 	boolean hasInput = false, hasOutput = false;
 
 	for (Connections c : input.keySet()) {
-	    if (c.getInputLayer() == targetLayer) {
-		hasInput = true;
-	    }
-
-	    if (c.getOutputLayer() == targetLayer) {
-		hasOutput = true;
-	    }
-
-	    if (hasInput && hasOutput) {
-		throw new IllegalArgumentException("Functions must only be for input or output layer, but not both");
+	    if (!(c instanceof OneToOne)) {
+		if (c.getInputLayer() == targetLayer) {
+		    hasInput = true;
+		}
+		
+		if (c.getOutputLayer() == targetLayer) {
+		    hasOutput = true;
+		}
+		
+		if (hasInput && hasOutput) {
+		    throw new IllegalArgumentException("Functions must only be for input or output layer, but not both");
+		}
 	    }
 	}
 
@@ -76,7 +80,6 @@ public abstract class AparapiBaseFunction extends Kernel implements ConnectionCa
 
 	this.series = 0;
 	this.output = outputMatrix.getElements();
-	this.inputOutputColumns = 0;
 
 	for (java.util.Map.Entry<Connections, Matrix> e : input.entrySet()) {
 	    Connections graph = e.getKey();
@@ -85,28 +88,24 @@ public abstract class AparapiBaseFunction extends Kernel implements ConnectionCa
 
 	    switch (series) {
 	    case 0:
-		this.weights = cg.getElements();
 		this.input = inputMatrix.getElements();
-
+		this.weights = cg.getElements();
 		this.weightsColumns = cg.getColumns();
-		this.inputOutputColumns = inputMatrix.getColumns();
 		this.inputStartIndex = graph.getInputLayerStartNeuron();
 		this.outputStartIndex = graph.getOutputLayerStartNeuron();
 		break;
 
 	    case 1:
-		this.weights1 = cg.getElements();
 		this.input1 = inputMatrix.getElements();
-
+		this.weights1 = cg.getElements();
 		this.weightsColumns1 = cg.getColumns();
 		this.inputStartIndex1 = graph.getInputLayerStartNeuron();
 		this.outputStartIndex1 = graph.getOutputLayerStartNeuron();
 		break;
 
 	    case 2:
-		this.weights2 = cg.getElements();
 		this.input2 = inputMatrix.getElements();
-
+		this.weights2 = cg.getElements();
 		this.weightsColumns2 = cg.getColumns();
 		this.inputStartIndex2 = graph.getInputLayerStartNeuron();
 		this.outputStartIndex2 = graph.getOutputLayerStartNeuron();
@@ -114,6 +113,22 @@ public abstract class AparapiBaseFunction extends Kernel implements ConnectionCa
 	    }
 
 	    series++;
+	}
+
+	if (series < 2) {
+	    this.weights1 = new float[1]; // 1 for aparapi reasons
+	    this.input1 = new float[1];
+	    this.weightsColumns1 = 0;
+	    this.inputStartIndex1 = 0;
+	    this.outputStartIndex1 = 0;
+	}
+
+	if (series < 3) {
+	    this.weights2 = new float[1];
+	    this.input2 = new float[1];
+	    this.weightsColumns2 = 0;
+	    this.inputStartIndex2 = 0;
+	    this.outputStartIndex2 = 0;
 	}
 
 	setExecutionMode(Environment.getInstance().getExecutionMode());
@@ -160,10 +175,5 @@ public abstract class AparapiBaseFunction extends Kernel implements ConnectionCa
 
     protected int outputBaseIndex(int row, int column) {
 	return row * inputOutputColumns + column;
-    }
-
-    public Layer getTargetLayer(Collection<Connections> c) {
-	Layer result = null;
-	return result;
     }
 }
