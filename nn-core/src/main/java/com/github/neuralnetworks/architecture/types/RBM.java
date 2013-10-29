@@ -21,7 +21,7 @@ public class RBM extends NeuralNetwork {
     public RBM(Layer visibleLayer, Layer hiddenLayer, boolean addVisibleBias, boolean addHiddenBias) {
 	super();
 
-	addConnection(mainConnections = new FullyConnected(hiddenLayer, visibleLayer));
+	addConnection(mainConnections = new FullyConnected(visibleLayer, hiddenLayer));
 
 	if (addVisibleBias) {
 	    addConnection(visibleBiasConnections = new OneToOne(visibleLayer, new Layer(visibleLayer.getNeuronCount(), new ConstantConnectionCalculator(1))));

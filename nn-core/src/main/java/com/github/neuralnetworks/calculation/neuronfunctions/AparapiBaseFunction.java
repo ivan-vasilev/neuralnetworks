@@ -1,7 +1,9 @@
 package com.github.neuralnetworks.calculation.neuronfunctions;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.SortedMap;
 
 import com.amd.aparapi.Kernel;
 import com.github.neuralnetworks.architecture.Connections;
@@ -20,35 +22,27 @@ public abstract class AparapiBaseFunction extends Kernel implements ConnectionCa
 
     protected int inputOutputColumns;
     protected int series;
+    protected float[] input;
+    protected float[] weights;
     protected float[] output;
     protected int[] weightsColumns;
     protected int[] inputStartIndexes;
     protected int[] outputStartIndexes;
-
-    protected float[] weights;
-    protected float[] input;
-
-    protected float[] weights1;
-    protected float[] input1;
-
-    protected float[] weights2;
-    protected float[] input2;
+    protected int[] inputStartPositions;
+    protected int[] weightStartPositions;
+    protected Map<Integer, float[]> storedInputs = new HashMap<>();
+    protected Map<Integer, float[]> storedWeights = new HashMap<>();
 
     @Override
-    public void calculate(Map<Connections, Matrix> input, Matrix outputMatrix, Layer targetLayer) {
+    public void calculate(SortedMap<Connections, Matrix> input, Matrix outputMatrix, Layer targetLayer) {
 	if (input.size() > 0) {
 	    init(input, outputMatrix, targetLayer);
 	    execute(outputMatrix.getRows());
 	}
     }
 
-    /**
-     * initialization before the actual calculation
-     */
-    protected void init(Map<Connections, Matrix> input, Matrix outputMatrix, Layer targetLayer) {
-	boolean hasInput = false, hasOutput = false;
-
-	Iterator<Matrix> it = input.values().iterator();
+    protected void init(SortedMap<Connections, Matrix> inputConnections, Matrix outputMatrix, Layer targetLayer) {
+	Iterator<Matrix> it = inputConnections.values().iterator();
 	this.inputOutputColumns = it.next().getColumns();
 	while (it.hasNext()) {
 	    if (inputOutputColumns != it.next().getColumns()) {
@@ -56,46 +50,23 @@ public abstract class AparapiBaseFunction extends Kernel implements ConnectionCa
 	    }
 	}
 
-	this.weightsColumns = new int[input.size()];
-	this.inputStartIndexes = new int[input.size()];
-	this.outputStartIndexes = new int[input.size()];
+	boolean hasInput = false, hasOutput = false;
+	this.series = inputConnections.size();
+	this.weightsColumns = new int[series];
+	this.inputStartIndexes = new int[series];
+	this.outputStartIndexes = new int[series];
 	this.output = outputMatrix.getElements();
+	this.inputStartPositions = new int[series];
+	this.weightStartPositions = new int[series];
 
-	this.series = 0;
-	for (java.util.Map.Entry<Connections, Matrix> e : input.entrySet()) {
-	    Connections graph = e.getKey();
-	    Matrix inputMatrix = e.getValue();
-	    Matrix cg = graph.getConnectionGraph();
-
-	    this.weightsColumns[series] = cg.getColumns();
-	    this.inputStartIndexes[series] = graph.getInputLayerStartNeuron();
-	    this.outputStartIndexes[series] = graph.getOutputLayerStartNeuron();
-
-	    switch (series) {
-	    case 0:
-		this.input = inputMatrix.getElements();
-		this.weights = cg.getElements();
-		break;
-
-	    case 1:
-		this.input1 = inputMatrix.getElements();
-		this.weights1 = cg.getElements();
-		break;
-
-	    case 2:
-		this.input2 = inputMatrix.getElements();
-		this.weights2 = cg.getElements();
-		break;
-	    }
-
-	    series++;
-
-	    if (!(graph instanceof OneToOne)) {
-		if (graph.getInputLayer() == targetLayer) {
+	int totalInputSize = 0, totalWeightSize = 0, i = 0;
+	for (java.util.Map.Entry<Connections, Matrix> e : inputConnections.entrySet()) {
+	    if (!(e.getKey() instanceof OneToOne)) {
+		if (e.getKey().getInputLayer() == targetLayer) {
 		    hasInput = true;
 		}
 		
-		if (graph.getOutputLayer() == targetLayer) {
+		if (e.getKey().getOutputLayer() == targetLayer) {
 		    hasOutput = true;
 		}
 		
@@ -103,27 +74,53 @@ public abstract class AparapiBaseFunction extends Kernel implements ConnectionCa
 		    throw new IllegalArgumentException("Functions must only be for input or output layer, but not both");
 		}
 	    }
+
+	    inputStartPositions[i] = totalInputSize;
+	    totalInputSize += e.getValue().getElements().length;
+	    weightStartPositions[i] = totalWeightSize;
+	    totalWeightSize += e.getKey().getConnectionGraph().getElements().length;
+
+	    weightsColumns[i] = e.getKey().getConnectionGraph().getColumns();
+	    inputStartIndexes[i] = e.getKey().getInputLayerStartNeuron();
+	    outputStartIndexes[i] = e.getKey().getOutputLayerStartNeuron();
+
+	    i++;
 	}
 
-	if (series < 2) {
-	    this.weights1 = new float[1]; // 1 for aparapi reasons
-	    this.input1 = new float[1];
-	}
+	if (inputConnections.size() == 1) {
+	    java.util.Map.Entry<Connections, Matrix> e = inputConnections.entrySet().iterator().next();
+	    this.input = e.getValue().getElements();
+	    this.weights = e.getKey().getConnectionGraph().getElements();
+	} else {
+	    this.input = storedInputs.get(totalInputSize);
+	    if (this.input == null) {
+		this.input = new float[totalInputSize];
+		storedInputs.put(totalInputSize, this.input);
+	    }
 
-	if (series < 3) {
-	    this.weights2 = new float[1];
-	    this.input2 = new float[1];
+	    this.weights = storedWeights.get(totalWeightSize);
+	    if (weights == null) {
+		this.weights = new float[totalWeightSize];
+		storedWeights.put(totalWeightSize, this.weights);
+	    }
+
+	    i = 0;
+	    for (java.util.Map.Entry<Connections, Matrix> e : inputConnections.entrySet()) {
+		System.arraycopy(e.getValue().getElements(), 0, input, inputStartPositions[i], e.getValue().getElements().length);
+		System.arraycopy(e.getKey().getConnectionGraph().getElements(), 0, weights, weightStartPositions[i], e.getKey().getConnectionGraph().getElements().length);
+		i++;
+	    }
 	}
 
 	setExecutionMode(Environment.getInstance().getExecutionMode());
     };
 
     protected int weightIndex(int row, int column, int series) {
-	return row * weightsColumns[series] + column;
+	return weightStartPositions[series] + row * weightsColumns[series] + column;
     }
 
     protected int inputIndex(int row, int column, int series) {
-	return (inputStartIndexes[series] + row) * inputOutputColumns + column;
+	return inputStartPositions[series] + (inputStartIndexes[series] + row) * inputOutputColumns + column;
     }
 
     protected int outputIndex(int row, int column, int series) {

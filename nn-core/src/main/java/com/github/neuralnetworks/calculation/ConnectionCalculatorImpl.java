@@ -1,8 +1,8 @@
 package com.github.neuralnetworks.calculation;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Map.Entry;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
@@ -31,9 +31,9 @@ public class ConnectionCalculatorImpl implements ConnectionCalculator {
     }
 
     @Override
-    public void calculate(Map<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
-	Map<Connections, Matrix> forward = new HashMap<>();
-	Map<Connections, Matrix> backward = new HashMap<>();
+    public void calculate(SortedMap<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
+	SortedMap<Connections, Matrix> forward = new TreeMap<>();
+	SortedMap<Connections, Matrix> backward = new TreeMap<>();
 	for (Entry<Connections, Matrix> e : connections.entrySet()) {
 	    Connections c = e.getKey();
 	    Matrix input = e.getValue();

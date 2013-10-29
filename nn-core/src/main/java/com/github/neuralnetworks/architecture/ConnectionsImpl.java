@@ -6,7 +6,7 @@ package com.github.neuralnetworks.architecture;
  * @author hok
  * 
  */
-public abstract class ConnectionsImpl implements Connections {
+public abstract class ConnectionsImpl implements Connections, Comparable<ConnectionsImpl> {
 
     /**
      * input layer of neurons
@@ -35,5 +35,10 @@ public abstract class ConnectionsImpl implements Connections {
     @Override
     public Layer getOutputLayer() {
 	return outputLayer;
+    }
+
+    @Override
+    public int compareTo(ConnectionsImpl o) {
+	return this.toString().compareTo(o.toString());
     }
 }

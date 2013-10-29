@@ -1,7 +1,7 @@
 package com.github.neuralnetworks.calculation;
 
 import java.io.Serializable;
-import java.util.Map;
+import java.util.SortedMap;
 
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
@@ -13,5 +13,5 @@ import com.github.neuralnetworks.architecture.Matrix;
  *
  */
 public interface ConnectionCalculator extends Serializable {
-    public void calculate(Map<Connections, Matrix> connections, Matrix output, Layer targetLayer);
+    public void calculate(SortedMap<Connections, Matrix> connections, Matrix output, Layer targetLayer);
 }

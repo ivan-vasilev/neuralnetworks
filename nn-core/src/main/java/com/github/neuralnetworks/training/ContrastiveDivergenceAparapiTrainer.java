@@ -1,6 +1,7 @@
 package com.github.neuralnetworks.training;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -8,12 +9,11 @@ import com.amd.aparapi.Kernel;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.types.RBM;
+import com.github.neuralnetworks.calculation.LayerCalculator;
 import com.github.neuralnetworks.calculation.LayerCalculatorImpl;
-import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.Constants;
+import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.Properties;
-import com.github.neuralnetworks.util.UniqueList;
-import com.github.neuralnetworks.util.Util;
 
 public class ContrastiveDivergenceAparapiTrainer extends Trainer<RBM> {
 
@@ -27,7 +27,10 @@ public class ContrastiveDivergenceAparapiTrainer extends Trainer<RBM> {
     private Kernel weightUpdatesKernel;
     private Kernel visibleBiasUpdatesKernel;
     private Kernel hiddenBiasUpdatesKernel;
+    private LayerCalculator calculator;
     private int miniBatchSize;
+    private Map<Layer, Matrix> results;
+    private Set<Layer> calculatedLayers;
 
     public ContrastiveDivergenceAparapiTrainer() {
 	super();
@@ -56,25 +59,7 @@ public class ContrastiveDivergenceAparapiTrainer extends Trainer<RBM> {
 	final float[] negPhaseHidden = this.negPhaseHidden.getElements();
 	final float[] weights = rbm.getMainConnections().getConnectionGraph().getElements();
 	final float learningRate = (float) properties.get(Constants.LEARNING_RATE);
-	Set<Layer> calculatedLayers = new UniqueList<Layer>();
-
-	// nullify weights
-	Util.fillArray(weightUpdates, 0);
-
-	if (rbm.getVisibleBiasConnections() != null) {
-	    Util.fillArray(visibleBiasUpdates, 0);
-	}
-
-	if (rbm.getHiddenBiasConnections() != null) {
-	    Util.fillArray(hiddenBiasUpdates, 0);
-	}
-
-	LayerCalculatorImpl calculator = new LayerCalculatorImpl();
-
-	// TODO member
-	Map<Layer, Matrix> results = new HashMap<>();
-
-	results.clear();
+	final float momentum = (float) properties.get(Constants.MOMENTUM);
 
 	// clamp results to visible layer
 	System.arraycopy(input.getElements(), 0, posPhaseVisible, 0, posPhaseVisible.length);
@@ -82,18 +67,21 @@ public class ContrastiveDivergenceAparapiTrainer extends Trainer<RBM> {
 
 	// calculate positive phase
 	results.put(rbm.getHiddenLayer(), this.posPhaseHidden);
+	calculatedLayers.clear();
 	calculatedLayers.add(rbm.getVisibleLayer());
 	calculator.calculate(calculatedLayers, results, rbm.getHiddenLayer());
 
 	// Gibbs sampling
 	int gibbsSamplingCount = properties.containsKey(Constants.GIBBS_SAMPLING_COUNT) ? (int) properties.get(Constants.GIBBS_SAMPLING_COUNT) : 1;
 	for (int i = 0; i < gibbsSamplingCount; i++) {
-	    results.put(rbm.getVisibleLayer(), this.negPhaseVisible);
 	    calculatedLayers.clear();
 	    calculatedLayers.add(rbm.getHiddenLayer());
+	    results.put(rbm.getVisibleLayer(), this.negPhaseVisible);
 	    calculator.calculate(calculatedLayers, results, rbm.getVisibleLayer());
-	    results.put(rbm.getHiddenLayer(), this.negPhaseHidden);
+
+	    calculatedLayers.clear();
 	    calculatedLayers.add(rbm.getVisibleLayer());
+	    results.put(rbm.getHiddenLayer(), this.negPhaseHidden);
 	    calculator.calculate(calculatedLayers, results, rbm.getHiddenLayer());
 	}
 
@@ -107,11 +95,14 @@ public class ContrastiveDivergenceAparapiTrainer extends Trainer<RBM> {
 		    int id = getGlobalId();
 		    int visibleId = (id % neuronWeightsColumns) * miniBatchSize;
 		    int hiddenId = (id / neuronWeightsColumns) * miniBatchSize;
+		    float weightUpdate = 0;
 		    for (int i = 0; i < miniBatchSize; i++) {
-			weightUpdates[id] += posPhaseHidden[hiddenId + i] * posPhaseVisible[visibleId + i] - negPhaseHidden[hiddenId + i] * negPhaseVisible[visibleId + i];
+			weightUpdate += posPhaseHidden[hiddenId + i] * posPhaseVisible[visibleId + i] - negPhaseHidden[hiddenId + i] * negPhaseVisible[visibleId + i];
 		    }
 
-		    weights[id] += learningRate * (weightUpdates[id] / miniBatchSize);
+		    weightUpdate = learningRate * (weightUpdate / miniBatchSize) + momentum * weightUpdates[id];
+		    weights[id] += weightUpdate;
+		    weightUpdates[id] = weightUpdate;
 		}
 	    };
 	}
@@ -127,11 +118,14 @@ public class ContrastiveDivergenceAparapiTrainer extends Trainer<RBM> {
 		    @Override
 		    public void run() {
 			int id = getGlobalId();
+			float weightUpdate = 0;
 			for (int i = 0; i < miniBatchSize; i++) {
-			    visibleBiasUpdates[id] += posPhaseVisible[id * miniBatchSize + i] - negPhaseVisible[id * miniBatchSize + i];
+			    weightUpdate += posPhaseVisible[id * miniBatchSize + i] - negPhaseVisible[id * miniBatchSize + i];
 			}
 
-			visibleBiasWeights[id] += learningRate * (visibleBiasUpdates[id] / miniBatchSize);
+			weightUpdate = learningRate * (weightUpdate / miniBatchSize) + momentum * visibleBiasUpdates[id];
+			visibleBiasWeights[id] += weightUpdate;
+			visibleBiasUpdates[id] = weightUpdate;
 		    }
 		};
 	    }
@@ -143,18 +137,22 @@ public class ContrastiveDivergenceAparapiTrainer extends Trainer<RBM> {
 	// update hidden bias
 	if (rbm.getHiddenBiasConnections() != null) {
 	    final float[] hiddenBiasWeights = rbm.getHiddenBiasConnections().getConnectionGraph().getElements();
-	    final float[] hiddenBiasUpdates = this.visibleBiasUpdates;
+	    final float[] hiddenBiasUpdates = this.hiddenBiasUpdates;
 
 	    if (hiddenBiasUpdatesKernel == null) {
 		hiddenBiasUpdatesKernel = new Kernel() {
 		    @Override
 		    public void run() {
 			int id = getGlobalId();
+			float weightUpdate = 0;
 			for (int i = 0; i < miniBatchSize; i++) {
+			    weightUpdate += posPhaseHidden[id * miniBatchSize + i] - negPhaseHidden[id * miniBatchSize + i];
 			    hiddenBiasUpdates[id] += posPhaseHidden[id * miniBatchSize + i] - negPhaseHidden[id * miniBatchSize + i];
 			}
 
-			hiddenBiasWeights[id] += learningRate * (hiddenBiasUpdates[id] / miniBatchSize);
+			weightUpdate = learningRate * (weightUpdate / miniBatchSize) + momentum * hiddenBiasUpdates[id];
+			hiddenBiasWeights[id] += weightUpdate;
+			hiddenBiasUpdates[id] = weightUpdate;
 		    }
 		};
 	    }
@@ -165,6 +163,10 @@ public class ContrastiveDivergenceAparapiTrainer extends Trainer<RBM> {
     }
 
     protected void init() {
+	calculatedLayers = new HashSet<>();
+	results = new HashMap<>();
+	calculator = new LayerCalculatorImpl();
+
 	RBM neuralNetwork = getNeuralNetwork();
 	posPhaseVisible = new Matrix(neuralNetwork.getVisibleLayer().getNeuronCount(), miniBatchSize);
 	negPhaseVisible = new Matrix(neuralNetwork.getVisibleLayer().getNeuronCount(), miniBatchSize);

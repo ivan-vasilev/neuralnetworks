@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.InputOutputLayers;
@@ -57,10 +59,10 @@ public class BackPropagationAparapiImpl extends LayerCalculatorImpl implements B
     }
 
     @Override
-    public void calculate(Map<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
-	Map<Connections, Matrix> forward = new HashMap<>();
-	Map<Connections, Matrix> backward = new HashMap<>();
-	Map<Connections, Matrix> bias = new HashMap<>();
+    public void calculate(SortedMap<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
+	SortedMap<Connections, Matrix> forward = new TreeMap<>();
+	SortedMap<Connections, Matrix> backward = new TreeMap<>();
+	SortedMap<Connections, Matrix> bias = new TreeMap<>();
 	Matrix biasOutput = null;
 	Layer biasLayer = null;
 	for (Entry<Connections, Matrix> e : connections.entrySet()) {
@@ -110,54 +112,32 @@ public class BackPropagationAparapiImpl extends LayerCalculatorImpl implements B
 
 	private float[] outputActivation;
 	private float[] weightUpdates;
-	private float[] weightUpdates1;
-	private float[] weightUpdates2;
-	private Map<Connections, float[]> storedWeightUpdates = new HashMap<>();
+	private Map<Layer, float[]> storedWeightUpdates = new HashMap<>();
 	private float learningRate;
 	private float momentum;
 	private Map<Layer, Matrix> activations;
 
 	@Override
-	protected void init(Map<Connections, Matrix> input, Matrix outputMatrix, Layer targetLayer) {
+	public void calculate(SortedMap<Connections, Matrix> inputConnections, Matrix outputMatrix, Layer targetLayer) {
+	    super.calculate(inputConnections, outputMatrix, targetLayer);
+	    if (inputConnections.size() > 1) {
+		int i = 0;
+		for (java.util.Map.Entry<Connections, Matrix> e : inputConnections.entrySet()) {
+		    System.arraycopy(input, inputStartPositions[i], e.getValue().getElements(), 0, e.getValue().getElements().length);
+		    System.arraycopy(weights, weightStartPositions[i], e.getKey().getConnectionGraph().getElements(), 0, e.getKey().getConnectionGraph().getElements().length);
+		    i++;
+		}
+	    }
+	}
+
+	@Override
+	protected void init(SortedMap<Connections, Matrix> input, Matrix outputMatrix, Layer targetLayer) {
 	    super.init(input, outputMatrix, targetLayer);
 
-	    int i = 0;
-	    for (java.util.Map.Entry<Connections, Matrix> e : input.entrySet()) {
-		Connections graph = e.getKey();
-
-		switch (i) {
-		case 0:
-		    weightUpdates = storedWeightUpdates.get(graph);
-		    if (weightUpdates == null) {
-			weightUpdates = new float[graph.getConnectionGraph().getElements().length];
-			storedWeightUpdates.put(graph, weightUpdates);
-		    }
-		    break;
-		case 1:
-		    weightUpdates1 = storedWeightUpdates.get(graph);
-		    if (weightUpdates1 == null) {
-			weightUpdates1 = new float[graph.getConnectionGraph().getElements().length];
-			storedWeightUpdates.put(graph, weightUpdates1);
-		    }
-		    break;
-		case 2:
-		    weightUpdates2 = storedWeightUpdates.get(graph);
-		    if (weightUpdates2 == null) {
-			weightUpdates2 = new float[graph.getConnectionGraph().getElements().length];
-			storedWeightUpdates.put(graph, weightUpdates2);
-		    }
-		    break;
-		}
-
-		i++;
-	    }
-
-	    if (series <= 2) {
-		weightUpdates1 = new float[1];
-	    }
-	    
-	    if (series <= 3) {
-		weightUpdates2 = new float[1];
+	    weightUpdates = storedWeightUpdates.get(targetLayer);
+	    if (weightUpdates == null) {
+		weightUpdates = new float[weights.length];
+		storedWeightUpdates.put(targetLayer, weightUpdates);
 	    }
 
 	    outputActivation = activations.get(targetLayer).getElements();
@@ -167,25 +147,12 @@ public class BackPropagationAparapiImpl extends LayerCalculatorImpl implements B
 	protected void after(int row, int column) {
 	    output[outputBaseIndex(row, column)] *= outputActivation[outputBaseIndex(row, column)] * (1 - outputActivation[outputBaseIndex(row, column)]);
 
-	    for (int j = 0; j < weightsColumns[0]; j++) {
-		float weightUpdate = learningRate * input[inputIndex(j, column, 0)] * outputActivation[outputIndex(row, column, 0)] + momentum * weightUpdates[weightIndex(row, j, 0)];
-		weights[weightIndex(row, j, 0)] += weightUpdate;
-		weightUpdates[weightIndex(row, j, 0)] = weightUpdate;
-	    }
-
-	    if (series >= 2) {
-		for (int j = 0; j < weightsColumns[1]; j++) {
-		    float weightUpdate = learningRate * input1[inputIndex(j, column, 1)] * outputActivation[outputIndex(row, column, 1)] + momentum * weightUpdates1[weightIndex(row, j, 1)];
-		    weights1[weightIndex(row, j, 1)] += weightUpdate;
-		    weightUpdates1[weightIndex(row, j, 1)] = weightUpdate;
-		}
-	    }
-
-	    if (series >= 3) {
-		for (int j = 0; j < weightsColumns[2]; j++) {
-		    float weightUpdate = learningRate * input2[inputIndex(j, column, 2)] * outputActivation[outputIndex(row, column, 2)] + momentum * weightUpdates2[weightIndex(row, j, 2)];
-		    weights2[weightIndex(row, j, 2)] += weightUpdate;
-		    weightUpdates2[weightIndex(row, j, 2)] = weightUpdate;
+	    for (int i = 0; i < series; i++) {
+		for (int j = 0; j < weightsColumns[i]; j++) {
+		    int weightIndex = weightIndex(row, j, i);
+		    float weightUpdate = learningRate * input[inputIndex(j, column, i)] * outputActivation[outputIndex(row, column, i)] + momentum * weightUpdates[weightIndex];
+		    weights[weightIndex] += weightUpdate;
+		    weightUpdates[weightIndex] = weightUpdate;
 		}
 	    }
 	}
@@ -196,54 +163,33 @@ public class BackPropagationAparapiImpl extends LayerCalculatorImpl implements B
 	private static final long serialVersionUID = -5101971690861270462L;
 
 	private float[] outputActivation;
-	private Map<Connections, float[]> storedWeightUpdates = new HashMap<>();
+	private Map<Layer, float[]> storedWeightUpdates = new HashMap<>();
 	private float[] weightUpdates;
-	private float[] weightUpdates1;
-	private float[] weightUpdates2;
 	private float learningRate;
 	private float momentum;
 	private Map<Layer, Matrix> activations;
 
 	@Override
-	protected void init(Map<Connections, Matrix> input, Matrix outputMatrix, Layer targetLayer) {
+	public void calculate(SortedMap<Connections, Matrix> inputConnections, Matrix outputMatrix, Layer targetLayer) {
+	    super.calculate(inputConnections, outputMatrix, targetLayer);
+	    if (inputConnections.size() > 1) {
+		int i = 0;
+		for (java.util.Map.Entry<Connections, Matrix> e : inputConnections.entrySet()) {
+		    System.arraycopy(input, inputStartPositions[i], e.getValue().getElements(), 0, e.getValue().getElements().length);
+		    System.arraycopy(weights, weightStartPositions[i], e.getKey().getConnectionGraph().getElements(), 0, e.getKey().getConnectionGraph().getElements().length);
+		    i++;
+		}
+	    }
+	}
+
+	@Override
+	protected void init(SortedMap<Connections, Matrix> input, Matrix outputMatrix, Layer targetLayer) {
 	    super.init(input, outputMatrix, targetLayer);
 
-	    int i = 0;
-	    for (java.util.Map.Entry<Connections, Matrix> e : input.entrySet()) {
-		Connections graph = e.getKey();
-
-		switch (i) {
-		case 0:
-		    weightUpdates = storedWeightUpdates.get(graph);
-		    if (weightUpdates == null) {
-			weightUpdates = new float[graph.getConnectionGraph().getElements().length];
-			storedWeightUpdates.put(graph, weightUpdates);
-		    }
-		    break;
-		case 1:
-		    weightUpdates1 = storedWeightUpdates.get(graph);
-		    if (weightUpdates1 == null) {
-			weightUpdates1 = new float[graph.getConnectionGraph().getElements().length];
-			storedWeightUpdates.put(graph, weightUpdates1);
-		    }
-		    break;
-		case 2:
-		    weightUpdates2 = storedWeightUpdates.get(graph);
-		    if (weightUpdates2 == null) {
-			weightUpdates2 = new float[graph.getConnectionGraph().getElements().length];
-			storedWeightUpdates.put(graph, weightUpdates2);
-		    }
-		}
-
-		i++;
-	    }
-
-	    if (series <= 2) {
-		weightUpdates1 = new float[1];
-	    }
-	    
-	    if (series <= 3) {
-		weightUpdates2 = new float[1];
+	    weightUpdates = storedWeightUpdates.get(targetLayer);
+	    if (weightUpdates == null) {
+		weightUpdates = new float[weights.length];
+		storedWeightUpdates.put(targetLayer, weightUpdates);
 	    }
 
 	    outputActivation = activations.get(targetLayer).getElements();
@@ -253,30 +199,14 @@ public class BackPropagationAparapiImpl extends LayerCalculatorImpl implements B
 	protected void after(int row, int column) {
 	    output[outputBaseIndex(row, column)] *= outputActivation[outputBaseIndex(row, column)] * (1 - outputActivation[outputBaseIndex(row, column)]);
 
-	    for (int j = 0; j < weightsRows[0]; j++) {
-		int weightIndex = weightIndex(j, row, 0);
-		float weightUpdate = learningRate * input[inputIndex(j, column, 0)] * outputActivation[outputIndex(row, column, 0)] + momentum * weightUpdates[weightIndex];
-		weights[weightIndex] += weightUpdate;
-		weightUpdates[weightIndex] = weightUpdate;
+	    for (int i = 0; i < series; i++) {
+		for (int j = 0; j < weightsRows[i]; j++) {
+		    int weightIndex = weightIndex(j, row, i);
+		    float weightUpdate = learningRate * input[inputIndex(j, column, i)] * outputActivation[outputIndex(row, column, i)] + momentum * weightUpdates[weightIndex];
+		    weights[weightIndex] += weightUpdate;
+		    weightUpdates[weightIndex] = weightUpdate;
+		}
 	    }
-
-//	    if (series >= 2) {
-//		for (int j = 0; j < weightsRows[1]; j++) {
-//		    int weightIndex = weightIndex(j, row, 1);
-//		    float weightUpdate = learningRate * input1[inputIndex(j, column, 1)] * outputActivation[outputIndex(row, column, 1)] + momentum * weightUpdates1[weightIndex];
-//		    weights1[weightIndex] += weightUpdate;
-//		    weightUpdates1[weightIndex] = weightUpdate;
-//		}
-//	    }
-//
-//	    if (series >= 3) {
-//		for (int j = 0; j < weightsRows[2]; j++) {
-//		    int weightIndex = weightIndex(j, row, 2);
-//		    float weightUpdate = learningRate * input2[inputIndex(j, column, 2)] * outputActivation[outputIndex(row, column, 2)] + momentum * weightUpdates2[weightIndex];
-//		    weights2[weightIndex] += weightUpdate;
-//		    weightUpdates2[weightIndex] = weightUpdate;
-//		}
-//	    }
 	}
     }
 }

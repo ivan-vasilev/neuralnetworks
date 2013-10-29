@@ -1,6 +1,6 @@
 package com.github.neuralnetworks.calculation.neuronfunctions;
 
-import java.util.Map;
+import java.util.SortedMap;
 
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
@@ -17,21 +17,11 @@ public class AparapiWeightedSumByRows extends AparapiBaseFunction {
 	for (int i = 0; i < inputOutputColumns; i++) {
 	    before(id, i);
 
-	    for (int j = 0; j < weightsColumns[0]; j++) {
-		output[outputIndex(id, i, 0)] += input[inputIndex(j, i, 0)] * weights[weightIndex(id, j, 0)];
+	    for (int k = 0; k < series; k++) {
+		for (int j = 0; j < weightsColumns[0]; j++) {
+		    output[outputIndex(id, i, k)] += input[inputIndex(j, i, k)] * weights[weightIndex(id, j, k)];
+		}
 	    }
-
-//	    if (series >= 2) {
-//		for (int j = 0; j < weightsColumns[1]; j++) {
-//		    output[outputIndex(id, i, 1)] += input1[inputIndex(j, i, 1)] * weights1[weightIndex(id, j, 1)];
-//		}
-//	    }
-//
-//	    if (series >= 3) {
-//		for (int j = 0; j < weightsColumns[2]; j++) {
-//		    output[outputIndex(id, i, 2)] += input2[inputIndex(j, i, 2)] * weights2[weightIndex(id, j, 2)];
-//		}
-//	    }
 
 	    after(id, i);
 	}
@@ -41,7 +31,7 @@ public class AparapiWeightedSumByRows extends AparapiBaseFunction {
      * initialization before the actual calculation
      */
     @Override
-    protected void init(Map<Connections, Matrix> input, Matrix outputMatrix, Layer targetLayer) {
+    protected void init(SortedMap<Connections, Matrix> input, Matrix outputMatrix, Layer targetLayer) {
 	super.init(input, outputMatrix, targetLayer);
 
 	for (java.util.Map.Entry<Connections, Matrix> e : input.entrySet()) {

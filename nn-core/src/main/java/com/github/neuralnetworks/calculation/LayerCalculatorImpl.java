@@ -2,11 +2,12 @@ package com.github.neuralnetworks.calculation;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
@@ -33,22 +34,22 @@ public class LayerCalculatorImpl implements LayerCalculator, Serializable {
 	    ConnectionCalculator cc = getConnectionCalculator(currentLayer);
 
 	    if (cc != null) {
-		int columns = getInputColumns(calculatedLayers, results);
-		
-		Matrix output = results.get(currentLayer);
-		if (output == null || output.getColumns() != columns) {
-		    output = new Matrix(currentLayer.getNeuronCount(), columns);
-		    results.put(currentLayer, output);
-		}
-		
-		Map<Connections, Matrix> connections = new HashMap<Connections, Matrix>();
-		
+		SortedMap<Connections, Matrix> connections = new TreeMap<Connections, Matrix>();
 		for (Connections c : currentLayer.getConnections()) {
 		    Layer opposite = Util.getOppositeLayer(c, currentLayer);
 		    if (!inProgressLayers.contains(opposite)) {
 			calculate(calculatedLayers, inProgressLayers, results, opposite);
 			connections.put(c, results.get(opposite));
 		    }
+		}
+
+		Matrix output = results.get(currentLayer);
+		int columns = getInputColumns(calculatedLayers, results);
+		if (output == null || output.getColumns() != columns) {
+		    output = new Matrix(currentLayer.getNeuronCount(), columns);
+		    results.put(currentLayer, output);
+		} else {
+		    Util.fillArray(output.getElements(), 0);
 		}
 
 		cc.calculate(connections, output, currentLayer);
