@@ -45,10 +45,10 @@ public class RBM extends NeuralNetwork {
     }
 
     public Layer getVisibleLayer() {
-	return getInputLayer();
+	return mainConnections.getInputLayer();
     }
 
     public Layer getHiddenLayer() {
-	return getOutputLayer();
+	return mainConnections.getOutputLayer();
     }
 }

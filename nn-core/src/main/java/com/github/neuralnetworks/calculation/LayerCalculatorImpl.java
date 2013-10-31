@@ -28,8 +28,12 @@ public class LayerCalculatorImpl implements LayerCalculator, Serializable {
 	calculate(calculatedLayers, new UniqueList<Layer>(), results, layer);
     }
 
-    protected void calculate(Set<Layer> calculatedLayers, Set<Layer> inProgressLayers, Map<Layer, Matrix> results, Layer currentLayer) {
-	if (!calculatedLayers.contains(currentLayer) && !inProgressLayers.contains(currentLayer)) {
+    protected boolean calculate(Set<Layer> calculatedLayers, Set<Layer> inProgressLayers, Map<Layer, Matrix> results, Layer currentLayer) {
+	boolean result = false;
+
+	if (calculatedLayers.contains(currentLayer)) {
+	    result = true;
+	} else if (!inProgressLayers.contains(currentLayer)) {
 	    inProgressLayers.add(currentLayer);
 	    ConnectionCalculator cc = getConnectionCalculator(currentLayer);
 
@@ -37,22 +41,25 @@ public class LayerCalculatorImpl implements LayerCalculator, Serializable {
 		SortedMap<Connections, Matrix> connections = new TreeMap<Connections, Matrix>();
 		for (Connections c : currentLayer.getConnections()) {
 		    Layer opposite = Util.getOppositeLayer(c, currentLayer);
-		    if (!inProgressLayers.contains(opposite)) {
-			calculate(calculatedLayers, inProgressLayers, results, opposite);
+		    if (calculate(calculatedLayers, inProgressLayers, results, opposite)) {
 			connections.put(c, results.get(opposite));
 		    }
 		}
 
-		Matrix output = results.get(currentLayer);
-		int columns = getInputColumns(calculatedLayers, results);
-		if (output == null || output.getColumns() != columns) {
-		    output = new Matrix(currentLayer.getNeuronCount(), columns);
-		    results.put(currentLayer, output);
-		} else {
-		    Util.fillArray(output.getElements(), 0);
-		}
+		if (connections.size() > 0) {
+		    Matrix output = results.get(currentLayer);
+		    int columns = getInputColumns(calculatedLayers, results);
+		    if (output == null || output.getColumns() != columns) {
+			output = new Matrix(currentLayer.getNeuronCount(), columns);
+			results.put(currentLayer, output);
+		    } else {
+			Util.fillArray(output.getElements(), 0);
+		    }
+		    
+		    cc.calculate(connections, output, currentLayer);
 
-		cc.calculate(connections, output, currentLayer);
+		    result = true;
+		}
 	    }
 
 	    inProgressLayers.remove(currentLayer);
@@ -60,9 +67,11 @@ public class LayerCalculatorImpl implements LayerCalculator, Serializable {
 
 	    triggerEvent(new PropagationEvent(currentLayer, results));
 	}
+
+	return result;
     }
 
-    protected ConnectionCalculator getConnectionCalculator(Layer layer){
+    protected ConnectionCalculator getConnectionCalculator(Layer layer) {
 	return layer.getConnectionCalculator();
     }
 

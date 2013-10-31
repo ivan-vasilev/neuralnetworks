@@ -13,7 +13,7 @@ public class ConstantConnectionCalculator implements ConnectionCalculator {
     private static final long serialVersionUID = -512468674234271624L;
 
     private float value;
-    
+
     public ConstantConnectionCalculator(float value) {
 	super();
 	this.value = value;
@@ -22,5 +22,13 @@ public class ConstantConnectionCalculator implements ConnectionCalculator {
     @Override
     public void calculate(SortedMap<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
 	Util.fillArray(output.getElements(), value);
+    }
+    
+    public float getValue() {
+        return value;
+    }
+
+    public void setValue(float value) {
+        this.value = value;
     }
 }
