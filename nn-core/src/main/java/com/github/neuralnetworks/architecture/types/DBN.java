@@ -4,12 +4,13 @@ import java.util.List;
 
 import com.github.neuralnetworks.architecture.DeepNeuralNetwork;
 import com.github.neuralnetworks.architecture.Layer;
+import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.util.UniqueList;
 
-public class DBN extends NeuralNetworkImpl implements DeepNeuralNetwork<RBM> {
+public class DBN extends NeuralNetworkImpl implements DeepNeuralNetwork {
 
-    protected List<RBM> neuralNetworks;
+    protected List<NeuralNetwork> neuralNetworks;
 
     public DBN() {
 	super();
@@ -26,7 +27,7 @@ public class DBN extends NeuralNetworkImpl implements DeepNeuralNetwork<RBM> {
     }
 
     @Override
-    public List<RBM> getNeuralNetworks() {
+    public List<NeuralNetwork> getNeuralNetworks() {
 	return neuralNetworks;
     }
 }
