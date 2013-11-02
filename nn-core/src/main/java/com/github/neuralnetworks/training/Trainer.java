@@ -41,15 +41,7 @@ public abstract class Trainer<N extends NeuralNetwork> {
 	initializeWithRandom();
     }
 
-    public void train() {
-	TrainingInputData input = null;
-	while ((input = getTrainingInputProvider().getNextInput()) != null) {
-	    learnInput(input);
-	    triggerEvent(new SampleFinishedEvent(this, input));
-	}
-
-	triggerEvent(new TrainingFinishedEvent(this));
-    }
+    public abstract void train();
 
     public float test() {
 	TrainingInputProvider ip = getTestingInputProvider();
@@ -164,8 +156,6 @@ public abstract class Trainer<N extends NeuralNetwork> {
 	    }
 	}
     }
-
-    protected abstract void learnInput(TrainingInputData data);
 
     public static class TrainingFinishedEvent extends TrainingEvent {
 

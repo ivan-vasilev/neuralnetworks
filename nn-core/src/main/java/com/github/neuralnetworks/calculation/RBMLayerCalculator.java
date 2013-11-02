@@ -13,10 +13,10 @@ public class RBMLayerCalculator extends LayerCalculatorImpl {
 
     private static final long serialVersionUID = -7524966192939615856L;
 
-    private RBM rbm;
-    private ConnectionCalculator connectionCalculator;
-    private Set<Layer> calculatedLayers;
-    private Map<Layer, Matrix> results;
+    protected RBM rbm;
+    protected ConnectionCalculator connectionCalculator;
+    protected Set<Layer> calculatedLayers;
+    protected Map<Layer, Matrix> results;
 
     public RBMLayerCalculator(RBM rbm) {
 	super();

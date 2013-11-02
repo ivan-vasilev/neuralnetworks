@@ -5,7 +5,7 @@ package com.github.neuralnetworks.architecture;
  * inbound or outbound connections to the neuron
  * 
  */
-public interface Connections extends InputOutputLayers {
+public interface Connections extends NeuralNetwork {
 
     /**
      * @return the start neuron of the input layer neurons

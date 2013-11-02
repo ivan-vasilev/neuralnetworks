@@ -26,4 +26,5 @@ public class Constants {
     public static final String BACKPROPAGATION = "backpropagation";
     public static final String VISIBLE_CONNECTION_CALCULATOR = "visibleConnectionCalculator";
     public static final String HIDDEN_CONNECTION_CALCULATOR = "hiddenConnectionCalculator";
+    public static final String DEEP_TRAINERS = "deepTrainers";
 }

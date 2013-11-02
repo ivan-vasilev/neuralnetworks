@@ -8,4 +8,5 @@ package com.github.neuralnetworks.training;
 public interface TrainingInputProvider {
     public TrainingInputData getNextInput();
     public int getInputSize();
+    public void reset();
 }

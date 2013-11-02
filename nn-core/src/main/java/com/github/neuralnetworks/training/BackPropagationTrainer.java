@@ -7,12 +7,13 @@ import java.util.Set;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
+import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.calculation.LayerCalculator;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
 import com.github.neuralnetworks.util.UniqueList;
 
-public class BackPropagationTrainer extends Trainer<NeuralNetwork> {
+public class BackPropagationTrainer extends OneStepTrainer<NeuralNetworkImpl> {
 
     private Map<Layer, Matrix> activations;
 

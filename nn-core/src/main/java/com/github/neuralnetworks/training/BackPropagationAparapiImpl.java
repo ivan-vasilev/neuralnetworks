@@ -8,7 +8,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import com.github.neuralnetworks.architecture.Connections;
-import com.github.neuralnetworks.architecture.InputOutputLayers;
+import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
@@ -40,7 +40,7 @@ public class BackPropagationAparapiImpl extends LayerCalculatorImpl implements B
     }
 
     @Override
-    public void backPropagate(Map<Layer, Matrix> activations, Matrix outputError, InputOutputLayers layers) {
+    public void backPropagate(Map<Layer, Matrix> activations, Matrix outputError, NeuralNetwork layers) {
 	Set<Layer> calculatedLayers = new UniqueList<Layer>();
 	calculatedLayers.add(layers.getOutputLayer());
 	for (Matrix m : results.values()) {

@@ -8,24 +8,18 @@ import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
 
 /**
- * 
- * base class for contrastive divergence
- *
+ * base class for Contrastive Divergence
  */
-public abstract class ContrastiveDivergenceTrainer extends Trainer<RBM> {
+public abstract class ContrastiveDivergenceTrainer extends OneStepTrainer<RBM> {
 
-    private Matrix posPhaseVisible;
-    private Matrix negPhaseVisible;
-    private Matrix posPhaseHidden;
-    private Matrix negPhaseHidden;
-    private int miniBatchSize;
-    private RBMLayerCalculator calculator;
-    private ConnectionCalculator hiddenConnectionCalculator;
-    private ConnectionCalculator visibleConnectionCalculator;
-
-    public ContrastiveDivergenceTrainer() {
-	super();
-    }
+    protected Matrix posPhaseVisible;
+    protected Matrix negPhaseVisible;
+    protected Matrix posPhaseHidden;
+    protected Matrix negPhaseHidden;
+    protected int miniBatchSize;
+    protected RBMLayerCalculator calculator;
+    protected ConnectionCalculator hiddenConnectionCalculator;
+    protected ConnectionCalculator visibleConnectionCalculator;
 
     public ContrastiveDivergenceTrainer(Properties properties) {
 	super(properties);
@@ -33,7 +27,7 @@ public abstract class ContrastiveDivergenceTrainer extends Trainer<RBM> {
 
     @Override
     protected void learnInput(TrainingInputData data) {
-	posPhaseVisible = data.getInput();
+	posPhaseVisible = getPositivePhaseVisible(data);
 
 	if (miniBatchSize != data.getInput().getColumns()) {
 	    miniBatchSize = data.getInput().getColumns();
@@ -53,6 +47,10 @@ public abstract class ContrastiveDivergenceTrainer extends Trainer<RBM> {
 	updateWeights();
     }
 
+    protected Matrix getPositivePhaseVisible(TrainingInputData data) {
+	return data.getInput();
+    }
+
     protected void init() {
 	hiddenConnectionCalculator = properties.getParameter(Constants.HIDDEN_CONNECTION_CALCULATOR);
 	visibleConnectionCalculator = properties.getParameter(Constants.VISIBLE_CONNECTION_CALCULATOR);
@@ -60,7 +58,6 @@ public abstract class ContrastiveDivergenceTrainer extends Trainer<RBM> {
 	RBM nn = getNeuralNetwork();
 	calculator = new RBMLayerCalculator(nn);
 
-	//this.posPhaseVisible = new Matrix(new float[nn.getVisibleLayer().getNeuronCount()], miniBatchSize);
 	this.negPhaseVisible = new Matrix(nn.getVisibleLayer().getNeuronCount(), miniBatchSize);
 	this.posPhaseHidden = new Matrix(nn.getHiddenLayer().getNeuronCount(), miniBatchSize);
 	this.negPhaseHidden = new Matrix(nn.getHiddenLayer().getNeuronCount(), miniBatchSize);

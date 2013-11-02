@@ -48,10 +48,7 @@ public class MnistInputProvider implements TrainingInputProvider {
 	    cols = images.readInt();
 
 	    random = new Random();
-	    elementsOrder = new ArrayList<Integer>(inputSize);
-	    for (int i = 0; i < inputSize; i++) {
-		elementsOrder.add(i);
-	    }
+	    reset();
 	} catch (IOException e) {
 	    e.printStackTrace();
 	}
@@ -71,6 +68,14 @@ public class MnistInputProvider implements TrainingInputProvider {
 	}
 
 	return result;
+    }
+
+    @Override
+    public void reset() {
+	elementsOrder = new ArrayList<Integer>(inputSize);
+	for (int i = 0; i < inputSize; i++) {
+	    elementsOrder.add(i);
+	}
     }
 
     @Override

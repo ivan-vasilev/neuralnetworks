@@ -3,57 +3,34 @@ package com.github.neuralnetworks.training;
 import com.amd.aparapi.Kernel;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.types.RBM;
-import com.github.neuralnetworks.calculation.ConnectionCalculator;
-import com.github.neuralnetworks.calculation.RBMLayerCalculator;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiBinaryRandomSigmoidConnectionCalculator;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSigmoidConnectionCalculator;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.Properties;
 
-public class ContrastiveDivergenceAparapiTrainer extends Trainer<RBM> {
+public class ContrastiveDivergenceAparapiTrainer extends ContrastiveDivergenceTrainer {
 
-    private Matrix posPhaseVisible;
-    private Matrix negPhaseVisible;
-    private Matrix posPhaseHidden;
-    private Matrix negPhaseHidden;
     private Kernel weightUpdatesKernel;
     private Kernel visibleBiasUpdatesKernel;
     private Kernel hiddenBiasUpdatesKernel;
-    private int miniBatchSize;
-    private RBMLayerCalculator calculator;
-    private ConnectionCalculator hiddenConnectionCalculator;
-    private ConnectionCalculator visibleConnectionCalculator;
-
-    public ContrastiveDivergenceAparapiTrainer() {
-	super();
-    }
 
     public ContrastiveDivergenceAparapiTrainer(Properties properties) {
 	super(properties);
+
+	if (properties.containsKey(Constants.HIDDEN_CONNECTION_CALCULATOR)) {
+	    properties.setParameter(Constants.HIDDEN_CONNECTION_CALCULATOR, new AparapiBinaryRandomSigmoidConnectionCalculator());
+	}
+
+	if (properties.containsKey(Constants.VISIBLE_CONNECTION_CALCULATOR)) {
+	    properties.setParameter(Constants.VISIBLE_CONNECTION_CALCULATOR, new AparapiSigmoidConnectionCalculator());
+	}
     }
 
     @Override
-    protected void learnInput(TrainingInputData data) {
-	posPhaseVisible = data.getInput();
-
-	if (miniBatchSize != data.getInput().getColumns()) {
-	    miniBatchSize = data.getInput().getColumns();
-	    init();
-	}
-
+    protected void updateWeights() {
 	RBM rbm = getNeuralNetwork();
 
-	calculator.calculateHiddenLayer(posPhaseVisible, posPhaseHidden, hiddenConnectionCalculator);
-
-	// Gibbs sampling
-	int gibbsSamplingCount = properties.containsKey(Constants.GIBBS_SAMPLING_COUNT) ? (int) properties.get(Constants.GIBBS_SAMPLING_COUNT) : 1;
-	for (int i = 0; i < gibbsSamplingCount; i++) {
-	    calculator.calculateVisibleLayer(negPhaseVisible, posPhaseHidden, visibleConnectionCalculator);
-	    calculator.calculateHiddenLayer(negPhaseVisible, negPhaseHidden, hiddenConnectionCalculator);
-	}
-
-	// update weights
 	weightUpdatesKernel.setExecutionMode(Environment.getInstance().getExecutionMode());
 	weightUpdatesKernel.execute(rbm.getMainConnections().getConnectionGraph().getElements().length);
 
@@ -70,20 +47,14 @@ public class ContrastiveDivergenceAparapiTrainer extends Trainer<RBM> {
 	}
     }
 
+    @Override
     protected void init() {
-	hiddenConnectionCalculator = new AparapiBinaryRandomSigmoidConnectionCalculator();
-	visibleConnectionCalculator = new AparapiSigmoidConnectionCalculator();
+	super.init();
 
-	RBM nn = getNeuralNetwork();
-	calculator = new RBMLayerCalculator(nn);
-
-	//this.posPhaseVisible = new Matrix(new float[nn.getVisibleLayer().getNeuronCount()], miniBatchSize);
-	this.negPhaseVisible = new Matrix(nn.getVisibleLayer().getNeuronCount(), miniBatchSize);
-	this.posPhaseHidden = new Matrix(nn.getHiddenLayer().getNeuronCount(), miniBatchSize);
-	this.negPhaseHidden = new Matrix(nn.getHiddenLayer().getNeuronCount(), miniBatchSize);
 	float learningRate = properties.getParameter(Constants.LEARNING_RATE);
 	float momentum = properties.getParameter(Constants.MOMENTUM);
 
+	RBM nn = getNeuralNetwork();
 	Matrix weights = nn.getMainConnections().getConnectionGraph();
 
 	weightUpdatesKernel = new WeightUpdatesKernel(posPhaseVisible.getElements(), posPhaseHidden.getElements(), negPhaseVisible.getElements(), negPhaseHidden.getElements(), weights.getElements(), weights.getColumns(), learningRate, momentum, miniBatchSize);
