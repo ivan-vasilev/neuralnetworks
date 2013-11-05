@@ -80,7 +80,7 @@ public abstract class AparapiBaseFunction extends Kernel implements ConnectionCa
 	    weightStartPositions[i] = totalWeightSize;
 	    totalWeightSize += e.getKey().getConnectionGraph().getElements().length;
 
-	    weightsColumns[i] = e.getValue().getRows() < e.getKey().getConnectionGraph().getColumns() ? e.getValue().getRows() : e.getKey().getConnectionGraph().getColumns();
+	    weightsColumns[i] = e.getKey().getConnectionGraph().getColumns();
 	    inputStartIndexes[i] = e.getKey().getInputLayerStartNeuron();
 	    outputStartIndexes[i] = e.getKey().getOutputLayerStartNeuron();
 

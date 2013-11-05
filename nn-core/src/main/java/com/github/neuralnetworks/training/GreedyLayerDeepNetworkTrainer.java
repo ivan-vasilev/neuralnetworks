@@ -18,9 +18,9 @@ import com.github.neuralnetworks.util.Properties;
  * Default implementation for deep network trainer
  *
  */
-public class DeepNetworkTrainer extends Trainer<DeepNeuralNetwork> {
+public class GreedyLayerDeepNetworkTrainer extends Trainer<DeepNeuralNetwork> {
 
-    public DeepNetworkTrainer(Properties properties) {
+    public GreedyLayerDeepNetworkTrainer(Properties properties) {
 	super(properties);
     }
 

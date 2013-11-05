@@ -20,9 +20,13 @@ public class RBM extends NeuralNetworkImpl {
 
     public RBM(Layer visibleLayer, Layer hiddenLayer, boolean addVisibleBias, boolean addHiddenBias) {
 	super();
+	init(visibleLayer, hiddenLayer, addVisibleBias, addHiddenBias);
+    }
 
+    protected void init(Layer visibleLayer, Layer hiddenLayer, boolean addVisibleBias, boolean addHiddenBias) {
 	addLayer(visibleLayer);
 	addLayer(hiddenLayer);
+
 	mainConnections = new FullyConnected(visibleLayer, hiddenLayer);
 
 	if (addVisibleBias) {

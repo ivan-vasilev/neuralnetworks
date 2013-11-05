@@ -25,6 +25,22 @@ public class RBMLayerCalculator extends LayerCalculatorImpl {
 	results = new HashMap<>();
     }
 
+    @Override
+    public void calculate(Set<Layer> calculatedLayers, Map<Layer, Matrix> results, Layer layer) {
+	Layer visibleLayer = rbm.getVisibleLayer();
+	Layer hiddenLayer = rbm.getHiddenLayer();
+
+	// gibbs sampling first
+	if ((layer == visibleLayer || layer == rbm.getDataOutputLayer()) && layer != hiddenLayer && calculatedLayers.contains(visibleLayer)) {
+	    super.calculate(calculatedLayers, results, hiddenLayer);
+	    calculatedLayers.clear();
+	    calculatedLayers.add(hiddenLayer);
+	    super.calculate(calculatedLayers, results, visibleLayer);
+	} else {
+	    super.calculate(calculatedLayers, results, layer);
+	}
+    }
+
     public void calculateVisibleLayer(Matrix visibleLayerResults, Matrix hiddenLayerResults) {
 	this.calculateVisibleLayer(visibleLayerResults, hiddenLayerResults, null);
     }
@@ -46,7 +62,7 @@ public class RBMLayerCalculator extends LayerCalculatorImpl {
 	results.put(visibleLayer, visibleLayerResults);
 	results.put(hiddenLayer, hiddenLayerResults);
 
-	calculate(calculatedLayers, results, visibleLayer);
+	super.calculate(calculatedLayers, results, visibleLayer);
     }
 
     public void calculateHiddenLayer(Matrix visibleLayerResults, Matrix hiddenLayerResults, ConnectionCalculator connectionCalculator) {
@@ -62,7 +78,7 @@ public class RBMLayerCalculator extends LayerCalculatorImpl {
 	results.put(visibleLayer, visibleLayerResults);
 	results.put(hiddenLayer, hiddenLayerResults);
 
-	calculate(calculatedLayers, results, hiddenLayer);
+	super.calculate(calculatedLayers, results, hiddenLayer);
     }
 
     @Override

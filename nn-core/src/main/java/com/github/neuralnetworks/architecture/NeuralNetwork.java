@@ -10,7 +10,16 @@ import java.util.Set;
  */
 public interface NeuralNetwork {
     public Layer getInputLayer();
+
+    /**
+     * @return the layer that is used for output when the network is "stacked"
+     */
     public Layer getOutputLayer();
+
+    /**
+     * @return the output layer for the rest of the world - this and the previous methods may return different results (in case of RBMs for example)
+     */
+    public Layer getDataOutputLayer();
     public Set<Layer> getLayers();
     public Set<Connections> getConnections();
 }

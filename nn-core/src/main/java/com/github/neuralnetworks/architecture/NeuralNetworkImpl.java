@@ -48,6 +48,12 @@ public class NeuralNetworkImpl implements NeuralNetwork {
 	return null;
     }
 
+    @Override
+    public Layer getDataOutputLayer() {
+	return getOutputLayer();
+    }
+
+    @Override
     public Set<Connections> getConnections() {
 	Set<Connections> result = new UniqueList<>();
 	for (Layer l : layers) {
@@ -58,18 +64,21 @@ public class NeuralNetworkImpl implements NeuralNetwork {
     }
 
     protected boolean addLayer(Layer layer) {
-	if (layers == null) {
-	    layers = new UniqueList<>();
-	}
-
-	if (!layers.contains(layer)) {
-	    layers.add(layer);
-	    return true;
+	if (layer != null) {
+	    if (layers == null) {
+		layers = new UniqueList<>();
+	    }
+	    
+	    if (!layers.contains(layer)) {
+		layers.add(layer);
+		return true;
+	    }
 	}
 
 	return false;
     }
 
+    @Override
     public Set<Layer> getLayers() {
 	return layers;
     }

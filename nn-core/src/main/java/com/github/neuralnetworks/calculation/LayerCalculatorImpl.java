@@ -47,17 +47,8 @@ public class LayerCalculatorImpl implements LayerCalculator, Serializable {
 		}
 
 		if (connections.size() > 0) {
-		    Matrix output = results.get(currentLayer);
-		    int columns = getInputColumns(calculatedLayers, results);
-		    if (output == null || output.getColumns() != columns) {
-			output = new Matrix(currentLayer.getNeuronCount(), columns);
-			results.put(currentLayer, output);
-		    } else {
-			Util.fillArray(output.getElements(), 0);
-		    }
-		    
+		    Matrix output = getLayerResult(calculatedLayers, results, currentLayer);
 		    cc.calculate(connections, output, currentLayer);
-
 		    result = true;
 		}
 	    }
@@ -75,7 +66,20 @@ public class LayerCalculatorImpl implements LayerCalculator, Serializable {
 	return layer.getConnectionCalculator();
     }
 
-    private Integer getInputColumns(Set<Layer> calculatedLayers, Map<Layer, Matrix> results) {
+    protected Matrix getLayerResult(Set<Layer> calculatedLayers, Map<Layer, Matrix> results, Layer layer) {
+	Matrix result = results.get(layer);
+	int columns = getInputColumns(calculatedLayers, results);
+	if (result == null || result.getColumns() != columns) {
+	    result = new Matrix(layer.getNeuronCount(), columns);
+	    results.put(layer, result);
+	} else {
+	    Util.fillArray(result.getElements(), 0);
+	}
+
+	return result;
+    }
+
+    protected Integer getInputColumns(Set<Layer> calculatedLayers, Map<Layer, Matrix> results) {
 	for (Entry<Layer, Matrix> e : results.entrySet()) {
 	    if (calculatedLayers.contains(e.getKey())) {
 		return e.getValue().getColumns();

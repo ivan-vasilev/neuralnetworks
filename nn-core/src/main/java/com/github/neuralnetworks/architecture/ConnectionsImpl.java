@@ -39,6 +39,11 @@ public abstract class ConnectionsImpl implements Connections, Comparable<Connect
     }
 
     @Override
+    public Layer getDataOutputLayer() {
+	return getOutputLayer();
+    }
+
+    @Override
     public Set<Layer> getLayers() {
 	Set<Layer> result = new UniqueList<Layer>();
 	result.add(getInputLayer());
