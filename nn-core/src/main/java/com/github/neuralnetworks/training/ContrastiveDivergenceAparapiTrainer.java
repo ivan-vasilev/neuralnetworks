@@ -53,11 +53,12 @@ public class ContrastiveDivergenceAparapiTrainer extends ContrastiveDivergenceTr
 
 	float learningRate = properties.getParameter(Constants.LEARNING_RATE);
 	float momentum = properties.getParameter(Constants.MOMENTUM);
+	float weightDecay = properties.getParameter(Constants.WEIGHT_DECAY);
 
 	RBM nn = getNeuralNetwork();
 	Matrix weights = nn.getMainConnections().getConnectionGraph();
 
-	weightUpdatesKernel = new WeightUpdatesKernel(posPhaseVisible.getElements(), posPhaseHidden.getElements(), negPhaseVisible.getElements(), negPhaseHidden.getElements(), weights.getElements(), weights.getColumns(), learningRate, momentum, miniBatchSize);
+	weightUpdatesKernel = new WeightUpdatesKernel(posPhaseVisible.getElements(), posPhaseHidden.getElements(), negPhaseVisible.getElements(), negPhaseHidden.getElements(), weights.getElements(), weights.getColumns(), learningRate, momentum, weightDecay, miniBatchSize);
 
 	if (nn.getVisibleBiasConnections() != null) {
 	    visibleBiasUpdatesKernel = new BiasUpdatesKernel(nn.getVisibleBiasConnections().getConnectionGraph().getElements(), posPhaseVisible.getElements(), negPhaseVisible.getElements(), learningRate, momentum, miniBatchSize);
@@ -79,9 +80,10 @@ public class ContrastiveDivergenceAparapiTrainer extends ContrastiveDivergenceTr
 	private int weightColumns;
 	private float learningRate;
 	private float momentum;
+	private float weightDecay;
 	private int miniBatchSize;
 
-	public WeightUpdatesKernel(float[] posPhaseVisible, float[] posPhaseHidden, float[] negPhaseVisible, float[] negPhaseHidden, float[] weights, int weightColumns, float learningRate, float momentum, int miniBatchSize) {
+	public WeightUpdatesKernel(float[] posPhaseVisible, float[] posPhaseHidden, float[] negPhaseVisible, float[] negPhaseHidden, float[] weights, int weightColumns, float learningRate, float momentum, float weightDecay, int miniBatchSize) {
 	    super();
 	    this.posPhaseVisible = posPhaseVisible;
 	    this.posPhaseHidden = posPhaseHidden;
@@ -92,6 +94,7 @@ public class ContrastiveDivergenceAparapiTrainer extends ContrastiveDivergenceTr
 	    this.weightColumns = weightColumns;
 	    this.learningRate = learningRate;
 	    this.momentum = momentum;
+	    this.weightDecay = weightDecay;
 	    this.miniBatchSize = miniBatchSize;
 	}
 
@@ -105,7 +108,7 @@ public class ContrastiveDivergenceAparapiTrainer extends ContrastiveDivergenceTr
 		weightUpdate += posPhaseHidden[hiddenId + i] * posPhaseVisible[visibleId + i] - negPhaseHidden[hiddenId + i] * negPhaseVisible[visibleId + i];
 	    }
 
-	    weightUpdate = learningRate * (weightUpdate / miniBatchSize) + momentum * weightUpdates[id];
+	    weightUpdate = learningRate * (weightUpdate / miniBatchSize - weightDecay * weights[id]) + momentum * weightUpdates[id];
 	    weights[id] += weightUpdate;
 	    weightUpdates[id] = weightUpdate;
 	}

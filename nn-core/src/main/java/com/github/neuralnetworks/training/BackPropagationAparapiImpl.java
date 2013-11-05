@@ -8,9 +8,9 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import com.github.neuralnetworks.architecture.Connections;
-import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
+import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.calculation.LayerCalculatorImpl;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSumByColumns;
@@ -30,13 +30,14 @@ public class BackPropagationAparapiImpl extends LayerCalculatorImpl implements B
     private AparapiRmsDerivativeByRows forwardBackprop;
     private AparapiRmsDerivativeByColumns backwardBackprop;
 
-    public BackPropagationAparapiImpl(float learningRate, float momentum) {
+    public BackPropagationAparapiImpl(float learningRate, float momentum, float weightDecay) {
 	super();
 	this.results = new HashMap<Layer, Matrix>();
 	forwardBackprop = new AparapiRmsDerivativeByRows();
 	backwardBackprop = new AparapiRmsDerivativeByColumns();
 	forwardBackprop.learningRate = backwardBackprop.learningRate = learningRate;
 	forwardBackprop.momentum = backwardBackprop.momentum = momentum;
+	forwardBackprop.weightDecay = backwardBackprop.weightDecay = weightDecay;
     }
 
     @Override
@@ -88,6 +89,7 @@ public class BackPropagationAparapiImpl extends LayerCalculatorImpl implements B
 	}
 
 	if (bias.size() > 0) {
+	    backwardBackprop.weightDecay = 0;
 	    backwardBackprop.calculate(bias, biasOutput, biasLayer);
 	}
     }
@@ -115,6 +117,7 @@ public class BackPropagationAparapiImpl extends LayerCalculatorImpl implements B
 	private Map<Layer, float[]> storedWeightUpdates = new HashMap<>();
 	private float learningRate;
 	private float momentum;
+	private float weightDecay;
 	private Map<Layer, Matrix> activations;
 
 	@Override
@@ -150,7 +153,7 @@ public class BackPropagationAparapiImpl extends LayerCalculatorImpl implements B
 	    for (int i = 0; i < series; i++) {
 		for (int j = 0; j < weightsColumns[i]; j++) {
 		    int weightIndex = weightIndex(row, j, i);
-		    float weightUpdate = learningRate * input[inputIndex(j, column, i)] * outputActivation[outputIndex(row, column, i)] + momentum * weightUpdates[weightIndex];
+		    float weightUpdate = learningRate * (input[inputIndex(j, column, i)] * outputActivation[outputIndex(row, column, i)] - weightDecay * weights[weightIndex]) + momentum * weightUpdates[weightIndex];
 		    weights[weightIndex] += weightUpdate;
 		    weightUpdates[weightIndex] = weightUpdate;
 		}
@@ -167,6 +170,7 @@ public class BackPropagationAparapiImpl extends LayerCalculatorImpl implements B
 	private float[] weightUpdates;
 	private float learningRate;
 	private float momentum;
+	private float weightDecay;
 	private Map<Layer, Matrix> activations;
 
 	@Override
@@ -202,7 +206,7 @@ public class BackPropagationAparapiImpl extends LayerCalculatorImpl implements B
 	    for (int i = 0; i < series; i++) {
 		for (int j = 0; j < weightsRows[i]; j++) {
 		    int weightIndex = weightIndex(j, row, i);
-		    float weightUpdate = learningRate * input[inputIndex(j, column, i)] * outputActivation[outputIndex(row, column, i)] + momentum * weightUpdates[weightIndex];
+		    float weightUpdate = learningRate * (input[inputIndex(j, column, i)] * outputActivation[outputIndex(row, column, i)] - weightDecay * weights[weightIndex]) + momentum * weightUpdates[weightIndex];
 		    weights[weightIndex] += weightUpdate;
 		    weightUpdates[weightIndex] = weightUpdate;
 		}
