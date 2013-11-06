@@ -12,8 +12,9 @@ import com.github.neuralnetworks.input.mnist.MnistInputProvider;
 import com.github.neuralnetworks.input.mnist.MnistTargetMultiNeuronOutputConverter;
 import com.github.neuralnetworks.outputerror.MnistMultipleNeuronsOutputError;
 import com.github.neuralnetworks.testing.Sampler;
-import com.github.neuralnetworks.training.ContrastiveDivergenceAparapiTrainer;
 import com.github.neuralnetworks.training.MersenneTwisterRandomInitializer;
+import com.github.neuralnetworks.training.rbm.CDAparapiTrainer;
+import com.github.neuralnetworks.training.rbm.CDAparapiTrainerBase;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
 
@@ -46,7 +47,7 @@ public class RBMSampler extends Sampler {
 	trainerProperties.setParameter(Constants.LEARNING_RATE, 0.01f);
 	trainerProperties.setParameter(Constants.OUTPUT_ERROR, new MnistMultipleNeuronsOutputError());
 	trainerProperties.setParameter(Constants.RANDOM_INITIALIZER, new MersenneTwisterRandomInitializer(-0.1f, 0.2f));
-	ContrastiveDivergenceAparapiTrainer trainer = new ContrastiveDivergenceAparapiTrainer(trainerProperties);
+	CDAparapiTrainerBase trainer = new CDAparapiTrainer(trainerProperties);
 	trainingConfigurations.add(trainer);
     }
 }

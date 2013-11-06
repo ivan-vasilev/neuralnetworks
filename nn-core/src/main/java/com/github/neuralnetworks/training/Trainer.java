@@ -123,7 +123,7 @@ public abstract class Trainer<N extends NeuralNetwork> {
 
     public void addEventListener(TrainingEventListener listener) {
 	if (listeners == null) {
-	    listeners = new ArrayList<>();
+	    listeners = new UniqueList<>();
 	}
 
 	listeners.add(listener);
@@ -137,6 +137,7 @@ public abstract class Trainer<N extends NeuralNetwork> {
 
     protected void triggerEvent(TrainingEvent event) {
 	if (listeners != null) {
+	    List<TrainingEventListener> listeners = new ArrayList<>(this.listeners);
 	    for (TrainingEventListener l : listeners) {
 		l.handleEvent(event);
 	    }

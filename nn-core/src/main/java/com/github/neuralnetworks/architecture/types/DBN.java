@@ -1,20 +1,14 @@
 package com.github.neuralnetworks.architecture.types;
 
-import java.util.List;
-
-import com.github.neuralnetworks.architecture.DeepNeuralNetwork;
 import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.architecture.NeuralNetwork;
-import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
-import com.github.neuralnetworks.util.UniqueList;
 
-public class DBN extends NeuralNetworkImpl implements DeepNeuralNetwork {
-
-    protected List<NeuralNetwork> neuralNetworks;
+/**
+ * Deep Belief Network
+ */
+public class DBN extends DNN {
 
     public DBN() {
 	super();
-	this.neuralNetworks = new UniqueList<>();
     }
 
     public DBN addLayer(Layer layer, boolean addBias) {
@@ -24,10 +18,5 @@ public class DBN extends NeuralNetworkImpl implements DeepNeuralNetwork {
 	}
 
 	return this;
-    }
-
-    @Override
-    public List<NeuralNetwork> getNeuralNetworks() {
-	return neuralNetworks;
     }
 }
