@@ -1,5 +1,6 @@
 package com.github.neuralnetworks.calculation;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedMap;
@@ -11,6 +12,7 @@ import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.OneToOne;
 import com.github.neuralnetworks.calculation.neuronfunctions.ActivationFunction;
 import com.github.neuralnetworks.calculation.neuronfunctions.ConstantConnectionCalculator;
+import com.github.neuralnetworks.util.UniqueList;
 
 /**
  * 
@@ -23,13 +25,12 @@ public class ConnectionCalculatorImpl implements ConnectionCalculator {
 
     private ConnectionCalculator forwardInputFunction;
     private ConnectionCalculator backwardInputFunction;
-    private ActivationFunction activationFunction;
+    private List<ActivationFunction> activationFunctions;
 
-    public ConnectionCalculatorImpl(ConnectionCalculator forwardInputFunction, ConnectionCalculator backwardInputFunction, ActivationFunction activationFunction) {
+    public ConnectionCalculatorImpl(ConnectionCalculator forwardInputFunction, ConnectionCalculator backwardInputFunction) {
 	super();
 	this.forwardInputFunction = forwardInputFunction;
 	this.backwardInputFunction = backwardInputFunction;
-	this.activationFunction = activationFunction;
     }
 
     @Override
@@ -76,8 +77,24 @@ public class ConnectionCalculatorImpl implements ConnectionCalculator {
 	    backwardInputFunction.calculate(backward, output, targetLayer);
 	}
 
-	if (activationFunction != null) {
-	    activationFunction.value(output);
+	if (activationFunctions != null) {
+	    for (ActivationFunction f : activationFunctions) {
+		f.value(output);
+	    }
+	}
+    }
+
+    public void addActivationFunction(ActivationFunction activationFunction) {
+	if (activationFunctions == null) {
+	    activationFunctions = new UniqueList<>();
+	}
+
+	activationFunctions.add(activationFunction);
+    }
+
+    public void removeActivationFunction(ActivationFunction activationFunction) {
+	if (activationFunctions == null) {
+	    activationFunctions.remove(activationFunction);
 	}
     }
 }

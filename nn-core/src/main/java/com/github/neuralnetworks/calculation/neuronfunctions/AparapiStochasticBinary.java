@@ -9,22 +9,22 @@ import com.github.neuralnetworks.calculation.ConnectionCalculatorImpl;
 import com.github.neuralnetworks.training.MersenneTwisterRandomInitializer;
 import com.github.neuralnetworks.training.RandomInitializer;
 
-public class AparapiBinaryRandomSigmoidConnectionCalculator extends ConnectionCalculatorImpl {
+public class AparapiStochasticBinary extends ConnectionCalculatorImpl {
 
     private static final long serialVersionUID = 5869298546838843306L;
 
-    public AparapiBinaryRandomSigmoidConnectionCalculator() {
-	super(new AparapiBinaryRandomSigmoidByRows(), new AparapiBinaryRandomSigmoidByColumns(), null);
+    public AparapiStochasticBinary() {
+	super(new AparapiStochasticBinaryByRows(), new AparapiStochasticBinaryByColumns());
     }
 
-    public static class AparapiBinaryRandomSigmoidByRows extends AparapiWeightedSumByRows {
+    public static class AparapiStochasticBinaryByRows extends AparapiWeightedSumByRows {
 
 	private static final long serialVersionUID = -9125510037725731152L;
 
 	private float[] random;
 	private RandomInitializer randomInitializer;
 
-	public AparapiBinaryRandomSigmoidByRows() {
+	public AparapiStochasticBinaryByRows() {
 	    super();
 	    randomInitializer = new MersenneTwisterRandomInitializer();
 	}
@@ -49,14 +49,14 @@ public class AparapiBinaryRandomSigmoidConnectionCalculator extends ConnectionCa
 	}
     }
 
-    public static class AparapiBinaryRandomSigmoidByColumns extends AparapiWeightedSumByColumns {
+    public static class AparapiStochasticBinaryByColumns extends AparapiWeightedSumByColumns {
 
 	private static final long serialVersionUID = -9125510037725731152L;
 
 	private float[] random;
 	private RandomInitializer randomInitializer;
 
-	public AparapiBinaryRandomSigmoidByColumns() {
+	public AparapiStochasticBinaryByColumns() {
 	    super();
 	    randomInitializer = new MersenneTwisterRandomInitializer();
 	}

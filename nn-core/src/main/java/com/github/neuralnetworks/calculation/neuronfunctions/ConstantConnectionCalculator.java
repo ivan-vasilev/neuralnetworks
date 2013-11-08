@@ -23,7 +23,7 @@ public class ConstantConnectionCalculator implements ConnectionCalculator {
     public void calculate(SortedMap<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
 	Util.fillArray(output.getElements(), value);
     }
-    
+
     public float getValue() {
         return value;
     }

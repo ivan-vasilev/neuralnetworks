@@ -10,17 +10,16 @@ import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.calculation.LayerCalculator;
+import com.github.neuralnetworks.events.TrainingEvent;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
 
 /**
- * 
  * Default implementation for deep network trainer
- *
  */
-public class GreedyLayerDeepNetworkTrainer extends Trainer<DeepNeuralNetwork> {
+public class GreedyLayerDNNTrainer extends Trainer<DeepNeuralNetwork> {
 
-    public GreedyLayerDeepNetworkTrainer(Properties properties) {
+    public GreedyLayerDNNTrainer(Properties properties) {
 	super(properties);
     }
 
@@ -35,10 +34,10 @@ public class GreedyLayerDeepNetworkTrainer extends Trainer<DeepNeuralNetwork> {
 	    deepInput.nn = nn;
 	    while ((deepInput.baseInput = getTrainingInputProvider().getNextInput()) != null) {
 		trainer.learnInput(deepInput);
-		triggerEvent(new SampleFinishedEvent(this, deepInput.baseInput));
+		triggerEvent(new SampleFromLayerFinished(this, deepInput.baseInput, trainer));
 	    }
 
-	    triggerEvent(new TrainingFinishedEvent(this));
+	    triggerEvent(new LayerTrainingFinished(this, trainer));
 	}
     }
 
@@ -91,6 +90,36 @@ public class GreedyLayerDeepNetworkTrainer extends Trainer<DeepNeuralNetwork> {
 	@Override
 	public Matrix getTarget() {
 	    return baseInput.getTarget();
+	}
+    }
+
+    /**
+     * this event is triggered when a training sample is finished
+     */
+    public static class SampleFromLayerFinished extends SampleFinishedEvent {
+
+	private static final long serialVersionUID = 2155527437110587968L;
+
+	public OneStepTrainer<?> currentTrainer;
+
+	public SampleFromLayerFinished(GreedyLayerDNNTrainer source, TrainingInputData input, OneStepTrainer<?> currentTrainer) {
+	    super(source, input);
+	    this.currentTrainer = currentTrainer;
+	}
+    }
+
+    /**
+     * this event is triggered when a nested neural network has finished training
+     */
+    public static class LayerTrainingFinished extends TrainingEvent {
+
+	private static final long serialVersionUID = 2155527437110587968L;
+
+	public OneStepTrainer<?> currentTrainer;
+
+	public LayerTrainingFinished(Trainer<?> source, OneStepTrainer<?> currentTrainer) {
+	    super(source);
+	    this.currentTrainer = currentTrainer;
 	}
     }
 }

@@ -9,6 +9,10 @@ import java.util.Set;
  * convolutional layers
  */
 public interface NeuralNetwork {
+
+    /**
+     * input layer
+     */
     public Layer getInputLayer();
 
     /**
@@ -20,6 +24,14 @@ public interface NeuralNetwork {
      * @return the output layer for the rest of the world - this and the previous methods may return different results (in case of RBMs for example)
      */
     public Layer getDataOutputLayer();
+
+    /**
+     * @return all the layers in this network
+     */
     public Set<Layer> getLayers();
+
+    /**
+     * @return all the connections in this network
+     */
     public Set<Connections> getConnections();
 }
