@@ -29,8 +29,8 @@ public abstract class CDTrainerBase extends OneStepTrainer<RBM> {
     protected void learnInput(TrainingInputData data) {
 	posPhaseVisible = data.getInput();
 
-	if (miniBatchSize != data.getInput().getColumns()) {
-	    miniBatchSize = data.getInput().getColumns();
+	if (miniBatchSize != posPhaseVisible.getColumns()) {
+	    miniBatchSize = posPhaseVisible.getColumns();
 
 	    RBM nn = getNeuralNetwork();
 	    this.negPhaseVisible = new Matrix(nn.getVisibleLayer().getNeuronCount(), miniBatchSize);

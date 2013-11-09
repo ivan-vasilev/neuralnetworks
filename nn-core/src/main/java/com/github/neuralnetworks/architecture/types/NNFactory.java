@@ -1,16 +1,16 @@
 package com.github.neuralnetworks.architecture.types;
 
 import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.calculation.neuronfunctions.AparapiStochasticBinary;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiReLU;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSigmoid;
+import com.github.neuralnetworks.calculation.neuronfunctions.AparapiStochasticBinary;
 
 /**
  * Factory class for neural networks
  */
 public class NNFactory {
 
-    public static MultiLayerPerceptron sigmoidMLP(int[] layers, boolean addBias) {
+    public static MultiLayerPerceptron mlpSigmoid(int[] layers, boolean addBias) {
 	if (layers.length <= 1) {
 	    throw new IllegalArgumentException("more than one layer is required");
 	}
@@ -24,7 +24,7 @@ public class NNFactory {
 	return result;
     }
 
-    public static MultiLayerPerceptron reluMLP(int[] layers, boolean addBias) {
+    public static MultiLayerPerceptron mlpRelu(int[] layers, boolean addBias) {
 	if (layers.length <= 1) {
 	    throw new IllegalArgumentException("more than one layer is required");
 	}
@@ -38,19 +38,61 @@ public class NNFactory {
 	return result;
     }
 
-    public static RBM sigmoidBinaryRBM(int visibleCount, int hiddenCount, boolean addBias) {
+    public static RBM rbmSigmoidSigmoid(int visibleCount, int hiddenCount, boolean addBias) {
+	return new RBM(new Layer(visibleCount, new AparapiSigmoid()), new Layer(hiddenCount, new AparapiSigmoid()), addBias, addBias);
+    }
+
+    public static RBM rbmReluRelu(int visibleCount, int hiddenCount, boolean addBias) {
+	return new RBM(new Layer(visibleCount, new AparapiReLU()), new Layer(hiddenCount, new AparapiReLU()), addBias, addBias);
+    }
+
+    public static RBM rbmSigmoidBinary(int visibleCount, int hiddenCount, boolean addBias) {
 	return new RBM(new Layer(visibleCount, new AparapiSigmoid()), new Layer(hiddenCount, new AparapiStochasticBinary()), addBias, addBias);
     }
 
-    public static RBM reluBinaryRBM(int visibleCount, int hiddenCount, boolean addBias) {
+    public static RBM rbmReluBinary(int visibleCount, int hiddenCount, boolean addBias) {
 	return new RBM(new Layer(visibleCount, new AparapiReLU()), new Layer(hiddenCount, new AparapiStochasticBinary()), addBias, addBias);
     }
 
-    public static SupervisedRBM sigmoidBinarySRBM(int visibleCount, int hiddenCount, int dataCount, boolean addBias) {
+    public static SupervisedRBM srbmSigmoidSigmoid(int visibleCount, int hiddenCount, int dataCount, boolean addBias) {
+	return new SupervisedRBM(new Layer(visibleCount, new AparapiSigmoid()), new Layer(hiddenCount, new AparapiSigmoid()), new Layer(dataCount), addBias, addBias);
+    }
+
+    public static SupervisedRBM srbmSigmoidBinary(int visibleCount, int hiddenCount, int dataCount, boolean addBias) {
 	return new SupervisedRBM(new Layer(visibleCount, new AparapiSigmoid()), new Layer(hiddenCount, new AparapiStochasticBinary()), new Layer(dataCount), addBias, addBias);
     }
 
-    public static SupervisedRBM reluBinarySRBM(int visibleCount, int hiddenCount, int dataCount, boolean addBias) {
+    public static SupervisedRBM srbmReluBinary(int visibleCount, int hiddenCount, int dataCount, boolean addBias) {
 	return new SupervisedRBM(new Layer(visibleCount, new AparapiReLU()), new Layer(hiddenCount, new AparapiStochasticBinary()), new Layer(dataCount), addBias, addBias);
+    }
+    
+    public static SupervisedRBM srbmReluRelu(int visibleCount, int hiddenCount, int dataCount, boolean addBias) {
+	return new SupervisedRBM(new Layer(visibleCount, new AparapiReLU()), new Layer(hiddenCount, new AparapiReLU()), new Layer(dataCount), addBias, addBias);
+    }
+
+    public static DBN dbnSigmoid(int[] layers, boolean addBias) {
+	if (layers.length <= 1) {
+	    throw new IllegalArgumentException("more than one layer is required");
+	}
+
+	DBN result = new DBN();
+	for (int i = 0; i < layers.length; i++) {
+	    result.addLayer(new Layer(layers[i], new AparapiSigmoid()), addBias);
+	}
+
+	return result;
+    }
+    
+    public static DBN dbnReLU(int[] layers, boolean addBias) {
+	if (layers.length <= 1) {
+	    throw new IllegalArgumentException("more than one layer is required");
+	}
+	
+	DBN result = new DBN();
+	for (int i = 0; i < layers.length; i++) {
+	    result.addLayer(new Layer(layers[i], new AparapiReLU()), addBias);
+	}
+	
+	return result;
     }
 }

@@ -20,6 +20,8 @@ public abstract class OneStepTrainer<N extends NeuralNetwork> extends Trainer<N>
 
     @Override
     public void train() {
+	super.train();
+
 	TrainingInputData input = null;
 	while ((input = getTrainingInputProvider().getNextInput()) != null) {
 	    learnInput(input);

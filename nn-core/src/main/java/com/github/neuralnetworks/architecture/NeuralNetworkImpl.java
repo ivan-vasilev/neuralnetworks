@@ -21,7 +21,7 @@ public class NeuralNetworkImpl implements NeuralNetwork {
 	hasInboundConnections:
 	for (Layer l : layers) {
 	    for (Connections c : l.getConnections()) {
-		if (l == c.getOutputLayer()) {
+		if (isInnerConnection(c) && l == c.getOutputLayer()) {
 		    continue hasInboundConnections;
 		}
 	    }
@@ -37,7 +37,7 @@ public class NeuralNetworkImpl implements NeuralNetwork {
 	hasOutboundConnections:
 	for (Layer l : layers) {
 	    for (Connections c : l.getConnections()) {
-		if (l == c.getInputLayer()) {
+		if (isInnerConnection(c) && l == c.getInputLayer()) {
 		    continue hasOutboundConnections;
 		}
 	    }
@@ -56,8 +56,17 @@ public class NeuralNetworkImpl implements NeuralNetwork {
     @Override
     public Set<Connections> getConnections() {
 	Set<Connections> result = new UniqueList<>();
-	for (Layer l : layers) {
-	    result.addAll(l.getConnections());
+	if (layers != null) {
+	    for (Layer l : layers) {
+		if (l.getConnections() != null) {
+		    for (Connections c : l.getConnections()) {
+			// both layers of the connection have to be part of the neural network for this connection to be included
+			if (isInnerConnection(c)) {
+			    result.add(c);
+			}
+		    }
+		}
+	    }
 	}
 
 	return result;
@@ -73,6 +82,14 @@ public class NeuralNetworkImpl implements NeuralNetwork {
 		layers.add(layer);
 		return true;
 	    }
+	}
+
+	return false;
+    }
+
+    protected boolean isInnerConnection(Connections c) {
+	if (layers != null) {
+	    return layers.contains(c.getInputLayer()) && layers.contains(c.getOutputLayer());
 	}
 
 	return false;

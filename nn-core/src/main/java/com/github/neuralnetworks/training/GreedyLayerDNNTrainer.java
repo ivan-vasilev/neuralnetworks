@@ -74,7 +74,7 @@ public class GreedyLayerDNNTrainer extends Trainer<DeepNeuralNetwork> {
 		    results.put(currentLayer, output);
 		}
 		
-		results.put(inputLayer, baseInput.getInput());
+		results.put(inputLayer, input);
 
 		Set<Layer> calculatedLayers = new HashSet<>();
 		calculatedLayers.add(inputLayer);

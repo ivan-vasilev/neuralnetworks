@@ -36,41 +36,43 @@ public abstract class Trainer<N extends NeuralNetwork> {
     public Trainer(Properties properties) {
 	super();
 	this.properties = properties;
-
-	// random initialization
-	initializeWithRandom();
     }
 
-    public abstract void train();
+    public void train() {
+	initializeWithRandom();
+    };
 
     public float test() {
 	TrainingInputProvider ip = getTestingInputProvider();
+	OutputError e = getOutputError();
 	NeuralNetwork n = getNeuralNetwork();
 	LayerCalculator c = getLayerCalculator();
 
-	OutputError e = getOutputError();
-
-	Set<Layer> calculatedLayers = new UniqueList<>();
-	Map<Layer, Matrix> results = new HashMap<>();
-	TrainingInputData input = null;
-
-	while ((input = ip.getNextInput()) != null) {
-	    calculatedLayers.clear();
-	    calculatedLayers.add(n.getInputLayer());
-	    results.put(n.getInputLayer(), input.getInput());
-	    c.calculate(calculatedLayers, results, n.getDataOutputLayer());
-	    e.addItem(results.get(n.getDataOutputLayer()), input.getTarget());
-
-	    for (Matrix m : results.values()) {
-		Util.fillArray(m.getElements(), 0);
+	if (ip != null && e != null && n != null && c != null) {
+	    Set<Layer> calculatedLayers = new UniqueList<>();
+	    Map<Layer, Matrix> results = new HashMap<>();
+	    TrainingInputData input = null;
+	    
+	    while ((input = ip.getNextInput()) != null) {
+		calculatedLayers.clear();
+		calculatedLayers.add(n.getInputLayer());
+		results.put(n.getInputLayer(), input.getInput());
+		c.calculate(calculatedLayers, results, n.getDataOutputLayer());
+		e.addItem(results.get(n.getDataOutputLayer()), input.getTarget());
+		
+		for (Matrix m : results.values()) {
+		    Util.fillArray(m.getElements(), 0);
+		}
+		
+		triggerEvent(new SampleFinishedEvent(this, input));
 	    }
-
-	    triggerEvent(new SampleFinishedEvent(this, input));
+	    
+	    triggerEvent(new TestingFinishedEvent(this));
+	    
+	    return e.getTotalNetworkError();
 	}
 
-	triggerEvent(new TestingFinishedEvent(this));
-
-	return e.getTotalNetworkError();
+	return 0;
     }
 
     public Properties getProperties() {

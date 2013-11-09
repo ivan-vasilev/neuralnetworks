@@ -2,8 +2,8 @@ package com.github.neuralnetworks.training.rbm;
 
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.types.RBM;
-import com.github.neuralnetworks.calculation.neuronfunctions.AparapiStochasticBinary;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSigmoid;
+import com.github.neuralnetworks.calculation.neuronfunctions.AparapiStochasticBinary;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.Properties;
@@ -60,11 +60,11 @@ public abstract class CDAparapiTrainerBase extends CDTrainerBase {
     protected void init() {
 	RBM nn = getNeuralNetwork();
 
-	if (properties.containsKey(Constants.HIDDEN_CONNECTION_CALCULATOR)) {
+	if (!properties.containsKey(Constants.HIDDEN_CONNECTION_CALCULATOR)) {
 	    properties.setParameter(Constants.HIDDEN_CONNECTION_CALCULATOR, new AparapiStochasticBinary());
 	}
 
-	if (properties.containsKey(Constants.VISIBLE_CONNECTION_CALCULATOR)) {
+	if (!properties.containsKey(Constants.VISIBLE_CONNECTION_CALCULATOR)) {
 	    properties.setParameter(Constants.VISIBLE_CONNECTION_CALCULATOR, new AparapiSigmoid());
 	}
 
