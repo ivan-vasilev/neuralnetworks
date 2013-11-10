@@ -15,22 +15,26 @@ import com.github.neuralnetworks.util.Properties;
 public class TrainerFactory {
 
     public static BackPropagationTrainer backPropagation(NeuralNetwork nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay) {
+	return new BackPropagationTrainer(backpropProperties(nn, trainingSet, testingSet, error, rand, learningRate, momentum, weightDecay));
+    }
+
+    public static BackPropagationAutoencoder backPropagationAutoencoder(NeuralNetwork nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay) {
+	return new BackPropagationAutoencoder(backpropProperties(nn, trainingSet, testingSet, error, rand, learningRate, momentum, weightDecay));
+    }
+
+    protected static Properties backpropProperties(NeuralNetwork nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay) {
 	Properties p = new Properties();
 	p.setParameter(Constants.NEURAL_NETWORK, nn);
 	p.setParameter(Constants.TRAINING_INPUT_PROVIDER, trainingSet);
 	p.setParameter(Constants.TESTING_INPUT_PROVIDER, testingSet);
 	p.setParameter(Constants.LAYER_CALCULATOR, new LayerCalculatorImpl());
-	p.setParameter(Constants.LEARNING_RATE, learningRate);
-	p.setParameter(Constants.MOMENTUM, momentum);
-	p.setParameter(Constants.WEIGHT_DECAY, weightDecay);
+	p.setParameter(Constants.BACKPROPAGATION, new BackPropagationAparapiImpl(learningRate, momentum, weightDecay));
 	p.setParameter(Constants.OUTPUT_ERROR, error);
 	p.setParameter(Constants.RANDOM_INITIALIZER, rand);
 
-	BackPropagationTrainer result = new BackPropagationTrainer(p);
-
-	return result;
+	return p;
     }
-
+    
     public static CDAparapiTrainer cdTrainer(RBM rbm, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay, int gibbsSampling) {
 	return new CDAparapiTrainer(rbmProperties(rbm, trainingSet, testingSet, error, rand, learningRate, momentum, weightDecay, gibbsSampling));
     }

@@ -12,7 +12,7 @@ import com.github.neuralnetworks.calculation.neuronfunctions.ConstantConnectionC
  */
 public class MultiLayerPerceptron extends NeuralNetworkImpl {
     public MultiLayerPerceptron addLayer(Layer layer, boolean addBias) {
-	if (addLayer(layer) && getLayers().size() > 0) {
+	if (addLayer(layer) && getOutputLayer() != layer) {
 	    new FullyConnected(getOutputLayer(), layer);
 	}
 

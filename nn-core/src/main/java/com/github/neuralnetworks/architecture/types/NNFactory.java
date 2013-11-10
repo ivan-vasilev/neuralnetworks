@@ -38,6 +38,15 @@ public class NNFactory {
 	return result;
     }
 
+
+    public static MultiLayerPerceptron autoencoderSigmoid(int visibleCount, int hiddenCount, boolean addBias) {
+	return mlpSigmoid(new int[] {visibleCount,  hiddenCount, visibleCount}, addBias);
+    }
+    
+    public static MultiLayerPerceptron autoencoderReLU(int visibleCount, int hiddenCount, boolean addBias) {
+	return mlpRelu(new int[] {visibleCount,  hiddenCount, visibleCount}, addBias);
+    }
+
     public static RBM rbmSigmoidSigmoid(int visibleCount, int hiddenCount, boolean addBias) {
 	return new RBM(new Layer(visibleCount, new AparapiSigmoid()), new Layer(hiddenCount, new AparapiSigmoid()), addBias, addBias);
     }
