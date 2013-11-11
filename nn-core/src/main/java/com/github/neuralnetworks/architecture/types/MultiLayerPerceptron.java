@@ -3,7 +3,6 @@ package com.github.neuralnetworks.architecture.types;
 import com.github.neuralnetworks.architecture.FullyConnected;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
-import com.github.neuralnetworks.architecture.OneToOne;
 import com.github.neuralnetworks.calculation.neuronfunctions.ConstantConnectionCalculator;
 
 /**
@@ -18,9 +17,9 @@ public class MultiLayerPerceptron extends NeuralNetworkImpl {
 	}
 
 	if (addBias) {
-	    Layer biasLayer = new Layer(layer.getNeuronCount(), new ConstantConnectionCalculator(1));
+	    Layer biasLayer = new Layer(1, new ConstantConnectionCalculator(1));
 	    addLayer(biasLayer);
-	    new OneToOne(biasLayer, layer);
+	    new FullyConnected(biasLayer, layer);
 	}
 
 	return this;
