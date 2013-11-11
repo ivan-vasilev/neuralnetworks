@@ -14,7 +14,7 @@ public class DBN extends DNN {
     public DBN addLayer(Layer layer, boolean addBias) {
 	Layer currentOutputLayer = getOutputLayer();
 	if (addLayer(layer) && getLayers().size() > 1) {
-	    neuralNetworks.add(new RBM(currentOutputLayer, layer, false, addBias));
+	    addNeuralNetwork(new RBM(currentOutputLayer, layer, false, addBias));
 	}
 
 	return this;
@@ -23,7 +23,7 @@ public class DBN extends DNN {
     public DBN addSupervisedLayer(Layer layer, Layer dataOutputLayer, boolean addBias) {
 	Layer currentOutputLayer = getOutputLayer();
 	if (addLayer(layer) && getLayers().size() > 1) {
-	    neuralNetworks.add(new SupervisedRBM(currentOutputLayer, layer, dataOutputLayer, false, addBias));
+	    addNeuralNetwork(new SupervisedRBM(currentOutputLayer, layer, dataOutputLayer, false, addBias));
 	}
 
 	return this;
