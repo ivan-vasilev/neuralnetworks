@@ -22,9 +22,9 @@ public class ConnectionCalculatorImpl implements ConnectionCalculator {
 
     private static final long serialVersionUID = -5405654469496055017L;
 
-    private ConnectionCalculator forwardInputFunction;
-    private ConnectionCalculator backwardInputFunction;
-    private List<ActivationFunction> activationFunctions;
+    protected ConnectionCalculator forwardInputFunction;
+    protected ConnectionCalculator backwardInputFunction;
+    protected List<ActivationFunction> activationFunctions;
 
     public ConnectionCalculatorImpl(ConnectionCalculator forwardInputFunction, ConnectionCalculator backwardInputFunction) {
 	super();
@@ -59,14 +59,7 @@ public class ConnectionCalculatorImpl implements ConnectionCalculator {
 	    }
 	}
 
-	if (bias.size() > 0) {
-	    float[] out = output.getElements();
-	    for (int i = 0; i < out.length; i++) {
-		for (Entry<Connections, Float> e : bias.entrySet()) {
-		    out[i] += e.getKey().getConnectionGraph().getElements()[i / output.getColumns()] * e.getValue();
-		}
-	    }
-	}
+	calculateBias(bias, output);
 	
 	if (forward.size() > 0) {
 	    forwardInputFunction.calculate(forward, output, targetLayer);
@@ -83,6 +76,17 @@ public class ConnectionCalculatorImpl implements ConnectionCalculator {
 	}
     }
 
+    protected void calculateBias(Map<Connections, Float> bias, Matrix output) {
+	if (bias.size() > 0) {
+	    float[] out = output.getElements();
+	    for (int i = 0; i < out.length; i++) {
+		for (Entry<Connections, Float> e : bias.entrySet()) {
+		    out[i] += e.getKey().getConnectionGraph().getElements()[i / output.getColumns()] * e.getValue();
+		}
+	    }
+	}
+    }
+
     public void addActivationFunction(ActivationFunction activationFunction) {
 	if (activationFunctions == null) {
 	    activationFunctions = new UniqueList<>();
@@ -92,7 +96,7 @@ public class ConnectionCalculatorImpl implements ConnectionCalculator {
     }
 
     public void removeActivationFunction(ActivationFunction activationFunction) {
-	if (activationFunctions == null) {
+	if (activationFunctions != null) {
 	    activationFunctions.remove(activationFunction);
 	}
     }

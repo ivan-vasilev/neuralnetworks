@@ -7,6 +7,10 @@ import com.github.neuralnetworks.calculation.LayerCalculatorImpl;
 import com.github.neuralnetworks.calculation.OutputError;
 import com.github.neuralnetworks.calculation.RBMLayerCalculator;
 import com.github.neuralnetworks.calculation.SupervisedRBMLayerCalculator;
+import com.github.neuralnetworks.training.backpropagation.BackPropagationLayerCalculatorImpl;
+import com.github.neuralnetworks.training.backpropagation.BackPropagationAutoencoder;
+import com.github.neuralnetworks.training.backpropagation.BackPropagationTrainer;
+import com.github.neuralnetworks.training.backpropagation.BackPropagationSigmoid;
 import com.github.neuralnetworks.training.rbm.CDAparapiTrainer;
 import com.github.neuralnetworks.training.rbm.PCDAparapiTrainer;
 import com.github.neuralnetworks.util.Constants;
@@ -14,11 +18,11 @@ import com.github.neuralnetworks.util.Properties;
 
 public class TrainerFactory {
 
-    public static BackPropagationTrainer backPropagation(NeuralNetwork nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay) {
+    public static BackPropagationTrainer backPropagationSigmoid(NeuralNetwork nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay) {
 	return new BackPropagationTrainer(backpropProperties(nn, trainingSet, testingSet, error, rand, learningRate, momentum, weightDecay));
     }
 
-    public static BackPropagationAutoencoder backPropagationAutoencoder(NeuralNetwork nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay) {
+    public static BackPropagationAutoencoder backPropagationSigmoidAutoencoder(NeuralNetwork nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay) {
 	return new BackPropagationAutoencoder(backpropProperties(nn, trainingSet, testingSet, error, rand, learningRate, momentum, weightDecay));
     }
 
@@ -27,8 +31,14 @@ public class TrainerFactory {
 	p.setParameter(Constants.NEURAL_NETWORK, nn);
 	p.setParameter(Constants.TRAINING_INPUT_PROVIDER, trainingSet);
 	p.setParameter(Constants.TESTING_INPUT_PROVIDER, testingSet);
+	p.setParameter(Constants.LEARNING_RATE, learningRate);
+	p.setParameter(Constants.MOMENTUM, momentum);
+	p.setParameter(Constants.WEIGHT_DECAY, weightDecay);
 	p.setParameter(Constants.LAYER_CALCULATOR, new LayerCalculatorImpl());
-	p.setParameter(Constants.BACKPROPAGATION, new BackPropagationAparapiImpl(learningRate, momentum, weightDecay));
+	BackPropagationSigmoid bps = new BackPropagationSigmoid(p);
+	p.setParameter(Constants.OUTPUT_ERROR_DERIVATIVE, bps);
+	BackPropagationLayerCalculatorImpl lc = new BackPropagationLayerCalculatorImpl(bps);
+	p.setParameter(Constants.BACKPROPAGATION, lc);
 	p.setParameter(Constants.OUTPUT_ERROR, error);
 	p.setParameter(Constants.RANDOM_INITIALIZER, rand);
 
