@@ -5,7 +5,7 @@ package com.github.neuralnetworks.architecture;
  * represents a fully connected weight matrix between two layers of neurons
  * 
  */
-public class FullyConnected extends ConnectionsImpl {
+public class FullyConnected extends ConnectionsImpl implements GraphConnections {
 
     private final Matrix connectionGraph;
     private int inputLayerStartNeuron;

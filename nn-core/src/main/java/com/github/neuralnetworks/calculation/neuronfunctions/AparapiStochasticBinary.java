@@ -2,7 +2,7 @@ package com.github.neuralnetworks.calculation.neuronfunctions;
 
 import java.util.SortedMap;
 
-import com.github.neuralnetworks.architecture.Connections;
+import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.calculation.ConnectionCalculatorImpl;
@@ -30,7 +30,7 @@ public class AparapiStochasticBinary extends ConnectionCalculatorImpl {
 	}
 
 	@Override
-	protected void init(SortedMap<Connections, Matrix> input, Matrix outputMatrix, Layer targetLayer) {
+	protected void init(SortedMap<GraphConnections, Matrix> input, Matrix outputMatrix, Layer targetLayer) {
 	    super.init(input, outputMatrix, targetLayer);
 	    if (random == null || random.length != outputMatrix.getElements().length) {
 		random = new float[outputMatrix.getElements().length];
@@ -62,7 +62,7 @@ public class AparapiStochasticBinary extends ConnectionCalculatorImpl {
 	}
 
 	@Override
-	protected void init(SortedMap<Connections, Matrix> input, Matrix outputMatrix, Layer targetLayer) {
+	protected void init(SortedMap<GraphConnections, Matrix> input, Matrix outputMatrix, Layer targetLayer) {
 	    super.init(input, outputMatrix, targetLayer);
 	    if (random == null || random.length != outputMatrix.getElements().length) {
 		random = new float[outputMatrix.getElements().length];

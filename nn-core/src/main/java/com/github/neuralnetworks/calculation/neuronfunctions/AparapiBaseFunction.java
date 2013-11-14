@@ -7,6 +7,7 @@ import java.util.SortedMap;
 
 import com.amd.aparapi.Kernel;
 import com.github.neuralnetworks.architecture.Connections;
+import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.OneToOne;
@@ -33,15 +34,16 @@ public abstract class AparapiBaseFunction extends Kernel implements ConnectionCa
     protected Map<Integer, float[]> storedInputs = new HashMap<>();
     protected Map<Integer, float[]> storedWeights = new HashMap<>();
 
+    @SuppressWarnings("unchecked")
     @Override
     public void calculate(SortedMap<Connections, Matrix> input, Matrix outputMatrix, Layer targetLayer) {
 	if (input.size() > 0) {
-	    init(input, outputMatrix, targetLayer);
+	    init((SortedMap<GraphConnections, Matrix>) ((SortedMap<?, ?>) input), outputMatrix, targetLayer);
 	    execute(outputMatrix.getRows());
 	}
     }
 
-    protected void init(SortedMap<Connections, Matrix> inputConnections, Matrix outputMatrix, Layer targetLayer) {
+    protected void init(SortedMap<GraphConnections, Matrix> inputConnections, Matrix outputMatrix, Layer targetLayer) {
 	Iterator<Matrix> it = inputConnections.values().iterator();
 	this.inputOutputColumns = it.next().getColumns();
 	while (it.hasNext()) {
@@ -60,7 +62,7 @@ public abstract class AparapiBaseFunction extends Kernel implements ConnectionCa
 	this.weightStartPositions = new int[series];
 
 	int totalInputSize = 0, totalWeightSize = 0, i = 0;
-	for (java.util.Map.Entry<Connections, Matrix> e : inputConnections.entrySet()) {
+	for (java.util.Map.Entry<GraphConnections, Matrix> e : inputConnections.entrySet()) {
 	    if (!(e.getKey() instanceof OneToOne)) {
 		if (e.getKey().getInputLayer() == targetLayer) {
 		    hasInput = true;
@@ -88,7 +90,7 @@ public abstract class AparapiBaseFunction extends Kernel implements ConnectionCa
 	}
 
 	if (inputConnections.size() == 1) {
-	    java.util.Map.Entry<Connections, Matrix> e = inputConnections.entrySet().iterator().next();
+	    java.util.Map.Entry<GraphConnections, Matrix> e = inputConnections.entrySet().iterator().next();
 	    this.input = e.getValue().getElements();
 	    this.weights = e.getKey().getConnectionGraph().getElements();
 	} else {
@@ -105,7 +107,7 @@ public abstract class AparapiBaseFunction extends Kernel implements ConnectionCa
 	    }
 
 	    i = 0;
-	    for (java.util.Map.Entry<Connections, Matrix> e : inputConnections.entrySet()) {
+	    for (java.util.Map.Entry<GraphConnections, Matrix> e : inputConnections.entrySet()) {
 		System.arraycopy(e.getValue().getElements(), 0, input, inputStartPositions[i], e.getValue().getElements().length);
 		System.arraycopy(e.getKey().getConnectionGraph().getElements(), 0, weights, weightStartPositions[i], e.getKey().getConnectionGraph().getElements().length);
 		i++;

@@ -3,17 +3,17 @@ package com.github.neuralnetworks.calculation.neuronfunctions;
 import com.github.neuralnetworks.calculation.ConnectionCalculatorImpl;
 
 /**
- * Rectified linear unit activation function
+ * Soft Rectified linear unit activation function
  */
-public class AparapiReLU extends ConnectionCalculatorImpl {
+public class AparapiSoftReLU extends ConnectionCalculatorImpl {
 
     private static final long serialVersionUID = -6602713983386107132L;
 
-    public AparapiReLU() {
-	super(new AparapiReLUByRows(), new AparapiReLUByColumns());
+    public AparapiSoftReLU() {
+	super(new AparapiSoftReLUByRows(), new AparapiSoftReLUByColumns());
     }
 
-    public static class AparapiReLUByRows extends AparapiWeightedSumByRows {
+    public static class AparapiSoftReLUByRows extends AparapiWeightedSumByRows {
 
 	private static final long serialVersionUID = 2572354641295173835L;
 
@@ -23,7 +23,7 @@ public class AparapiReLU extends ConnectionCalculatorImpl {
 	}
     }
 
-    public static class AparapiReLUByColumns extends AparapiWeightedSumByColumns {
+    public static class AparapiSoftReLUByColumns extends AparapiWeightedSumByColumns {
 
 	private static final long serialVersionUID = 2572354641295173835L;
 

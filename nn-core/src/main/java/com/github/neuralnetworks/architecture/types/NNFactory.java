@@ -1,7 +1,7 @@
 package com.github.neuralnetworks.architecture.types;
 
 import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.calculation.neuronfunctions.AparapiReLU;
+import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSoftReLU;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSigmoid;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiStochasticBinary;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiTanh;
@@ -44,9 +44,9 @@ public class NNFactory {
 	}
 	
 	MultiLayerPerceptron result = new MultiLayerPerceptron();
-	result.addLayer(new Layer(layers[0], new AparapiReLU()), false);
+	result.addLayer(new Layer(layers[0], new AparapiSoftReLU()), false);
 	for (int i = 1; i < layers.length; i++) {
-	    result.addLayer(new Layer(layers[i], new AparapiReLU()), addBias);
+	    result.addLayer(new Layer(layers[i], new AparapiSoftReLU()), addBias);
 	}
 	
 	return result;
@@ -83,7 +83,7 @@ public class NNFactory {
     }
 
     public static RBM rbmReluRelu(int visibleCount, int hiddenCount, boolean addBias) {
-	return new RBM(new Layer(visibleCount, new AparapiReLU()), new Layer(hiddenCount, new AparapiReLU()), addBias, addBias);
+	return new RBM(new Layer(visibleCount, new AparapiSoftReLU()), new Layer(hiddenCount, new AparapiSoftReLU()), addBias, addBias);
     }
 
     public static RBM rbmTanhTanh(int visibleCount, int hiddenCount, boolean addBias) {
@@ -95,7 +95,7 @@ public class NNFactory {
     }
 
     public static RBM rbmReluBinary(int visibleCount, int hiddenCount, boolean addBias) {
-	return new RBM(new Layer(visibleCount, new AparapiReLU()), new Layer(hiddenCount, new AparapiStochasticBinary()), addBias, addBias);
+	return new RBM(new Layer(visibleCount, new AparapiSoftReLU()), new Layer(hiddenCount, new AparapiStochasticBinary()), addBias, addBias);
     }
 
     public static RBM rbmTanhBinary(int visibleCount, int hiddenCount, boolean addBias) {
@@ -111,11 +111,11 @@ public class NNFactory {
     }
 
     public static SupervisedRBM srbmReluBinary(int visibleCount, int hiddenCount, int dataCount, boolean addBias) {
-	return new SupervisedRBM(new Layer(visibleCount, new AparapiReLU()), new Layer(hiddenCount, new AparapiStochasticBinary()), new Layer(dataCount), addBias, addBias);
+	return new SupervisedRBM(new Layer(visibleCount, new AparapiSoftReLU()), new Layer(hiddenCount, new AparapiStochasticBinary()), new Layer(dataCount), addBias, addBias);
     }
 
     public static SupervisedRBM srbmReluRelu(int visibleCount, int hiddenCount, int dataCount, boolean addBias) {
-	return new SupervisedRBM(new Layer(visibleCount, new AparapiReLU()), new Layer(hiddenCount, new AparapiReLU()), new Layer(dataCount), addBias, addBias);
+	return new SupervisedRBM(new Layer(visibleCount, new AparapiSoftReLU()), new Layer(hiddenCount, new AparapiSoftReLU()), new Layer(dataCount), addBias, addBias);
     }
 
     public static SupervisedRBM srbmTanhTanh(int visibleCount, int hiddenCount, int dataCount, boolean addBias) {
@@ -142,7 +142,7 @@ public class NNFactory {
 	
 	DBN result = new DBN();
 	for (int i = 0; i < layers.length; i++) {
-	    result.addLayer(new Layer(layers[i], new AparapiReLU()), addBias);
+	    result.addLayer(new Layer(layers[i], new AparapiSoftReLU()), addBias);
 	}
 	
 	return result;
@@ -179,9 +179,9 @@ public class NNFactory {
 	    throw new IllegalArgumentException("more than one layer is required");
 	}
 	
-	StackedAutoencoder result = new StackedAutoencoder(new Layer(visibleCount, new AparapiReLU()));
+	StackedAutoencoder result = new StackedAutoencoder(new Layer(visibleCount, new AparapiSoftReLU()));
 	for (int i = 0; i < levels; i++) {
-	    result.addLevel(new Layer(hiddenCount, new AparapiReLU()), new Layer(visibleCount, new AparapiReLU()), addBias);
+	    result.addLevel(new Layer(hiddenCount, new AparapiSoftReLU()), new Layer(visibleCount, new AparapiSoftReLU()), addBias);
 	}
 
 	return result;

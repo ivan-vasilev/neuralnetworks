@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.SortedMap;
 
 import com.github.neuralnetworks.architecture.Connections;
+import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSumByColumns;
@@ -28,14 +29,15 @@ public class AparapiBackpropagationBaseByColumns extends AparapiWeightedSumByCol
 	    int i = 0;
 	    for (java.util.Map.Entry<Connections, Matrix> e : inputConnections.entrySet()) {
 		System.arraycopy(input, inputStartPositions[i], e.getValue().getElements(), 0, e.getValue().getElements().length);
-		System.arraycopy(weights, weightStartPositions[i], e.getKey().getConnectionGraph().getElements(), 0, e.getKey().getConnectionGraph().getElements().length);
+		float[] cg = ((GraphConnections) e.getKey()).getConnectionGraph().getElements();
+		System.arraycopy(weights, weightStartPositions[i], cg, 0, cg.length);
 		i++;
 	    }
 	}
     }
 
     @Override
-    protected void init(SortedMap<Connections, Matrix> input, Matrix outputMatrix, Layer targetLayer) {
+    protected void init(SortedMap<GraphConnections, Matrix> input, Matrix outputMatrix, Layer targetLayer) {
 	super.init(input, outputMatrix, targetLayer);
 
 	weightUpdates = storedWeightUpdates.get(targetLayer);

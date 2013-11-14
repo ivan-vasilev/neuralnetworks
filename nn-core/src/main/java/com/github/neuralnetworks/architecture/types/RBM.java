@@ -1,6 +1,6 @@
 package com.github.neuralnetworks.architecture.types;
 
-import com.github.neuralnetworks.architecture.Connections;
+import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.FullyConnected;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
@@ -13,7 +13,7 @@ import com.github.neuralnetworks.calculation.neuronfunctions.ConstantConnectionC
  */
 public class RBM extends NeuralNetworkImpl {
 
-    private Connections mainConnections;
+    private GraphConnections mainConnections;
     private FullyConnected visibleBiasConnections;
     private FullyConnected hiddenBiasConnections;
 
@@ -41,15 +41,15 @@ public class RBM extends NeuralNetworkImpl {
 	}
     }
 
-    public Connections getMainConnections() {
+    public GraphConnections getMainConnections() {
 	return mainConnections;
     }
 
-    public Connections getVisibleBiasConnections() {
+    public GraphConnections getVisibleBiasConnections() {
 	return visibleBiasConnections;
     }
 
-    public Connections getHiddenBiasConnections() {
+    public GraphConnections getHiddenBiasConnections() {
 	return hiddenBiasConnections;
     }
 

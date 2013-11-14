@@ -6,7 +6,7 @@ package com.github.neuralnetworks.architecture;
  * example for use with biases)
  * 
  */
-public class OneToOne extends ConnectionsImpl {
+public class OneToOne extends ConnectionsImpl implements GraphConnections {
 
     private Matrix connectionGraph;
     private int inputLayerStartNeuron;

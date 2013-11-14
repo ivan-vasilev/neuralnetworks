@@ -2,7 +2,7 @@ package com.github.neuralnetworks.calculation.neuronfunctions;
 
 import java.util.SortedMap;
 
-import com.github.neuralnetworks.architecture.Connections;
+import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 
@@ -31,11 +31,11 @@ public class AparapiWeightedSumByRows extends AparapiBaseFunction {
      * initialization before the actual calculation
      */
     @Override
-    protected void init(SortedMap<Connections, Matrix> input, Matrix outputMatrix, Layer targetLayer) {
+    protected void init(SortedMap<GraphConnections, Matrix> input, Matrix outputMatrix, Layer targetLayer) {
 	super.init(input, outputMatrix, targetLayer);
 
-	for (java.util.Map.Entry<Connections, Matrix> e : input.entrySet()) {
-	    Connections graph = e.getKey();
+	for (java.util.Map.Entry<GraphConnections, Matrix> e : input.entrySet()) {
+	    GraphConnections graph = e.getKey();
 	    Matrix inputMatrix = e.getValue();
 
 	    if (inputMatrix.getColumns() != outputMatrix.getColumns() || outputMatrix.getRows() != graph.getConnectionGraph().getRows()) {

@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.github.neuralnetworks.architecture.Connections;
+import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
@@ -155,7 +156,9 @@ public abstract class Trainer<N extends NeuralNetwork> {
 	    N nn = getNeuralNetwork();
 	    RandomInitializer r = properties.getParameter(Constants.RANDOM_INITIALIZER);
 	    for (Connections c : nn.getConnections()) {
-		r.initialize(c.getConnectionGraph().getElements());
+		if (c instanceof GraphConnections) {
+		    r.initialize(((GraphConnections) c).getConnectionGraph().getElements());
+		}
 	    }
 	}
     }

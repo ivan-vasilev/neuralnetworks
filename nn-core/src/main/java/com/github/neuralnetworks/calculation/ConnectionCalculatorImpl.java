@@ -7,6 +7,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import com.github.neuralnetworks.architecture.Connections;
+import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.calculation.neuronfunctions.ActivationFunction;
@@ -36,23 +37,23 @@ public class ConnectionCalculatorImpl implements ConnectionCalculator {
     public void calculate(SortedMap<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
 	SortedMap<Connections, Matrix> forward = new TreeMap<>();
 	SortedMap<Connections, Matrix> backward = new TreeMap<>();
-	Map<Connections, Float> bias = new TreeMap<>();
+	Map<GraphConnections, Float> bias = new TreeMap<>();
 
 	for (Entry<Connections, Matrix> e : connections.entrySet()) {
 	    Connections c = e.getKey();
 	    Matrix input = e.getValue();
 	    // bias layer scenarios
 	    if (c.getOutputLayer() == targetLayer) {
-		if (c.getInputLayer().getConnectionCalculator() instanceof ConstantConnectionCalculator) {
+		if (c instanceof GraphConnections && c.getInputLayer().getConnectionCalculator() instanceof ConstantConnectionCalculator) {
 		    ConstantConnectionCalculator cc = (ConstantConnectionCalculator) c.getInputLayer().getConnectionCalculator();
-		    bias.put(c, cc.getValue());;
+		    bias.put((GraphConnections) c, cc.getValue());;
 		} else {
 		    forward.put(c, input);
 		}
 	    } else if (c.getInputLayer() == targetLayer) {
-		if (c.getOutputLayer().getConnectionCalculator() instanceof ConstantConnectionCalculator) {
+		if (c instanceof GraphConnections && c.getOutputLayer().getConnectionCalculator() instanceof ConstantConnectionCalculator) {
 		    ConstantConnectionCalculator cc = (ConstantConnectionCalculator) c.getOutputLayer().getConnectionCalculator();
-		    bias.put(c, cc.getValue());;
+		    bias.put((GraphConnections) c, cc.getValue());;
 		} else {
 		    backward.put(c, input);
 		}
@@ -76,11 +77,11 @@ public class ConnectionCalculatorImpl implements ConnectionCalculator {
 	}
     }
 
-    protected void calculateBias(Map<Connections, Float> bias, Matrix output) {
+    protected void calculateBias(Map<GraphConnections, Float> bias, Matrix output) {
 	if (bias.size() > 0) {
 	    float[] out = output.getElements();
 	    for (int i = 0; i < out.length; i++) {
-		for (Entry<Connections, Float> e : bias.entrySet()) {
+		for (Entry<GraphConnections, Float> e : bias.entrySet()) {
 		    out[i] += e.getKey().getConnectionGraph().getElements()[i / output.getColumns()] * e.getValue();
 		}
 	    }
