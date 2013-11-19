@@ -1,8 +1,13 @@
 package com.github.neuralnetworks.architecture.types;
 
+import com.github.neuralnetworks.architecture.Conv2DConnection;
+import com.github.neuralnetworks.architecture.ConvGridLayer;
 import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSoftReLU;
+import com.github.neuralnetworks.architecture.Matrix;
+import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2DSigmoid;
+import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2DSoftReLU;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSigmoid;
+import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSoftReLU;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiStochasticBinary;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiTanh;
 
@@ -199,4 +204,25 @@ public class NNFactory {
 	
 	return result;
     }
+
+    public static Conv2DConnection convSigmoidConnection(ConvGridLayer inputLayer, int featureMapRows, int featureMapColumns, int featureMaps) {
+	Conv2DConnection result = new Conv2DConnection(inputLayer, new AparapiConv2DSigmoid());
+
+	for (int i = 0; i < featureMaps; i++) {
+	    result.addFeatureMap(new Matrix(featureMapRows, featureMapColumns));
+	}
+
+	return result;
+    }
+    
+    public static Conv2DConnection convSoftReLUConnection(ConvGridLayer inputLayer, int featureMapRows, int featureMapColumns, int featureMaps) {
+	Conv2DConnection result = new Conv2DConnection(inputLayer, new AparapiConv2DSoftReLU());
+
+	for (int i = 0; i < featureMaps; i++) {
+	    result.addFeatureMap(new Matrix(featureMapRows, featureMapColumns));
+	}
+
+	return result;
+    }
+
 }

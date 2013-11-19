@@ -64,4 +64,12 @@ public class Matrix implements Serializable {
     public float get(int row, int column) {
 	return elements[row * columns + column];
     }
+
+    public int getColumn(int index) {
+	return index % columns;
+    }
+
+    public int getRow(int index) {
+	return index / columns;
+    }
 }
