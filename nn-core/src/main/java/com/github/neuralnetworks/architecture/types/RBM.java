@@ -1,7 +1,7 @@
 package com.github.neuralnetworks.architecture.types;
 
-import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.FullyConnected;
+import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.calculation.neuronfunctions.ConstantConnectionCalculator;
@@ -59,5 +59,15 @@ public class RBM extends NeuralNetworkImpl {
 
     public Layer getHiddenLayer() {
 	return mainConnections.getOutputLayer();
+    }
+
+    @Override
+    public Layer getOutputLayer() {
+	return getNoOutboundConnectionsLayer();
+    }
+
+    @Override
+    public Layer getDataOutputLayer() {
+	return getNoOutboundConnectionsLayer();
     }
 }

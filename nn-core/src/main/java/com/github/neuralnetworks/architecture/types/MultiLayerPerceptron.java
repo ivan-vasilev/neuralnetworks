@@ -7,7 +7,6 @@ import com.github.neuralnetworks.calculation.neuronfunctions.ConstantConnectionC
 
 /**
  * a Multi Layer perceptron network
- * 
  */
 public class MultiLayerPerceptron extends NeuralNetworkImpl {
 
@@ -23,5 +22,15 @@ public class MultiLayerPerceptron extends NeuralNetworkImpl {
 	}
 
 	return this;
+    }
+
+    @Override
+    public Layer getOutputLayer() {
+	return getNoOutboundConnectionsLayer();
+    }
+
+    @Override
+    public Layer getDataOutputLayer() {
+	return getNoOutboundConnectionsLayer();
     }
 }

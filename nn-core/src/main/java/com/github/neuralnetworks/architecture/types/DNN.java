@@ -33,4 +33,40 @@ public class DNN extends NeuralNetworkImpl implements DeepNeuralNetwork {
 	    }
 	}
     }
+
+    @Override
+    public Layer getOutputLayer() {
+	NeuralNetwork nn = getLastNeuralNetwork();
+	if (nn != null) {
+	    return nn.getOutputLayer();
+	}
+
+	return null;
+    }
+
+    @Override
+    public Layer getDataOutputLayer() {
+	NeuralNetwork nn = getLastNeuralNetwork();
+	if (nn != null) {
+	    return nn.getDataOutputLayer();
+	}
+
+	return null;
+    }
+
+    public NeuralNetwork getFirstNeuralNetwork() {
+	if (neuralNetworks != null && neuralNetworks.size() > 0) {
+	    return neuralNetworks.get(0);
+	}
+
+	return null;
+    }
+
+    public NeuralNetwork getLastNeuralNetwork() {
+	if (neuralNetworks != null && neuralNetworks.size() > 0) {
+	    return neuralNetworks.get(neuralNetworks.size() - 1);
+	}
+	
+	return null;
+    }
 }

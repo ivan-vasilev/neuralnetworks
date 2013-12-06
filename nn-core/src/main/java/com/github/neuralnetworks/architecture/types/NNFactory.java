@@ -209,7 +209,7 @@ public class NNFactory {
 	Conv2DConnection result = new Conv2DConnection(inputLayer, new AparapiConv2DSigmoid());
 
 	for (int i = 0; i < featureMaps; i++) {
-	    result.addFeatureMap(new Matrix(featureMapRows, featureMapColumns));
+	    result.addFilter(new Matrix(featureMapRows, featureMapColumns));
 	}
 
 	return result;
@@ -219,10 +219,9 @@ public class NNFactory {
 	Conv2DConnection result = new Conv2DConnection(inputLayer, new AparapiConv2DSoftReLU());
 
 	for (int i = 0; i < featureMaps; i++) {
-	    result.addFeatureMap(new Matrix(featureMapRows, featureMapColumns));
+	    result.addFilter(new Matrix(featureMapRows, featureMapColumns));
 	}
 
 	return result;
     }
-
 }

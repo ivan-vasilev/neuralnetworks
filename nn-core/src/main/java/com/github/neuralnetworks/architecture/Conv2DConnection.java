@@ -10,45 +10,45 @@ import com.github.neuralnetworks.util.UniqueList;
  */
 public class Conv2DConnection extends ConnectionsImpl {
 
-    protected List<Matrix> featureMaps;
+    protected List<Matrix> filters;
 
     public Conv2DConnection(ConvGridLayer inputLayer, ConnectionCalculator convCalculator) {
 	super(inputLayer, new ConvGridLayer(0, 0, 0, convCalculator));
     }
 
-    public List<Matrix> getFeatureMaps() {
-	return featureMaps;
+    public List<Matrix> getFilters() {
+	return filters;
     }
 
-    public void setFeatureMaps(List<Matrix> featureMaps) {
-	this.featureMaps = featureMaps;
+    public void setFilters(List<Matrix> filters) {
+	this.filters = filters;
     }
 
-    public void addFeatureMap(Matrix featureMap) {
-	if (featureMaps == null) {
-	    featureMaps = new UniqueList<>();
+    public void addFilter(Matrix filter) {
+	if (filters == null) {
+	    filters = new UniqueList<>();
 	}
 
-	for (Matrix m : featureMaps) {
-	    if (featureMap.getColumns() != m.getColumns() || featureMap.getRows() != m.getRows()) {
+	for (Matrix m : filters) {
+	    if (filter.getColumns() != m.getColumns() || filter.getRows() != m.getRows()) {
 		throw new IllegalArgumentException();
 	    }
 	}
 
-	featureMaps.add(featureMap);
+	filters.add(filter);
 
 	ConvGridLayer inputLayer = (ConvGridLayer) getInputLayer();
 	ConvGridLayer outputLayer = (ConvGridLayer) getOutputLayer();
-	outputLayer.setColumns(inputLayer.getColumns() - inputLayer.getColumns() % featureMap.getColumns());
-	outputLayer.setRows(inputLayer.getRows() - inputLayer.getRows() % featureMap.getRows());
-	outputLayer.setFeatureMaps(featureMaps.size());
+	outputLayer.setColumns(inputLayer.getColumns() - inputLayer.getColumns() % filter.getColumns());
+	outputLayer.setRows(inputLayer.getRows() - inputLayer.getRows() % filter.getRows());
+	outputLayer.setFilters(filters.size());
     }
 
     public void removeFeatureMap(Matrix featureMap) {
-	if (featureMaps != null) {
-	    featureMaps.remove(featureMap);
+	if (filters != null) {
+	    filters.remove(featureMap);
 	    ConvGridLayer l = (ConvGridLayer) getOutputLayer();
-	    l.setFeatureMaps(featureMaps.size());
+	    l.setFilters(filters.size());
 	}
     }
 }

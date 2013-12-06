@@ -46,14 +46,14 @@ public class AparapiConv2D extends Kernel implements ConnectionCalculator {
 	this.inputColumns = inputLayer.getColumns();
 	this.outputColumns = outputLayer.getColumns();
 	this.outputLength = outputLayer.getColumns() * outputLayer.getRows();
-	this.featureMapStartIndexes = new int[c.getFeatureMaps().size() + 1];
+	this.featureMapStartIndexes = new int[c.getFilters().size() + 1];
 
 	List<Integer> featureMapOffsets = new ArrayList<>();
 	List<Float> featureMapWeights = new ArrayList<>();
 	int offset = 0;
 
-	for (int i = 0; i < c.getFeatureMaps().size(); i++) {
-	    Matrix fm = c.getFeatureMaps().get(i);
+	for (int i = 0; i < c.getFilters().size(); i++) {
+	    Matrix fm = c.getFilters().get(i);
 	    featureMapStartIndexes[i] = offset;
 	    for (int j = 0; j < fm.getRows(); j++) {
 		for (int k = 0; k < fm.getColumns(); k++) {
@@ -64,7 +64,7 @@ public class AparapiConv2D extends Kernel implements ConnectionCalculator {
 	    }
 	}
 
-	featureMapStartIndexes[c.getFeatureMaps().size()] = featureMapOffsets.size() - 1;
+	featureMapStartIndexes[c.getFilters().size()] = featureMapOffsets.size() - 1;
 
 	if (this.featureMapOffsets == null || this.featureMapOffsets.length != featureMapOffsets.size()) {
 	    this.featureMapOffsets = new int[featureMapOffsets.size()];

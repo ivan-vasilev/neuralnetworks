@@ -7,7 +7,7 @@ import com.github.neuralnetworks.util.UniqueList;
 /**
  * this is the base class for all the neural networks
  */
-public class NeuralNetworkImpl implements NeuralNetwork {
+public abstract class NeuralNetworkImpl implements NeuralNetwork {
 
     private Set<Layer> layers;
 
@@ -32,8 +32,7 @@ public class NeuralNetworkImpl implements NeuralNetwork {
 	return null;
     }
 
-    @Override
-    public Layer getOutputLayer() {
+    protected Layer getNoOutboundConnectionsLayer() {
 	hasOutboundConnections:
 	for (Layer l : layers) {
 	    for (Connections c : l.getConnections()) {
@@ -46,11 +45,6 @@ public class NeuralNetworkImpl implements NeuralNetwork {
 	}
 
 	return null;
-    }
-
-    @Override
-    public Layer getDataOutputLayer() {
-	return getOutputLayer();
     }
 
     @Override

@@ -13,24 +13,24 @@ public class ConvGridLayer extends Layer {
 
     private int columns;
     private int rows;
-    private int featureMaps;
+    private int filters;
 
     public ConvGridLayer(ConnectionCalculator connectionCalculator) {
 	super(0, connectionCalculator);
     }
 
-    public ConvGridLayer(int rows, int columns, int featureMaps, ConnectionCalculator connectionCalculator) {
-	super(rows * columns * featureMaps, connectionCalculator);
+    public ConvGridLayer(int rows, int columns, int filters, ConnectionCalculator connectionCalculator) {
+	super(rows * columns * filters, connectionCalculator);
 	this.columns = columns;
 	this.rows = rows;
-	this.featureMaps = featureMaps;
+	this.filters = filters;
     }
 
-    public ConvGridLayer(int rows, int columns, int featureMaps) {
-	super(rows * columns * featureMaps);
+    public ConvGridLayer(int rows, int columns, int filters) {
+	super(rows * columns * filters);
 	this.columns = columns;
 	this.rows = rows;
-	this.featureMaps = featureMaps;
+	this.filters = filters;
     }
 
     public int getColumns() {
@@ -51,16 +51,16 @@ public class ConvGridLayer extends Layer {
 	updateNeuronCount();
     }
 
-    public int getFeatureMaps() {
-	return featureMaps;
+    public int getFilters() {
+	return filters;
     }
 
-    public void setFeatureMaps(int featureMaps) {
-	this.featureMaps = featureMaps;
+    public void setFilters(int filters) {
+	this.filters = filters;
 	updateNeuronCount();
     }
 
     protected void updateNeuronCount() {
-	setNeuronCount(rows * columns * featureMaps);
+	setNeuronCount(rows * columns * filters);
     }
 }
