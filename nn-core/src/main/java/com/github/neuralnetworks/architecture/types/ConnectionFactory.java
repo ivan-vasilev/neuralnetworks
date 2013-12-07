@@ -3,7 +3,7 @@ package com.github.neuralnetworks.architecture.types;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
 import com.github.neuralnetworks.architecture.ConvGridLayer;
 import com.github.neuralnetworks.architecture.Matrix;
-import com.github.neuralnetworks.architecture.Pooling2DConnection;
+import com.github.neuralnetworks.architecture.Subsampling2DConnection;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiAveragePooling2D;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2DSigmoid;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2DSoftReLU;
@@ -44,15 +44,15 @@ public class ConnectionFactory {
 	return result;
     }
     
-    public static Pooling2DConnection maxPoolingConnection(ConvGridLayer inputLayer, int regionRows, int regionCols) {
-	return new Pooling2DConnection(inputLayer, regionRows, regionCols, new AparapiMaxPooling2D());
+    public static Subsampling2DConnection maxPoolingConnection(ConvGridLayer inputLayer, int regionRows, int regionCols) {
+	return new Subsampling2DConnection(inputLayer, regionRows, regionCols, new AparapiMaxPooling2D());
     }
     
-    public static Pooling2DConnection averagePoolingConnection(ConvGridLayer inputLayer, int regionRows, int regionCols) {
-	return new Pooling2DConnection(inputLayer, regionRows, regionCols, new AparapiAveragePooling2D());
+    public static Subsampling2DConnection averagePoolingConnection(ConvGridLayer inputLayer, int regionRows, int regionCols) {
+	return new Subsampling2DConnection(inputLayer, regionRows, regionCols, new AparapiAveragePooling2D());
     }
     
-    public static Pooling2DConnection stochasticPoolingConnection(ConvGridLayer inputLayer, int regionRows, int regionCols) {
-	return new Pooling2DConnection(inputLayer, regionRows, regionCols, new AparapiStochasticPooling2D());
+    public static Subsampling2DConnection stochasticPoolingConnection(ConvGridLayer inputLayer, int regionRows, int regionCols) {
+	return new Subsampling2DConnection(inputLayer, regionRows, regionCols, new AparapiStochasticPooling2D());
     }
 }

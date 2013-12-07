@@ -15,8 +15,10 @@ import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.util.Environment;
 
 /**
- * base class for input functions
+ * Base Aparapi connection calculator for weighted sum functions (matrix multiplication). In order to work Aparapi has to use only one-dimensional arrays with simple data types and can only call member methods of the Kernel class itself.
+ * Aparapi also requires to use only float (or int) data types
  */
+
 public abstract class AparapiBaseFunction extends Kernel implements ConnectionCalculator {
 
     private static final long serialVersionUID = -8435155322138790083L;
