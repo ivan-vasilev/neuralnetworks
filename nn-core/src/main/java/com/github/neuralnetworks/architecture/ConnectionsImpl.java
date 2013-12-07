@@ -32,10 +32,18 @@ public abstract class ConnectionsImpl implements Connections, Comparable<Connect
     public Layer getInputLayer() {
 	return inputLayer;
     }
+    
+    public void setInputLayer(Layer inputLayer) {
+	this.inputLayer = inputLayer;
+    }
 
     @Override
     public Layer getOutputLayer() {
 	return outputLayer;
+    }
+
+    public void setOutputLayer(Layer outputLayer) {
+        this.outputLayer = outputLayer;
     }
 
     @Override

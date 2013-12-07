@@ -18,10 +18,21 @@ public class Layer implements Serializable {
     private int neuronCount;
     private ConnectionCalculator connectionCalculator;
     private Set<Connections> connections;
+    
+    public Layer() {
+	super();
+	this.connections = new UniqueList<>();
+    }
 
     public Layer(int neuronCount) {
 	super();
 	this.neuronCount = neuronCount;
+	this.connections = new UniqueList<>();
+    }
+
+    public Layer(ConnectionCalculator connectionCalculator) {
+	super();
+	this.connectionCalculator = connectionCalculator;
 	this.connections = new UniqueList<>();
     }
 

@@ -20,7 +20,7 @@ public class StackedAutoencoder extends DNN {
 	}
 
 	if (input.getNeuronCount() != output.getNeuronCount()) {
-	    throw new IllegalArgumentException("Input and output layers must have equal number of neurons");
+	    output.setNeuronCount(input.getNeuronCount());
 	}
 
 	addNeuralNetwork(new Autoencoder(input, hidden, output, addBias));

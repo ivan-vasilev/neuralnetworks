@@ -1,11 +1,6 @@
 package com.github.neuralnetworks.architecture.types;
 
-import com.github.neuralnetworks.architecture.Conv2DConnection;
-import com.github.neuralnetworks.architecture.ConvGridLayer;
 import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.architecture.Matrix;
-import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2DSigmoid;
-import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2DSoftReLU;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSigmoid;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSoftReLU;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiStochasticBinary;
@@ -165,63 +160,43 @@ public class NNFactory {
 	
 	return result;
     }
-    
-    public static StackedAutoencoder saeSigmoid(int levels, int visibleCount, int hiddenCount, boolean addBias) {
-	if (levels <= 1) {
+
+    public static StackedAutoencoder saeSigmoid(int[] layers, boolean addBias) {
+	if (layers == null || layers.length <= 1) {
 	    throw new IllegalArgumentException("more than one layer is required");
 	}
 
-	StackedAutoencoder result = new StackedAutoencoder(new Layer(visibleCount, new AparapiSigmoid()));
-	for (int i = 0; i < levels; i++) {
-	    result.addLevel(new Layer(hiddenCount, new AparapiSigmoid()), new Layer(visibleCount, new AparapiSigmoid()), addBias);
+	StackedAutoencoder result = new StackedAutoencoder(new Layer(layers[0], new AparapiSigmoid()));
+	for (int i = 1; i < layers.length; i++) {
+	    result.addLevel(new Layer(layers[i], new AparapiSigmoid()), new Layer(new AparapiSigmoid()), addBias);
 	}
 
 	return result;
     }
 
-    public static StackedAutoencoder saeReLU(int levels, int visibleCount, int hiddenCount, boolean addBias) {
-	if (levels <= 1) {
+    public static StackedAutoencoder saeReLU(int[] layers, int hiddenCount, boolean addBias) {
+	if (layers == null || layers.length <= 1) {
 	    throw new IllegalArgumentException("more than one layer is required");
 	}
-	
-	StackedAutoencoder result = new StackedAutoencoder(new Layer(visibleCount, new AparapiSoftReLU()));
-	for (int i = 0; i < levels; i++) {
-	    result.addLevel(new Layer(hiddenCount, new AparapiSoftReLU()), new Layer(visibleCount, new AparapiSoftReLU()), addBias);
-	}
 
-	return result;
-    }
-
-    public static StackedAutoencoder saeTanh(int levels, int visibleCount, int hiddenCount, boolean addBias) {
-	if (levels <= 1) {
-	    throw new IllegalArgumentException("more than one layer is required");
-	}
-	
-	StackedAutoencoder result = new StackedAutoencoder(new Layer(visibleCount, new AparapiTanh()));
-	for (int i = 0; i < levels; i++) {
-	    result.addLevel(new Layer(hiddenCount, new AparapiTanh()), new Layer(visibleCount, new AparapiTanh()), addBias);
-	}
-	
-	return result;
-    }
-
-    public static Conv2DConnection convSigmoidConnection(ConvGridLayer inputLayer, int featureMapRows, int featureMapColumns, int featureMaps) {
-	Conv2DConnection result = new Conv2DConnection(inputLayer, new AparapiConv2DSigmoid());
-
-	for (int i = 0; i < featureMaps; i++) {
-	    result.addFilter(new Matrix(featureMapRows, featureMapColumns));
+	StackedAutoencoder result = new StackedAutoencoder(new Layer(layers[0], new AparapiSoftReLU()));
+	for (int i = 1; i < layers.length; i++) {
+	    result.addLevel(new Layer(layers[i], new AparapiSoftReLU()), new Layer(new AparapiSoftReLU()), addBias);
 	}
 
 	return result;
     }
     
-    public static Conv2DConnection convSoftReLUConnection(ConvGridLayer inputLayer, int featureMapRows, int featureMapColumns, int featureMaps) {
-	Conv2DConnection result = new Conv2DConnection(inputLayer, new AparapiConv2DSoftReLU());
-
-	for (int i = 0; i < featureMaps; i++) {
-	    result.addFilter(new Matrix(featureMapRows, featureMapColumns));
+    public static StackedAutoencoder saeTanh(int[] layers, int hiddenCount, boolean addBias) {
+	if (layers == null || layers.length <= 1) {
+	    throw new IllegalArgumentException("more than one layer is required");
 	}
-
+	
+	StackedAutoencoder result = new StackedAutoencoder(new Layer(layers[0], new AparapiTanh()));
+	for (int i = 1; i < layers.length; i++) {
+	    result.addLevel(new Layer(layers[i], new AparapiTanh()), new Layer(new AparapiTanh()), addBias);
+	}
+	
 	return result;
     }
 }
