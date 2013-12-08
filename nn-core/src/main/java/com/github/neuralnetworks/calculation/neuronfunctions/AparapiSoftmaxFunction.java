@@ -6,7 +6,7 @@ import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.util.Util;
 
 /**
- * softmax activation function
+ * Softmax activation function
  */
 public class AparapiSoftmaxFunction extends Kernel implements ActivationFunction {
 

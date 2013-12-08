@@ -12,6 +12,9 @@ public class StackedAutoencoder extends DNN {
 	addLayer(input);
     }
 
+    /**
+     * This method creates new Autoencoder with input layer - the hidden layer of the previous topmost autoencoder.
+     */
     public void addLevel(Layer hidden, Layer output, boolean addBias) {
 	Layer input = getOutputLayer();
 

@@ -3,9 +3,7 @@ package com.github.neuralnetworks.training;
 import java.util.Random;
 
 /**
- * 
  * Default implementation of the random initializer using JDK's default Random
- * 
  */
 public class RandomInitializerImpl implements RandomInitializer {
 

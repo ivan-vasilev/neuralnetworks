@@ -4,6 +4,9 @@ import com.github.neuralnetworks.events.TrainingEvent;
 import com.github.neuralnetworks.events.TrainingEventListener;
 import com.github.neuralnetworks.util.Properties;
 
+/**
+ * Aparapi Contrastive Divergence
+ */
 public class CDAparapiTrainer extends CDAparapiTrainerBase implements TrainingEventListener {
 
     public CDAparapiTrainer(Properties properties) {
@@ -14,7 +17,7 @@ public class CDAparapiTrainer extends CDAparapiTrainerBase implements TrainingEv
     @Override
     public void handleEvent(TrainingEvent event) {
 	if (event instanceof SamplingStepEvent) {
-	    // if this is the first example
+	    // clamp results to the visible layer
 	    SamplingStepEvent sse = (SamplingStepEvent) event;
 	    if (sse.getSamplingCount() == 0) {
 		System.arraycopy(getPosPhaseHidden().getElements(), 0, getNegPhaseHidden().getElements(), 0, getNegPhaseHidden().getElements().length);

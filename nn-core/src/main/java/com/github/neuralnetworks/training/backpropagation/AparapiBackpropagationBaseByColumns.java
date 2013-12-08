@@ -10,16 +10,35 @@ import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSumByColumns;
 
+/**
+ * Aparapi Backpropagation base weighted sum
+ * Supports learning rage, momentum and weight decay
+ */
 public class AparapiBackpropagationBaseByColumns extends AparapiWeightedSumByColumns {
 
     private static final long serialVersionUID = -5101971690861270462L;
 
+    /**
+     * Activation of the output layer from the feedforward phase
+     */
     protected float[] outputActivation;
+
+    /**
+     * Stored weight updates for reuse
+     */
     protected Map<Layer, float[]> storedWeightUpdates = new HashMap<>();
+
+    /**
+     * Weight updates array
+     */
     protected float[] weightUpdates;
     protected float learningRate;
     protected float momentum;
     protected float weightDecay;
+
+    /**
+     * Stored activations
+     */
     protected Map<Layer, Matrix> activations;
 
     @Override
@@ -53,6 +72,7 @@ public class AparapiBackpropagationBaseByColumns extends AparapiWeightedSumByCol
     protected void after(int row, int column) {
 	calcDerivativeBefore(row, column);
 
+	// perform weights update
 	for (int i = 0; i < series; i++) {
 	    for (int j = 0; j < weightsRows[i]; j++) {
 		int weightIndex = weightIndex(j, row, i);

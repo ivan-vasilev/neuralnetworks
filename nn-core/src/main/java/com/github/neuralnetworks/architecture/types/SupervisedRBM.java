@@ -3,8 +3,7 @@ package com.github.neuralnetworks.architecture.types;
 import com.github.neuralnetworks.architecture.Layer;
 
 /**
- * RBM with extra layer
- *
+ * RBM that has a separate data-output layer. This is an attempt to recreate http://www.cs.toronto.edu/~hinton/nipstutorial/nipstut3.pdf (slide 33)
  */
 public class SupervisedRBM extends RBM {
 

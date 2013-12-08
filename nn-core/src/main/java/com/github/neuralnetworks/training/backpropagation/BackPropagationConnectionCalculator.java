@@ -13,6 +13,10 @@ import com.github.neuralnetworks.calculation.neuronfunctions.ConstantConnectionC
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
 
+/**
+ * Connection calculator for the backpropagation phase of the algorithm
+ * The difference with the regular ConnectionCalculatorImpl is that forwardBackprop's and backwardBackprop's properties (learing rate, momentum, weight decay) are updated before each propagation
+ */
 public class BackPropagationConnectionCalculator implements ConnectionCalculator {
 
     private static final long serialVersionUID = -8854054073444883314L;

@@ -6,7 +6,6 @@ import com.github.neuralnetworks.training.TrainingInputProvider;
 
 /**
  * simple input provider for testing purposes
- *
  */
 public class SimpleInputProvider implements TrainingInputProvider {
 

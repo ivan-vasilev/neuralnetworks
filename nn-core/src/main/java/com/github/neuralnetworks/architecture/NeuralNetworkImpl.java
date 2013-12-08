@@ -5,7 +5,8 @@ import java.util.Set;
 import com.github.neuralnetworks.util.UniqueList;
 
 /**
- * this is the base class for all the neural networks
+ * Base class for all types of neural networks.
+ * A neural network is defined only by the layers it contains. The layers themselves contain the connections with the other layers.
  */
 public abstract class NeuralNetworkImpl implements NeuralNetwork {
 
@@ -16,6 +17,10 @@ public abstract class NeuralNetworkImpl implements NeuralNetwork {
 	this.layers = new UniqueList<Layer>();
     }
 
+    /* (non-Javadoc)
+     * @see com.github.neuralnetworks.architecture.NeuralNetwork#getInputLayer()
+     * Default implementation - the input layer is that layer, which doesn't have any inbound connections
+     */
     @Override
     public Layer getInputLayer() {
 	hasInboundConnections:
@@ -47,6 +52,11 @@ public abstract class NeuralNetworkImpl implements NeuralNetwork {
 	return null;
     }
 
+    /* (non-Javadoc)
+     * @see com.github.neuralnetworks.architecture.NeuralNetwork#getConnections()
+     * Returns list of all the connections within the network.
+     * The list is retrieved by iterating over all the layers. Only connections that have both layers in this network are returned.
+     */
     @Override
     public Set<Connections> getConnections() {
 	Set<Connections> result = new UniqueList<>();
@@ -66,6 +76,11 @@ public abstract class NeuralNetworkImpl implements NeuralNetwork {
 	return result;
     }
 
+    /**
+     * Add layer to the network
+     * @param layer
+     * @return whether the layer was added successfully
+     */
     protected boolean addLayer(Layer layer) {
 	if (layer != null) {
 	    if (layers == null) {
@@ -81,6 +96,10 @@ public abstract class NeuralNetworkImpl implements NeuralNetwork {
 	return false;
     }
 
+    /**
+     * @param c
+     * @return the connection is inner when it's both layers are within the network
+     */
     protected boolean isInnerConnection(Connections c) {
 	if (layers != null) {
 	    return layers.contains(c.getInputLayer()) && layers.contains(c.getOutputLayer());

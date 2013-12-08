@@ -2,9 +2,19 @@ package com.github.neuralnetworks.architecture;
 
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
 
+/**
+ * Subsampling connections. Contains information about the size of the subsampling region
+ */
 public class Subsampling2DConnection extends ConnectionsImpl {
 
+    /**
+     * subsampling region rows
+     */
     private int subsamplingRegionRows;
+
+    /**
+     * subsampling region columns
+     */
     private int subsamplingRegionCols;
 
     public Subsampling2DConnection(ConvGridLayer inputLayer, int subsamplingRegionRows, int subsamplingRegionCols, ConnectionCalculator outputConnectionCalculator) {
@@ -12,7 +22,9 @@ public class Subsampling2DConnection extends ConnectionsImpl {
 	
 	this.subsamplingRegionRows = subsamplingRegionRows;
 	this.subsamplingRegionCols = subsamplingRegionCols;
-	updateOutputLayerDims();
+
+	// update the dimensions of the output layer
+	updateOutputLayerDimmensions();
     }
 
     public int getSubsamplingRegionRows() {
@@ -21,6 +33,7 @@ public class Subsampling2DConnection extends ConnectionsImpl {
 
     public void setSubsamplingRegionRows(int subsamplingRegionRows) {
 	this.subsamplingRegionRows = subsamplingRegionRows;
+	updateOutputLayerDimmensions();
     }
 
     public int getSubsamplingRegionCols() {
@@ -29,9 +42,13 @@ public class Subsampling2DConnection extends ConnectionsImpl {
 
     public void setSubsamplingRegionCols(int subsamplingRegionCols) {
 	this.subsamplingRegionCols = subsamplingRegionCols;
+	updateOutputLayerDimmensions();
     }
 
-    protected void updateOutputLayerDims() {
+    /**
+     * When the size of the subsampling region is changed, then the neuron count in the output layer is also changed
+     */
+    protected void updateOutputLayerDimmensions() {
 	if (subsamplingRegionRows != 0 && subsamplingRegionCols != 0) {
 	    ConvGridLayer inputLayer = (ConvGridLayer) getInputLayer();
 	    ConvGridLayer outputLayer = (ConvGridLayer) getOutputLayer();

@@ -3,9 +3,7 @@ package com.github.neuralnetworks.input;
 import com.github.neuralnetworks.architecture.Matrix;
 
 /**
- * 
- * input modifier for a mean value
- * 
+ * Mean value input modifier
  */
 public class MeanInputModifier implements InputModifier {
 

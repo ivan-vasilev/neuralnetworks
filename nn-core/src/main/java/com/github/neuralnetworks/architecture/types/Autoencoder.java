@@ -17,13 +17,16 @@ public class Autoencoder extends NeuralNetworkImpl {
 	this.hiddenLayer = hiddenLayer;
 	this.outputLayer = outputLayer;
 
+	// layers are added
 	addLayer(inputLayer);
 	addLayer(hiddenLayer);
 	addLayer(outputLayer);
 
+	// connections are created
 	new FullyConnected(inputLayer, outputLayer);
 	new FullyConnected(inputLayer, outputLayer);
 
+	// biases are added
 	if (addBias) {
 	    Layer hiddenBiasLayer = new Layer(1, new ConstantConnectionCalculator(1));
 	    addLayer(hiddenBiasLayer);

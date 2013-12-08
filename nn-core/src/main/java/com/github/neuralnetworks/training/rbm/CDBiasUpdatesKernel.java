@@ -2,11 +2,29 @@ package com.github.neuralnetworks.training.rbm;
 
 import com.amd.aparapi.Kernel;
 
+/**
+ * Aparapi kernerl for update of bias updates
+ */
 public class CDBiasUpdatesKernel extends Kernel {
 
-    private float[] hiddenBiasWeights;
-    private float[] hiddenBiasUpdates;
+    /**
+     * bias weights
+     */
+    private float[] biasWeights;
+
+    /**
+     * weight updates
+     */
+    private float[] biasUpdates;
+
+    /**
+     * positive phase
+     */
     private float[] posPhase;
+
+    /**
+     * negative phase
+     */
     private float[] negPhase;
     private float learningRate;
     private float momentum;
@@ -14,14 +32,14 @@ public class CDBiasUpdatesKernel extends Kernel {
 
     public CDBiasUpdatesKernel(float[] hiddenBiasWeights) {
 	super();
-	this.hiddenBiasWeights = hiddenBiasWeights;
-	this.hiddenBiasUpdates = new float[hiddenBiasWeights.length];
+	this.biasWeights = hiddenBiasWeights;
+	this.biasUpdates = new float[hiddenBiasWeights.length];
     }
 
     public CDBiasUpdatesKernel(float[] hiddenBiasWeights, float[] posPhase, float[] negPhase, float learningRate, float momentum, int miniBatchSize) {
 	super();
-	this.hiddenBiasWeights = hiddenBiasWeights;
-	this.hiddenBiasUpdates = new float[hiddenBiasWeights.length];
+	this.biasWeights = hiddenBiasWeights;
+	this.biasUpdates = new float[hiddenBiasWeights.length];
 	this.posPhase = posPhase;
 	this.negPhase = negPhase;
 	this.learningRate = learningRate;
@@ -37,28 +55,28 @@ public class CDBiasUpdatesKernel extends Kernel {
 	    weightUpdate += posPhase[id * miniBatchSize + i] - negPhase[id * miniBatchSize + i];
 	}
 
-	weightUpdate = learningRate * (weightUpdate / miniBatchSize) + momentum * hiddenBiasUpdates[id];
-	hiddenBiasWeights[id] += weightUpdate;
-	hiddenBiasUpdates[id] = weightUpdate;
+	weightUpdate = learningRate * (weightUpdate / miniBatchSize) + momentum * biasUpdates[id];
+	biasWeights[id] += weightUpdate;
+	biasUpdates[id] = weightUpdate;
     }
 
-    public float[] getHiddenBiasWeights() {
-        return hiddenBiasWeights;
+    public float[] getBiasWeights() {
+        return biasWeights;
     }
 
     public void setHiddenBiasWeights(float[] hiddenBiasWeights) {
-        this.hiddenBiasWeights = hiddenBiasWeights;
-        if (this.hiddenBiasUpdates == null || this.hiddenBiasUpdates.length != hiddenBiasWeights.length) {
-            this.hiddenBiasUpdates = new float[hiddenBiasUpdates.length];
+        this.biasWeights = hiddenBiasWeights;
+        if (this.biasUpdates == null || this.biasUpdates.length != hiddenBiasWeights.length) {
+            this.biasUpdates = new float[biasUpdates.length];
         }
     }
 
-    public float[] getHiddenBiasUpdates() {
-        return hiddenBiasUpdates;
+    public float[] getBiasUpdates() {
+        return biasUpdates;
     }
 
-    public void setHiddenBiasUpdates(float[] hiddenBiasUpdates) {
-        this.hiddenBiasUpdates = hiddenBiasUpdates;
+    public void setBiasUpdates(float[] biasUpdates) {
+        this.biasUpdates = biasUpdates;
     }
 
     public float[] getPosPhase() {

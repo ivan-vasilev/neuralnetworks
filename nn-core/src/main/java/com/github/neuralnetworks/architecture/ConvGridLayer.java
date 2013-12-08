@@ -3,9 +3,7 @@ package com.github.neuralnetworks.architecture;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
 
 /**
- * 
- * 2 dimensional layer
- * 
+ * Three dimensional layer to be used for convolutional and subsampling connections.
  */
 public class ConvGridLayer extends Layer {
 

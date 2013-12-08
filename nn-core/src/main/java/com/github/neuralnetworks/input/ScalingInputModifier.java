@@ -2,6 +2,9 @@ package com.github.neuralnetworks.input;
 
 import com.github.neuralnetworks.architecture.Matrix;
 
+/**
+ * Scaling input modifier
+ */
 public class ScalingInputModifier implements InputModifier {
 
     private float scale;

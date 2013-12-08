@@ -8,6 +8,9 @@ import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.calculation.OutputError;
 
+/**
+ * Util class
+ */
 public class Util {
 
     /**

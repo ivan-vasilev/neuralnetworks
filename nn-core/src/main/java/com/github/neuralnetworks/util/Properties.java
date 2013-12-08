@@ -4,9 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 
- * properties class for convenience
- * 
+ * Properties class for convenience
  */
 public class Properties extends HashMap<String, Object> {
 

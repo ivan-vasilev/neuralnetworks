@@ -7,16 +7,27 @@ import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.util.UniqueList;
 
 /**
- * 
- * represents a layer of neurons
- * 
+ * A layer of neurons. Each layer contains a set of connections that link it to other layers.
+ * In that sense every neural network is a graph. This is done for maximum versatility.
+ * It makes possible the representation of various architectures - committee of machines or parallel networks to be calculated on different GPU devices.
  */
 public class Layer implements Serializable {
 
     private static final long serialVersionUID = 1035633207383317489L;
 
+    /**
+     * Number of neurons in the layer
+     */
     private int neuronCount;
+
+    /**
+     * Default connection calculator for this layer. TODO: because of the various ways (for example during training or test time) a layer is calculated it would be better to move this somewhere else.
+     */
     private ConnectionCalculator connectionCalculator;
+
+    /**
+     * Set of links to other layers
+     */
     private Set<Connections> connections;
     
     public Layer() {

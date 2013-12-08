@@ -11,20 +11,34 @@ import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSumByRows;
 
 /**
- * base function for backpropagation training
- * the derivative has to be added separately
- *
+ * Aparapi Backpropagation base weighted sum
+ * Supports learning rage, momentum and weight decay
  */
 public class AparapiBackpropagationBaseByRows extends AparapiWeightedSumByRows {
 
     private static final long serialVersionUID = -5101971690861270462L;
 
+    /**
+     * Activation of the output layer from the feedforward phase
+     */
     protected float[] outputActivation;
+
+    /**
+     * Weight updates array
+     */
     protected float[] weightUpdates;
+
+    /**
+     * Stored weight updates for reuse
+     */
     protected Map<Layer, float[]> storedWeightUpdates = new HashMap<>();
     protected float learningRate;
     protected float momentum;
     protected float weightDecay;
+
+    /**
+     * activations from the feedforward phase
+     */
     protected Map<Layer, Matrix> activations;
 
     @Override

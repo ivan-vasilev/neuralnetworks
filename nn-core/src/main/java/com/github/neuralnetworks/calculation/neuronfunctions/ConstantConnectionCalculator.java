@@ -8,6 +8,9 @@ import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.util.Util;
 
+/**
+ * Basic connection calculator that populates the output with a constant (for bias layers)
+ */
 public class ConstantConnectionCalculator implements ConnectionCalculator {
 
     private static final long serialVersionUID = -512468674234271624L;

@@ -5,7 +5,7 @@ import java.util.Set;
 import com.github.neuralnetworks.util.UniqueList;
 
 /**
- * this abstract class serves as a base for all weight matrices
+ * Base implementation of Connections
  */
 public abstract class ConnectionsImpl implements Connections, Comparable<ConnectionsImpl> {
 

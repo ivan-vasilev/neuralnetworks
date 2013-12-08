@@ -9,6 +9,10 @@ import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.types.RBM;
 
+/**
+ * Implementation of LayerCalculatorImpl for RBMs
+ * Contains some helper methods like calculateVisibleLayer and calculateHiddenLayer and also takes gibbs sampling into account
+ */
 public class RBMLayerCalculator extends LayerCalculatorImpl {
 
     private static final long serialVersionUID = -7524966192939615856L;
@@ -25,6 +29,10 @@ public class RBMLayerCalculator extends LayerCalculatorImpl {
 	results = new HashMap<>();
     }
 
+    /* (non-Javadoc)
+     * @see com.github.neuralnetworks.calculation.LayerCalculatorImpl#calculate(java.util.Set, java.util.Map, com.github.neuralnetworks.architecture.Layer)
+     * takes into account the gibbs sampling - if the target "layer" is the input layer then the hidden layer is calculated first and then the visible
+     */
     @Override
     public void calculate(Set<Layer> calculatedLayers, Map<Layer, Matrix> results, Layer layer) {
 	Layer visibleLayer = rbm.getVisibleLayer();

@@ -1,7 +1,8 @@
 package com.github.neuralnetworks.architecture;
 
 /**
- * default interface for connections between the layers
+ * Default interface for connections between the layers
+ * Each Connection is also a NeuralNetwork of itself
  */
 public interface Connections extends NeuralNetwork {
 }

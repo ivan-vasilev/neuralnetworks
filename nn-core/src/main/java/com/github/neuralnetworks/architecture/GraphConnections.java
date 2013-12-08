@@ -1,9 +1,8 @@
 package com.github.neuralnetworks.architecture;
 
 /**
- * the classes that implement this interface need to be able to return either
+ * Classes that implement this interface need to be able to return either
  * inbound or outbound connections to the neuron
- * 
  */
 public interface GraphConnections extends Connections {
 

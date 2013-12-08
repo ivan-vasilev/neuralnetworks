@@ -1,11 +1,10 @@
-package com.github.neuralnetworks.training;
+package com.github.neuralnetworks.input;
 
 import com.github.neuralnetworks.architecture.Matrix;
+import com.github.neuralnetworks.training.TrainingInputData;
 
 /**
- * 
- * this combines input and output data into the input value
- * 
+ * Combines input and output data into the input value
  */
 public class IOCombinedTrainingInputData implements TrainingInputData {
 

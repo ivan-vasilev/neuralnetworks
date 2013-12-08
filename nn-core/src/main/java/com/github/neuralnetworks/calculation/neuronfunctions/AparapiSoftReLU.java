@@ -3,7 +3,7 @@ package com.github.neuralnetworks.calculation.neuronfunctions;
 import com.github.neuralnetworks.calculation.ConnectionCalculatorImpl;
 
 /**
- * Soft Rectified linear unit activation function
+ * Soft Rectified linear unit
  */
 public class AparapiSoftReLU extends ConnectionCalculatorImpl {
 

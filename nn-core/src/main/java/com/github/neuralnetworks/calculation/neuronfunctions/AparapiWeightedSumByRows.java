@@ -6,6 +6,9 @@ import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 
+/**
+ * Weighted sum by rows (it is used in the feedforward case)
+ */
 public class AparapiWeightedSumByRows extends AparapiBaseFunction {
 
     private static final long serialVersionUID = 8288998425211708411L;
@@ -14,10 +17,13 @@ public class AparapiWeightedSumByRows extends AparapiBaseFunction {
     public void run() {
 	int id = getGlobalId();
 
+	// each input example
 	for (int i = 0; i < inputOutputColumns; i++) {
 	    before(id, i);
 
+	    // each connection (of the combined connections)
 	    for (int k = 0; k < series; k++) {
+		// each element in the row
 		for (int j = 0; j < weightsColumns[0]; j++) {
 		    output[outputIndex(id, i, k)] += input[inputIndex(j, i, k)] * weights[weightIndex(id, j, k)];
 		}
@@ -45,15 +51,15 @@ public class AparapiWeightedSumByRows extends AparapiBaseFunction {
     }
 
     /**
-     * @param row
-     *            , column - index within the output array
+     * Executed before the sum
+     * @param row, column - index within the output array
      */
     protected void before(int row, int column) {
     }
 
     /**
-     * @param row
-     *            , column - index within the output array
+     * Executed after the sum
+     * @param row, column - index within the output array
      */
     protected void after(int row, int column) {
     }

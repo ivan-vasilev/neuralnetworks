@@ -7,15 +7,18 @@ import com.github.neuralnetworks.calculation.LayerCalculatorImpl;
 import com.github.neuralnetworks.calculation.OutputError;
 import com.github.neuralnetworks.calculation.RBMLayerCalculator;
 import com.github.neuralnetworks.calculation.SupervisedRBMLayerCalculator;
-import com.github.neuralnetworks.training.backpropagation.BackPropagationLayerCalculatorImpl;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationAutoencoder;
-import com.github.neuralnetworks.training.backpropagation.BackPropagationTrainer;
+import com.github.neuralnetworks.training.backpropagation.BackPropagationLayerCalculatorImpl;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationSigmoid;
+import com.github.neuralnetworks.training.backpropagation.BackPropagationTrainer;
 import com.github.neuralnetworks.training.rbm.CDAparapiTrainer;
 import com.github.neuralnetworks.training.rbm.PCDAparapiTrainer;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
 
+/**
+ * Factory for trainers
+ */
 public class TrainerFactory {
 
     public static BackPropagationTrainer backPropagationSigmoid(NeuralNetwork nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay) {

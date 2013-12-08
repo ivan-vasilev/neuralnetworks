@@ -17,6 +17,11 @@ import com.github.neuralnetworks.events.PropagationEventListener;
 import com.github.neuralnetworks.util.UniqueList;
 import com.github.neuralnetworks.util.Util;
 
+/**
+ * Default Implementation of the LayerCalculator interface
+ * It takes advantage of the fact that the neural network is a graph with layers as nodes and connections between layers as links of the graph
+ * The results are propagated within the graph
+ */
 public class LayerCalculatorImpl implements LayerCalculator, Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -28,6 +33,29 @@ public class LayerCalculatorImpl implements LayerCalculator, Serializable {
 	calculate(calculatedLayers, new UniqueList<Layer>(), results, layer);
     }
 
+    /**
+     * Calculates single layer based on the network graph
+     * 
+     * For example the feedforward part of the backpropagation algorithm the initial parameters would be:
+     * "currentLayer" will be the output layer of the network
+     * "results" will contain only one entry for the input layer of the network - this is the training example
+     * "calculatedLayers" will contain only one entry - the input layer
+     * "inProgressLayers" will be empty
+     * 
+     * In the backpropagation part the initial parameters would be:
+     * "currentLayer" will be the input layer of the network
+     * "results" will contain only one entry for the output layer of the network - this is the calculated error derivative between the result of the network and the target value
+     * "calculatedLayers" will contain only one entry - the output layer
+     * "inProgressLayers" will be empty
+     * 
+     * This allows for single code to be used for the whole backpropagation, but also for RBMs, autoencoders, etc
+     * 
+     * @param calculatedLayers - layers that are fully calculated - the results for these layers can be used for calculating other parts of the network
+     * @param inProgressLayers - layers which are currently calculated, but are not yet finished - not all connections to the layer are calculated and the result of the propagation through this layer cannot be used for another calculations
+     * @param results - results of the calculations
+     * @param currentLayer - the layer which is currently being calculated.
+     * @return
+     */
     protected boolean calculate(Set<Layer> calculatedLayers, Set<Layer> inProgressLayers, Map<Layer, Matrix> results, Layer currentLayer) {
 	boolean result = false;
 

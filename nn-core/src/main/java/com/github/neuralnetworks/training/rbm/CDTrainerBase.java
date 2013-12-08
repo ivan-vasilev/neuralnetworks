@@ -11,14 +11,34 @@ import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
 
 /**
- * base class for Contrastive Divergence
+ * Base class for Contrastive Divergence
+ * requires RBMLayerCalculator as the layer calculator. This allows for different implementations of the layer calculator, like GPU/CPU for example
  */
 public abstract class CDTrainerBase extends OneStepTrainer<RBM> {
 
+    /**
+     * positive phase visible layer results
+     */
     private Matrix posPhaseVisible;
+
+    /**
+     * negative phase visible layer results
+     */
     private Matrix negPhaseVisible;
+
+    /**
+     * positive phase hidden layer results
+     */
     private Matrix posPhaseHidden;
+
+    /**
+     * negative phase hidden layer results
+     */
     private Matrix negPhaseHidden;
+
+    /**
+     * size of the mini batch
+     */
     private int miniBatchSize;
 
     public CDTrainerBase(Properties properties) {
@@ -42,6 +62,7 @@ public abstract class CDTrainerBase extends OneStepTrainer<RBM> {
 
 	RBMLayerCalculator calculator = (RBMLayerCalculator) getLayerCalculator();
 
+	// calculate hidden layer positive phase
 	calculator.calculateHiddenLayer(posPhaseVisible, posPhaseHidden, getHiddenConnectionCalculator(0));
 
 	triggerEvent(new SamplingStepEvent(this, 0));

@@ -3,6 +3,9 @@ package com.github.neuralnetworks.training.backpropagation;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.util.Properties;
 
+/**
+ * Backpropagation connection calculator for sigmoid layers
+ */
 public class BackPropagationSigmoid extends BackPropagationConnectionCalculator implements OutputErrorDerivative {
 
     private static final long serialVersionUID = 1178188233641224762L;

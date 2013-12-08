@@ -7,10 +7,7 @@ import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 
 /**
- * This event is triggered when a propagation step is finished
- * 
- * @author hok
- * 
+ * Triggered when a propagation step is finished
  */
 public class PropagationEvent extends EventObject {
 

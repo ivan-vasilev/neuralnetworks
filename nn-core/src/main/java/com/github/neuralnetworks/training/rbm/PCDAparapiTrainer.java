@@ -5,9 +5,7 @@ import com.github.neuralnetworks.events.TrainingEventListener;
 import com.github.neuralnetworks.util.Properties;
 
 /**
- * 
  * Persistent Contrastive Divergence
- *
  */
 public class PCDAparapiTrainer extends CDAparapiTrainerBase implements TrainingEventListener {
 
@@ -19,10 +17,12 @@ public class PCDAparapiTrainer extends CDAparapiTrainerBase implements TrainingE
     @Override
     public void handleEvent(TrainingEvent event) {
 	if (event instanceof SamplingStepEvent) {
-	    // if this is the first example
+	    // if this is the first example the results are clamped to the input layer
 	    SamplingStepEvent sse = (SamplingStepEvent) event;
 	    if (sse.getSamplingCount() == 0) {
 		System.arraycopy(getPosPhaseHidden().getElements(), 0, getNegPhaseHidden().getElements(), 0, getNegPhaseHidden().getElements().length);
+
+		// listener is removed
 		removeEventListener(this);
 	    }
 	}

@@ -5,8 +5,10 @@ import java.util.SortedMap;
 import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
-import com.github.neuralnetworks.architecture.OneToOne;
 
+/**
+ * Weighted sum by columns (it is used in the backpropagation case)
+ */
 public class AparapiWeightedSumByColumns extends AparapiBaseFunction {
 
     private static final long serialVersionUID = 8288998425211708411L;
@@ -17,10 +19,14 @@ public class AparapiWeightedSumByColumns extends AparapiBaseFunction {
     public void run() {
 	int id = getGlobalId();
 
+	// each input example
 	for (int i = 0; i < inputOutputColumns; i++) {
 	    before(id, i);
 
+	    // each connection (of the combined connections)
 	    for (int k = 0; k < series; k++) {
+
+		// each element in the column
 		for (int j = 0; j < weightsRows[0]; j++) {
 		    output[outputIndex(id, i, k)] += input[inputIndex(j, i, k)] * weights[weightIndex(j, id, k)];
 		}
@@ -49,7 +55,7 @@ public class AparapiWeightedSumByColumns extends AparapiBaseFunction {
 		throw new IllegalArgumentException("matrices do not match");
 	    }
 
-	    weightsRows[i++] = graph instanceof OneToOne ? 1 : cg.getRows();
+	    weightsRows[i++] = cg.getRows();
 	}
     }
 

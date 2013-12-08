@@ -2,6 +2,9 @@ package com.github.neuralnetworks.calculation.neuronfunctions;
 
 import com.github.neuralnetworks.architecture.Matrix;
 
+/**
+ * Threshold binary activation function
+ */
 public class ThresholdFunction implements ActivationFunction {
 
     private float threshold;

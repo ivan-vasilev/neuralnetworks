@@ -31,5 +31,8 @@ public abstract class OneStepTrainer<N extends NeuralNetwork> extends Trainer<N>
 	triggerEvent(new TrainingFinishedEvent(this));
     }
 
+    /**
+     * Learning of one batch of examples
+     */
     protected abstract void learnInput(TrainingInputData data);
 }

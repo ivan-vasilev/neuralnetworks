@@ -2,17 +2,19 @@ package com.github.neuralnetworks.architecture.types;
 
 import java.util.List;
 
-import com.github.neuralnetworks.architecture.DeepNeuralNetwork;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.util.UniqueList;
 
 /**
- * Deep neural network
+ * Default implementation of the DeepNeuralNetwork interface
  */
 public class DNN extends NeuralNetworkImpl implements DeepNeuralNetwork {
 
+    /**
+     * List of networks in the network
+     */
     private List<NeuralNetwork> neuralNetworks;
 
     public DNN() {
@@ -25,6 +27,10 @@ public class DNN extends NeuralNetworkImpl implements DeepNeuralNetwork {
 	return neuralNetworks;
     }
 
+    /**
+     * When a new network is added all it's layers are also added to the deep network
+     * @param nn
+     */
     protected void addNeuralNetwork(NeuralNetwork nn) {
 	neuralNetworks.add(nn);
 	if (nn.getLayers() != null) {
@@ -34,6 +40,10 @@ public class DNN extends NeuralNetworkImpl implements DeepNeuralNetwork {
 	}
     }
 
+    /* (non-Javadoc)
+     * @see com.github.neuralnetworks.architecture.NeuralNetwork#getOutputLayer()
+     * The output layer is the output layer of the last "child" network
+     */
     @Override
     public Layer getOutputLayer() {
 	NeuralNetwork nn = getLastNeuralNetwork();
@@ -44,6 +54,10 @@ public class DNN extends NeuralNetworkImpl implements DeepNeuralNetwork {
 	return null;
     }
 
+    /* (non-Javadoc)
+     * @see com.github.neuralnetworks.architecture.NeuralNetwork#getDataOutputLayer()
+     * The data output layer is the data output layer of the last "child" network
+     */
     @Override
     public Layer getDataOutputLayer() {
 	NeuralNetwork nn = getLastNeuralNetwork();

@@ -21,13 +21,18 @@ import com.github.neuralnetworks.util.UniqueList;
 import com.github.neuralnetworks.util.Util;
 
 /**
- * 
- * base class for training (used for both supervised and unsupervised learning)
- * 
+ * Base class for training (used for both supervised and unsupervised learning)
  */
 public abstract class Trainer<N extends NeuralNetwork> {
 
+    /**
+     * Properties for the training (for example learnig rate, weight decay etc)
+     */
     protected Properties properties;
+
+    /**
+     * Training event listeners
+     */
     protected List<TrainingEventListener> listeners;
 
     public Trainer() {
@@ -39,10 +44,16 @@ public abstract class Trainer<N extends NeuralNetwork> {
 	this.properties = properties;
     }
 
+    /**
+     * Default empty implementation of the training procedure
+     */
     public void train() {
 	initializeWithRandom();
     };
 
+    /**
+     * The network is tested via the testing input provider and the training error is aggregated for each example.
+     */
     public float test() {
 	TrainingInputProvider ip = getTestingInputProvider();
 	OutputError e = getOutputError();
@@ -151,6 +162,9 @@ public abstract class Trainer<N extends NeuralNetwork> {
 	return index >= getTestingInputProvider().getInputSize();
     }
 
+    /**
+     * Random initialization of weights
+     */
     protected void initializeWithRandom() {
 	if (properties.containsKey(Constants.RANDOM_INITIALIZER)) {
 	    N nn = getNeuralNetwork();

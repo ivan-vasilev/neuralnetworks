@@ -3,9 +3,7 @@ package com.github.neuralnetworks.calculation;
 import com.github.neuralnetworks.architecture.Matrix;
 
 /**
- * 
- * interface for calculating output error
- * 
+ * Implementations should calculate the output error, which will be presented as the result of the training. This is not the same as the output error derivative in BP.
  */
 public interface OutputError {
     public void addItem(Matrix networkOutput, Matrix targetOutput);

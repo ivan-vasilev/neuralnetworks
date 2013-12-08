@@ -6,13 +6,15 @@ import java.util.List;
 import com.github.neuralnetworks.architecture.Matrix;
 
 /**
- * 
- * Class for converting input values to matrices
- * 
+ * Converts input values to matrices
  */
 public abstract class InputConverter {
 
+    /**
+     * List of modifiers to apply on the input data after the conversion
+     */
     private List<InputModifier> modifiers;
+
     protected Matrix convertedInput;
 
     public Matrix getConvertedInput(Object[] input) {

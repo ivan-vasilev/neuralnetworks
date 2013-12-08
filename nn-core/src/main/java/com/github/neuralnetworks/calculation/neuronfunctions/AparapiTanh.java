@@ -2,6 +2,9 @@ package com.github.neuralnetworks.calculation.neuronfunctions;
 
 import com.github.neuralnetworks.calculation.ConnectionCalculatorImpl;
 
+/**
+ * Tanh activation function
+ */
 public class AparapiTanh extends ConnectionCalculatorImpl {
 
     private static final long serialVersionUID = 5869298546838843306L;

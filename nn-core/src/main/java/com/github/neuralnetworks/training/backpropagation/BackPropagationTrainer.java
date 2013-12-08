@@ -14,6 +14,13 @@ import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
 import com.github.neuralnetworks.util.UniqueList;
 
+/**
+ * Base backpropagation one step trainer
+ * It has two additional parameters:
+ * LayerCalculator for the feedforward phase
+ * BackPropagationLayerCalculator for the backpropagation phase
+ * This allows for various implementations of these calculators to be used (for example via GPU or other)
+ */
 public class BackPropagationTrainer extends OneStepTrainer<NeuralNetwork> {
 
     private Map<Layer, Matrix> activations;
@@ -30,6 +37,11 @@ public class BackPropagationTrainer extends OneStepTrainer<NeuralNetwork> {
 	backpropagation = new HashMap<Layer, Matrix>();
     }
 
+    /* (non-Javadoc)
+     * @see com.github.neuralnetworks.training.OneStepTrainer#learnInput(com.github.neuralnetworks.training.TrainingInputData)
+     * The training example is propagated forward through the network (via the LayerCalculator lc) and the results are stored.
+     * After that the error is backpropagated (via BackPropagationLayerCalculator blc).
+     */
     @Override
     protected void learnInput(TrainingInputData data) {
 	NeuralNetwork nn = getNeuralNetwork();

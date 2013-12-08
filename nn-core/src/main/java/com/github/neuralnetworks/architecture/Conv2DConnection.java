@@ -10,6 +10,9 @@ import com.github.neuralnetworks.util.UniqueList;
  */
 public class Conv2DConnection extends ConnectionsImpl {
 
+    /**
+     * The list of filters to be used in the connection
+     */
     protected List<Matrix> filters;
     
     public Conv2DConnection(ConvGridLayer inputLayer) {
@@ -28,6 +31,10 @@ public class Conv2DConnection extends ConnectionsImpl {
 	this.filters = filters;
     }
 
+    /**
+     * Add new filter to the connection. This also means that the neuron count in the output layer has to be updated
+     * @param filter
+     */
     public void addFilter(Matrix filter) {
 	if (filters == null) {
 	    filters = new UniqueList<>();
@@ -35,7 +42,7 @@ public class Conv2DConnection extends ConnectionsImpl {
 
 	for (Matrix m : filters) {
 	    if (filter.getColumns() != m.getColumns() || filter.getRows() != m.getRows()) {
-		throw new IllegalArgumentException();
+		throw new IllegalArgumentException("All filters must have the same dimensions");
 	    }
 	}
 
@@ -48,11 +55,19 @@ public class Conv2DConnection extends ConnectionsImpl {
 	outputLayer.setFilters(filters.size());
     }
 
-    public void removeFeatureMap(Matrix featureMap) {
-	if (filters != null) {
-	    filters.remove(featureMap);
-	    ConvGridLayer l = (ConvGridLayer) getOutputLayer();
-	    l.setFilters(filters.size());
+    /**
+     * Remove filter from the connection. This also means that the neuron count in the output layer has to be updated
+     * @param filter
+     */
+    public void removeFeatureMap(Matrix filter) {
+	if (filters != null && filters.contains(filter)) {
+	    filters.remove(filter);
+	    ConvGridLayer inputLayer = (ConvGridLayer) getInputLayer();
+	    ConvGridLayer outputLayer = (ConvGridLayer) getOutputLayer();
+	    outputLayer.setColumns(inputLayer.getColumns() - inputLayer.getColumns() % filter.getColumns());
+	    outputLayer.setRows(inputLayer.getRows() - inputLayer.getRows() % filter.getRows());
+
+	    outputLayer.setFilters(filters.size());
 	}
     }
 }

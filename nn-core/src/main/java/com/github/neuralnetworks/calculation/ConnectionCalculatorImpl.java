@@ -15,16 +15,34 @@ import com.github.neuralnetworks.calculation.neuronfunctions.ConstantConnectionC
 import com.github.neuralnetworks.util.UniqueList;
 
 /**
+ * Default implementation for Connection calculator
+ * Each inbound connection is calculated separately and the results are combined in the "output" matrix
+ * Biases are also added
+ * After all the input functions are calculated there is a list of activation functions that can be applied to the result
+ * This class differs from LayerCalculatorImpl in the fact that LayerCalculatorImpl traverses the graph of layers, where ConnectionCalculatorImpl only deals with the connections passed as parameter
  * 
- * default implementation for Connection calculator
- *
+ * !!! Important !!!
+ * The results of the calculations are represented as matrices (Matrix).
+ * This is done, because it is assumed that implementations will provide a way for calculating many input results at once.
+ * Each column of the matrix represents a single input. For example if the network is trained to classify MNIST images, each column of the input matrix will represent single MNIST image.
  */
 public class ConnectionCalculatorImpl implements ConnectionCalculator {
 
     private static final long serialVersionUID = -5405654469496055017L;
 
+    /**
+     * ConnectionCalculator when the targetLayer is the input layer in the list of connections
+     */
     protected ConnectionCalculator forwardInputFunction;
+
+    /**
+     * ConnectionCalculator when the targetLayer is the output layer in the list of connections
+     */
     protected ConnectionCalculator backwardInputFunction;
+
+    /**
+     * Activation functions
+     */
     protected List<ActivationFunction> activationFunctions;
 
     public ConnectionCalculatorImpl(ConnectionCalculator forwardInputFunction, ConnectionCalculator backwardInputFunction) {

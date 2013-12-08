@@ -1,9 +1,7 @@
 package com.github.neuralnetworks.training;
 
 /**
- * 
- * input provider for training data
- * 
+ * Input provider for training data
  */
 public interface TrainingInputProvider {
     public TrainingInputData getNextInput();

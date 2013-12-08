@@ -7,14 +7,15 @@ import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 
 /**
- * 
- * the implementations of this interface provide a way of propagating results
+ * The implementations of this interface provide a way of propagating results
  * from one layer to the next
- * 
  */
 public interface LayerCalculator {
 
     /**
+     * This method receives a target layer to calculate, a list of calculated layer results and a list of layers that have already been calculated.
+     * This information is enough for the target layer can be calculated
+     * 
      * @param calculatedLayers
      *            - existing results
      * @param layer

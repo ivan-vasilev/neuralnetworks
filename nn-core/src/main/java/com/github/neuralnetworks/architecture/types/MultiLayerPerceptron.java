@@ -6,7 +6,7 @@ import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.calculation.neuronfunctions.ConstantConnectionCalculator;
 
 /**
- * a Multi Layer perceptron network
+ * Multi Layer Perceptron network
  */
 public class MultiLayerPerceptron extends NeuralNetworkImpl {
 

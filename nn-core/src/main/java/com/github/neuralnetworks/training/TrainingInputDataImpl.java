@@ -4,15 +4,21 @@ import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.input.InputConverter;
 
 /**
- * 
- * training input data with target value
- * 
+ * Training input data with target value default implementation
  */
 public class TrainingInputDataImpl implements TrainingInputData {
 
     private Object[] realInput;
     private Object[] realTarget;
+
+    /**
+     * Converting input to Matrix
+     */
     private InputConverter inputConverter;
+
+    /**
+     * Converting target to Matrix
+     */
     private InputConverter targetConverter;
 
     public TrainingInputDataImpl() {

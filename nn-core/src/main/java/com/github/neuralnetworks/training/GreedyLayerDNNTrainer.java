@@ -5,10 +5,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import com.github.neuralnetworks.architecture.DeepNeuralNetwork;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
+import com.github.neuralnetworks.architecture.types.DeepNeuralNetwork;
 import com.github.neuralnetworks.calculation.LayerCalculator;
 import com.github.neuralnetworks.events.TrainingEvent;
 import com.github.neuralnetworks.util.Constants;
@@ -23,6 +23,10 @@ public class GreedyLayerDNNTrainer extends Trainer<DeepNeuralNetwork> {
 	super(properties);
     }
 
+    /* (non-Javadoc)
+     * @see com.github.neuralnetworks.training.Trainer#train()
+     * Child netwokrs are trained in sequential order. Each network has it's own Trainer.
+     */
     @Override
     public void train() {
 	TrainingInputProvider inputProvider = getTrainingInputProvider();
@@ -45,6 +49,11 @@ public class GreedyLayerDNNTrainer extends Trainer<DeepNeuralNetwork> {
 	return properties.getParameter(Constants.DEEP_TRAINERS);
     }
 
+    /**
+     * Wrapper object for the input data.
+     * The "real" input is propagated through the deep network until the current child network is reached.
+     * This result is returned from the wrapper as an input for the child network
+     */
     private static class DeepTrainingInputData implements TrainingInputData {
 
 	private DeepNeuralNetwork dnn;
@@ -94,7 +103,7 @@ public class GreedyLayerDNNTrainer extends Trainer<DeepNeuralNetwork> {
     }
 
     /**
-     * this event is triggered when a training sample is finished
+     * Triggered when a training sample is finished
      */
     public static class SampleFromLayerFinished extends SampleFinishedEvent {
 
@@ -109,7 +118,7 @@ public class GreedyLayerDNNTrainer extends Trainer<DeepNeuralNetwork> {
     }
 
     /**
-     * this event is triggered when a nested neural network has finished training
+     * Triggered when a nested neural network has finished training
      */
     public static class LayerTrainingFinished extends TrainingEvent {
 

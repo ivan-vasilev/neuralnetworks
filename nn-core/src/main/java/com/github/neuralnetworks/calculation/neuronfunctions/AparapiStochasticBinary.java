@@ -9,6 +9,9 @@ import com.github.neuralnetworks.calculation.ConnectionCalculatorImpl;
 import com.github.neuralnetworks.training.MersenneTwisterRandomInitializer;
 import com.github.neuralnetworks.training.RandomInitializer;
 
+/**
+ * Stochastic binary activation function (for RBMs for example)
+ */
 public class AparapiStochasticBinary extends ConnectionCalculatorImpl {
 
     private static final long serialVersionUID = 5869298546838843306L;
@@ -21,7 +24,14 @@ public class AparapiStochasticBinary extends ConnectionCalculatorImpl {
 
 	private static final long serialVersionUID = -9125510037725731152L;
 
+	/**
+	 * random values for the stochastic activation of neurons
+	 */
 	private float[] random;
+
+	/**
+	 * random initializer
+	 */
 	private RandomInitializer randomInitializer;
 
 	public AparapiStochasticBinaryByRows() {
@@ -29,6 +39,10 @@ public class AparapiStochasticBinary extends ConnectionCalculatorImpl {
 	    randomInitializer = new MersenneTwisterRandomInitializer();
 	}
 
+	/* (non-Javadoc)
+	 * @see com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSumByRows#init(java.util.SortedMap, com.github.neuralnetworks.architecture.Matrix, com.github.neuralnetworks.architecture.Layer)
+	 * Unfortunately there isn't yet random implementation that works for Aparapi, so this step is done sequential
+	 */
 	@Override
 	protected void init(SortedMap<GraphConnections, Matrix> input, Matrix outputMatrix, Layer targetLayer) {
 	    super.init(input, outputMatrix, targetLayer);
@@ -53,7 +67,14 @@ public class AparapiStochasticBinary extends ConnectionCalculatorImpl {
 
 	private static final long serialVersionUID = -9125510037725731152L;
 
+	/**
+	 * random values for the stochastic activation of neurons
+	 */
 	private float[] random;
+
+	/**
+	 * random initializer
+	 */
 	private RandomInitializer randomInitializer;
 
 	public AparapiStochasticBinaryByColumns() {
@@ -61,6 +82,10 @@ public class AparapiStochasticBinary extends ConnectionCalculatorImpl {
 	    randomInitializer = new MersenneTwisterRandomInitializer();
 	}
 
+	/* (non-Javadoc)
+	 * @see com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSumByRows#init(java.util.SortedMap, com.github.neuralnetworks.architecture.Matrix, com.github.neuralnetworks.architecture.Layer)
+	 * Unfortunately there isn't yet random implementation that works for Aparapi, so this step is done sequential
+	 */
 	@Override
 	protected void init(SortedMap<GraphConnections, Matrix> input, Matrix outputMatrix, Layer targetLayer) {
 	    super.init(input, outputMatrix, targetLayer);

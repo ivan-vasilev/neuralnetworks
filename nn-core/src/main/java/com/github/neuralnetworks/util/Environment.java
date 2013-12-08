@@ -3,14 +3,20 @@ package com.github.neuralnetworks.util;
 import com.amd.aparapi.Kernel.EXECUTION_MODE;
 
 /**
- * 
- * Singleton for execution mode (can be used for debugging)
- *
+ * Singleton for environment variables (can be used for debugging)
  */
 public class Environment {
 
     private static Environment singleton = new Environment();
+
+    /**
+     * Determnines whether the code will be executed on the GPU or the CPU
+     */
     private EXECUTION_MODE executionMode;
+
+    /**
+     * is debug
+     */
     private boolean debug;
 
     private Environment() {

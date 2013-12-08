@@ -5,8 +5,8 @@ import java.util.Set;
 /**
  * this interface is implemented by everything that wants to present itself as a
  * black box with with a list of input/output layers for example these could be
- * whole neural network taking part in committee of machines or single
- * convolutional layers
+ * whole neural network taking part in committee of machines, single
+ * convolutional/subsamplingo layers or even a single connection between the layers
  */
 public interface NeuralNetwork {
 
@@ -21,7 +21,7 @@ public interface NeuralNetwork {
     public Layer getOutputLayer();
 
     /**
-     * @return the output layer for the rest of the world - this and the previous methods may return different results (in case of RBMs for example)
+     * @return the output layer for the rest of the world - this and the previous methods may return different results (in case of Autoencoders for example)
      */
     public Layer getDataOutputLayer();
 

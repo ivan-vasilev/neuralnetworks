@@ -18,8 +18,6 @@ import com.github.neuralnetworks.util.Util;
 
 /**
  * 
- * implementations of this class
- * 
  */
 public class Sampler {
 

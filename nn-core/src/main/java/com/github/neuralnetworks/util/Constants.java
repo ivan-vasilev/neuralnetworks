@@ -1,10 +1,7 @@
 package com.github.neuralnetworks.util;
 
 /**
- * this class contains various constants
- * 
- * @author hok
- * 
+ * Contains various constants
  */
 public class Constants {
     public static final String FORWARD_INPUT_FUNCTION = "forwardInputFunction";

@@ -8,6 +8,10 @@ import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.types.SupervisedRBM;
 import com.github.neuralnetworks.util.Util;
 
+/**
+ * LayerCalculator for SupervisedRBMs. Work-in-progress
+ *
+ */
 public class SupervisedRBMLayerCalculator extends RBMLayerCalculator {
 
     private static final long serialVersionUID = -8397884896433147900L;

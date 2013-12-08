@@ -3,10 +3,8 @@ package com.github.neuralnetworks.architecture;
 import java.io.Serializable;
 
 /**
- * 
- * this is a graph representation based on a one dimensional array (in order to
- * facilitate gpu computations)
- * 
+ * Simple matrix representation with one-dimensional array.
+ * This is required, because Aparapi supports only one-dim arrays (otherwise the execution is transferred to the cpu)
  */
 public class Matrix implements Serializable {
 

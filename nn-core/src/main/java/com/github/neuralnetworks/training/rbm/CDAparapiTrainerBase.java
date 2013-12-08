@@ -8,10 +8,25 @@ import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.Properties;
 
+/**
+ * Base class for Aparapi Contrastive Divergence
+ * Supports learning rate, momentum and weight decay
+ */
 public abstract class CDAparapiTrainerBase extends CDTrainerBase {
 
+    /**
+     * weights update kernel for the connections between the visible and the hidden layer
+     */
     private CDWeightUpdatesKernel weightUpdatesKernel;
+
+    /**
+     * weights update kernel for visible bias connections
+     */
     private CDBiasUpdatesKernel visibleBiasUpdatesKernel;
+
+    /**
+     * weights update kernel for the hidden bias connections
+     */
     private CDBiasUpdatesKernel hiddenBiasUpdatesKernel;
 
     public CDAparapiTrainerBase(Properties properties) {
@@ -19,6 +34,10 @@ public abstract class CDAparapiTrainerBase extends CDTrainerBase {
 	init();
     }
 
+    /* (non-Javadoc)
+     * @see com.github.neuralnetworks.training.rbm.CDTrainerBase#updateWeights(com.github.neuralnetworks.architecture.Matrix, com.github.neuralnetworks.architecture.Matrix, com.github.neuralnetworks.architecture.Matrix, com.github.neuralnetworks.architecture.Matrix)
+     * before each update the kernel update parameters are refreshed
+     */
     @Override
     protected void updateWeights(Matrix posPhaseVisible, Matrix posPhaseHidden, Matrix negPhaseVisible, Matrix negPhaseHidden) {
 	RBM rbm = getNeuralNetwork();

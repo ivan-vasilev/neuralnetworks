@@ -2,6 +2,9 @@ package com.github.neuralnetworks.training.rbm;
 
 import com.amd.aparapi.Kernel;
 
+/**
+ * Aparapi weight udpates for the connections between the hidden and the visible layers
+ */
 public class CDWeightUpdatesKernel extends Kernel {
 
     private float[] posPhaseHidden;

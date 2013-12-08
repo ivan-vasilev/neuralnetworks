@@ -11,6 +11,12 @@ public class DBN extends DNN {
 	super();
     }
 
+    /**
+     * For each added layer a new RBM is created with visible layer - the hidden layer of the previous network and hidden layer - the new layer
+     * @param layer
+     * @param addBias
+     * @return this
+     */
     public DBN addLayer(Layer layer, boolean addBias) {
 	Layer currentOutputLayer = getOutputLayer();
 	if (addLayer(layer) && getLayers().size() > 1) {

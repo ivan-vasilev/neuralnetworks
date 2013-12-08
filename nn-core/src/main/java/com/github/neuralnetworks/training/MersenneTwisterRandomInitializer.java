@@ -3,9 +3,7 @@ package com.github.neuralnetworks.training;
 import org.uncommons.maths.random.MersenneTwisterRNG;
 
 /**
- * 
  * Mersenne twister random initializer
- * 
  */
 public class MersenneTwisterRandomInitializer extends RandomInitializerImpl {
 

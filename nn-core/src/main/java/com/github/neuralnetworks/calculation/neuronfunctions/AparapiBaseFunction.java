@@ -10,30 +10,88 @@ import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
-import com.github.neuralnetworks.architecture.OneToOne;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.util.Environment;
 
 /**
- * Base Aparapi connection calculator for weighted sum functions (matrix multiplication). In order to work Aparapi has to use only one-dimensional arrays with simple data types and can only call member methods of the Kernel class itself.
- * Aparapi also requires to use only float (or int) data types
+ * Base Aparapi connection calculator for weighted sum functions (matrix multiplication).
+ * If there are multiple inbound connections they are combined in a "single" connection and are calculated simultaneously
+ * 
+ * !!! IMPORTANT !!!
+ * Aparapi only works one-dimensional arrays of primitive data types can only call member methods of the Kernel class itself.
+ * 
+ * Because of this limitations all the data that is contained in the input connections, weight matrices, input values etc is converted into one-dimensional member arrays of this class
+ * 
+ * This implementation assumes that
  */
 
 public abstract class AparapiBaseFunction extends Kernel implements ConnectionCalculator {
 
     private static final long serialVersionUID = -8435155322138790083L;
 
+    /**
+     * Number of input exmaples that will be calculated simultaneously
+     */
     protected int inputOutputColumns;
+
+    /**
+     * Number of input connections that will be "combined" for simultaneous calculation
+     */
     protected int series;
+
+    /**
+     * input values
+     */
     protected float[] input;
+
+    /**
+     * this is the weight matrix
+     */
     protected float[] weights;
+
+    /**
+     * output values
+     */
     protected float[] output;
+
+    /**
+     * This is combined with the "weights" to represent the weight matrix (the Matrix class itself cannot be used because of the Aparapi limitations).
+     * It is an array, because of the combined connections
+     */
     protected int[] weightsColumns;
+
+    /**
+     * This is combined with the other properties to represent the FullyConnected connection (the FullyConnected class itself cannot be used because of the Aparapi limitations)
+     * It is an array, because of the combined connections
+     */
     protected int[] inputStartIndexes;
+
+    /**
+     * This is combined with the other properties to represent the FullyConnected connection (the FullyConnected class itself cannot be used because of the Aparapi limitations)
+     * It is an array, because of the combined connections
+     */
     protected int[] outputStartIndexes;
+
+    /**
+     * This is combined with the other properties to represent the FullyConnected connection (the FullyConnected class itself cannot be used because of the Aparapi limitations)
+     * It is an array, because of the combined connections
+     */
     protected int[] inputStartPositions;
+
+    /**
+     * This is combined with the other properties to represent the FullyConnected connection (the FullyConnected class itself cannot be used because of the Aparapi limitations)
+     * It is an array, because of the combined connections
+     */
     protected int[] weightStartPositions;
+
+    /**
+     * helper map to reuse existing arrays for inputs
+     */
     protected Map<Integer, float[]> storedInputs = new HashMap<>();
+
+    /**
+     * helper map to reuse existing arrays for outputs
+     */
     protected Map<Integer, float[]> storedWeights = new HashMap<>();
 
     @SuppressWarnings("unchecked")
@@ -41,10 +99,14 @@ public abstract class AparapiBaseFunction extends Kernel implements ConnectionCa
     public void calculate(SortedMap<Connections, Matrix> input, Matrix outputMatrix, Layer targetLayer) {
 	if (input.size() > 0) {
 	    init((SortedMap<GraphConnections, Matrix>) ((SortedMap<?, ?>) input), outputMatrix, targetLayer);
+	    
 	    execute(outputMatrix.getRows());
 	}
     }
 
+    /**
+     * Combines all the inputConnections and initializes all the arrays based on the connections
+     */
     protected void init(SortedMap<GraphConnections, Matrix> inputConnections, Matrix outputMatrix, Layer targetLayer) {
 	Iterator<Matrix> it = inputConnections.values().iterator();
 	this.inputOutputColumns = it.next().getColumns();
@@ -65,18 +127,16 @@ public abstract class AparapiBaseFunction extends Kernel implements ConnectionCa
 
 	int totalInputSize = 0, totalWeightSize = 0, i = 0;
 	for (java.util.Map.Entry<GraphConnections, Matrix> e : inputConnections.entrySet()) {
-	    if (!(e.getKey() instanceof OneToOne)) {
-		if (e.getKey().getInputLayer() == targetLayer) {
-		    hasInput = true;
-		}
-		
-		if (e.getKey().getOutputLayer() == targetLayer) {
-		    hasOutput = true;
-		}
-		
-		if (hasInput && hasOutput) {
-		    throw new IllegalArgumentException("Functions must only be for input or output layer, but not both");
-		}
+	    if (e.getKey().getInputLayer() == targetLayer) {
+		hasInput = true;
+	    }
+
+	    if (e.getKey().getOutputLayer() == targetLayer) {
+		hasOutput = true;
+	    }
+
+	    if (hasInput && hasOutput) {
+		throw new IllegalArgumentException("Functions must only be for input or output layer, but not both");
 	    }
 
 	    inputStartPositions[i] = totalInputSize;
@@ -119,18 +179,30 @@ public abstract class AparapiBaseFunction extends Kernel implements ConnectionCa
 	setExecutionMode(Environment.getInstance().getExecutionMode());
     };
 
+    /**
+     * helper method for retrieving weight value based on row, column and series
+     */
     protected int weightIndex(int row, int column, int series) {
 	return weightStartPositions[series] + row * weightsColumns[series] + column;
     }
 
+    /**
+     * helper method for retrieving input value based on row, column and series
+     */
     protected int inputIndex(int row, int column, int series) {
 	return inputStartPositions[series] + (inputStartIndexes[series] + row) * inputOutputColumns + column;
     }
 
+    /**
+     * helper method for retrieving output value based on row, column and series
+     */
     protected int outputIndex(int row, int column, int series) {
 	return (outputStartIndexes[series] + row) * inputOutputColumns + column;
     }
 
+    /**
+     * helper method for retrieving weight value based on row and column
+     */
     protected int outputBaseIndex(int row, int column) {
 	return row * inputOutputColumns + column;
     }
