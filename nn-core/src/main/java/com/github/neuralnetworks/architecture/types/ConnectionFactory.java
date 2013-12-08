@@ -7,9 +7,9 @@ import com.github.neuralnetworks.architecture.Subsampling2DConnection;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiAveragePooling2D;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2DSigmoid;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2DSoftReLU;
+import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2DTanh;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiMaxPooling2D;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiStochasticPooling2D;
-import com.github.neuralnetworks.calculation.neuronfunctions.AparapiTanh;
 
 /**
  * Factory for connections
@@ -40,7 +40,7 @@ public class ConnectionFactory {
 
     public static Conv2DConnection convTanhConnection(ConvGridLayer inputLayer, int featureMapRows, int featureMapColumns, int featureMaps) {
 	Conv2DConnection result = convConnection(inputLayer, featureMapRows, featureMapColumns, featureMaps);
-	result.getOutputLayer().setConnectionCalculator(new AparapiTanh());
+	result.getOutputLayer().setConnectionCalculator(new AparapiConv2DTanh());
 	return result;
     }
     

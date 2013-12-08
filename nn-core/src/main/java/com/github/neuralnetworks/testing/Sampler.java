@@ -17,7 +17,7 @@ import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.Util;
 
 /**
- * 
+ * Executes training and testing for e collection of trainers and writes the results in a file
  */
 public class Sampler {
 
