@@ -84,3 +84,6 @@ All the trainers are using the Trainer base class. The implementations are optim
 
 Contrastive Divergence and Deep training has been implemented following the guidelines in 
 http://www.iro.umontreal.ca/~lisa/publications2/index.php/publications/show/239 and http://www.cs.toronto.edu/~hinton/absps/guideTR.pdf.
+
+###Input data
+Input is provided to the neural network by the trainers via TrainingInputProvider interface. Eeach TrainingInputProvider provides training examples in the form of TrainingInputData (and it's main implementation TrainingInputDataImpl). The input can be modified by a list of InputModifiers - for example MeanInputModifier (for substracting the mean value) and ScalingInputModifier (scaling within a range). Currently MnistInputProvider is implemented.
