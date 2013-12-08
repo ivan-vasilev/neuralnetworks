@@ -51,7 +51,7 @@ Most of the data is represented as one-dimensional array by default (for example
 ###Neuron types based on weighted sum
 
 - AparapiSigmoid - sigmoid layer
-- AparapiSoftReLU - soft rectifier
+- AparapiSoftReLU - softplus
 - AparapiTanh - tanh activation function
 - AparapiSoftmax - softmax layer
 - AparapiStochasticBinary - stochastic binary activation function (for RBMs)
@@ -76,7 +76,7 @@ Training
 All the trainers are using the Trainer base class. The implementations are optimized to run on the GPU, but all the trainers are designed in such a way that another implementation can be plugged.The training procedure has training and testing phases. Each Trainer receives parameters (for example learning rate, momentum, etc) via Properties (a HashMap). For the supported properties for each trainer please check the TrainerFactory class.
 
 ###Supported training algorithms
-- BackPropagationTrainer - Backpropagation. Aparapi implementation is provided (check the package).
+- BackPropagationTrainer - Backpropagation. Aparapi implementation is provided (check the package) for sigmoid, tanh and softplus functions. Backpropagation is not yet working for convolutional and subsampling layers.
 - CDAparapiTrainer - Contrastive Divergence via Aparapi.
 - PCDAparapiTrainer - Persistent Contrastive Divergence.
 - GreedyLayerDNNTrainer - For Deep networks training. Each "layer" (child network) is trained by it's own trainer. After a level is finished, the next level starts training. The training inputs for the current level are propagated through the previous levels first.
