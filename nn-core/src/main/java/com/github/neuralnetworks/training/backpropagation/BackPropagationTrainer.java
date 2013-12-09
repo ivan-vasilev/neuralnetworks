@@ -21,7 +21,7 @@ import com.github.neuralnetworks.util.UniqueList;
  * BackPropagationLayerCalculator for the backpropagation phase
  * This allows for various implementations of these calculators to be used (for example via GPU or other)
  */
-public class BackPropagationTrainer extends OneStepTrainer<NeuralNetwork> {
+public class BackPropagationTrainer<N extends NeuralNetwork> extends OneStepTrainer<N> {
 
     private Map<Layer, Matrix> activations;
     private Map<Layer, Matrix> backpropagation;

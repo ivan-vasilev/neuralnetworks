@@ -66,16 +66,16 @@ public class NNFactory {
 	return result;
     }
 
-    public static MultiLayerPerceptron autoencoderSigmoid(int visibleCount, int hiddenCount, boolean addBias) {
-	return mlpSigmoid(new int[] {visibleCount,  hiddenCount, visibleCount}, addBias);
+    public static Autoencoder autoencoderSigmoid(int visibleCount, int hiddenCount, boolean addBias) {
+	return new Autoencoder(new Layer(visibleCount), new Layer(hiddenCount, new AparapiSigmoid()), new Layer(visibleCount, new AparapiSigmoid()), addBias);
     }
     
-    public static MultiLayerPerceptron autoencoderReLU(int visibleCount, int hiddenCount, boolean addBias) {
-	return mlpRelu(new int[] {visibleCount,  hiddenCount, visibleCount}, addBias);
+    public static Autoencoder autoencoderReLU(int visibleCount, int hiddenCount, boolean addBias) {
+	return new Autoencoder(new Layer(visibleCount), new Layer(hiddenCount, new AparapiSoftReLU()), new Layer(visibleCount, new AparapiSoftReLU()), addBias);
     }
-
-    public static MultiLayerPerceptron autoencoderTanh(int visibleCount, int hiddenCount, boolean addBias) {
-	return mlpTanh(new int[] {visibleCount,  hiddenCount, visibleCount}, addBias);
+    
+    public static Autoencoder autoencoderTanh(int visibleCount, int hiddenCount, boolean addBias) {
+	return new Autoencoder(new Layer(visibleCount), new Layer(hiddenCount, new AparapiTanh()), new Layer(visibleCount, new AparapiTanh()), addBias);
     }
 
     public static RBM rbmSigmoidSigmoid(int visibleCount, int hiddenCount, boolean addBias) {

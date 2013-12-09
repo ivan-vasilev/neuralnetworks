@@ -28,7 +28,7 @@ Each NeuralNetwork (default NeuralNetworkImpl) is defined by a list of Layers. E
 ###Neural Networks
 - MultiLayerPerceptron - Multilayer Perceptron.
 - RBM - Restricted Boltzmann Machine.
-- Autoencoder
+- Autoencoder, Denoising autoencoder
 - DBN - Deep Belief Network.
 - StackedAutoencoder - Stacked Autoencoder.
 - Convolutional Networks - essentially MultiLayerPerceptrons with convolutional and subsampling layers and connections.
@@ -77,7 +77,7 @@ Training
 All the trainers are using the Trainer base class. The implementations are optimized to run on the GPU, but all the trainers are designed in such a way that another implementation can be plugged.The training procedure has training and testing phases. Each Trainer receives parameters (for example learning rate, momentum, etc) via Properties (a HashMap). For the supported properties for each trainer please check the TrainerFactory class.
 
 ###Supported training algorithms
-- BackPropagationTrainer - Backpropagation. Aparapi implementation is provided (check the package) for sigmoid, tanh and softplus functions. Backpropagation is not yet working for convolutional and subsampling layers.
+- BackPropagationTrainer - Backpropagation. Aparapi implementation is provided (check the package) for sigmoid, tanh, softplus functions and denoising autoencoders. Backpropagation is not yet working for convolutional and subsampling layers.
 - CDAparapiTrainer - GPU optimized Contrastive Divergence via Aparapi.
 - PCDAparapiTrainer -GPU optimized Persistent Contrastive Divergence.
 - GreedyLayerDNNTrainer - For Deep networks training. Each "layer" (child network) is trained by it's own trainer. After a level is finished, the next level starts training. The training inputs for the current level are propagated through the previous levels first.
@@ -86,4 +86,4 @@ Contrastive Divergence and Deep training has been implemented following the guid
 http://www.iro.umontreal.ca/~lisa/publications2/index.php/publications/show/239 and http://www.cs.toronto.edu/~hinton/absps/guideTR.pdf.
 
 ###Input data
-Input is provided to the neural network by the trainers via TrainingInputProvider interface. Eeach TrainingInputProvider provides training examples in the form of TrainingInputData (and it's main implementation TrainingInputDataImpl). The input can be modified by a list of InputModifiers - for example MeanInputModifier (for subtracting the mean value) and ScalingInputModifier (scaling within a range). Currently MnistInputProvider is implemented.
+Input is provided to the neural network by the trainers via TrainingInputProvider interface. Eeach TrainingInputProvider provides training examples in the form of TrainingInputData (default implementation is TrainingInputDataImpl). The input can be modified by a list of InputModifiers - for example MeanInputModifier (for subtracting the mean value) and ScalingInputModifier (scaling within a range). Currently MnistInputProvider is implemented.

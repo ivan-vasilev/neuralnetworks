@@ -12,6 +12,7 @@ public class Autoencoder extends NeuralNetworkImpl {
 
     private Layer hiddenLayer;
     private Layer outputLayer;
+    private boolean useHiddenLayerAsOutput = true;
 
     public Autoencoder(Layer inputLayer, Layer hiddenLayer, Layer outputLayer, boolean addBias) {
 	this.hiddenLayer = hiddenLayer;
@@ -40,11 +41,19 @@ public class Autoencoder extends NeuralNetworkImpl {
 
     @Override
     public Layer getOutputLayer() {
-	return hiddenLayer;
+	return useHiddenLayerAsOutput ? hiddenLayer : outputLayer;
     }
 
     @Override
     public Layer getDataOutputLayer() {
-	return outputLayer;
+	return useHiddenLayerAsOutput ? hiddenLayer : outputLayer;
+    }
+
+    public boolean getUseHiddenLayerAsOutput() {
+        return useHiddenLayerAsOutput;
+    }
+
+    public void setUseHiddenLayerAsOutput(boolean useHiddenLayerAsOutput) {
+        this.useHiddenLayerAsOutput = useHiddenLayerAsOutput;
     }
 }

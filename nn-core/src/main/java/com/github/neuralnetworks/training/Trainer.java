@@ -134,6 +134,14 @@ public abstract class Trainer<N extends NeuralNetwork> {
     public void setLayerCalculator(LayerCalculator layerCalculator) {
 	properties.setParameter(Constants.LAYER_CALCULATOR, layerCalculator);
     }
+    
+    public RandomInitializer getRandomInitializer() {
+	return properties.getParameter(Constants.RANDOM_INITIALIZER);
+    }
+    
+    public void setRandomInitializer(RandomInitializer randomInitializer) {
+	properties.setParameter(Constants.RANDOM_INITIALIZER, randomInitializer);
+    }
 
     public void addEventListener(TrainingEventListener listener) {
 	if (listeners == null) {
@@ -166,9 +174,9 @@ public abstract class Trainer<N extends NeuralNetwork> {
      * Random initialization of weights
      */
     protected void initializeWithRandom() {
-	if (properties.containsKey(Constants.RANDOM_INITIALIZER)) {
+	if (getRandomInitializer() != null) {
 	    N nn = getNeuralNetwork();
-	    RandomInitializer r = properties.getParameter(Constants.RANDOM_INITIALIZER);
+	    RandomInitializer r = getRandomInitializer();
 	    for (Connections c : nn.getConnections()) {
 		if (c instanceof GraphConnections) {
 		    r.initialize(((GraphConnections) c).getConnectionGraph().getElements());

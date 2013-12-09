@@ -18,6 +18,7 @@ public class Constants {
     public static final String NEURAL_NETWORK = "neuralNetwork";
     public static final String OUTPUT_ERROR = "outputError";
     public static final String RANDOM_INITIALIZER = "randomInitializer";
+    public static final String RANDOM_GENERATOR = "randomGenerator";
     public static final String ERROR_CALCULATOR = "errorCalculator";
     public static final String LAYER_CALCULATOR = "layerCalculator";
     public static final String BACKPROPAGATION = "backpropagation";
@@ -27,4 +28,5 @@ public class Constants {
     public static final String DEEP_TRAINERS = "deepTrainers";
     public static final String WEIGHT_DECAY = "weightDecayTrainers";
     public static final String ACTIVATIONS = "activations";
+    public static final String CORRUPTION_LEVEL = "corruptionLevel";
 }

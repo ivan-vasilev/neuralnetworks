@@ -38,7 +38,8 @@ public class RandomInitializerImpl implements RandomInitializer {
 	    array[i] = start + random.nextFloat() * (end - start);
 	}
     }
-
+ 
+    @Override
     public Random getRandom() {
 	return random;
     }
