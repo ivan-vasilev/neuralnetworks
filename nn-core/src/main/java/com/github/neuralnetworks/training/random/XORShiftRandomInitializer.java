@@ -8,14 +8,14 @@ import com.github.neuralnetworks.util.Environment;
 
 public class XORShiftRandomInitializer implements RandomInitializer {
 
-    protected float start;
-    protected float end;
+    protected float mean;
+    protected float standardDeviation;
     protected Map<Integer, XORShift> kernels = new HashMap<>();
 
-    public XORShiftRandomInitializer(float start, float end) {
+    public XORShiftRandomInitializer(float mean, float standardDeviation) {
 	super();
-	this.start = start;
-	this.end = end;
+	this.mean = mean;
+	this.standardDeviation = standardDeviation;
     }
 
     @Override
@@ -26,7 +26,8 @@ public class XORShiftRandomInitializer implements RandomInitializer {
 
 	XORShift x = kernels.get(array.length);
 	x.array = array;
-	x.range = end - start;
+	x.mean = mean;
+	x.standardDeviation = standardDeviation;
 
 	x.setExecutionMode(Environment.getInstance().getExecutionMode());
 	x.execute(array.length);
@@ -37,26 +38,11 @@ public class XORShiftRandomInitializer implements RandomInitializer {
 	return null;
     }
 
-    public float getStart() {
-	return start;
-    }
-
-    public void setStart(float start) {
-	this.start = start;
-    }
-
-    public float getEnd() {
-	return end;
-    }
-
-    public void setEnd(float end) {
-	this.end = end;
-    }
-
     private static class XORShift extends XORShiftKernel {
 
 	private float[] array;
-	private float range;
+	private float mean;
+	private float standardDeviation;
 
 	public XORShift(int maximumRange) {
 	    super(maximumRange);
@@ -64,7 +50,7 @@ public class XORShiftRandomInitializer implements RandomInitializer {
 
 	@Override
 	public void run() {
-	    array[getGlobalId()] = randomGaussian() * range;
+	    array[getGlobalId()] = mean + randomGaussian() * standardDeviation;
 	}
     }
 }
