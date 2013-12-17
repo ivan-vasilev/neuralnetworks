@@ -39,7 +39,6 @@ public class RandomInitializerImpl implements RandomInitializer {
 	}
     }
  
-    @Override
     public Random getRandom() {
 	return random;
     }

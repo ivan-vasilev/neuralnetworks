@@ -1,7 +1,7 @@
-
 package com.github.neuralnetworks.training.backpropagation;
 
-import org.uncommons.maths.random.BinomialGenerator;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.types.Autoencoder;
@@ -10,10 +10,11 @@ import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
 
 /**
- * BackPropagation for autoencoders (input and target are the same). Supports denoising autoencoders.
+ * BackPropagation for autoencoders (input and target are the same). Supports
+ * denoising autoencoders.
  */
 public class BackPropagationAutoencoder extends BackPropagationTrainer<Autoencoder> {
-   
+
     private AutoencoderTrainingInputData autoencoderTrainingInputData;
 
     public BackPropagationAutoencoder() {
@@ -40,13 +41,20 @@ public class BackPropagationAutoencoder extends BackPropagationTrainer<Autoencod
 	nn.setUseHiddenLayerAsOutput(useHiddenLayerAsOutput);
     }
 
-
     public Float getCorruptionLevel() {
 	return properties.getParameter(Constants.CORRUPTION_LEVEL);
     }
 
     public void setCorruptionLevel(Float corruptionLevel) {
 	properties.setParameter(Constants.CORRUPTION_LEVEL, corruptionLevel);
+    }
+    
+    public InputCorruptor getInputCorruptor() {
+	return properties.getParameter(Constants.CORRUPTOR);
+    }
+    
+    public void setInputCorruptor(InputCorruptor corruptor) {
+	properties.setParameter(Constants.CORRUPTOR, corruptor);
     }
 
     /**
@@ -56,13 +64,10 @@ public class BackPropagationAutoencoder extends BackPropagationTrainer<Autoencod
 
 	private Matrix baseInput;
 	private Matrix baseTarget;
-	private BinomialGenerator binomial;
+	protected Map<Integer, float[]> randomDistributions = new HashMap<>();
 
 	public AutoencoderTrainingInputData() {
 	    super();
-	    if (getCorruptionLevel() != null && getCorruptionLevel() > 0) {
-		binomial = new BinomialGenerator(1, BackPropagationAutoencoder.this.getCorruptionLevel(), getRandomInitializer().getRandom());
-	    }
 	}
 
 	@Override
@@ -77,14 +82,18 @@ public class BackPropagationAutoencoder extends BackPropagationTrainer<Autoencod
 
 	public void setBaseInput(TrainingInputData baseInput) {
 	    this.baseTarget = baseInput.getInput();
-	    if (getCorruptionLevel() != null && getCorruptionLevel() > 0) {
+	    if (getCorruptionLevel() != null && getCorruptionLevel() > 0 && getInputCorruptor() != null) {
+		float[] randomDistribution = randomDistributions.get(baseTarget.getElements().length);
+		if (randomDistribution == null) {
+		    randomDistribution = new float[baseTarget.getElements().length];
+		    randomDistributions.put(randomDistribution.length, randomDistribution);
+		}
+
 		if (this.baseInput == null || this.baseInput.getElements().length != baseTarget.getElements().length) {
 		    this.baseInput = new Matrix(baseTarget.getColumns(), baseTarget.getRows());
 		}
 
-		for (int i = 0; i < baseInput.getInput().getElements().length; i++) {
-		    this.baseInput.getElements()[i] = this.baseTarget.getElements()[i] * binomial.nextValue();
-		}
+		getInputCorruptor().corrupt(this.baseInput.getElements(), getCorruptionLevel());
 	    } else {
 		this.baseInput = this.baseTarget;
 	    }

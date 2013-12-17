@@ -29,4 +29,5 @@ public class Constants {
     public static final String WEIGHT_DECAY = "weightDecayTrainers";
     public static final String ACTIVATIONS = "activations";
     public static final String CORRUPTION_LEVEL = "corruptionLevel";
+    public static final String CORRUPTOR = "corruptionInitializer";
 }
