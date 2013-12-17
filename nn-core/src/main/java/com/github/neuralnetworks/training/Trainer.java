@@ -15,6 +15,7 @@ import com.github.neuralnetworks.calculation.LayerCalculator;
 import com.github.neuralnetworks.calculation.OutputError;
 import com.github.neuralnetworks.events.TrainingEvent;
 import com.github.neuralnetworks.events.TrainingEventListener;
+import com.github.neuralnetworks.training.random.RandomInitializer;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
 import com.github.neuralnetworks.util.UniqueList;

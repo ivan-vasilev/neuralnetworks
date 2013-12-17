@@ -19,7 +19,8 @@ public class BackPropagationSigmoid extends BackPropagationConnectionCalculator 
 
 	@Override
 	protected void calcDerivativeBefore(int row, int column) {
-	    output[outputBaseIndex(row, column)] *= outputActivation[outputBaseIndex(row, column)] * (1 - outputActivation[outputBaseIndex(row, column)]);
+	    int id = outputBaseIndex(row, column);
+	    output[id] *= outputActivation[id] * (1 - outputActivation[id]);
 	}
     }
 
@@ -29,7 +30,8 @@ public class BackPropagationSigmoid extends BackPropagationConnectionCalculator 
 
 	@Override
 	protected void calcDerivativeBefore(int row, int column) {
-	    output[outputBaseIndex(row, column)] *= outputActivation[outputBaseIndex(row, column)] * (1 - outputActivation[outputBaseIndex(row, column)]);
+	    int id = outputBaseIndex(row, column);
+	    output[id] *= outputActivation[id] * (1 - outputActivation[id]);
 	}
     }
 }

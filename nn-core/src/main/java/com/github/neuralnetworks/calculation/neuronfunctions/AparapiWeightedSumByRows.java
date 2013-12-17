@@ -24,9 +24,13 @@ public class AparapiWeightedSumByRows extends AparapiBaseFunction {
 	    // each connection (of the combined connections)
 	    for (int k = 0; k < series; k++) {
 		// each element in the row
+		float value = 0;
+
 		for (int j = 0; j < weightsColumns[0]; j++) {
-		    output[outputIndex(id, i, k)] += input[inputIndex(j, i, k)] * weights[weightIndex(id, j, k)];
+		    value += input[inputIndex(j, i, k)] * weights[weightIndex(id, j, k)];
 		}
+
+		output[outputIndex(id, i, k)] = value;
 	    }
 
 	    after(id, i);

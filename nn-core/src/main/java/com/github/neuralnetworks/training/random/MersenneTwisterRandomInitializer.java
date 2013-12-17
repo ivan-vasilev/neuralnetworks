@@ -1,4 +1,4 @@
-package com.github.neuralnetworks.training;
+package com.github.neuralnetworks.training.random;
 
 import org.uncommons.maths.random.MersenneTwisterRNG;
 

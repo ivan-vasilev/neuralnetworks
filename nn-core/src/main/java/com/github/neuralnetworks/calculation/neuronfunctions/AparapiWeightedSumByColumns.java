@@ -27,9 +27,11 @@ public class AparapiWeightedSumByColumns extends AparapiBaseFunction {
 	    for (int k = 0; k < series; k++) {
 
 		// each element in the column
+		float value = 0;
 		for (int j = 0; j < weightsRows[0]; j++) {
-		    output[outputIndex(id, i, k)] += input[inputIndex(j, i, k)] * weights[weightIndex(j, id, k)];
+		    value += input[inputIndex(j, i, k)] * weights[weightIndex(j, id, k)];
 		}
+		output[outputIndex(id, i, k)] = value;
 	    }
 
 	    after(id, i);

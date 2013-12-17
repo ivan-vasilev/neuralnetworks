@@ -12,7 +12,7 @@ import com.github.neuralnetworks.input.mnist.MnistInputProvider;
 import com.github.neuralnetworks.input.mnist.MnistTargetMultiNeuronOutputConverter;
 import com.github.neuralnetworks.outputerror.MnistMultipleNeuronsOutputError;
 import com.github.neuralnetworks.testing.Sampler;
-import com.github.neuralnetworks.training.MersenneTwisterRandomInitializer;
+import com.github.neuralnetworks.training.random.MersenneTwisterRandomInitializer;
 import com.github.neuralnetworks.training.rbm.CDAparapiTrainer;
 import com.github.neuralnetworks.training.rbm.CDAparapiTrainerBase;
 import com.github.neuralnetworks.util.Constants;

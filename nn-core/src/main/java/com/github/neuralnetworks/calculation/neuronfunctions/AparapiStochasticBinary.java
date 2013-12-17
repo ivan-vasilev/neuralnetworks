@@ -6,8 +6,8 @@ import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.calculation.ConnectionCalculatorImpl;
-import com.github.neuralnetworks.training.MersenneTwisterRandomInitializer;
-import com.github.neuralnetworks.training.RandomInitializer;
+import com.github.neuralnetworks.training.random.MersenneTwisterRandomInitializer;
+import com.github.neuralnetworks.training.random.RandomInitializer;
 
 /**
  * Stochastic binary activation function (for RBMs for example)

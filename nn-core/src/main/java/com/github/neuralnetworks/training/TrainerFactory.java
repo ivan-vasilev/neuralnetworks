@@ -14,6 +14,7 @@ import com.github.neuralnetworks.training.backpropagation.BackPropagationSoftReL
 import com.github.neuralnetworks.training.backpropagation.BackPropagationTanh;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationTrainer;
 import com.github.neuralnetworks.training.backpropagation.MSEDerivative;
+import com.github.neuralnetworks.training.random.RandomInitializer;
 import com.github.neuralnetworks.training.rbm.CDAparapiTrainer;
 import com.github.neuralnetworks.training.rbm.PCDAparapiTrainer;
 import com.github.neuralnetworks.util.Constants;
