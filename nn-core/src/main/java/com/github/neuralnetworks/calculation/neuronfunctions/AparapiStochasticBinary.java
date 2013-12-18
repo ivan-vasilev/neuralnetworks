@@ -6,7 +6,6 @@ import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.calculation.ConnectionCalculatorImpl;
-import com.github.neuralnetworks.training.random.MersenneTwisterRandomInitializer;
 import com.github.neuralnetworks.training.random.RandomInitializer;
 
 /**
@@ -16,8 +15,8 @@ public class AparapiStochasticBinary extends ConnectionCalculatorImpl {
 
     private static final long serialVersionUID = 5869298546838843306L;
 
-    public AparapiStochasticBinary() {
-	super(new AparapiStochasticBinaryByRows(), new AparapiStochasticBinaryByColumns());
+    public AparapiStochasticBinary(RandomInitializer randominitializer) {
+	super(new AparapiStochasticBinaryByRows(randominitializer), new AparapiStochasticBinaryByColumns(randominitializer));
     }
 
     public static class AparapiStochasticBinaryByRows extends AparapiWeightedSumByRows {
@@ -34,9 +33,9 @@ public class AparapiStochasticBinary extends ConnectionCalculatorImpl {
 	 */
 	private RandomInitializer randomInitializer;
 
-	public AparapiStochasticBinaryByRows() {
+	public AparapiStochasticBinaryByRows(RandomInitializer randominitializer) {
 	    super();
-	    randomInitializer = new MersenneTwisterRandomInitializer();
+	    randomInitializer = randominitializer;
 	}
 
 	/* (non-Javadoc)
@@ -77,9 +76,9 @@ public class AparapiStochasticBinary extends ConnectionCalculatorImpl {
 	 */
 	private RandomInitializer randomInitializer;
 
-	public AparapiStochasticBinaryByColumns() {
+	public AparapiStochasticBinaryByColumns(RandomInitializer randominitializer) {
 	    super();
-	    randomInitializer = new MersenneTwisterRandomInitializer();
+	    randomInitializer = randominitializer;
 	}
 
 	/* (non-Javadoc)

@@ -12,6 +12,12 @@ public class AparapiXORShiftInitializer implements RandomInitializer {
     protected float start;
     protected float range;
     protected Map<Integer, XORShift> kernels = new HashMap<>();
+    
+    public AparapiXORShiftInitializer() {
+	super();
+	this.start = 0;
+	this.range = 1;
+    }
 
     public AparapiXORShiftInitializer(float start, float end) {
 	super();

@@ -5,6 +5,7 @@ import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSigmoid;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSoftReLU;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiStochasticBinary;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiTanh;
+import com.github.neuralnetworks.training.random.AparapiXORShiftInitializer;
 
 /**
  * Factory class for neural networks
@@ -91,15 +92,15 @@ public class NNFactory {
     }
 
     public static RBM rbmSigmoidBinary(int visibleCount, int hiddenCount, boolean addBias) {
-	return new RBM(new Layer(visibleCount, new AparapiSigmoid()), new Layer(hiddenCount, new AparapiStochasticBinary()), addBias, addBias);
+	return new RBM(new Layer(visibleCount, new AparapiSigmoid()), new Layer(hiddenCount, new AparapiStochasticBinary(new AparapiXORShiftInitializer())), addBias, addBias);
     }
 
     public static RBM rbmReluBinary(int visibleCount, int hiddenCount, boolean addBias) {
-	return new RBM(new Layer(visibleCount, new AparapiSoftReLU()), new Layer(hiddenCount, new AparapiStochasticBinary()), addBias, addBias);
+	return new RBM(new Layer(visibleCount, new AparapiSoftReLU()), new Layer(hiddenCount, new AparapiStochasticBinary(new AparapiXORShiftInitializer())), addBias, addBias);
     }
 
     public static RBM rbmTanhBinary(int visibleCount, int hiddenCount, boolean addBias) {
-	return new RBM(new Layer(visibleCount, new AparapiTanh()), new Layer(hiddenCount, new AparapiStochasticBinary()), addBias, addBias);
+	return new RBM(new Layer(visibleCount, new AparapiTanh()), new Layer(hiddenCount, new AparapiStochasticBinary(new AparapiXORShiftInitializer())), addBias, addBias);
     }
 
     public static SupervisedRBM srbmSigmoidSigmoid(int visibleCount, int hiddenCount, int dataCount, boolean addBias) {
@@ -107,11 +108,11 @@ public class NNFactory {
     }
 
     public static SupervisedRBM srbmSigmoidBinary(int visibleCount, int hiddenCount, int dataCount, boolean addBias) {
-	return new SupervisedRBM(new Layer(visibleCount, new AparapiSigmoid()), new Layer(hiddenCount, new AparapiStochasticBinary()), new Layer(dataCount), addBias, addBias);
+	return new SupervisedRBM(new Layer(visibleCount, new AparapiSigmoid()), new Layer(hiddenCount, new AparapiStochasticBinary(new AparapiXORShiftInitializer())), new Layer(dataCount), addBias, addBias);
     }
 
     public static SupervisedRBM srbmReluBinary(int visibleCount, int hiddenCount, int dataCount, boolean addBias) {
-	return new SupervisedRBM(new Layer(visibleCount, new AparapiSoftReLU()), new Layer(hiddenCount, new AparapiStochasticBinary()), new Layer(dataCount), addBias, addBias);
+	return new SupervisedRBM(new Layer(visibleCount, new AparapiSoftReLU()), new Layer(hiddenCount, new AparapiStochasticBinary(new AparapiXORShiftInitializer())), new Layer(dataCount), addBias, addBias);
     }
 
     public static SupervisedRBM srbmReluRelu(int visibleCount, int hiddenCount, int dataCount, boolean addBias) {

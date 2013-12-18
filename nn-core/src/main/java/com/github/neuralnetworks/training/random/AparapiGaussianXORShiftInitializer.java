@@ -12,6 +12,12 @@ public class AparapiGaussianXORShiftInitializer implements RandomInitializer {
     protected float mean;
     protected float standardDeviation;
     protected Map<Integer, XORShift> kernels = new HashMap<>();
+    
+    public AparapiGaussianXORShiftInitializer() {
+	super();
+	this.mean = 0;
+	this.standardDeviation = 1;
+    }
 
     public AparapiGaussianXORShiftInitializer(float mean, float standardDeviation) {
 	super();
