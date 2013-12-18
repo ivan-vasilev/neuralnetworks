@@ -7,6 +7,8 @@ import java.util.Random;
  */
 public class RandomInitializerImpl implements RandomInitializer {
 
+    private static final long serialVersionUID = 1L;
+
     protected Random random;
     protected float start;
     protected float end;

@@ -40,14 +40,6 @@ public class BackPropagationAutoencoder extends BackPropagationTrainer<Autoencod
 
 	nn.setUseHiddenLayerAsOutput(useHiddenLayerAsOutput);
     }
-
-    public Float getCorruptionLevel() {
-	return properties.getParameter(Constants.CORRUPTION_LEVEL);
-    }
-
-    public void setCorruptionLevel(Float corruptionLevel) {
-	properties.setParameter(Constants.CORRUPTION_LEVEL, corruptionLevel);
-    }
     
     public InputCorruptor getInputCorruptor() {
 	return properties.getParameter(Constants.CORRUPTOR);
@@ -82,7 +74,7 @@ public class BackPropagationAutoencoder extends BackPropagationTrainer<Autoencod
 
 	public void setBaseInput(TrainingInputData baseInput) {
 	    this.baseTarget = baseInput.getInput();
-	    if (getCorruptionLevel() != null && getCorruptionLevel() > 0 && getInputCorruptor() != null) {
+	    if (getInputCorruptor() != null) {
 		float[] randomDistribution = randomDistributions.get(baseTarget.getElements().length);
 		if (randomDistribution == null) {
 		    randomDistribution = new float[baseTarget.getElements().length];
@@ -93,7 +85,7 @@ public class BackPropagationAutoencoder extends BackPropagationTrainer<Autoencod
 		    this.baseInput = new Matrix(baseTarget.getColumns(), baseTarget.getRows());
 		}
 
-		getInputCorruptor().corrupt(this.baseInput.getElements(), getCorruptionLevel());
+		getInputCorruptor().corrupt(this.baseInput.getElements());
 	    } else {
 		this.baseInput = this.baseTarget;
 	    }

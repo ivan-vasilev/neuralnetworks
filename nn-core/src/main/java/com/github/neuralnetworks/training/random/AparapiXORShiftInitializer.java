@@ -6,6 +6,9 @@ import java.util.Map;
 import com.github.neuralnetworks.util.Environment;
 
 public class AparapiXORShiftInitializer implements RandomInitializer {
+
+    private static final long serialVersionUID = 1L;
+
     protected float start;
     protected float range;
     protected Map<Integer, XORShift> kernels = new HashMap<>();
@@ -18,17 +21,17 @@ public class AparapiXORShiftInitializer implements RandomInitializer {
 
     @Override
     public void initialize(float[] array) {
-	if (!kernels.containsKey(array.length)) {
-	    kernels.put(array.length, new XORShift(array.length));
+	XORShift kernel = kernels.get(array.length);
+	if (kernel == null) {
+	    kernels.put(array.length, kernel = new XORShift(array.length));
 	}
 
-	XORShift x = kernels.get(array.length);
-	x.array = array;
-	x.start = start;
-	x.range = range;
+	kernel.array = array;
+	kernel.start = start;
+	kernel.range = range;
 
-	x.setExecutionMode(Environment.getInstance().getExecutionMode());
-	x.execute(array.length);
+	kernel.setExecutionMode(Environment.getInstance().getExecutionMode());
+	kernel.execute(array.length);
     }
 
     private static class XORShift extends XORShiftKernel {

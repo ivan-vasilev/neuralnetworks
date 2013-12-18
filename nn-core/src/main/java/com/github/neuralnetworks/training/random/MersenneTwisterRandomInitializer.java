@@ -7,6 +7,8 @@ import org.uncommons.maths.random.MersenneTwisterRNG;
  */
 public class MersenneTwisterRandomInitializer extends RandomInitializerImpl {
 
+    private static final long serialVersionUID = 1L;
+
     public MersenneTwisterRandomInitializer() {
 	super(new MersenneTwisterRNG());
     }

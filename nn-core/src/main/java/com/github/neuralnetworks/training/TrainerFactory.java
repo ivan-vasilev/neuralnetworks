@@ -13,6 +13,7 @@ import com.github.neuralnetworks.training.backpropagation.BackPropagationSigmoid
 import com.github.neuralnetworks.training.backpropagation.BackPropagationSoftReLU;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationTanh;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationTrainer;
+import com.github.neuralnetworks.training.backpropagation.InputCorruptor;
 import com.github.neuralnetworks.training.backpropagation.MSEDerivative;
 import com.github.neuralnetworks.training.random.RandomInitializer;
 import com.github.neuralnetworks.training.rbm.CDAparapiTrainer;
@@ -46,23 +47,23 @@ public class TrainerFactory {
 	return t;
     }
 
-    public static BackPropagationAutoencoder backPropagationSigmoidAutoencoder(NeuralNetwork nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay, Float corruptionLevel) {
+    public static BackPropagationAutoencoder backPropagationSigmoidAutoencoder(NeuralNetwork nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, InputCorruptor corruptor, float learningRate, float momentum, float weightDecay) {
 	BackPropagationAutoencoder t = new BackPropagationAutoencoder(backpropProperties(nn, trainingSet, testingSet, error, rand, learningRate, momentum, weightDecay));
-	t.setCorruptionLevel(corruptionLevel);
+	t.setInputCorruptor(corruptor);
 	t.getProperties().setParameter(Constants.BACKPROPAGATION, new BackPropagationLayerCalculatorImpl(new BackPropagationSigmoid(t.getProperties())));
 	return t;
     }
 
-    public static BackPropagationAutoencoder backPropagationSoftReLUAutoencoder(NeuralNetwork nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay, Float corruptionLevel) {
+    public static BackPropagationAutoencoder backPropagationSoftReLUAutoencoder(NeuralNetwork nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, InputCorruptor corruptor, float learningRate, float momentum, float weightDecay) {
 	BackPropagationAutoencoder t = new BackPropagationAutoencoder(backpropProperties(nn, trainingSet, testingSet, error, rand, learningRate, momentum, weightDecay));
-	t.setCorruptionLevel(corruptionLevel);
+	t.setInputCorruptor(corruptor);
 	t.getProperties().setParameter(Constants.BACKPROPAGATION, new BackPropagationLayerCalculatorImpl(new BackPropagationSoftReLU(t.getProperties())));
 	return t;
     }
     
-    public static BackPropagationAutoencoder backPropagationTanhAutoencoder(NeuralNetwork nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay, Float corruptionLevel) {
+    public static BackPropagationAutoencoder backPropagationTanhAutoencoder(NeuralNetwork nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, InputCorruptor corruptor, float learningRate, float momentum, float weightDecay) {
 	BackPropagationAutoencoder t = new BackPropagationAutoencoder(backpropProperties(nn, trainingSet, testingSet, error, rand, learningRate, momentum, weightDecay));
-	t.setCorruptionLevel(corruptionLevel);
+	t.setInputCorruptor(corruptor);
 	t.getProperties().setParameter(Constants.BACKPROPAGATION, new BackPropagationLayerCalculatorImpl(new BackPropagationTanh(t.getProperties())));
 	return t;
     }

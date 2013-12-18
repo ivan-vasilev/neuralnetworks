@@ -7,6 +7,8 @@ import com.github.neuralnetworks.util.Environment;
 
 public class AparapiGaussianXORShiftInitializer implements RandomInitializer {
 
+    private static final long serialVersionUID = 1L;
+
     protected float mean;
     protected float standardDeviation;
     protected Map<Integer, XORShift> kernels = new HashMap<>();
@@ -19,17 +21,17 @@ public class AparapiGaussianXORShiftInitializer implements RandomInitializer {
 
     @Override
     public void initialize(float[] array) {
-	if (!kernels.containsKey(array.length)) {
-	    kernels.put(array.length, new XORShift(array.length));
+	XORShift kernel = kernels.get(array.length);
+	if (kernel == null) {
+	    kernels.put(array.length, kernel = new XORShift(array.length));
 	}
 
-	XORShift x = kernels.get(array.length);
-	x.array = array;
-	x.mean = mean;
-	x.standardDeviation = standardDeviation;
+	kernel.array = array;
+	kernel.mean = mean;
+	kernel.standardDeviation = standardDeviation;
 
-	x.setExecutionMode(Environment.getInstance().getExecutionMode());
-	x.execute(array.length);
+	kernel.setExecutionMode(Environment.getInstance().getExecutionMode());
+	kernel.execute(array.length);
     }
 
     private static class XORShift extends XORShiftKernel {
