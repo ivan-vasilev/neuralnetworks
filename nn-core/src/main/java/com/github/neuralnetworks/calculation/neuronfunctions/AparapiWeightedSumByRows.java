@@ -26,7 +26,7 @@ public class AparapiWeightedSumByRows extends AparapiBaseFunction {
 		// each element in the row
 		float value = 0;
 
-		for (int j = 0; j < weightsColumns[0]; j++) {
+		for (int j = 0; j < weightsColumns[k]; j++) {
 		    value += input[inputIndex(j, i, k)] * weights[weightIndex(id, j, k)];
 		}
 
