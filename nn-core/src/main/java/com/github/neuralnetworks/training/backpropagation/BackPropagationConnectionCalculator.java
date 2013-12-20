@@ -22,19 +22,16 @@ public class BackPropagationConnectionCalculator implements ConnectionCalculator
     private static final long serialVersionUID = -8854054073444883314L;
 
     private Properties properties;
-    private AparapiBackpropagationBaseByRows forwardBackprop;
-    private AparapiBackpropagationBaseByColumns backwardBackprop;
+    private AparapiBackpropagationBase backprop;
 
-    public BackPropagationConnectionCalculator(Properties properties, AparapiBackpropagationBaseByRows forwardBackprop, AparapiBackpropagationBaseByColumns backwardBackprop) {
+    public BackPropagationConnectionCalculator(Properties properties, AparapiBackpropagationBase backprop) {
 	this.properties = properties;
-	this.forwardBackprop = forwardBackprop;
-	this.backwardBackprop = backwardBackprop;
+	this.backprop = backprop;
     }
 
     @Override
     public void calculate(SortedMap<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
-	SortedMap<Connections, Matrix> forward = new TreeMap<>();
-	SortedMap<Connections, Matrix> backward = new TreeMap<>();
+	SortedMap<Connections, Matrix> noBias = new TreeMap<>();
 	SortedMap<Connections, Matrix> bias = new TreeMap<>();
 	Matrix biasOutput = null;
 	Layer biasLayer = null;
@@ -45,35 +42,25 @@ public class BackPropagationConnectionCalculator implements ConnectionCalculator
 		bias.put(c, output);
 		biasOutput = input;
 		biasLayer = c.getInputLayer();
-	    } else if (c.getInputLayer() == targetLayer) {
-		backward.put(c, input);
-	    } else if (c.getOutputLayer() == targetLayer) {
-		forward.put(c, input);
+	    } else {
+		noBias.put(c, input);
 	    }
 	}
 
-	if (forward.size() > 0) {
-	    forwardBackprop.setLearningRate(getLearningRate());
-	    forwardBackprop.setMomentum(getMomentum());
-	    forwardBackprop.setWeightDecay(getWeightDecay());
-	    forwardBackprop.setActivations(getActivations());
-	    forwardBackprop.calculate(forward, output, targetLayer);
-	}
-
-	if (backward.size() > 0) {
-	    backwardBackprop.setLearningRate(getLearningRate());
-	    backwardBackprop.setMomentum(getMomentum());
-	    backwardBackprop.setWeightDecay(getWeightDecay());
-	    backwardBackprop.setActivations(getActivations());
-	    backwardBackprop.calculate(backward, output, targetLayer);
+	if (noBias.size() > 0) {
+	    backprop.setLearningRate(getLearningRate());
+	    backprop.setMomentum(getMomentum());
+	    backprop.setWeightDecay(getWeightDecay());
+	    backprop.setActivations(getActivations());
+	    backprop.calculate(noBias, output, targetLayer);
 	}
 
 	if (bias.size() > 0) {
-	    backwardBackprop.setLearningRate(getLearningRate());
-	    backwardBackprop.setMomentum(getMomentum());
-	    backwardBackprop.setWeightDecay(0);
-	    backwardBackprop.setActivations(getActivations());
-	    backwardBackprop.calculate(bias, biasOutput, biasLayer);
+	    backprop.setLearningRate(getLearningRate());
+	    backprop.setMomentum(getMomentum());
+	    backprop.setWeightDecay(0);
+	    backprop.setActivations(getActivations());
+	    backprop.calculate(bias, biasOutput, biasLayer);
 	}
     }
 

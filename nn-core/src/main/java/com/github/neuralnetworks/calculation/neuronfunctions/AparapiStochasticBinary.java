@@ -16,10 +16,10 @@ public class AparapiStochasticBinary extends ConnectionCalculatorImpl {
     private static final long serialVersionUID = 5869298546838843306L;
 
     public AparapiStochasticBinary(RandomInitializer randominitializer) {
-	super(new AparapiStochasticBinaryByRows(randominitializer), new AparapiStochasticBinaryByColumns(randominitializer));
+	super(new AparapiStochasticBinaryFunction(randominitializer));
     }
 
-    public static class AparapiStochasticBinaryByRows extends AparapiWeightedSumByRows {
+    public static class AparapiStochasticBinaryFunction extends AparapiWeightedSum {
 
 	private static final long serialVersionUID = -9125510037725731152L;
 
@@ -33,50 +33,7 @@ public class AparapiStochasticBinary extends ConnectionCalculatorImpl {
 	 */
 	private RandomInitializer randomInitializer;
 
-	public AparapiStochasticBinaryByRows(RandomInitializer randominitializer) {
-	    super();
-	    randomInitializer = randominitializer;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSumByRows#init(java.util.SortedMap, com.github.neuralnetworks.architecture.Matrix, com.github.neuralnetworks.architecture.Layer)
-	 * Unfortunately there isn't yet random implementation that works for Aparapi, so this step is done sequential
-	 */
-	@Override
-	protected void init(SortedMap<GraphConnections, Matrix> input, Matrix outputMatrix, Layer targetLayer) {
-	    super.init(input, outputMatrix, targetLayer);
-	    if (random == null || random.length != outputMatrix.getElements().length) {
-		random = new float[outputMatrix.getElements().length];
-	    }
-
-	    randomInitializer.initialize(random);
-	}
-
-	@Override
-	protected void after(int row, int column) {
-	    if (random[outputBaseIndex(row, column)] < 1 / (1 + exp(-output[outputBaseIndex(row, column)]))) {
-		output[outputBaseIndex(row, column)] = 1;
-	    } else {
-		output[outputBaseIndex(row, column)] = 0;
-	    }
-	}
-    }
-
-    public static class AparapiStochasticBinaryByColumns extends AparapiWeightedSumByColumns {
-
-	private static final long serialVersionUID = -9125510037725731152L;
-
-	/**
-	 * random values for the stochastic activation of neurons
-	 */
-	private float[] random;
-
-	/**
-	 * random initializer
-	 */
-	private RandomInitializer randomInitializer;
-
-	public AparapiStochasticBinaryByColumns(RandomInitializer randominitializer) {
+	public AparapiStochasticBinaryFunction(RandomInitializer randominitializer) {
 	    super();
 	    randomInitializer = randominitializer;
 	}

@@ -30,62 +30,39 @@ public class ConnectionCalculatorImpl implements ConnectionCalculator {
 
     private static final long serialVersionUID = -5405654469496055017L;
 
-    /**
-     * ConnectionCalculator when the targetLayer is the input layer in the list of connections
-     */
-    protected ConnectionCalculator forwardInputFunction;
-
-    /**
-     * ConnectionCalculator when the targetLayer is the output layer in the list of connections
-     */
-    protected ConnectionCalculator backwardInputFunction;
+    protected ConnectionCalculator inputFunction;
 
     /**
      * Activation functions
      */
     protected List<ActivationFunction> activationFunctions;
 
-    public ConnectionCalculatorImpl(ConnectionCalculator forwardInputFunction, ConnectionCalculator backwardInputFunction) {
+    public ConnectionCalculatorImpl(ConnectionCalculator inputFunction) {
 	super();
-	this.forwardInputFunction = forwardInputFunction;
-	this.backwardInputFunction = backwardInputFunction;
+	this.inputFunction = inputFunction;
     }
 
     @Override
     public void calculate(SortedMap<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
-	SortedMap<Connections, Matrix> forward = new TreeMap<>();
-	SortedMap<Connections, Matrix> backward = new TreeMap<>();
+	SortedMap<Connections, Matrix> notBias = new TreeMap<>();
 	Map<GraphConnections, Float> bias = new TreeMap<>();
 
 	for (Entry<Connections, Matrix> e : connections.entrySet()) {
 	    Connections c = e.getKey();
 	    Matrix input = e.getValue();
 	    // bias layer scenarios
-	    if (c.getOutputLayer() == targetLayer) {
-		if (c instanceof GraphConnections && c.getInputLayer().getConnectionCalculator() instanceof ConstantConnectionCalculator) {
-		    ConstantConnectionCalculator cc = (ConstantConnectionCalculator) c.getInputLayer().getConnectionCalculator();
-		    bias.put((GraphConnections) c, cc.getValue());;
-		} else {
-		    forward.put(c, input);
-		}
-	    } else if (c.getInputLayer() == targetLayer) {
-		if (c instanceof GraphConnections && c.getOutputLayer().getConnectionCalculator() instanceof ConstantConnectionCalculator) {
-		    ConstantConnectionCalculator cc = (ConstantConnectionCalculator) c.getOutputLayer().getConnectionCalculator();
-		    bias.put((GraphConnections) c, cc.getValue());;
-		} else {
-		    backward.put(c, input);
-		}
+	    if (c instanceof GraphConnections && c.getInputLayer().getConnectionCalculator() instanceof ConstantConnectionCalculator) {
+		ConstantConnectionCalculator cc = (ConstantConnectionCalculator) c.getInputLayer().getConnectionCalculator();
+		bias.put((GraphConnections) c, cc.getValue());
+	    } else {
+		notBias.put(c, input);
 	    }
 	}
 
 	calculateBias(bias, output);
-	
-	if (forward.size() > 0) {
-	    forwardInputFunction.calculate(forward, output, targetLayer);
-	}
-	
-	if (backward.size() > 0) {
-	    backwardInputFunction.calculate(backward, output, targetLayer);
+
+	if (notBias.size() > 0) {
+	    inputFunction.calculate(notBias, output, targetLayer);
 	}
 
 	if (activationFunctions != null) {

@@ -10,21 +10,10 @@ public class BackPropagationSigmoid extends BackPropagationConnectionCalculator 
     private static final long serialVersionUID = 1178188233641224762L;
 
     public BackPropagationSigmoid(Properties properties) {
-	super(properties, new AparapiBackpropSigmoidByRows(), new AparapiBackpropSigmoidByColumns());
+	super(properties, new AparapiBackpropSigmoid());
     }
 
-    public static class AparapiBackpropSigmoidByRows extends AparapiBackpropagationBaseByRows {
-
-	private static final long serialVersionUID = -3580345016542506932L;
-
-	@Override
-	protected void calcDerivativeBefore(int row, int column) {
-	    int id = outputBaseIndex(row, column);
-	    output[id] *= outputActivation[id] * (1 - outputActivation[id]);
-	}
-    }
-
-    public static class AparapiBackpropSigmoidByColumns extends AparapiBackpropagationBaseByColumns {
+    public static class AparapiBackpropSigmoid extends AparapiBackpropagationBase {
 
 	private static final long serialVersionUID = -3580345016542506932L;
 
