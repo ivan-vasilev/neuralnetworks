@@ -16,7 +16,8 @@ public class AparapiSigmoid extends ConnectionCalculatorImpl {
 
 	@Override
 	protected void after(int row, int column) {
-	    output[outputBaseIndex(row, column)] = 1 / (1 + exp(-output[outputBaseIndex(row, column)]));
+	    int index = outputBaseIndex(row, column);
+	    output[index] = 1 / (1 + exp(-output[index]));
 	}
     }
 }

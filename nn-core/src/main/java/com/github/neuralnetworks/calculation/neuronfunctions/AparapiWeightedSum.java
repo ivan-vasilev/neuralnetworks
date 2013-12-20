@@ -2,7 +2,6 @@ package com.github.neuralnetworks.calculation.neuronfunctions;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 
@@ -13,7 +12,6 @@ import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.util.Environment;
-import com.github.neuralnetworks.util.UniqueList;
 
 /**
  * Base Aparapi connection calculator for weighted sum functions (matrix multiplication).
@@ -106,17 +104,16 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
     /**
      * Will determine whether initialization is needed
      */
-    protected List<Connections> connections = new UniqueList<>();
+    protected Layer currentLayer;
 
     @SuppressWarnings("unchecked")
     @Override
     public void calculate(SortedMap<Connections, Matrix> input, Matrix outputMatrix, Layer targetLayer) {
 	if (input.size() > 0) {
-	    if (connections.size() == 0) {
-		connections.addAll(input.keySet());
+	    if (targetLayer != currentLayer) {
+		currentLayer = targetLayer;
+		init((SortedMap<GraphConnections, Matrix>) ((SortedMap<?, ?>) input), outputMatrix, targetLayer);
 	    }
-
-	    init((SortedMap<GraphConnections, Matrix>) ((SortedMap<?, ?>) input), outputMatrix, targetLayer);
 
 	    execute(outputMatrix.getRows());
 	}
@@ -232,13 +229,6 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
     }
 
     protected void after(int row, int column) {
-    }
-
-    /**
-     * helper method for retrieving input value based on row, column and series
-     */
-    protected int inputIndex(int row, int column, int series) {
-	return inputStartPositions[series] + (inputStartIndexes[series] + row) * inputOutputColumns + column;
     }
 
     /**
