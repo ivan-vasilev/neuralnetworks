@@ -46,7 +46,7 @@ Most of the ConnectionCalculator implementations are optimized for GPU execution
 - only one-dimensional arrays (and variables) of primitive data types are allowed. It is not possible to use complex objects.
 - only member-methods of the Aparapi Kernel class itself are allowed to be called from the GPU executable code. 
 
-Therefore before each GPU calculation all the data is converted to one-dim arrays and primitive type variables. Because of this all Aparapi neuron types are using either AparapiBaseFunction (for fully connected layers and weighted sum input functions), AparapiSubsampling2D (for subsampling layers) or AparapiConv2D (for convolutional layers). 
+Therefore before each GPU calculation all the data is converted to one-dim arrays and primitive type variables. Because of this all Aparapi neuron types are using either AparapiWeightedSum (for fully connected layers and weighted sum input functions), AparapiSubsampling2D (for subsampling layers) or AparapiConv2D (for convolutional layers). 
 Most of the data is represented as one-dimensional array by default (for example Matrix).
 
 ###Neuron types based on weighted sum
