@@ -22,9 +22,9 @@ import com.github.neuralnetworks.util.Environment;
  * 
  * Because of this limitations all the data that is contained in the input connections, weight matrices, input values etc is converted into one-dimensional member arrays of this class
  * 
- * This implementation assumes that
+ * @deprecated use {@link AparapiWeightedSum} instead.
  */
-
+@Deprecated
 public abstract class AparapiBaseFunction extends Kernel implements ConnectionCalculator {
 
     private static final long serialVersionUID = -8435155322138790083L;

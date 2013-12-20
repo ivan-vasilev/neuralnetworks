@@ -8,7 +8,9 @@ import com.github.neuralnetworks.architecture.Matrix;
 
 /**
  * Weighted sum by columns (it is used in the backpropagation case)
+ * @deprecated use {@link AparapiWeightedSum} instead.
  */
+@Deprecated
 public class AparapiWeightedSumByColumns extends AparapiBaseFunction {
 
     private static final long serialVersionUID = 8288998425211708411L;

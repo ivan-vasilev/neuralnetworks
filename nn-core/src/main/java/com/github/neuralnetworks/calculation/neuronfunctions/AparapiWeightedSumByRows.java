@@ -8,7 +8,9 @@ import com.github.neuralnetworks.architecture.Matrix;
 
 /**
  * Weighted sum by rows (it is used in the feedforward case)
+ * @deprecated use {@link AparapiWeightedSum} instead.
  */
+@Deprecated
 public class AparapiWeightedSumByRows extends AparapiBaseFunction {
 
     private static final long serialVersionUID = 8288998425211708411L;

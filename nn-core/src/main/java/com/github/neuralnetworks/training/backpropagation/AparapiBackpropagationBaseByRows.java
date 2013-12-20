@@ -13,7 +13,9 @@ import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSumB
 /**
  * Aparapi Backpropagation base weighted sum
  * Supports learning rage, momentum and weight decay
+ * @deprecated use {@link AparapiBackpropagationBase} instead.
  */
+@Deprecated
 public class AparapiBackpropagationBaseByRows extends AparapiWeightedSumByRows {
 
     private static final long serialVersionUID = -5101971690861270462L;
