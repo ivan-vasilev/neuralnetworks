@@ -96,4 +96,12 @@ public class ConnectionCalculatorImpl implements ConnectionCalculator {
 	    activationFunctions.remove(activationFunction);
 	}
     }
+
+    public ConnectionCalculator getInputFunction() {
+        return inputFunction;
+    }
+
+    public void setInputFunction(ConnectionCalculator inputFunction) {
+        this.inputFunction = inputFunction;
+    }
 }

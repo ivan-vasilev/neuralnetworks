@@ -26,7 +26,6 @@ public class BackPropagationLayerCalculatorImpl extends LayerCalculatorImpl impl
 	super.calculate(calculatedLayers, results, layer);
     }
 
-
     @Override
     public void addConnectionCalculator(Layer layer, ConnectionCalculator calculator) {
 	if (!(calculator instanceof BackPropagationConnectionCalculator)) {
