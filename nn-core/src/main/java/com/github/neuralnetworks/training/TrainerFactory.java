@@ -4,7 +4,6 @@ import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.architecture.types.RBM;
 import com.github.neuralnetworks.architecture.types.SupervisedRBM;
-import com.github.neuralnetworks.calculation.LayerCalculatorImpl;
 import com.github.neuralnetworks.calculation.OutputError;
 import com.github.neuralnetworks.calculation.RBMLayerCalculator;
 import com.github.neuralnetworks.calculation.SupervisedRBMLayerCalculator;
@@ -125,7 +124,7 @@ public class TrainerFactory {
 	p.setParameter(Constants.LEARNING_RATE, learningRate);
 	p.setParameter(Constants.MOMENTUM, momentum);
 	p.setParameter(Constants.WEIGHT_DECAY, weightDecay);
-	p.setParameter(Constants.LAYER_CALCULATOR, new LayerCalculatorImpl());
+	p.setParameter(Constants.LAYER_CALCULATOR, nn.getLayerCalculator());
 	p.setParameter(Constants.OUTPUT_ERROR_DERIVATIVE, new MSEDerivative());
 	p.setParameter(Constants.OUTPUT_ERROR, error);
 	p.setParameter(Constants.RANDOM_INITIALIZER, rand);

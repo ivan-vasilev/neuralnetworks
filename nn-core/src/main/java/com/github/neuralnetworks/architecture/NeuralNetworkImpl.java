@@ -41,13 +41,15 @@ public abstract class NeuralNetworkImpl implements NeuralNetwork {
     public Layer getInputLayer() {
 	hasInboundConnections:
 	for (Layer l : layers) {
-	    for (Connections c : l.getConnections()) {
-		if (isInnerConnection(c) && l == c.getOutputLayer()) {
-		    continue hasInboundConnections;
+	    if (!(l instanceof BiasLayer)) {
+		for (Connections c : l.getConnections()) {
+		    if (isInnerConnection(c) && l == c.getOutputLayer()) {
+			continue hasInboundConnections;
+		    }
 		}
-	    }
 
-	    return l;
+		return l;
+	    }
 	}
 
 	return null;

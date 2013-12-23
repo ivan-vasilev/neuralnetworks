@@ -15,7 +15,7 @@ public class MultiLayerPerceptron extends NeuralNetworkImpl {
 	    new FullyConnected(getOutputLayer(), layer);
 	}
 
-	if (addBias) {
+	if (addBias && getInputLayer() != layer) {
 	    Layer biasLayer = new BiasLayer();
 	    addLayer(biasLayer);
 	    new FullyConnected(biasLayer, layer);
