@@ -141,6 +141,28 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
 	    }
 	}
 
+	int totalInputSize = 0, totalWeightSize = 0, i = 0;
+	this.output = outputMatrix.getElements();
+
+	if (inputConnections.size() == 1) {
+	    java.util.Map.Entry<GraphConnections, Matrix> e = inputConnections.entrySet().iterator().next();
+	    this.input = e.getValue().getElements();
+	} else {
+	    this.input = storedInputs.get(totalInputSize);
+	    if (this.input == null) {
+		this.input = new float[totalInputSize];
+		storedInputs.put(totalInputSize, this.input);
+	    }
+
+	    i = 0;
+	    for (java.util.Map.Entry<GraphConnections, Matrix> e : inputConnections.entrySet()) {
+		System.arraycopy(e.getValue().getElements(), 0, input, inputStartPositions[i], e.getValue().getElements().length);
+		i++;
+	    }
+	}
+
+	setExecutionMode(Environment.getInstance().getExecutionMode());
+
 	if (targetLayer != currentLayer) {
 	    currentLayer = targetLayer;
 
@@ -148,13 +170,11 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
 	    this.weightsDimension = new int[series];
 	    this.inputStartIndexes = new int[series];
 	    this.outputStartIndexes = new int[series];
-	    this.output = outputMatrix.getElements();
 	    this.inputStartPositions = new int[series];
 	    this.weightStartPositions = new int[series];
 	    this.weightsInitialStep = new int[series];
 	    this.weightsStep = new int[series];
 
-	    int totalInputSize = 0, totalWeightSize = 0, i = 0;
 	    for (java.util.Map.Entry<GraphConnections, Matrix> e : inputConnections.entrySet()) {
 		Matrix cg = e.getKey().getConnectionGraph();
 
@@ -182,15 +202,8 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
 
 	    if (inputConnections.size() == 1) {
 		java.util.Map.Entry<GraphConnections, Matrix> e = inputConnections.entrySet().iterator().next();
-		this.input = e.getValue().getElements();
 		this.weights = e.getKey().getConnectionGraph().getElements();
 	    } else {
-		this.input = storedInputs.get(totalInputSize);
-		if (this.input == null) {
-		    this.input = new float[totalInputSize];
-		    storedInputs.put(totalInputSize, this.input);
-		}
-
 		this.weights = storedWeights.get(totalWeightSize);
 		if (weights == null) {
 		    this.weights = new float[totalWeightSize];
@@ -199,14 +212,11 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
 
 		i = 0;
 		for (java.util.Map.Entry<GraphConnections, Matrix> e : inputConnections.entrySet()) {
-		    System.arraycopy(e.getValue().getElements(), 0, input, inputStartPositions[i], e.getValue().getElements().length);
 		    System.arraycopy(e.getKey().getConnectionGraph().getElements(), 0, weights, weightStartPositions[i], e.getKey().getConnectionGraph().getElements().length);
 		    i++;
 		}
 	    }
 	}
-
-	setExecutionMode(Environment.getInstance().getExecutionMode());
     };
 
     @Override

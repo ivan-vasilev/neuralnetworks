@@ -2,7 +2,6 @@ package com.github.neuralnetworks.architecture.types;
 
 import com.github.neuralnetworks.architecture.BiasLayer;
 import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.calculation.ConnectionCalculatorImpl;
 import com.github.neuralnetworks.calculation.LayerCalculatorImpl;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSigmoid;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSoftReLU;
@@ -35,7 +34,7 @@ public class NNFactory {
 	result.setLayerCalculator(lc);
 	for (Layer l : result.getLayers()) {
 	    if (!(l instanceof BiasLayer) && l != result.getInputLayer()) {
-		lc.addConnectionCalculator(l, new ConnectionCalculatorImpl(new AparapiSigmoid()));
+		lc.addConnectionCalculator(l, new AparapiSigmoid());
 	    }
 	}
 
@@ -49,7 +48,7 @@ public class NNFactory {
 	result.setLayerCalculator(lc);
 	for (Layer l : result.getLayers()) {
 	    if (!(l instanceof BiasLayer) && l != result.getInputLayer()) {
-		lc.addConnectionCalculator(l, new ConnectionCalculatorImpl(new AparapiSoftReLU()));
+		lc.addConnectionCalculator(l, new AparapiSoftReLU());
 	    }
 	}
 
@@ -63,7 +62,7 @@ public class NNFactory {
 	result.setLayerCalculator(lc);
 	for (Layer l : result.getLayers()) {
 	    if (!(l instanceof BiasLayer) && l != result.getInputLayer()) {
-		lc.addConnectionCalculator(l, new ConnectionCalculatorImpl(new AparapiTanh()));
+		lc.addConnectionCalculator(l, new AparapiTanh());
 	    }
 	}
 
@@ -78,8 +77,8 @@ public class NNFactory {
 
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	ae.setLayerCalculator(lc);
-	lc.addConnectionCalculator(hidden, new ConnectionCalculatorImpl(new AparapiSigmoid()));
-	lc.addConnectionCalculator(output, new ConnectionCalculatorImpl(new AparapiSigmoid()));
+	lc.addConnectionCalculator(hidden, new AparapiSigmoid());
+	lc.addConnectionCalculator(output, new AparapiSigmoid());
 	
 	return ae;
     }
@@ -92,8 +91,8 @@ public class NNFactory {
 
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	ae.setLayerCalculator(lc);
-	lc.addConnectionCalculator(hidden, new ConnectionCalculatorImpl(new AparapiSoftReLU()));
-	lc.addConnectionCalculator(output, new ConnectionCalculatorImpl(new AparapiSoftReLU()));
+	lc.addConnectionCalculator(hidden, new AparapiSoftReLU());
+	lc.addConnectionCalculator(output, new AparapiSoftReLU());
 	
 	return ae;
     }
@@ -106,8 +105,8 @@ public class NNFactory {
 
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	ae.setLayerCalculator(lc);
-	lc.addConnectionCalculator(hidden, new ConnectionCalculatorImpl(new AparapiTanh()));
-	lc.addConnectionCalculator(output, new ConnectionCalculatorImpl(new AparapiTanh()));
+	lc.addConnectionCalculator(hidden, new AparapiTanh());
+	lc.addConnectionCalculator(output, new AparapiTanh());
 	
 	return ae;
     }
@@ -116,8 +115,8 @@ public class NNFactory {
 	RBM rbm = new RBM(new Layer(visibleCount), new Layer(hiddenCount), addBias, addBias);
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	rbm.setLayerCalculator(lc);
-	lc.addConnectionCalculator(rbm.getVisibleLayer(), new ConnectionCalculatorImpl(new AparapiSigmoid()));
-	lc.addConnectionCalculator(rbm.getHiddenLayer(), new ConnectionCalculatorImpl(new AparapiSigmoid()));
+	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiSigmoid());
+	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiSigmoid());
 
 	return rbm;
     }
@@ -126,8 +125,8 @@ public class NNFactory {
 	RBM rbm = new RBM(new Layer(visibleCount), new Layer(hiddenCount), addBias, addBias);
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	rbm.setLayerCalculator(lc);
-	lc.addConnectionCalculator(rbm.getVisibleLayer(), new ConnectionCalculatorImpl(new AparapiSoftReLU()));
-	lc.addConnectionCalculator(rbm.getHiddenLayer(), new ConnectionCalculatorImpl(new AparapiSoftReLU()));
+	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiSoftReLU());
+	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiSoftReLU());
 
 	return rbm;
     }
@@ -136,8 +135,8 @@ public class NNFactory {
 	RBM rbm = new RBM(new Layer(visibleCount), new Layer(hiddenCount), addBias, addBias);
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	rbm.setLayerCalculator(lc);
-	lc.addConnectionCalculator(rbm.getVisibleLayer(), new ConnectionCalculatorImpl(new AparapiTanh()));
-	lc.addConnectionCalculator(rbm.getHiddenLayer(), new ConnectionCalculatorImpl(new AparapiTanh()));
+	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiTanh());
+	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiTanh());
 
 	return rbm;
     }
@@ -146,8 +145,8 @@ public class NNFactory {
 	RBM rbm = new RBM(new Layer(visibleCount), new Layer(hiddenCount), addBias, addBias);
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	rbm.setLayerCalculator(lc);
-	lc.addConnectionCalculator(rbm.getVisibleLayer(), new ConnectionCalculatorImpl(new AparapiSigmoid()));
-	lc.addConnectionCalculator(rbm.getHiddenLayer(), new ConnectionCalculatorImpl(new AparapiStochasticBinary(new AparapiXORShiftInitializer())));
+	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiSigmoid());
+	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiStochasticBinary(new AparapiXORShiftInitializer()));
 
 	return rbm;
     }
@@ -156,8 +155,8 @@ public class NNFactory {
 	RBM rbm = new RBM(new Layer(visibleCount), new Layer(hiddenCount), addBias, addBias);
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	rbm.setLayerCalculator(lc);
-	lc.addConnectionCalculator(rbm.getVisibleLayer(), new ConnectionCalculatorImpl(new AparapiSoftReLU()));
-	lc.addConnectionCalculator(rbm.getHiddenLayer(), new ConnectionCalculatorImpl(new AparapiStochasticBinary(new AparapiXORShiftInitializer())));
+	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiSoftReLU());
+	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiStochasticBinary(new AparapiXORShiftInitializer()));
 
 	return rbm;
     }
@@ -166,8 +165,8 @@ public class NNFactory {
 	RBM rbm = new RBM(new Layer(visibleCount), new Layer(hiddenCount), addBias, addBias);
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	rbm.setLayerCalculator(lc);
-	lc.addConnectionCalculator(rbm.getVisibleLayer(), new ConnectionCalculatorImpl(new AparapiTanh()));
-	lc.addConnectionCalculator(rbm.getHiddenLayer(), new ConnectionCalculatorImpl(new AparapiStochasticBinary(new AparapiXORShiftInitializer())));
+	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiTanh());
+	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiStochasticBinary(new AparapiXORShiftInitializer()));
 
 	return rbm;
     }
@@ -176,8 +175,8 @@ public class NNFactory {
 	SupervisedRBM rbm = new SupervisedRBM(new Layer(visibleCount), new Layer(hiddenCount), new Layer(dataCount), addBias, addBias);
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	rbm.setLayerCalculator(lc);
-	lc.addConnectionCalculator(rbm.getVisibleLayer(), new ConnectionCalculatorImpl(new AparapiSigmoid()));
-	lc.addConnectionCalculator(rbm.getHiddenLayer(), new ConnectionCalculatorImpl(new AparapiSigmoid()));
+	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiSigmoid());
+	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiSigmoid());
 
 	return rbm;
     }
@@ -186,8 +185,8 @@ public class NNFactory {
 	SupervisedRBM rbm = new SupervisedRBM(new Layer(visibleCount), new Layer(hiddenCount), new Layer(dataCount), addBias, addBias);
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	rbm.setLayerCalculator(lc);
-	lc.addConnectionCalculator(rbm.getVisibleLayer(), new ConnectionCalculatorImpl(new AparapiSigmoid()));
-	lc.addConnectionCalculator(rbm.getHiddenLayer(), new ConnectionCalculatorImpl(new AparapiStochasticBinary(new AparapiXORShiftInitializer())));
+	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiSigmoid());
+	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiStochasticBinary(new AparapiXORShiftInitializer()));
 
 	return rbm;
     }
@@ -196,7 +195,7 @@ public class NNFactory {
 	SupervisedRBM rbm = new SupervisedRBM(new Layer(visibleCount), new Layer(hiddenCount), new Layer(dataCount), addBias, addBias);
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	rbm.setLayerCalculator(lc);
-	lc.addConnectionCalculator(rbm.getVisibleLayer(), new ConnectionCalculatorImpl(new AparapiSoftReLU()));
+	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiSoftReLU());
 	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiStochasticBinary(new AparapiXORShiftInitializer()));
 
 	return rbm;
@@ -206,8 +205,8 @@ public class NNFactory {
 	SupervisedRBM rbm = new SupervisedRBM(new Layer(visibleCount), new Layer(hiddenCount), new Layer(dataCount), addBias, addBias);
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	rbm.setLayerCalculator(lc);
-	lc.addConnectionCalculator(rbm.getVisibleLayer(), new ConnectionCalculatorImpl(new AparapiSoftReLU()));
-	lc.addConnectionCalculator(rbm.getHiddenLayer(), new ConnectionCalculatorImpl(new AparapiSoftReLU()));
+	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiSoftReLU());
+	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiSoftReLU());
 
 	return rbm;
     }
@@ -216,8 +215,8 @@ public class NNFactory {
 	SupervisedRBM rbm = new SupervisedRBM(new Layer(visibleCount), new Layer(hiddenCount), new Layer(dataCount), addBias, addBias);
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	rbm.setLayerCalculator(lc);
-	lc.addConnectionCalculator(rbm.getVisibleLayer(), new ConnectionCalculatorImpl(new AparapiTanh()));
-	lc.addConnectionCalculator(rbm.getHiddenLayer(), new ConnectionCalculatorImpl(new AparapiTanh()));
+	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiTanh());
+	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiTanh());
 
 	return rbm;
     }
@@ -242,7 +241,7 @@ public class NNFactory {
 	result.setLayerCalculator(lc);
 	for (Layer l : result.getLayers()) {
 	    if (!(l instanceof BiasLayer) && l != result.getInputLayer()) {
-		lc.addConnectionCalculator(l, new ConnectionCalculatorImpl(new AparapiSigmoid()));
+		lc.addConnectionCalculator(l, new AparapiSigmoid());
 	    }
 	}
 
@@ -256,7 +255,7 @@ public class NNFactory {
 	result.setLayerCalculator(lc);
 	for (Layer l : result.getLayers()) {
 	    if (!(l instanceof BiasLayer) && l != result.getInputLayer()) {
-		lc.addConnectionCalculator(l, new ConnectionCalculatorImpl(new AparapiSoftReLU()));
+		lc.addConnectionCalculator(l, new AparapiSoftReLU());
 	    }
 	}
 
@@ -270,7 +269,7 @@ public class NNFactory {
 	result.setLayerCalculator(lc);
 	for (Layer l : result.getLayers()) {
 	    if (!(l instanceof BiasLayer) && l != result.getInputLayer()) {
-		lc.addConnectionCalculator(l, new ConnectionCalculatorImpl(new AparapiTanh()));
+		lc.addConnectionCalculator(l, new AparapiTanh());
 	    }
 	}
 
@@ -296,7 +295,7 @@ public class NNFactory {
 	sae.setLayerCalculator(lc);
 	for (Layer l : sae.getLayers()) {
 	    if (!(l instanceof BiasLayer) && l != sae.getInputLayer()) {
-		lc.addConnectionCalculator(l, new ConnectionCalculatorImpl(new AparapiSigmoid()));
+		lc.addConnectionCalculator(l, new AparapiSigmoid());
 	    }
 	}
 
@@ -310,7 +309,7 @@ public class NNFactory {
 	sae.setLayerCalculator(lc);
 	for (Layer l : sae.getLayers()) {
 	    if (!(l instanceof BiasLayer) && l != sae.getInputLayer()) {
-		lc.addConnectionCalculator(l, new ConnectionCalculatorImpl(new AparapiSoftReLU()));
+		lc.addConnectionCalculator(l, new AparapiSoftReLU());
 	    }
 	}
 
@@ -324,7 +323,7 @@ public class NNFactory {
 	sae.setLayerCalculator(lc);
 	for (Layer l : sae.getLayers()) {
 	    if (!(l instanceof BiasLayer) && l != sae.getInputLayer()) {
-		lc.addConnectionCalculator(l, new ConnectionCalculatorImpl(new AparapiTanh()));
+		lc.addConnectionCalculator(l, new AparapiTanh());
 	    }
 	}
 
