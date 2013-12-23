@@ -2,6 +2,8 @@ package com.github.neuralnetworks.architecture;
 
 import java.util.Set;
 
+import com.github.neuralnetworks.calculation.LayerCalculator;
+
 /**
  * this interface is implemented by everything that wants to present itself as a
  * black box with with a list of input/output layers for example these could be
@@ -34,4 +36,9 @@ public interface NeuralNetwork {
      * @return all the connections in this network
      */
     public Set<Connections> getConnections();
+
+    /**
+     * LayerCalculator associated to this network
+     */
+    public LayerCalculator getLayerCalculator();
 }

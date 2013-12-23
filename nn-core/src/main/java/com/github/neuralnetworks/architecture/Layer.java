@@ -3,7 +3,6 @@ package com.github.neuralnetworks.architecture;
 import java.io.Serializable;
 import java.util.Set;
 
-import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.util.UniqueList;
 
 /**
@@ -21,11 +20,6 @@ public class Layer implements Serializable {
     private int neuronCount;
 
     /**
-     * Default connection calculator for this layer. TODO: because of the various ways (for example during training or test time) a layer is calculated it would be better to move this somewhere else.
-     */
-    private ConnectionCalculator connectionCalculator;
-
-    /**
      * Set of links to other layers
      */
     private Set<Connections> connections;
@@ -41,19 +35,6 @@ public class Layer implements Serializable {
 	this.connections = new UniqueList<>();
     }
 
-    public Layer(ConnectionCalculator connectionCalculator) {
-	super();
-	this.connectionCalculator = connectionCalculator;
-	this.connections = new UniqueList<>();
-    }
-
-    public Layer(int neuronCount, ConnectionCalculator connectionCalculator) {
-	super();
-	this.neuronCount = neuronCount;
-	this.connectionCalculator = connectionCalculator;
-	this.connections = new UniqueList<>();
-    }
-
     public int getNeuronCount() {
 	return neuronCount;
     }
@@ -62,13 +43,13 @@ public class Layer implements Serializable {
 	this.neuronCount = neuronCount;
     }
 
-    public ConnectionCalculator getConnectionCalculator() {
-	return connectionCalculator;
-    }
-
-    public void setConnectionCalculator(ConnectionCalculator connectionCalculator) {
-	this.connectionCalculator = connectionCalculator;
-    }
+//    public ConnectionCalculator getConnectionCalculator() {
+//	return connectionCalculator;
+//    }
+//
+//    public void setConnectionCalculator(ConnectionCalculator connectionCalculator) {
+//	this.connectionCalculator = connectionCalculator;
+//    }
 
     public Set<Connections> getConnections() {
 	return connections;

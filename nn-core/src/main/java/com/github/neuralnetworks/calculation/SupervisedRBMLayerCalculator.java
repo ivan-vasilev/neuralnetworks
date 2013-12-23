@@ -88,8 +88,8 @@ public class SupervisedRBMLayerCalculator extends RBMLayerCalculator {
 		}
 
 		System.arraycopy(combinedInput.getElements(), realInput.getElements().length, targetOutput.getElements(), 0, targetOutput.getElements().length);
-		if (dataOutputLayer.getConnectionCalculator() != null) {
-		    dataOutputLayer.getConnectionCalculator().calculate(null, targetOutput, null);
+		if (getConnectionCalculator(dataOutputLayer) != null) {
+		    getConnectionCalculator(dataOutputLayer).calculate(null, targetOutput, null);
 		}
 
 		results.put(dataOutputLayer, targetOutput);

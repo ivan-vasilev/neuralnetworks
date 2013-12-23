@@ -1,9 +1,9 @@
 package com.github.neuralnetworks.architecture.types;
 
+import com.github.neuralnetworks.architecture.BiasLayer;
 import com.github.neuralnetworks.architecture.FullyConnected;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
-import com.github.neuralnetworks.calculation.neuronfunctions.ConstantConnectionCalculator;
 
 /**
  * Autoencoder
@@ -29,14 +29,22 @@ public class Autoencoder extends NeuralNetworkImpl {
 
 	// biases are added
 	if (addBias) {
-	    Layer hiddenBiasLayer = new Layer(1, new ConstantConnectionCalculator(1));
+	    Layer hiddenBiasLayer = new BiasLayer();
 	    addLayer(hiddenBiasLayer);
 	    new FullyConnected(hiddenBiasLayer, hiddenLayer);
 
-	    Layer outputBiasLayer = new Layer(1, new ConstantConnectionCalculator(1));
+	    Layer outputBiasLayer = new BiasLayer();
 	    addLayer(outputBiasLayer);
 	    new FullyConnected(outputBiasLayer, outputLayer);
 	}
+    }
+
+    public Layer getHiddenLayer() {
+        return hiddenLayer;
+    }
+
+    public void setHiddenLayer(Layer hiddenLayer) {
+        this.hiddenLayer = hiddenLayer;
     }
 
     @Override

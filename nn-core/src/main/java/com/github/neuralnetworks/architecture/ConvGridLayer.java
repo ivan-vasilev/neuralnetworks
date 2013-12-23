@@ -1,6 +1,5 @@
 package com.github.neuralnetworks.architecture;
 
-import com.github.neuralnetworks.calculation.ConnectionCalculator;
 
 /**
  * Three dimensional layer to be used for convolutional and subsampling connections.
@@ -13,15 +12,8 @@ public class ConvGridLayer extends Layer {
     private int rows;
     private int filters;
 
-    public ConvGridLayer(ConnectionCalculator connectionCalculator) {
-	super(0, connectionCalculator);
-    }
-
-    public ConvGridLayer(int rows, int columns, int filters, ConnectionCalculator connectionCalculator) {
-	super(rows * columns * filters, connectionCalculator);
-	this.columns = columns;
-	this.rows = rows;
-	this.filters = filters;
+    public ConvGridLayer() {
+	super(0);
     }
 
     public ConvGridLayer(int rows, int columns, int filters) {

@@ -24,12 +24,7 @@ public class Util {
 	    switch (e.getKey()) {
 	    case Constants.NEURAL_NETWORK:
 		NeuralNetwork nn = (NeuralNetwork) e.getValue();
-		sb.append(System.getProperty("line.separator")).append(nn.getClass().getSimpleName()).append( " layers:").append(System.getProperty("line.separator"));
-		for (Layer l : nn.getLayers()) {
-		    sb	.append(l.getNeuronCount()).append(" neurons; ")
-		    	.append(l.getConnectionCalculator() != null ? l.getConnectionCalculator().getClass().getSimpleName() : "No").append(" connection calculator; ")
-		    	.append(System.getProperty("line.separator"));
-		}
+		sb.append(System.getProperty("line.separator")).append(nn.getClass().getSimpleName());
 		break;
 	    case Constants.OUTPUT_ERROR:
 		OutputError error = (OutputError) e.getValue();

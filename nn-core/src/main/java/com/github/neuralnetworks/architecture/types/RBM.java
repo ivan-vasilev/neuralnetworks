@@ -1,10 +1,10 @@
 package com.github.neuralnetworks.architecture.types;
 
+import com.github.neuralnetworks.architecture.BiasLayer;
 import com.github.neuralnetworks.architecture.FullyConnected;
 import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
-import com.github.neuralnetworks.calculation.neuronfunctions.ConstantConnectionCalculator;
 
 /**
  * 
@@ -40,13 +40,13 @@ public class RBM extends NeuralNetworkImpl {
 	mainConnections = new FullyConnected(visibleLayer, hiddenLayer);
 
 	if (addVisibleBias) {
-	    Layer visibleBiasLayer = new Layer(1, new ConstantConnectionCalculator(1));
+	    Layer visibleBiasLayer = new BiasLayer();
 	    addLayer(visibleBiasLayer);
 	    visibleBiasConnections = new FullyConnected(visibleLayer, visibleBiasLayer);
 	}
 
 	if (addHiddenBias) {
-	    Layer hiddenBiasLayer = new Layer(1, new ConstantConnectionCalculator(1));
+	    Layer hiddenBiasLayer = new BiasLayer();
 	    addLayer(hiddenBiasLayer);
 	    hiddenBiasConnections = new FullyConnected(hiddenBiasLayer, hiddenLayer);
 	}

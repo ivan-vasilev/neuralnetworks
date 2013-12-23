@@ -1,6 +1,5 @@
 package com.github.neuralnetworks.architecture;
 
-import com.github.neuralnetworks.calculation.ConnectionCalculator;
 
 /**
  * Subsampling connections. Contains information about the size of the subsampling region
@@ -17,8 +16,8 @@ public class Subsampling2DConnection extends ConnectionsImpl {
      */
     private int subsamplingRegionCols;
 
-    public Subsampling2DConnection(ConvGridLayer inputLayer, int subsamplingRegionRows, int subsamplingRegionCols, ConnectionCalculator outputConnectionCalculator) {
-	super(inputLayer, new ConvGridLayer(0, 0, inputLayer.getFilters(), outputConnectionCalculator));
+    public Subsampling2DConnection(ConvGridLayer inputLayer, int subsamplingRegionRows, int subsamplingRegionCols) {
+	super(inputLayer, new ConvGridLayer(0, 0, inputLayer.getFilters()));
 	
 	this.subsamplingRegionRows = subsamplingRegionRows;
 	this.subsamplingRegionCols = subsamplingRegionCols;

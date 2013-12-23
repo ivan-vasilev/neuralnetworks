@@ -2,6 +2,7 @@ package com.github.neuralnetworks.architecture;
 
 import java.util.Set;
 
+import com.github.neuralnetworks.calculation.LayerCalculator;
 import com.github.neuralnetworks.util.UniqueList;
 
 /**
@@ -11,10 +12,25 @@ import com.github.neuralnetworks.util.UniqueList;
 public abstract class NeuralNetworkImpl implements NeuralNetwork {
 
     private Set<Layer> layers;
+    private LayerCalculator layerCalculator;
 
     public NeuralNetworkImpl() {
 	super();
 	this.layers = new UniqueList<Layer>();
+    }
+
+    @Override
+    public LayerCalculator getLayerCalculator() {
+        return layerCalculator;
+    }
+
+    public void setLayerCalculator(LayerCalculator layerCalculator) {
+        this.layerCalculator = layerCalculator;
+    }
+
+    @Override
+    public Set<Layer> getLayers() {
+	return layers;
     }
 
     /* (non-Javadoc)
@@ -106,10 +122,5 @@ public abstract class NeuralNetworkImpl implements NeuralNetwork {
 	}
 
 	return false;
-    }
-
-    @Override
-    public Set<Layer> getLayers() {
-	return layers;
     }
 }

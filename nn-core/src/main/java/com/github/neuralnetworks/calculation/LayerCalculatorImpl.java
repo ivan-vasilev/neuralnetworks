@@ -2,6 +2,7 @@ package com.github.neuralnetworks.calculation;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -27,6 +28,7 @@ public class LayerCalculatorImpl implements LayerCalculator, Serializable {
     private static final long serialVersionUID = 1L;
 
     protected List<PropagationEventListener> listeners;
+    protected Map<Layer, ConnectionCalculator> calculators;
 
     @Override
     public void calculate(Set<Layer> calculatedLayers, Map<Layer, Matrix> results, Layer layer) {
@@ -91,7 +93,11 @@ public class LayerCalculatorImpl implements LayerCalculator, Serializable {
     }
 
     protected ConnectionCalculator getConnectionCalculator(Layer layer) {
-	return layer.getConnectionCalculator();
+	if (calculators != null) {
+	    return calculators.get(layer);
+	}
+
+	return null;
     }
 
     protected Matrix getLayerResult(Set<Layer> calculatedLayers, Map<Layer, Matrix> results, Layer layer) {
@@ -115,6 +121,20 @@ public class LayerCalculatorImpl implements LayerCalculator, Serializable {
 	}
 
 	return -1;
+    }
+
+    public void addConnectionCalculator(Layer layer, ConnectionCalculator calculator) {
+	if (calculators == null) {
+	    calculators = new HashMap<>();
+	}
+
+	calculators.put(layer, calculator);
+    }
+
+    public void removeConnectionCalculator(Layer layer) {
+	if (calculators != null) {
+	    calculators.remove(layer);
+	}
     }
 
     public void addEventListener(PropagationEventListener listener) {

@@ -15,21 +15,24 @@ public class BackPropagationLayerCalculatorImpl extends LayerCalculatorImpl impl
 
     private static final long serialVersionUID = 1L;
 
-    private BackPropagationConnectionCalculator connectionCalculator;
-
-    public BackPropagationLayerCalculatorImpl(BackPropagationConnectionCalculator connectionCalculator) {
+    public BackPropagationLayerCalculatorImpl() {
 	super();
-	this.connectionCalculator = connectionCalculator;
-    }
-
-    @Override
-    protected ConnectionCalculator getConnectionCalculator(Layer layer) {
-	return connectionCalculator;
     }
 
     @Override
     public void backpropagate(Set<Layer> calculatedLayers, Map<Layer, Matrix> activations, Map<Layer, Matrix> results, Layer layer) {
+	BackPropagationConnectionCalculator connectionCalculator = (BackPropagationConnectionCalculator) getConnectionCalculator(layer);
 	connectionCalculator.setActivations(activations);
 	super.calculate(calculatedLayers, results, layer);
+    }
+
+
+    @Override
+    public void addConnectionCalculator(Layer layer, ConnectionCalculator calculator) {
+	if (!(calculator instanceof BackPropagationConnectionCalculator)) {
+	    throw new IllegalArgumentException("Only BackPropagationConnectionCalculator is allowed");
+	}
+
+	super.addConnectionCalculator(layer, calculator);
     }
 }

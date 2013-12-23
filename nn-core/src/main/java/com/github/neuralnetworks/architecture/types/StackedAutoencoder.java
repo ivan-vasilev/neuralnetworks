@@ -15,17 +15,13 @@ public class StackedAutoencoder extends DNN {
     /**
      * This method creates new Autoencoder with input layer - the hidden layer of the previous topmost autoencoder.
      */
-    public void addLevel(Layer hidden, Layer output, boolean addBias) {
+    public void addLevel(Layer hidden, boolean addBias) {
 	Layer input = getOutputLayer();
 
 	if (input == null) {
 	    throw new IllegalArgumentException("At least one layer must be added before adding levels");
 	}
 
-	if (input.getNeuronCount() != output.getNeuronCount()) {
-	    output.setNeuronCount(input.getNeuronCount());
-	}
-
-	addNeuralNetwork(new Autoencoder(input, hidden, output, addBias));
+	addNeuralNetwork(new Autoencoder(input, hidden, new Layer(input.getNeuronCount()), addBias));
     }
 }

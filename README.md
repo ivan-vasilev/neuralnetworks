@@ -18,6 +18,7 @@ Each NeuralNetwork (default NeuralNetworkImpl) is defined by a list of Layers. E
 
 ###Layer types
 - Default Layer - has a neuron count property and default ConnectionCalculator (explained in the next section).
+- Bias Layer - bias layer.
 - ConvGridLayer - Convolutional 2D layer that contains information about the number of feature maps and width and height of each feature map.
 
 ###Connections between layers

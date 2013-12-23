@@ -1,17 +1,18 @@
 package com.github.neuralnetworks.calculation;
 
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import com.github.neuralnetworks.architecture.BiasLayer;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.calculation.neuronfunctions.ActivationFunction;
-import com.github.neuralnetworks.calculation.neuronfunctions.ConstantConnectionCalculator;
 import com.github.neuralnetworks.util.UniqueList;
 
 /**
@@ -45,15 +46,14 @@ public class ConnectionCalculatorImpl implements ConnectionCalculator {
     @Override
     public void calculate(SortedMap<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
 	SortedMap<Connections, Matrix> notBias = new TreeMap<>();
-	Map<GraphConnections, Float> bias = new TreeMap<>();
+	Set<GraphConnections> bias = new HashSet<>();
 
 	for (Entry<Connections, Matrix> e : connections.entrySet()) {
 	    Connections c = e.getKey();
 	    Matrix input = e.getValue();
 	    // bias layer scenarios
-	    if (c instanceof GraphConnections && c.getInputLayer().getConnectionCalculator() instanceof ConstantConnectionCalculator) {
-		ConstantConnectionCalculator cc = (ConstantConnectionCalculator) c.getInputLayer().getConnectionCalculator();
-		bias.put((GraphConnections) c, cc.getValue());
+	    if (c.getInputLayer() instanceof BiasLayer) {
+		bias.add((GraphConnections) c);
 	    } else {
 		notBias.put(c, input);
 	    }
@@ -72,12 +72,12 @@ public class ConnectionCalculatorImpl implements ConnectionCalculator {
 	}
     }
 
-    protected void calculateBias(Map<GraphConnections, Float> bias, Matrix output) {
+    protected void calculateBias(Set<GraphConnections> bias, Matrix output) {
 	if (bias.size() > 0) {
 	    float[] out = output.getElements();
 	    for (int i = 0; i < out.length; i++) {
-		for (Entry<GraphConnections, Float> e : bias.entrySet()) {
-		    out[i] += e.getKey().getConnectionGraph().getElements()[i / output.getColumns()] * e.getValue();
+		for (GraphConnections c : bias) {
+		    out[i + c.getInputLayerStartNeuron()] += c.getConnectionGraph().getElements()[i / output.getColumns()];
 		}
 	    }
 	}

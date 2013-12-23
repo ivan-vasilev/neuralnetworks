@@ -5,11 +5,11 @@ import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import com.github.neuralnetworks.architecture.BiasLayer;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
-import com.github.neuralnetworks.calculation.neuronfunctions.ConstantConnectionCalculator;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
 
@@ -38,7 +38,7 @@ public class BackPropagationConnectionCalculator implements ConnectionCalculator
 	for (Entry<Connections, Matrix> e : connections.entrySet()) {
 	    Connections c = e.getKey();
 	    Matrix input = e.getValue();
-	    if (c.getInputLayer().getConnectionCalculator() instanceof ConstantConnectionCalculator) {
+	    if (c.getInputLayer() instanceof BiasLayer) {
 		bias.put(c, output);
 		biasOutput = input;
 		biasLayer = c.getInputLayer();

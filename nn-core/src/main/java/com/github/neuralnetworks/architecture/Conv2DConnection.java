@@ -2,7 +2,6 @@ package com.github.neuralnetworks.architecture;
 
 import java.util.List;
 
-import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.util.UniqueList;
 
 /**
@@ -16,11 +15,7 @@ public class Conv2DConnection extends ConnectionsImpl {
     protected List<Matrix> filters;
     
     public Conv2DConnection(ConvGridLayer inputLayer) {
-	super(inputLayer, new ConvGridLayer(0, 0, 0, null));
-    }
-
-    public Conv2DConnection(ConvGridLayer inputLayer, ConnectionCalculator convCalculator) {
-	super(inputLayer, new ConvGridLayer(0, 0, 0, convCalculator));
+	super(inputLayer, new ConvGridLayer(0, 0, 0));
     }
 
     public List<Matrix> getFilters() {

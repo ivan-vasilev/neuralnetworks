@@ -2,6 +2,7 @@ package com.github.neuralnetworks.architecture;
 
 import java.util.Set;
 
+import com.github.neuralnetworks.calculation.LayerCalculator;
 import com.github.neuralnetworks.util.UniqueList;
 
 /**
@@ -64,6 +65,11 @@ public abstract class ConnectionsImpl implements Connections, Comparable<Connect
 	Set<Connections> result = new UniqueList<Connections>();
 	result.add(this);
 	return result;
+    }
+
+    @Override
+    public LayerCalculator getLayerCalculator() {
+	return null;
     }
 
     @Override
