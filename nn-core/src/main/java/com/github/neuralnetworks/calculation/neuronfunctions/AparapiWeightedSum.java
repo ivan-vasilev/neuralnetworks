@@ -224,11 +224,13 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
 	int id = getGlobalId();
 
 	// each input example
-	for (int i = 0; i < inputOutputColumns; i++) {
+	int ioc = inputOutputColumns;
+	int s = series;
+	for (int i = 0; i < ioc; i++) {
 	    before(id, i);
 
 	    // each connection (of the combined connections)
-	    for (int k = 0; k < series; k++) {
+	    for (int k = 0; k < s; k++) {
 
 		// each element in the row/column
 		float value = 0;
