@@ -81,6 +81,7 @@ public class AparapiConv2D extends Kernel implements ConnectionCalculator {
     }
 
     /**
+     * TODO
      * Converts connection, input and output data to one dimensional arrays (because of the Aparapi limitations)
      */
     protected void init(Conv2DConnection c, Matrix input, Matrix output) {
@@ -94,25 +95,25 @@ public class AparapiConv2D extends Kernel implements ConnectionCalculator {
 	    this.inputColumns = inputLayer.getColumns();
 	    this.outputColumns = outputLayer.getColumns();
 	    this.outputLength = outputLayer.getColumns() * outputLayer.getRows();
-	    this.featureMapStartIndexes = new int[c.getFilters().size() + 1];
+//	    this.featureMapStartIndexes = new int[c.getFilters().size() + 1];
 	    
 	    List<Integer> featureMapOffsets = new ArrayList<>();
 	    List<Float> featureMapWeights = new ArrayList<>();
 	    int offset = 0;
 	    
-	    for (int i = 0; i < c.getFilters().size(); i++) {
-		Matrix fm = c.getFilters().get(i);
-		featureMapStartIndexes[i] = offset;
-		for (int j = 0; j < fm.getRows(); j++) {
-		    for (int k = 0; k < fm.getColumns(); k++) {
-			featureMapWeights.add(fm.getElements()[k]);
-			featureMapOffsets.add(i * inputLayer.getRows() * inputLayer.getColumns() + j * inputLayer.getColumns() + k);
-			offset++;
-		    }
-		}
-	    }
+//	    for (int i = 0; i < c.getFilters().size(); i++) {
+//		Matrix fm = c.getFilters().get(i);
+//		featureMapStartIndexes[i] = offset;
+//		for (int j = 0; j < fm.getRows(); j++) {
+//		    for (int k = 0; k < fm.getColumns(); k++) {
+//			featureMapWeights.add(fm.getElements()[k]);
+//			featureMapOffsets.add(i * inputLayer.getRows() * inputLayer.getColumns() + j * inputLayer.getColumns() + k);
+//			offset++;
+//		    }
+//		}
+//	    }
 	    
-	    featureMapStartIndexes[c.getFilters().size()] = featureMapOffsets.size() - 1;
+//	    featureMapStartIndexes[c.getFilters().size()] = featureMapOffsets.size() - 1;
 	    
 	    if (this.featureMapOffsets == null || this.featureMapOffsets.length != featureMapOffsets.size()) {
 		this.featureMapOffsets = new int[featureMapOffsets.size()];

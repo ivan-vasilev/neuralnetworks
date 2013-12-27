@@ -47,7 +47,8 @@ public class CDWeightUpdatesKernel extends Kernel {
 	int visibleId = (id % weightColumns) * miniBatchSize;
 	int hiddenId = (id / weightColumns) * miniBatchSize;
 	float weightUpdate = 0;
-	for (int i = 0; i < miniBatchSize; i++) {
+	int mbs = miniBatchSize;
+	for (int i = 0; i < mbs; i++) {
 	    weightUpdate += posPhaseHidden[hiddenId + i] * posPhaseVisible[visibleId + i] - negPhaseHidden[hiddenId + i] * negPhaseVisible[visibleId + i];
 	}
 

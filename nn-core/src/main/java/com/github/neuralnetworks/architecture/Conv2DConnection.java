@@ -1,8 +1,5 @@
 package com.github.neuralnetworks.architecture;
 
-import java.util.List;
-
-import com.github.neuralnetworks.util.UniqueList;
 
 /**
  * Convolutional connection between layers (for 2d input data)
@@ -12,57 +9,70 @@ public class Conv2DConnection extends ConnectionsImpl {
     /**
      * The list of filters to be used in the connection
      */
-    protected List<Matrix> filters;
+    protected float[] weights;
+    protected int kernelColumns;
+    protected int kernelRows;
     
-    public Conv2DConnection(ConvGridLayer inputLayer) {
-	super(inputLayer, new ConvGridLayer(0, 0, 0));
+    public Conv2DConnection(ConvGridLayer inputLayer, int kernelColumns, int kernelRows) {
+	super(inputLayer, new ConvGridLayer());
+	this.kernelColumns = kernelColumns;
+	this.kernelRows = kernelRows;
+	ConvGridLayer o = (ConvGridLayer) getOutputLayer();
+	o.updateDimensions();
     }
 
-    public List<Matrix> getFilters() {
-	return filters;
-    }
-
-    public void setFilters(List<Matrix> filters) {
-	this.filters = filters;
-    }
-
-    /**
-     * Add new filter to the connection. This also means that the neuron count in the output layer has to be updated
-     * @param filter
-     */
-    public void addFilter(Matrix filter) {
-	if (filters == null) {
-	    filters = new UniqueList<>();
-	}
-
-	for (Matrix m : filters) {
-	    if (filter.getColumns() != m.getColumns() || filter.getRows() != m.getRows()) {
-		throw new IllegalArgumentException("All filters must have the same dimensions");
-	    }
-	}
-
-	filters.add(filter);
-
-	ConvGridLayer inputLayer = (ConvGridLayer) getInputLayer();
-	ConvGridLayer outputLayer = (ConvGridLayer) getOutputLayer();
-	outputLayer.setColumns(inputLayer.getColumns() - inputLayer.getColumns() % filter.getColumns());
-	outputLayer.setRows(inputLayer.getRows() - inputLayer.getRows() % filter.getRows());
-	outputLayer.setFilters(filters.size());
+    public Conv2DConnection(ConvGridLayer inputLayer, ConvGridLayer outputLayer) {
+	super(inputLayer, outputLayer);
+	updateDimensions();
     }
 
     /**
-     * Remove filter from the connection. This also means that the neuron count in the output layer has to be updated
-     * @param filter
+     * When some dimension changes in the output layer the weights array changes it's size
      */
-    public void removeFeatureMap(Matrix filter) {
-	if (filters != null && filters.contains(filter)) {
-	    filters.remove(filter);
-	    ConvGridLayer inputLayer = (ConvGridLayer) getInputLayer();
-	    ConvGridLayer outputLayer = (ConvGridLayer) getOutputLayer();
-	    outputLayer.setColumns(inputLayer.getColumns() - inputLayer.getColumns() % filter.getColumns());
-	    outputLayer.setRows(inputLayer.getRows() - inputLayer.getRows() % filter.getRows());
+    public void updateDimensions() {
+	ConvGridLayer i = (ConvGridLayer) getInputLayer();
+	ConvGridLayer o = (ConvGridLayer) getOutputLayer();
+	kernelColumns = i.getColumns() % o.getColumns() + 1;
+	kernelRows = i.getRows() % o.getRows() + 1;
+	updateWeights();
+    }
 
-	    outputLayer.setFilters(filters.size());
+    protected void updateWeights() {
+	ConvGridLayer i = (ConvGridLayer) getInputLayer();
+	ConvGridLayer o = (ConvGridLayer) getOutputLayer();
+	int totalWeights = kernelColumns * kernelRows * o.getFilters() * i.getFilters();
+	if (weights == null || weights.length != totalWeights) {
+	    weights = new float[totalWeights];
 	}
+    }
+
+    public float[] getWeights() {
+	return weights;
+    }
+
+    public void setWeights(float[] weights) {
+	this.weights = weights;
+    }
+
+    public int getKernelColumns() {
+        return kernelColumns;
+    }
+
+    public void setKernelColumns(int kernelColumns) {
+        this.kernelColumns = kernelColumns;
+        updateWeights();
+	ConvGridLayer o = (ConvGridLayer) getOutputLayer();
+	o.updateDimensions();
+    }
+
+    public int getKernelRows() {
+        return kernelRows;
+    }
+
+    public void setKernelRows(int kernelRows) {
+        this.kernelRows = kernelRows;
+        updateWeights();
+	ConvGridLayer o = (ConvGridLayer) getOutputLayer();
+	o.updateDimensions();
     }
 }

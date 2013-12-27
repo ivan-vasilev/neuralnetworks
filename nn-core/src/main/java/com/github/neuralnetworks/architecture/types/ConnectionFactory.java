@@ -2,7 +2,6 @@ package com.github.neuralnetworks.architecture.types;
 
 import com.github.neuralnetworks.architecture.Conv2DConnection;
 import com.github.neuralnetworks.architecture.ConvGridLayer;
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.Subsampling2DConnection;
 import com.github.neuralnetworks.calculation.LayerCalculatorImpl;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiAveragePooling2D;
@@ -18,13 +17,7 @@ import com.github.neuralnetworks.calculation.neuronfunctions.AparapiStochasticPo
 public class ConnectionFactory {
 
     public static Conv2DConnection convConnection(ConvGridLayer inputLayer, int featureMapRows, int featureMapColumns, int featureMaps) {
-	Conv2DConnection result = new Conv2DConnection(inputLayer);
-
-	for (int i = 0; i < featureMaps; i++) {
-	    result.addFilter(new Matrix(featureMapRows, featureMapColumns));
-	}
-
-	return result;
+	return new Conv2DConnection(inputLayer, featureMapColumns, featureMapRows);
     }
 
     public static Conv2DConnection convSigmoidConnection(ConvGridLayer inputLayer, LayerCalculatorImpl lc, int featureMapRows, int featureMapColumns, int featureMaps) {

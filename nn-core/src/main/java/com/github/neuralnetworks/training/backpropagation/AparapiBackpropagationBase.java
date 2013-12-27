@@ -72,7 +72,8 @@ public class AparapiBackpropagationBase extends AparapiWeightedSum {
     protected void after(int row, int column) {
 	calcDerivativeBefore(row, column);
 
-	for (int i = 0; i < series; i++) {
+	int s = series;
+	for (int i = 0; i < s; i++) {
 	    int inputStartPosition = inputStartPositions[i];
 	    int inputStartIndex = inputStartIndexes[i];
 	    int initialWeightIndex = weightStartPositions[i] + weightsInitialStep[i] * getGlobalId();

@@ -241,7 +241,7 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
 		int dim = weightsDimension[k];
 
 		for (int j = 0; j < dim; j++) {
-		    value += input[inputStartPosition + (inputStartIndex + j) * inputOutputColumns + i] * weights[initialWeightIndex + j * weightStep];
+		    value += input[inputStartPosition + (inputStartIndex + j) * ioc + i] * weights[initialWeightIndex + j * weightStep];
 		}
 
 		output[outputIndex(id, i, k)] += value;
