@@ -30,7 +30,7 @@ public class ConvGridLayer extends Layer {
     public void setColumns(int columns) {
 	this.columns = columns;
 	updateNeuronCount();
-	updateDimensions();
+	getInputConnection().updateDimensions();
     }
 
     public int getRows() {
@@ -40,7 +40,7 @@ public class ConvGridLayer extends Layer {
     public void setRows(int rows) {
 	this.rows = rows;
 	updateNeuronCount();
-	updateDimensions();
+	getInputConnection().updateDimensions();
     }
 
     public int getFilters() {
@@ -50,7 +50,7 @@ public class ConvGridLayer extends Layer {
     public void setFilters(int filters) {
 	this.filters = filters;
 	updateNeuronCount();
-	updateDimensions();
+	getInputConnection().updateDimensions();
     }
     
     public void updateDimensions() {
@@ -60,11 +60,22 @@ public class ConvGridLayer extends Layer {
 		ConvGridLayer input = (ConvGridLayer) con.getInputLayer();
 		setRows(input.getRows() - input.getRows() % con.getKernelRows());
 		setColumns(input.getColumns() - input.getColumns() % con.getKernelColumns());
+		break;
 	    }
 	}
     }
 
     protected void updateNeuronCount() {
 	setNeuronCount(rows * columns * filters);
+    }
+
+    protected Conv2DConnection getInputConnection() {
+	for (Connections c : getConnections()) {
+	    if (c instanceof Conv2DConnection && c.getOutputLayer() == this) {
+		return (Conv2DConnection) c;
+	    }
+	}
+
+	return null;
     }
 }
