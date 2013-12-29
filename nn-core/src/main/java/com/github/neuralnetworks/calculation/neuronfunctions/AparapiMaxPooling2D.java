@@ -8,14 +8,21 @@ public class AparapiMaxPooling2D extends AparapiSubsampling2D {
     private static final long serialVersionUID = -2393526660090301257L;
 
     @Override
-    protected void currentValuesUpdated() {
-	float max = currentValues[0];
-	for (int i = 1; i < regionLength; i++) {
-	    if (currentValues[i] > max) {
-		max = currentValues[i];
-	    }
-	}
+    protected void pool(int inputStartIndex) {
+	int rl = regionLength;
+	int ios = inputOutputSamples;
+	float max = 0;
 
-	output[getGlobalId()] = max;
+	for (int i = 0; i < ios; i++) {
+	    max = input[inputStartIndex + featureMapOffsets[0]];
+	    for (int j = 1; j < rl; j++) {
+		float v = input[(inputStartIndex + featureMapOffsets[j]) * ios + i];
+		if (v > max) {
+		    max = v;
+		}
+	    }
+	    
+	    output[getGlobalId() * ios + i] = max;
+	}
     }
 }

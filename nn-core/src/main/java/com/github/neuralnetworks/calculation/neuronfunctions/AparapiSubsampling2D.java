@@ -32,6 +32,11 @@ public class AparapiSubsampling2D extends Kernel implements ConnectionCalculator
     protected int outputLength;
 
     /**
+     * input samples count
+     */
+    protected int inputOutputSamples;
+
+    /**
      * Length of the subsampling region (subsampling rows *  subsampling cols)
      */
     protected int regionLength;
@@ -47,13 +52,9 @@ public class AparapiSubsampling2D extends Kernel implements ConnectionCalculator
     protected float[] output;
 
     /**
-     * Contains only the input values that are in the current region. The current region is determined by the current output neuron
-     */
-    protected float[] currentValues;
-
-    /**
      * Contains the offset in the input array for each cell of the current region. The offset is calculated in respect to the first cell of the region
      */
+    @Local
     protected int[] featureMapOffsets;
 
     /**
@@ -79,6 +80,8 @@ public class AparapiSubsampling2D extends Kernel implements ConnectionCalculator
      * @param output
      */
     protected void init(Subsampling2DConnection c, Matrix input, Matrix output) {
+	this.inputOutputSamples = output.getColumns();
+
 	if (c != current) {
 	    current = c;
 
@@ -86,12 +89,11 @@ public class AparapiSubsampling2D extends Kernel implements ConnectionCalculator
 	    ConvGridLayer outputLayer = (ConvGridLayer) c.getOutputLayer();
 	    this.input = input.getElements();
 	    this.output = output.getElements();
-	    this.inputLength = inputLayer.getFeatureMapColumns() * inputLayer.getFeatureMapRows();
-	    this.outputLength = outputLayer.getFeatureMapColumns() * outputLayer.getFeatureMapRows();
+	    this.inputLength = inputLayer.getFeatureMapLength();
+	    this.outputLength = outputLayer.getFeatureMapLength();
 	    this.regionLength = c.getSubsamplingRegionRows() * c.getSubsamplingRegionCols();
 	    this.featureMapOffsets = new int[regionLength];
 	    this.outputInputIndexes = new int [outputLength];
-	    this.currentValues = new float[regionLength];
 
 	    for (int i = 0, j = 0; j < c.getSubsamplingRegionRows(); j++) {
 		for (int k = 0; k < c.getSubsamplingRegionCols(); k++, i++) {
@@ -122,21 +124,12 @@ public class AparapiSubsampling2D extends Kernel implements ConnectionCalculator
 	// get current feature map
 	int featureMap = id / outputLength;
 
-	// calculate the start index (in the input of the current subsampling region)
-	int inputStartIndex = featureMap * inputLength + outputInputIndexes[id - featureMap * outputLength];
-
-	// populate currentValues based on the inputStartIndex and the offsets in featureMapOffsets
-	for (int i = 0; i < regionLength; i++) {
-	    currentValues[i] = input[inputStartIndex + featureMapOffsets[i]];
-	}
-
-	// the actual subsampling
-	currentValuesUpdated();
+	pool(featureMap * inputLength + outputInputIndexes[id - featureMap * outputLength]);
     }
 
     /**
-     * This is where the subsampling happens based on the extracted values in currentValues
+     * This is where the subsampling happens
      */
-    protected void currentValuesUpdated() {
+    protected void pool(int inputStartIndex) {
     }
 }

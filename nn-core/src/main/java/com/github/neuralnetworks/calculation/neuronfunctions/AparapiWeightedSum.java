@@ -1,7 +1,6 @@
 package com.github.neuralnetworks.calculation.neuronfunctions;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.SortedMap;
 
@@ -133,13 +132,7 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
      * the connections
      */
     protected void init(SortedMap<GraphConnections, Matrix> inputConnections, Matrix outputMatrix, Layer targetLayer) {
-	Iterator<Matrix> it = inputConnections.values().iterator();
-	this.inputOutputColumns = it.next().getColumns();
-	while (it.hasNext()) {
-	    if (inputOutputColumns != it.next().getColumns()) {
-		throw new IllegalArgumentException("Input is not the same");
-	    }
-	}
+	this.inputOutputColumns = outputMatrix.getColumns();
 
 	int totalInputSize = 0, totalWeightSize = 0, i = 0;
 	this.output = outputMatrix.getElements();

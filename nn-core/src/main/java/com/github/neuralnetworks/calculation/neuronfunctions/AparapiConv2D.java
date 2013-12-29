@@ -34,9 +34,9 @@ public class AparapiConv2D extends Kernel implements ConnectionCalculator {
     protected int outputColumns;
 
     /**
-     * output kernels count
+     * number of samples per calculation (for example number of images)
      */
-    protected int outputKernels;
+    protected int inputOutputSamples;
 
     /**
      * output columns * output rows
@@ -83,14 +83,16 @@ public class AparapiConv2D extends Kernel implements ConnectionCalculator {
 
 	ConvGridLayer tl = (ConvGridLayer) targetLayer;
 
-	this.execute(tl.getFeatureMapLength());
+	this.execute(tl.getNeuronCount());
     }
 
     /**
-     * TODO
      * Converts connection, input and output data to one dimensional arrays (because of the Aparapi limitations)
      */
     protected void init(Conv2DConnection c, Matrix input, Matrix output) {
+	this.inputOutputSamples = input.getColumns();
+	setExecutionMode(Environment.getInstance().getExecutionMode());
+
 	if (current != c) {
 	    current = c;
 
@@ -101,13 +103,12 @@ public class AparapiConv2D extends Kernel implements ConnectionCalculator {
 	    this.weights = c.getWeights();
 	    this.inputColumns = inputLayer.getFeatureMapColumns();
 	    this.outputColumns = outputLayer.getFeatureMapColumns();
-	    this.outputKernels = outputLayer.getFilters();
 	    this.featureMapLength = outputLayer.getFeatureMapLength();
 	    this.featureMapWeights = c.getWeights().length / outputLayer.getFilters();
 	    this.featureMapOffsets = new int[featureMapWeights];
-	    
+
 	    int offset = 0;
-	    
+
 	    for (int i = 0; i < inputLayer.getFilters(); i++) {
 		for (int j = 0; j < c.getKernelRows(); j++) {
 		    for (int k = 0; k < c.getKernelColumns(); k++) {
@@ -116,8 +117,6 @@ public class AparapiConv2D extends Kernel implements ConnectionCalculator {
 		}
 	    }
 	}
-
-	setExecutionMode(Environment.getInstance().getExecutionMode());
     }
 
     @Override
@@ -126,24 +125,25 @@ public class AparapiConv2D extends Kernel implements ConnectionCalculator {
 
 	// calculate sum based on feature map offsets and feature map weights
 	float sum = 0;
+	int ios = inputOutputSamples;
 	int fmw = featureMapWeights;
-	int fml = featureMapLength;
-	int ok = outputKernels;
+	int featureMap = id / featureMapLength;
 
-	for (int k = 0; k < ok; k++) {
-	    for (int i = 0, j = fmw * k; i < fmw; i++, j++) {
-		sum += input[id + featureMapOffsets[i]] * weights[j];
+	for (int p = 0; p < ios; p++) {
+	    for (int i = 0, j = fmw * featureMap; i < fmw; i++, j++) {
+		sum += input[(id + featureMapOffsets[i]) * ios + p] * weights[j];
 	    }
 
-	    output[k * fml + id] = sum;
+	    int outputIndex = id * ios + p;
+	    output[outputIndex] = sum;
 
-	    after();
+	    after(outputIndex);
 	}
     }
 
     /**
      * this is called after the convolution
      */
-    protected void after() {
+    protected void after(int outputIndex) {
     }
 }
