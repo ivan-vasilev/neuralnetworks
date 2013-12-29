@@ -51,8 +51,7 @@ public class Subsampling2DConnection extends ConnectionsImpl {
 	if (subsamplingRegionRows != 0 && subsamplingRegionCols != 0) {
 	    ConvGridLayer inputLayer = (ConvGridLayer) getInputLayer();
 	    ConvGridLayer outputLayer = (ConvGridLayer) getOutputLayer();
-	    outputLayer.setFeatureMapRows(inputLayer.getFeatureMapRows() / subsamplingRegionRows);
-	    outputLayer.setFeatureMapColumns(inputLayer.getFeatureMapColumns() / subsamplingRegionCols);
+	    outputLayer.setDimensions(inputLayer.getFeatureMapRows() / subsamplingRegionRows, inputLayer.getFeatureMapColumns() / subsamplingRegionCols, outputLayer.getFilters());
 	}
     }
 }

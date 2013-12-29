@@ -27,20 +27,21 @@ public class ConvGridLayer extends Layer {
 	return featureMapColumns;
     }
 
-    public void setFeatureMapColumns(int featureMapColumns) {
+    public void setDimensions(int featureMaprows, int featureMapColumns, int filters) {
+	this.featureMapRows = featureMaprows;
 	this.featureMapColumns = featureMapColumns;
+	this.filters = filters;
+
 	updateNeuronCount();
-	getInputConnection().updateDimensions();
+
+	Conv2DConnection c = getInputConvConnection();
+	if (c != null) {
+	    c.updateDimensions();
+	}
     }
 
     public int getFeatureMapRows() {
 	return featureMapRows;
-    }
-
-    public void setFeatureMapRows(int featureMaprows) {
-	this.featureMapRows = featureMaprows;
-	updateNeuronCount();
-	getInputConnection().updateDimensions();
     }
 
     public int getFeatureMapLength() {
@@ -50,20 +51,13 @@ public class ConvGridLayer extends Layer {
     public int getFilters() {
 	return filters;
     }
-
-    public void setFilters(int filters) {
-	this.filters = filters;
-	updateNeuronCount();
-	getInputConnection().updateDimensions();
-    }
     
     public void updateDimensions() {
 	for (Connections c : getConnections()) {
 	    Conv2DConnection con = (Conv2DConnection) c;
 	    if (con.getOutputLayer() == this) {
 		ConvGridLayer input = (ConvGridLayer) con.getInputLayer();
-		setFeatureMapRows(input.getFeatureMapRows() - input.getFeatureMapRows() % con.getKernelRows());
-		setFeatureMapColumns(input.getFeatureMapColumns() - input.getFeatureMapColumns() % con.getKernelColumns());
+		setDimensions(input.getFeatureMapRows() - con.getKernelRows() + 1, input.getFeatureMapColumns() - con.getKernelColumns() + 1, filters);
 		break;
 	    }
 	}
@@ -73,7 +67,7 @@ public class ConvGridLayer extends Layer {
 	setNeuronCount(featureMapRows * featureMapColumns * filters);
     }
 
-    protected Conv2DConnection getInputConnection() {
+    protected Conv2DConnection getInputConvConnection() {
 	for (Connections c : getConnections()) {
 	    if (c instanceof Conv2DConnection && c.getOutputLayer() == this) {
 		return (Conv2DConnection) c;

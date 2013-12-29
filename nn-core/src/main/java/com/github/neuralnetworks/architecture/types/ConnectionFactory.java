@@ -16,24 +16,24 @@ import com.github.neuralnetworks.calculation.neuronfunctions.AparapiStochasticPo
  */
 public class ConnectionFactory {
 
-    public static Conv2DConnection convConnection(ConvGridLayer inputLayer, int featureMapRows, int featureMapColumns, int featureMaps) {
-	return new Conv2DConnection(inputLayer, featureMapColumns, featureMapRows);
+    public static Conv2DConnection convConnection(ConvGridLayer inputLayer, int kernelRows, int kernelColumns, int filters) {
+	return new Conv2DConnection(inputLayer, kernelColumns, kernelRows, filters);
     }
 
-    public static Conv2DConnection convSigmoidConnection(ConvGridLayer inputLayer, LayerCalculatorImpl lc, int featureMapRows, int featureMapColumns, int featureMaps) {
-	Conv2DConnection result = convConnection(inputLayer, featureMapRows, featureMapColumns, featureMaps);
+    public static Conv2DConnection convSigmoidConnection(ConvGridLayer inputLayer, LayerCalculatorImpl lc, int kernelRows, int kernelColumns, int kernels) {
+	Conv2DConnection result = convConnection(inputLayer, kernelRows, kernelColumns, kernels);
 	lc.addConnectionCalculator(result.getOutputLayer(), new AparapiConv2DSigmoid());
 	return result;
     }
 
-    public static Conv2DConnection convSoftReLUConnection(ConvGridLayer inputLayer, LayerCalculatorImpl lc, int featureMapRows, int featureMapColumns, int featureMaps) {
-	Conv2DConnection result = convConnection(inputLayer, featureMapRows, featureMapColumns, featureMaps);
+    public static Conv2DConnection convSoftReLUConnection(ConvGridLayer inputLayer, LayerCalculatorImpl lc, int kernelRows, int kernelColumns, int kernels) {
+	Conv2DConnection result = convConnection(inputLayer, kernelRows, kernelColumns, kernels);
 	lc.addConnectionCalculator(result.getOutputLayer(), new AparapiConv2DSoftReLU());
 	return result;
     }
 
-    public static Conv2DConnection convTanhConnection(ConvGridLayer inputLayer, LayerCalculatorImpl lc, int featureMapRows, int featureMapColumns, int featureMaps) {
-	Conv2DConnection result = convConnection(inputLayer, featureMapRows, featureMapColumns, featureMaps);
+    public static Conv2DConnection convTanhConnection(ConvGridLayer inputLayer, LayerCalculatorImpl lc, int kernelRows, int kernelColumns, int kernels) {
+	Conv2DConnection result = convConnection(inputLayer, kernelRows, kernelColumns, kernels);
 	lc.addConnectionCalculator(result.getOutputLayer(), new AparapiConv2DTanh());
 	return result;
     }

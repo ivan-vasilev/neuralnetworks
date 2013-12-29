@@ -1,0 +1,23 @@
+allprojects  {
+  apply plugin: 'maven'
+  apply plugin: 'eclipse'
+  group = 'com.github'
+  version = '0.1-SNAPSHOT'
+}
+
+subprojects {
+  apply plugin: 'java'
+  sourceCompatibility = 1.7
+  targetCompatibility = 1.7
+
+  
+  repositories {
+    mavenLocal()
+    
+    maven { url "http://repo.maven.apache.org/maven2" }
+  }
+
+  
+  
+  
+}

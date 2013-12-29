@@ -99,7 +99,7 @@ public abstract class NeuralNetworkImpl implements NeuralNetwork {
      * @param layer
      * @return whether the layer was added successfully
      */
-    protected boolean addLayer(Layer layer) {
+    public boolean addLayer(Layer layer) {
 	if (layer != null) {
 	    if (layers == null) {
 		layers = new UniqueList<>();
@@ -112,6 +112,17 @@ public abstract class NeuralNetworkImpl implements NeuralNetwork {
 	}
 
 	return false;
+    }
+
+    /**
+     * Add connection to the network - this means adding both input and output layers to the network
+     * @param connection
+     */
+    public void addConnection(Connections connection) {
+	if (connection != null) {
+	    addLayer(connection.getInputLayer());
+	    addLayer(connection.getOutputLayer());
+	}
     }
 
     /**
