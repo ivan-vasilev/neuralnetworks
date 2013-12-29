@@ -8,39 +8,43 @@ public class ConvGridLayer extends Layer {
 
     private static final long serialVersionUID = -4824165465883890932L;
 
-    private int columns;
-    private int rows;
+    private int featureMapColumns;
+    private int featureMapRows;
     private int filters;
 
     public ConvGridLayer() {
 	super(0);
     }
 
-    public ConvGridLayer(int rows, int columns, int filters) {
-	super(rows * columns * filters);
-	this.columns = columns;
-	this.rows = rows;
+    public ConvGridLayer(int featureMapRows, int featureMapColumns, int filters) {
+	super(featureMapRows * featureMapColumns * filters);
+	this.featureMapColumns = featureMapColumns;
+	this.featureMapRows = featureMapRows;
 	this.filters = filters;
     }
 
-    public int getColumns() {
-	return columns;
+    public int getFeatureMapColumns() {
+	return featureMapColumns;
     }
 
-    public void setColumns(int columns) {
-	this.columns = columns;
+    public void setFeatureMapColumns(int featureMapColumns) {
+	this.featureMapColumns = featureMapColumns;
 	updateNeuronCount();
 	getInputConnection().updateDimensions();
     }
 
-    public int getRows() {
-	return rows;
+    public int getFeatureMapRows() {
+	return featureMapRows;
     }
 
-    public void setRows(int rows) {
-	this.rows = rows;
+    public void setFeatureMapRows(int featureMaprows) {
+	this.featureMapRows = featureMaprows;
 	updateNeuronCount();
 	getInputConnection().updateDimensions();
+    }
+
+    public int getFeatureMapLength() {
+	return featureMapRows * featureMapColumns;
     }
 
     public int getFilters() {
@@ -58,15 +62,15 @@ public class ConvGridLayer extends Layer {
 	    Conv2DConnection con = (Conv2DConnection) c;
 	    if (con.getOutputLayer() == this) {
 		ConvGridLayer input = (ConvGridLayer) con.getInputLayer();
-		setRows(input.getRows() - input.getRows() % con.getKernelRows());
-		setColumns(input.getColumns() - input.getColumns() % con.getKernelColumns());
+		setFeatureMapRows(input.getFeatureMapRows() - input.getFeatureMapRows() % con.getKernelRows());
+		setFeatureMapColumns(input.getFeatureMapColumns() - input.getFeatureMapColumns() % con.getKernelColumns());
 		break;
 	    }
 	}
     }
 
     protected void updateNeuronCount() {
-	setNeuronCount(rows * columns * filters);
+	setNeuronCount(featureMapRows * featureMapColumns * filters);
     }
 
     protected Conv2DConnection getInputConnection() {

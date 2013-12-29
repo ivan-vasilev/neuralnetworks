@@ -1,7 +1,5 @@
 package com.github.neuralnetworks.calculation.neuronfunctions;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.SortedMap;
 
 import com.amd.aparapi.Kernel;
@@ -20,7 +18,6 @@ import com.github.neuralnetworks.util.Environment;
  * !!! IMPORTANT !!!
  * Aparapi only works one-dimensional arrays of primitive data types can only call member methods of the Kernel class itself.
  * 
- * 
  */
 public class AparapiConv2D extends Kernel implements ConnectionCalculator {
 
@@ -37,9 +34,14 @@ public class AparapiConv2D extends Kernel implements ConnectionCalculator {
     protected int outputColumns;
 
     /**
+     * output kernels count
+     */
+    protected int outputKernels;
+
+    /**
      * output columns * output rows
      */
-    protected int outputLength;
+    protected int featureMapLength;
 
     /**
      * input
@@ -54,17 +56,19 @@ public class AparapiConv2D extends Kernel implements ConnectionCalculator {
     /**
      * combined feature weights of all feature maps
      */
-    protected float[] featureMapWeights;
+    @Local
+    protected float[] weights;
+    
+    /**
+     * weights for single feature map
+     */
+    protected int featureMapWeights;
 
     /**
      * input offset for each feature map in respect to the start index
      */
+    @Local
     protected int[] featureMapOffsets;
-
-    /**
-     * feature map start indexes in the featureMapOffsets array
-     */
-    protected int[] featureMapStartIndexes;
 
     /**
      * current connection
@@ -77,7 +81,9 @@ public class AparapiConv2D extends Kernel implements ConnectionCalculator {
 
 	this.init(c, connections.values().iterator().next(), output);
 
-	this.execute(targetLayer.getNeuronCount());
+	ConvGridLayer tl = (ConvGridLayer) targetLayer;
+
+	this.execute(tl.getFeatureMapLength());
     }
 
     /**
@@ -92,40 +98,22 @@ public class AparapiConv2D extends Kernel implements ConnectionCalculator {
 	    ConvGridLayer outputLayer = (ConvGridLayer) c.getOutputLayer();
 	    this.input = input.getElements();
 	    this.output = output.getElements();
-	    this.inputColumns = inputLayer.getColumns();
-	    this.outputColumns = outputLayer.getColumns();
-	    this.outputLength = outputLayer.getColumns() * outputLayer.getRows();
-//	    this.featureMapStartIndexes = new int[c.getFilters().size() + 1];
+	    this.weights = c.getWeights();
+	    this.inputColumns = inputLayer.getFeatureMapColumns();
+	    this.outputColumns = outputLayer.getFeatureMapColumns();
+	    this.outputKernels = outputLayer.getFilters();
+	    this.featureMapLength = outputLayer.getFeatureMapLength();
+	    this.featureMapWeights = c.getWeights().length / outputLayer.getFilters();
+	    this.featureMapOffsets = new int[featureMapWeights];
 	    
-	    List<Integer> featureMapOffsets = new ArrayList<>();
-	    List<Float> featureMapWeights = new ArrayList<>();
 	    int offset = 0;
 	    
-//	    for (int i = 0; i < c.getFilters().size(); i++) {
-//		Matrix fm = c.getFilters().get(i);
-//		featureMapStartIndexes[i] = offset;
-//		for (int j = 0; j < fm.getRows(); j++) {
-//		    for (int k = 0; k < fm.getColumns(); k++) {
-//			featureMapWeights.add(fm.getElements()[k]);
-//			featureMapOffsets.add(i * inputLayer.getRows() * inputLayer.getColumns() + j * inputLayer.getColumns() + k);
-//			offset++;
-//		    }
-//		}
-//	    }
-	    
-//	    featureMapStartIndexes[c.getFilters().size()] = featureMapOffsets.size() - 1;
-	    
-	    if (this.featureMapOffsets == null || this.featureMapOffsets.length != featureMapOffsets.size()) {
-		this.featureMapOffsets = new int[featureMapOffsets.size()];
-	    }
-	    
-	    if (this.featureMapWeights == null || this.featureMapWeights.length != featureMapOffsets.size()) {
-		this.featureMapWeights = new float[featureMapOffsets.size()];
-	    }
-	    
-	    for (int i = 0; i < featureMapOffsets.size(); i++) {
-		this.featureMapOffsets[i] = featureMapOffsets.get(i);
-		this.featureMapWeights[i] = featureMapWeights.get(i);
+	    for (int i = 0; i < inputLayer.getFilters(); i++) {
+		for (int j = 0; j < c.getKernelRows(); j++) {
+		    for (int k = 0; k < c.getKernelColumns(); k++) {
+			featureMapOffsets[offset++] = i * inputLayer.getFeatureMapLength() + j * inputLayer.getFeatureMapColumns() + k;
+		    }
+		}
 	    }
 	}
 
@@ -136,24 +124,21 @@ public class AparapiConv2D extends Kernel implements ConnectionCalculator {
     public void run() {
 	int id = getGlobalId();
 
-	// get feature map data
-	int featureMap = id / outputLength;
-	int featureMapStartIndex = featureMapStartIndexes[featureMap];
-	int featureMapEndIndex = featureMapStartIndexes[featureMap + 1];
-
-	// get input index
-	int currentImageMapIndex = id % outputLength;
-	int inputIndex = (currentImageMapIndex / outputColumns) * inputColumns + currentImageMapIndex % outputColumns;
-
 	// calculate sum based on feature map offsets and feature map weights
 	float sum = 0;
-	for (; featureMapStartIndex < featureMapEndIndex; featureMapStartIndex++) {
-	    sum += input[inputIndex + featureMapOffsets[featureMapStartIndex]] * featureMapWeights[featureMapStartIndex];
+	int fmw = featureMapWeights;
+	int fml = featureMapLength;
+	int ok = outputKernels;
+
+	for (int k = 0; k < ok; k++) {
+	    for (int i = 0, j = fmw * k; i < fmw; i++, j++) {
+		sum += input[id + featureMapOffsets[i]] * weights[j];
+	    }
+
+	    output[k * fml + id] = sum;
+
+	    after();
 	}
-
-	output[id] = sum;
-
-	after();
     }
 
     /**

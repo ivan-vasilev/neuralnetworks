@@ -86,8 +86,8 @@ public class AparapiSubsampling2D extends Kernel implements ConnectionCalculator
 	    ConvGridLayer outputLayer = (ConvGridLayer) c.getOutputLayer();
 	    this.input = input.getElements();
 	    this.output = output.getElements();
-	    this.inputLength = inputLayer.getColumns() * inputLayer.getRows();
-	    this.outputLength = outputLayer.getColumns() * outputLayer.getRows();
+	    this.inputLength = inputLayer.getFeatureMapColumns() * inputLayer.getFeatureMapRows();
+	    this.outputLength = outputLayer.getFeatureMapColumns() * outputLayer.getFeatureMapRows();
 	    this.regionLength = c.getSubsamplingRegionRows() * c.getSubsamplingRegionCols();
 	    this.featureMapOffsets = new int[regionLength];
 	    this.outputInputIndexes = new int [outputLength];
@@ -95,15 +95,15 @@ public class AparapiSubsampling2D extends Kernel implements ConnectionCalculator
 
 	    for (int i = 0, j = 0; j < c.getSubsamplingRegionRows(); j++) {
 		for (int k = 0; k < c.getSubsamplingRegionCols(); k++, i++) {
-		    featureMapOffsets[i] = j * inputLayer.getColumns() + k;
+		    featureMapOffsets[i] = j * inputLayer.getFeatureMapColumns() + k;
 		}
 	    }
 
 	    int inputRowsOffset = (input.getRows() % c.getSubsamplingRegionRows()) / 2;
 	    int inputColsOffset = (input.getColumns() % c.getSubsamplingRegionCols()) / 2;
-	    for (int j = 0; j < outputLayer.getRows(); j++) {
-		for (int k = 0; k < outputLayer.getColumns(); k++) {
-		    outputInputIndexes[j * inputLayer.getColumns() + k] = (inputRowsOffset + c.getSubsamplingRegionRows() * j) * inputLayer.getColumns() + inputColsOffset + c.getSubsamplingRegionCols() * k;
+	    for (int j = 0; j < outputLayer.getFeatureMapRows(); j++) {
+		for (int k = 0; k < outputLayer.getFeatureMapColumns(); k++) {
+		    outputInputIndexes[j * inputLayer.getFeatureMapColumns() + k] = (inputRowsOffset + c.getSubsamplingRegionRows() * j) * inputLayer.getFeatureMapColumns() + inputColsOffset + c.getSubsamplingRegionCols() * k;
 		}
 	    }
 	}

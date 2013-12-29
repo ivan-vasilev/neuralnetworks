@@ -44,24 +44,24 @@ public class Conv2DConnection extends ConnectionsImpl {
     public int getKernelColumns() {
         ConvGridLayer i = (ConvGridLayer) getInputLayer();
 	ConvGridLayer o = (ConvGridLayer) getOutputLayer();
-	return i.getColumns() % o.getColumns() + 1;
+	return i.getFeatureMapColumns() % o.getFeatureMapColumns() + 1;
     }
 
     public void setKernelColumns(int kernelColumns) {
         ConvGridLayer i = (ConvGridLayer) getInputLayer();
 	ConvGridLayer o = (ConvGridLayer) getOutputLayer();
-	o.setColumns(i.getColumns() - i.getColumns() % kernelColumns);
+	o.setFeatureMapColumns(i.getFeatureMapColumns() - i.getFeatureMapColumns() % kernelColumns);
     }
 
     public int getKernelRows() {
         ConvGridLayer i = (ConvGridLayer) getInputLayer();
 	ConvGridLayer o = (ConvGridLayer) getOutputLayer();
-	return i.getRows() % o.getRows() + 1;
+	return i.getFeatureMapRows() % o.getFeatureMapRows() + 1;
     }
 
     public void setKernelRows(int kernelRows) {
         ConvGridLayer i = (ConvGridLayer) getInputLayer();
 	ConvGridLayer o = (ConvGridLayer) getOutputLayer();
-	o.setRows(i.getRows() - i.getRows() % kernelRows);
+	o.setFeatureMapRows(i.getFeatureMapRows() - i.getFeatureMapRows() % kernelRows);
     }
 }
