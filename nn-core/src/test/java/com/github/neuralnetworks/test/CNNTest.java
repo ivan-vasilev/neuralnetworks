@@ -16,11 +16,7 @@ public class CNNTest {
 
     @Test
     public void testDimensions() {
-	DefaultNeuralNetwork nn = new DefaultNeuralNetwork();
-	ConvGridLayer input = new ConvGridLayer(4, 4, 3);
-
-	Conv2DConnection c = ConnectionFactory.convConnection(input, 2, 2, 2);
-	nn.addConnection(c);
+	Conv2DConnection c = ConnectionFactory.convConnection(new ConvGridLayer(4, 4, 3), 2, 2, 2);
 
 	ConvGridLayer output = (ConvGridLayer) c.getOutputLayer();
 
