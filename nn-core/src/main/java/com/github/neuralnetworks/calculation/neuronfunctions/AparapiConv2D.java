@@ -124,14 +124,15 @@ public class AparapiConv2D extends Kernel implements ConnectionCalculator {
 	int id = getGlobalId();
 
 	// calculate sum based on feature map offsets and feature map weights
-	float sum = 0;
 	int ios = inputOutputSamples;
+	int inputId = (id / outputColumns) * inputColumns + id % outputColumns;
 	int fmw = featureMapWeights;
 	int featureMap = id / featureMapLength;
 
+	float sum = 0;
 	for (int p = 0; p < ios; p++) {
 	    for (int i = 0, j = fmw * featureMap; i < fmw; i++, j++) {
-		sum += input[(id + featureMapOffsets[i]) * ios + p] * weights[j];
+		sum += input[(inputId + featureMapOffsets[i]) * ios + p] * weights[j];
 	    }
 
 	    int outputIndex = id * ios + p;

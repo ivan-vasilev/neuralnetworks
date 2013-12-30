@@ -6,16 +6,17 @@ import java.util.TreeMap;
 
 import org.junit.Test;
 
-import com.github.neuralnetworks.architecture.BiasLayer;
+import com.amd.aparapi.Kernel.EXECUTION_MODE;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
 import com.github.neuralnetworks.architecture.ConvGridLayer;
-import com.github.neuralnetworks.architecture.FullyConnected;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.types.ConnectionFactory;
 import com.github.neuralnetworks.architecture.types.DefaultNeuralNetwork;
 import com.github.neuralnetworks.calculation.ConnectionCalculatorImpl;
-import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSum;
+import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2D;
+import com.github.neuralnetworks.util.Environment;
+import com.github.neuralnetworks.util.Util;
 
 /**
  * Tests for convolutional networks
@@ -36,74 +37,35 @@ public class CNNTest {
     @Test
     public void testConvolutions() {
 	DefaultNeuralNetwork nn = new DefaultNeuralNetwork();
-	Conv2DConnection c = ConnectionFactory.convConnection(new ConvGridLayer(3, 3, 2), 2, 2, 2);
+	Conv2DConnection c = ConnectionFactory.convConnection(new ConvGridLayer(3, 3, 2), 2, 2, 1);
 	nn.addConnection(c);
+	c.getWeights()[0] = 1;
+	c.getWeights()[1] = 2;
+	c.getWeights()[2] = 3;
+	c.getWeights()[3] = 4;
+	c.getWeights()[4] = 1;
+	c.getWeights()[5] = 2;
+	c.getWeights()[6] = 3;
+	c.getWeights()[7] = 4;
 
-	Matrix i1 = new Matrix(3, 2);
-	i1.set(0, 0, 1);
-	i1.set(1, 0, 2);
-	i1.set(2, 0, 3);
-	i1.set(0, 1, 4);
-	i1.set(1, 1, 5);
-	i1.set(2, 1, 6);
-	
-	ConnectionCalculatorImpl aws = new ConnectionCalculatorImpl(new AparapiWeightedSum());
+	Matrix i1 = new Matrix(new float[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18}, 1);
+
+	Matrix o = new Matrix(4, 1);
+
+	ConnectionCalculatorImpl conv = new ConnectionCalculatorImpl(new AparapiConv2D());
 
 	TreeMap<Connections, Matrix> map = new TreeMap<Connections, Matrix>();
-	map.put(c1, i1);
-	aws.calculate(map, o, ol);
+	map.put(c, i1);
+
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.JTP);
+
+	conv.calculate(map, o, c.getOutputLayer());
 
 	// most simple case
-	assertEquals(14, o.get(0, 0), 0);
-	assertEquals(32, o.get(0, 1), 0);
-	assertEquals(32, o.get(1, 0), 0);
-	assertEquals(77, o.get(1, 1), 0);
+	assertEquals(164, o.get(0, 0), 0);
+	assertEquals(184, o.get(0, 1), 0);
+	assertEquals(224, o.get(0, 2), 0);
+	assertEquals(244, o.get(0, 3), 0);
 	Util.fillArray(o.getElements(), 0);
-
-	// with bias
-	FullyConnected bc = new FullyConnected(new BiasLayer(), ol);
-	Matrix bcg = bc.getConnectionGraph();
-	bcg.set(0, 0, 0.1f);
-	bcg.set(1, 0, 0.2f);
-	map.put(bc, new Matrix(2, 2));
-	aws = new ConnectionCalculatorImpl(new AparapiWeightedSum());
-	aws.calculate(map, o, ol);
-
-	assertEquals(14.1, o.get(0, 0), 0.01);
-	assertEquals(32.1, o.get(0, 1), 0.01);
-	assertEquals(32.2, o.get(1, 0), 0.01);
-	assertEquals(77.2, o.get(1, 1), 0.01);
-	Util.fillArray(o.getElements(), 0);
-
-	// combined layers
-	Layer il2 = new Layer(3);
-	FullyConnected c2 = new FullyConnected(il2, ol);
-	cg = c2.getConnectionGraph();
-	cg.set(0, 0, 1);
-	cg.set(0, 1, 2);
-	cg.set(0, 2, 3);
-	cg.set(1, 0, 4);
-	cg.set(1, 1, 5);
-	cg.set(1, 2, 6);
-
-	Matrix i2 = new Matrix(3, 2);
-
-	i2.set(0, 0, 1);
-	i2.set(1, 0, 2);
-	i2.set(2, 0, 3);
-	i2.set(0, 1, 4);
-	i2.set(1, 1, 5);
-	i2.set(2, 1, 6);
-
-	map.put(c2, i2);
-	aws = new ConnectionCalculatorImpl(new AparapiWeightedSum());
-	aws.calculate(map, o, ol);
-
-	assertEquals(28.1, o.get(0, 0), 0.01);
-	assertEquals(64.1, o.get(0, 1), 0.01);
-	assertEquals(64.2, o.get(1, 0), 0.01);
-	assertEquals(154.2, o.get(1, 1), 0.01);
-	Util.fillArray(o.getElements(), 0);
-
     }
 }
