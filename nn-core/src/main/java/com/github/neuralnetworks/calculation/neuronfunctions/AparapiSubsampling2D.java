@@ -20,16 +20,26 @@ import com.github.neuralnetworks.util.Environment;
 public class AparapiSubsampling2D extends Kernel implements ConnectionCalculator {
 
     private static final long serialVersionUID = 8931101094464503687L;
+    
+    /**
+     * input feature map columns
+     */
+    protected int inputFeatureMapColumns;
 
     /**
      * Length of the input image (rows * cols)
      */
-    protected int inputLength;
+    protected int inputFeatureMapLength;
+    
+    /**
+     * output feature map columns
+     */
+    protected int outputFeatureMapColumns;
 
     /**
      * Length of the output image (rows * cols)
      */
-    protected int outputLength;
+    protected int outputFeatureMapLength;
 
     /**
      * input samples count
@@ -37,9 +47,29 @@ public class AparapiSubsampling2D extends Kernel implements ConnectionCalculator
     protected int inputOutputSamples;
 
     /**
+     * subsampling region rows
+     */
+    protected int subsamplingRows;
+    
+    /**
+     * subsampling region columns
+     */
+    protected int subsamplingCols;
+
+    /**
      * Length of the subsampling region (subsampling rows *  subsampling cols)
      */
     protected int regionLength;
+
+    /**
+     * offset from start when mapping input to output
+     */
+    protected int ioRowsOffset;
+
+    /**
+     * offset from start when mapping input to output
+     */
+    protected int ioColumnsOffset;
 
     /**
      * input data
@@ -57,10 +87,6 @@ public class AparapiSubsampling2D extends Kernel implements ConnectionCalculator
     @Local
     protected int[] featureMapOffsets;
 
-    /**
-     * Mapping between output-input indexes.
-     */
-    protected int[] outputInputIndexes;
     protected Subsampling2DConnection current;
 
     @Override
@@ -89,23 +115,20 @@ public class AparapiSubsampling2D extends Kernel implements ConnectionCalculator
 	    ConvGridLayer outputLayer = (ConvGridLayer) c.getOutputLayer();
 	    this.input = input.getElements();
 	    this.output = output.getElements();
-	    this.inputLength = inputLayer.getFeatureMapLength();
-	    this.outputLength = outputLayer.getFeatureMapLength();
-	    this.regionLength = c.getSubsamplingRegionRows() * c.getSubsamplingRegionCols();
+	    this.inputFeatureMapColumns = inputLayer.getFeatureMapColumns();
+	    this.inputFeatureMapLength = inputLayer.getFeatureMapLength();
+	    this.outputFeatureMapColumns = outputLayer.getFeatureMapColumns();
+	    this.outputFeatureMapLength = outputLayer.getFeatureMapLength();
+	    this.subsamplingRows = c.getSubsamplingRegionRows();
+	    this.subsamplingCols = c.getSubsamplingRegionCols();
+	    this.regionLength = subsamplingRows * subsamplingCols;
+	    this.ioRowsOffset = (input.getRows() % subsamplingRows) / 2;
+	    this.ioColumnsOffset = (input.getColumns() % subsamplingCols) / 2;
 	    this.featureMapOffsets = new int[regionLength];
-	    this.outputInputIndexes = new int [outputLength];
 
-	    for (int i = 0, j = 0; j < c.getSubsamplingRegionRows(); j++) {
-		for (int k = 0; k < c.getSubsamplingRegionCols(); k++, i++) {
+	    for (int i = 0, j = 0; j < subsamplingRows; j++) {
+		for (int k = 0; k < subsamplingCols; k++, i++) {
 		    featureMapOffsets[i] = j * inputLayer.getFeatureMapColumns() + k;
-		}
-	    }
-
-	    int inputRowsOffset = (input.getRows() % c.getSubsamplingRegionRows()) / 2;
-	    int inputColsOffset = (input.getColumns() % c.getSubsamplingRegionCols()) / 2;
-	    for (int j = 0; j < outputLayer.getFeatureMapRows(); j++) {
-		for (int k = 0; k < outputLayer.getFeatureMapColumns(); k++) {
-		    outputInputIndexes[j * inputLayer.getFeatureMapColumns() + k] = (inputRowsOffset + c.getSubsamplingRegionRows() * j) * inputLayer.getFeatureMapColumns() + inputColsOffset + c.getSubsamplingRegionCols() * k;
 		}
 	    }
 	}
@@ -121,10 +144,10 @@ public class AparapiSubsampling2D extends Kernel implements ConnectionCalculator
     public void run() {
 	int id = getGlobalId();
 
-	// get current feature map
-	int featureMap = id / outputLength;
+	// get current offset
+	int fmOffset = id % outputFeatureMapLength;
 
-	pool(featureMap * inputLength + outputInputIndexes[id - featureMap * outputLength]);
+	pool((id / outputFeatureMapLength) * inputFeatureMapLength + (ioRowsOffset + (fmOffset / outputFeatureMapColumns) * subsamplingRows) * inputFeatureMapColumns + (fmOffset % outputFeatureMapColumns) * subsamplingCols);
     }
 
     /**

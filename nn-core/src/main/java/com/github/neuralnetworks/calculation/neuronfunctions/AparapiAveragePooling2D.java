@@ -15,7 +15,7 @@ public class AparapiAveragePooling2D extends AparapiSubsampling2D {
 
 	for (int i = 0; i < ios; i++) {
 	    sum = 0;
-	    for (int j = 1; j < rl; j++) {
+	    for (int j = 0; j < rl; j++) {
 		sum += input[(inputStartIndex + featureMapOffsets[j]) * ios + i];
 	    }
 	    

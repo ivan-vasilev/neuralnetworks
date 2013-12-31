@@ -19,7 +19,7 @@ public class AparapiStochasticPooling2D extends AparapiSubsampling2D {
 	    sum = 0;
 	    result = 0;
 
-	    for (int j = 1; j < rl; j++) {
+	    for (int j = 0; j < rl; j++) {
 		sum += input[(inputStartIndex + featureMapOffsets[j]) * ios + i];
 	    }
 	    
