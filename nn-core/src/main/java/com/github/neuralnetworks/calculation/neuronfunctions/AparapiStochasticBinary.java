@@ -53,12 +53,12 @@ public class AparapiStochasticBinary extends ConnectionCalculatorImpl {
 	}
 
 	@Override
-	protected void after(int row, int column) {
-	    int index = outputBaseIndex(row, column);
-	    if (random[index] < 1 / (1 + exp(-output[index]))) {
-		output[index] = 1;
+	protected void after(float value, int row, int column) {
+	    int outputId = outputIndex(row, column);
+	    if (random[outputId] < 1 / (1 + exp(-value))) {
+		output[outputId] = 1;
 	    } else {
-		output[index] = 0;
+		output[outputId] = 0;
 	    }
 	}
     }

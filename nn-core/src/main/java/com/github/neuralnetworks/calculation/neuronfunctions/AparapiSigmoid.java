@@ -15,9 +15,8 @@ public class AparapiSigmoid extends ConnectionCalculatorImpl {
 	private static final long serialVersionUID = -3409078521599849086L;
 
 	@Override
-	protected void after(int row, int column) {
-	    int index = outputBaseIndex(row, column);
-	    output[index] = 1 / (1 + exp(-output[index]));
+	protected void after(float value, int row, int column) {
+	    output[outputIndex(row, column)] =  1 / (1 + exp(-value));
 	}
     }
 }

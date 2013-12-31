@@ -64,18 +64,6 @@ public abstract class AparapiBaseFunction extends Kernel implements ConnectionCa
      * This is combined with the other properties to represent the FullyConnected connection (the FullyConnected class itself cannot be used because of the Aparapi limitations)
      * It is an array, because of the combined connections
      */
-    protected int[] inputStartIndexes;
-
-    /**
-     * This is combined with the other properties to represent the FullyConnected connection (the FullyConnected class itself cannot be used because of the Aparapi limitations)
-     * It is an array, because of the combined connections
-     */
-    protected int[] outputStartIndexes;
-
-    /**
-     * This is combined with the other properties to represent the FullyConnected connection (the FullyConnected class itself cannot be used because of the Aparapi limitations)
-     * It is an array, because of the combined connections
-     */
     protected int[] inputStartPositions;
 
     /**
@@ -119,8 +107,6 @@ public abstract class AparapiBaseFunction extends Kernel implements ConnectionCa
 	boolean hasInput = false, hasOutput = false;
 	this.series = inputConnections.size();
 	this.weightsColumns = new int[series];
-	this.inputStartIndexes = new int[series];
-	this.outputStartIndexes = new int[series];
 	this.output = outputMatrix.getElements();
 	this.inputStartPositions = new int[series];
 	this.weightStartPositions = new int[series];
@@ -145,8 +131,6 @@ public abstract class AparapiBaseFunction extends Kernel implements ConnectionCa
 	    totalWeightSize += e.getKey().getConnectionGraph().getElements().length;
 
 	    weightsColumns[i] = e.getKey().getConnectionGraph().getColumns();
-	    inputStartIndexes[i] = e.getKey().getInputLayerStartNeuron();
-	    outputStartIndexes[i] = e.getKey().getOutputLayerStartNeuron();
 
 	    i++;
 	}
@@ -190,20 +174,13 @@ public abstract class AparapiBaseFunction extends Kernel implements ConnectionCa
      * helper method for retrieving input value based on row, column and series
      */
     protected int inputIndex(int row, int column, int series) {
-	return inputStartPositions[series] + (inputStartIndexes[series] + row) * inputOutputColumns + column;
+	return inputStartPositions[series] + row * inputOutputColumns + column;
     }
 
     /**
      * helper method for retrieving output value based on row, column and series
      */
     protected int outputIndex(int row, int column, int series) {
-	return (outputStartIndexes[series] + row) * inputOutputColumns + column;
-    }
-
-    /**
-     * helper method for retrieving weight value based on row and column
-     */
-    protected int outputBaseIndex(int row, int column) {
 	return row * inputOutputColumns + column;
     }
 }

@@ -33,11 +33,6 @@ public class ConvGridLayer extends Layer {
 	this.filters = filters;
 
 	updateNeuronCount();
-
-	Conv2DConnection c = getInputConvConnection();
-	if (c != null) {
-	    c.updateDimensions();
-	}
     }
 
     public int getFeatureMapRows() {
@@ -50,17 +45,6 @@ public class ConvGridLayer extends Layer {
 
     public int getFilters() {
 	return filters;
-    }
-    
-    public void updateDimensions() {
-	for (Connections c : getConnections()) {
-	    Conv2DConnection con = (Conv2DConnection) c;
-	    if (con.getOutputLayer() == this) {
-		ConvGridLayer input = (ConvGridLayer) con.getInputLayer();
-		setDimensions(input.getFeatureMapRows() - con.getKernelRows() + 1, input.getFeatureMapColumns() - con.getKernelColumns() + 1, filters);
-		break;
-	    }
-	}
     }
 
     protected void updateNeuronCount() {

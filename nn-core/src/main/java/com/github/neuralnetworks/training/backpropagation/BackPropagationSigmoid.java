@@ -18,9 +18,8 @@ public class BackPropagationSigmoid extends BackPropagationConnectionCalculator 
 	private static final long serialVersionUID = -3580345016542506932L;
 
 	@Override
-	protected void calcDerivativeBefore(int row, int column) {
-	    int id = outputBaseIndex(row, column);
-	    output[id] *= outputActivation[id] * (1 - outputActivation[id]);
+	protected void calcDerivativeBefore(float activation, float error, int outputId) {
+	    output[outputId] = error * activation * (1 - activation);
 	}
     }
 }

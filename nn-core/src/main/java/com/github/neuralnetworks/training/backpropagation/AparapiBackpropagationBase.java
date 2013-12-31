@@ -69,39 +69,45 @@ public class AparapiBackpropagationBase extends AparapiWeightedSum {
     }
 
     @Override
-    protected void after(int row, int column) {
-	calcDerivativeBefore(row, column);
+    protected void after(float value, int row, int column) {
+	int outputIndex = outputIndex(row, column);
+	float activation = outputActivation[outputIndex];
+	calcDerivativeBefore(activation, value, outputIndex);
 
 	int s = series;
+	int ios = inputOutputSamples;
+	float lr = learningRate;
+	float wd = weightDecay;
+	float mm = momentum;
+
 	for (int i = 0; i < s; i++) {
 	    int inputStartPosition = inputStartPositions[i];
 	    int inputStartIndex = inputStartIndexes[i];
 	    int initialWeightIndex = weightStartPositions[i] + weightsInitialStep[i] * getGlobalId();
 	    int weightStep = weightsStep[i];
 	    int dim = weightsDimension[i];
-	    int outputIndex = outputIndex(row, column, i);
 
 	    for (int j = 0; j < dim; j++) {
 		int weightIndex = initialWeightIndex + j * weightStep;
-		float weightUpdate = learningRate * (input[inputStartPosition + (inputStartIndex + j) * inputOutputColumns + column] * outputActivation[outputIndex] - weightDecay * weights[weightIndex]) + momentum * weightUpdates[weightIndex];
+		float weightUpdate = lr * (input[inputStartPosition + (inputStartIndex + j) * ios + column] * activation - wd * weights[weightIndex]) + mm * weightUpdates[weightIndex];
 		weights[weightIndex] += weightUpdate;
 		weightUpdates[weightIndex] = weightUpdate;
 	    }
 	}
 
-	calcDerivativeAfter(row, column);
+	calcDerivativeAfter(activation, value, outputIndex);
     }
 
     /**
      * calculate derivative before weights update
      */
-    protected void calcDerivativeBefore(int row, int column) {
+    protected void calcDerivativeBefore(float activation, float value, int outputId) {
     }
 
     /**
      * calculate derivative after weights update
      */
-    protected void calcDerivativeAfter(int row, int column) {
+    protected void calcDerivativeAfter(float activation, float value, int outputId) {
     }
 
     public float[] getOutputActivation() {

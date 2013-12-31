@@ -7,16 +7,6 @@ package com.github.neuralnetworks.architecture;
 public interface GraphConnections extends Connections {
 
     /**
-     * @return the start neuron of the input layer neurons
-     */
-    public int getInputLayerStartNeuron();
-
-    /**
-     * @return the start neuron of the output layer neurons
-     */
-    public int getOutputLayerStartNeuron();
-
-    /**
      * @return ConnectionGraph with weights
      */
     public Matrix getConnectionGraph();

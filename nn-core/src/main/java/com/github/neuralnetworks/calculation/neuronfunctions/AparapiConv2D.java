@@ -41,7 +41,7 @@ public class AparapiConv2D extends Kernel implements ConnectionCalculator {
     /**
      * output columns * output rows
      */
-    protected int featureMapLength;
+    protected int outputFeatureMapLength;
 
     /**
      * input
@@ -103,13 +103,11 @@ public class AparapiConv2D extends Kernel implements ConnectionCalculator {
 	    this.weights = c.getWeights();
 	    this.inputColumns = inputLayer.getFeatureMapColumns();
 	    this.outputColumns = outputLayer.getFeatureMapColumns();
-	    this.featureMapLength = outputLayer.getFeatureMapLength();
+	    this.outputFeatureMapLength = outputLayer.getFeatureMapLength();
 	    this.featureMapWeights = c.getWeights().length / outputLayer.getFilters();
 	    this.featureMapOffsets = new int[featureMapWeights];
 
-	    int offset = 0;
-
-	    for (int i = 0; i < inputLayer.getFilters(); i++) {
+	    for (int i = 0, offset = 0; i < inputLayer.getFilters(); i++) {
 		for (int j = 0; j < c.getKernelRows(); j++) {
 		    for (int k = 0; k < c.getKernelColumns(); k++) {
 			featureMapOffsets[offset++] = i * inputLayer.getFeatureMapLength() + j * inputLayer.getFeatureMapColumns() + k;
@@ -125,26 +123,25 @@ public class AparapiConv2D extends Kernel implements ConnectionCalculator {
 
 	// calculate sum based on feature map offsets and feature map weights
 	int ios = inputOutputSamples;
-	int inputId = (id / outputColumns) * inputColumns + id % outputColumns;
+	int inputId = ((id % outputFeatureMapLength) / outputColumns) * inputColumns + id % outputColumns;
 	int fmw = featureMapWeights;
-	int featureMap = id / featureMapLength;
+	int weightsStartId = fmw * (id / outputFeatureMapLength);
 
 	float sum = 0;
 	for (int p = 0; p < ios; p++) {
-	    for (int i = 0, j = fmw * featureMap; i < fmw; i++, j++) {
+	    sum = 0;
+	    for (int i = 0, j = weightsStartId; i < fmw; i++, j++) {
 		sum += input[(inputId + featureMapOffsets[i]) * ios + p] * weights[j];
 	    }
 
-	    int outputIndex = id * ios + p;
-	    output[outputIndex] = sum;
-
-	    after(outputIndex);
+	    output[id * ios + p] = activationFunction(sum);
 	}
     }
 
     /**
-     * this is called after the convolution
+     * activation function after the convolution
      */
-    protected void after(int outputIndex) {
+    protected float activationFunction(float value) {
+	return value;
     }
 }

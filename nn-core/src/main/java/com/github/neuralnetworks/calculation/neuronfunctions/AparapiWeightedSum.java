@@ -29,9 +29,9 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
     private static final long serialVersionUID = -8435155322138790083L;
 
     /**
-     * Number of input exmaples that will be calculated simultaneously
+     * Number of input samples that will be calculated simultaneously
      */
-    protected int inputOutputColumns;
+    protected int inputOutputSamples;
 
     /**
      * Number of input connections that will be "combined" for simultaneous
@@ -85,14 +85,6 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
      * because of the Aparapi limitations) It is an array, because of the
      * combined connections
      */
-    protected int[] outputStartIndexes;
-
-    /**
-     * This is combined with the other properties to represent the
-     * FullyConnected connection (the FullyConnected class itself cannot be used
-     * because of the Aparapi limitations) It is an array, because of the
-     * combined connections
-     */
     protected int[] inputStartPositions;
 
     /**
@@ -132,7 +124,7 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
      * the connections
      */
     protected void init(SortedMap<GraphConnections, Matrix> inputConnections, Matrix outputMatrix, Layer targetLayer) {
-	this.inputOutputColumns = outputMatrix.getColumns();
+	this.inputOutputSamples = outputMatrix.getColumns();
 
 	this.output = outputMatrix.getElements();
 
@@ -166,7 +158,6 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
 	    this.series = inputConnections.size();
 	    this.weightsDimension = new int[series];
 	    this.inputStartIndexes = new int[series];
-	    this.outputStartIndexes = new int[series];
 	    this.inputStartPositions = new int[series];
 	    this.weightStartPositions = new int[series];
 	    this.weightsInitialStep = new int[series];
@@ -191,9 +182,6 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
 		    weightsInitialStep[i] = 1;
 		    weightsStep[i] = cg.getColumns();
 		}
-
-		inputStartIndexes[i] = e.getKey().getInputLayerStartNeuron();
-		outputStartIndexes[i] = e.getKey().getOutputLayerStartNeuron();
 
 		i++;
 	    }
@@ -221,17 +209,16 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
     public void run() {
 	int id = getGlobalId();
 
-	// each input example
-	int ioc = inputOutputColumns;
+	int ios = inputOutputSamples;
 	int s = series;
-	for (int i = 0; i < ioc; i++) {
-	    before(id, i);
+	float value = 0;
 
+	// each input example
+	for (int i = 0; i < ios; i++) {
 	    // each connection (of the combined connections)
+	    value = output[outputIndex(id, i)];
 	    for (int k = 0; k < s; k++) {
-
 		// each element in the row/column
-		float value = 0;
 		int inputStartPosition = inputStartPositions[k];
 		int inputStartIndex = inputStartIndexes[k];
 		int initialWeightIndex = weightStartPositions[k] + weightsInitialStep[k] * id;
@@ -239,33 +226,22 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
 		int dim = weightsDimension[k];
 
 		for (int j = 0; j < dim; j++) {
-		    value += input[inputStartPosition + (inputStartIndex + j) * ioc + i] * weights[initialWeightIndex + j * weightStep];
+		    value += input[inputStartPosition + (inputStartIndex + j) * ios + i] * weights[initialWeightIndex + j * weightStep];
 		}
-
-		output[outputIndex(id, i, k)] += value;
 	    }
 
-	    after(id, i);
+	    after(value, id, i);
 	}
     }
 
-    protected void before(int row, int column) {
-    }
-
-    protected void after(int row, int column) {
+    protected void after(float value, int row, int column) {
+	output[outputIndex(row, column)] = value;
     }
 
     /**
      * helper method for retrieving output value based on row, column and series
      */
-    protected int outputIndex(int row, int column, int series) {
-	return (outputStartIndexes[series] + row) * inputOutputColumns + column;
-    }
-
-    /**
-     * helper method for retrieving weight value based on row and column
-     */
-    protected int outputBaseIndex(int row, int column) {
-	return row * inputOutputColumns + column;
+    protected int outputIndex(int row, int column) {
+	return row * inputOutputSamples + column;
     }
 }

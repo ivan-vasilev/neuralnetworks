@@ -77,7 +77,7 @@ public class ConnectionCalculatorImpl implements ConnectionCalculator {
 	    float[] out = output.getElements();
 	    for (int i = 0; i < out.length; i++) {
 		for (GraphConnections c : bias) {
-		    out[i + c.getInputLayerStartNeuron()] += c.getConnectionGraph().getElements()[i / output.getColumns()];
+		    out[i] += c.getConnectionGraph().getElements()[i / output.getColumns()];
 		}
 	    }
 	}

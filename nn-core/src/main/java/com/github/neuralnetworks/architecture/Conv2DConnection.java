@@ -13,6 +13,7 @@ public class Conv2DConnection extends ConnectionsImpl {
     public Conv2DConnection(ConvGridLayer inputLayer, int kernelColumns, int kernelRows, int filters) {
 	super(inputLayer, new ConvGridLayer());
 	setDimensions(kernelRows, kernelColumns, filters);
+	updateDimensions();
     }
 
     public Conv2DConnection(ConvGridLayer inputLayer, ConvGridLayer outputLayer) {

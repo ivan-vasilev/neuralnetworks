@@ -18,8 +18,8 @@ public class BackPropagationSoftReLU extends BackPropagationConnectionCalculator
 	private static final long serialVersionUID = -3580345016542506932L;
 
 	@Override
-	protected void calcDerivativeBefore(int row, int column) {
-	    output[outputBaseIndex(row, column)] = 1 / (1 + exp(-output[outputBaseIndex(row, column)]));
+	protected void calcDerivativeBefore(float activation, float error, int outputId) {
+	    output[outputId] = 1 / (1 + exp(-activation));
 	}
     }
 }

@@ -18,9 +18,8 @@ public class BackPropagationTanh extends BackPropagationConnectionCalculator {
 	private static final long serialVersionUID = -3580345016542506932L;
 
 	@Override
-	protected void calcDerivativeBefore(int row, int column) {
-	    int id = outputBaseIndex(row, column);
-	    output[id] = 1 - output[id] * output[id];
+	protected void calcDerivativeBefore(float activation, float error, int outputId) {
+	    output[outputId] = 1 - activation * activation;
 	}
     }
 }

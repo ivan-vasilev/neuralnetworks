@@ -18,8 +18,8 @@ public class AparapiSoftReLU extends ConnectionCalculatorImpl {
 	private static final long serialVersionUID = 2572354641295173835L;
 
 	@Override
-	protected void after(int row, int column) {
-	    output[outputBaseIndex(row, column)] = log(1 + exp(output[outputBaseIndex(row, column)]));
+	protected void after(float value, int row, int column) {
+	    output[outputIndex(row, column)] = log(1 + exp(value));
 	}
     }
 }

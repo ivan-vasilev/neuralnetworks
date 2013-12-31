@@ -1,57 +1,35 @@
 package com.github.neuralnetworks.architecture;
 
-
 /**
- * Subsampling connections. Contains information about the size of the subsampling region
+ * Subsampling connections. Contains information about the size of the
+ * subsampling region
  */
 public class Subsampling2DConnection extends ConnectionsImpl {
 
-    /**
-     * subsampling region rows
-     */
-    private int subsamplingRegionRows;
-
-    /**
-     * subsampling region columns
-     */
-    private int subsamplingRegionCols;
-
     public Subsampling2DConnection(ConvGridLayer inputLayer, int subsamplingRegionRows, int subsamplingRegionCols) {
-	super(inputLayer, new ConvGridLayer(0, 0, inputLayer.getFilters()));
-	
-	this.subsamplingRegionRows = subsamplingRegionRows;
-	this.subsamplingRegionCols = subsamplingRegionCols;
+	super(inputLayer, new ConvGridLayer());
+	setDimensions(subsamplingRegionRows, subsamplingRegionCols);
+    }
 
-	// update the dimensions of the output layer
-	updateOutputLayerDimmensions();
+    public Subsampling2DConnection(ConvGridLayer inputLayer, ConvGridLayer outputLayer) {
+	super(inputLayer, outputLayer);
+    }
+
+    public void setDimensions(int subsamplingRegionRows, int subsamplingRegionCols) {
+	ConvGridLayer inputLayer = (ConvGridLayer) getInputLayer();
+	ConvGridLayer outputLayer = (ConvGridLayer) getOutputLayer();
+	outputLayer.setDimensions(inputLayer.getFeatureMapRows() / subsamplingRegionRows, inputLayer.getFeatureMapColumns() / subsamplingRegionCols, inputLayer.getFilters());
     }
 
     public int getSubsamplingRegionRows() {
-	return subsamplingRegionRows;
-    }
-
-    public void setSubsamplingRegionRows(int subsamplingRegionRows) {
-	this.subsamplingRegionRows = subsamplingRegionRows;
-	updateOutputLayerDimmensions();
+	ConvGridLayer inputLayer = (ConvGridLayer) getInputLayer();
+	ConvGridLayer outputLayer = (ConvGridLayer) getOutputLayer();
+	return inputLayer.getFeatureMapRows() / outputLayer.getFeatureMapRows();
     }
 
     public int getSubsamplingRegionCols() {
-	return subsamplingRegionCols;
-    }
-
-    public void setSubsamplingRegionCols(int subsamplingRegionCols) {
-	this.subsamplingRegionCols = subsamplingRegionCols;
-	updateOutputLayerDimmensions();
-    }
-
-    /**
-     * When the size of the subsampling region is changed, then the neuron count in the output layer is also changed
-     */
-    protected void updateOutputLayerDimmensions() {
-	if (subsamplingRegionRows != 0 && subsamplingRegionCols != 0) {
-	    ConvGridLayer inputLayer = (ConvGridLayer) getInputLayer();
-	    ConvGridLayer outputLayer = (ConvGridLayer) getOutputLayer();
-	    outputLayer.setDimensions(inputLayer.getFeatureMapRows() / subsamplingRegionRows, inputLayer.getFeatureMapColumns() / subsamplingRegionCols, outputLayer.getFilters());
-	}
+	ConvGridLayer inputLayer = (ConvGridLayer) getInputLayer();
+	ConvGridLayer outputLayer = (ConvGridLayer) getOutputLayer();
+	return inputLayer.getFeatureMapColumns() / outputLayer.getFeatureMapColumns();
     }
 }
