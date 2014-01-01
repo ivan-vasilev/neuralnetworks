@@ -91,12 +91,13 @@ public class AparapiSubsampling2D extends Kernel implements ConnectionCalculator
 
     @Override
     public void calculate(SortedMap<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
-	Subsampling2DConnection c = (Subsampling2DConnection) connections.keySet().iterator().next();
+	if (connections.size() > 0) {
+	    Subsampling2DConnection c = (Subsampling2DConnection) connections.keySet().iterator().next();
+	    init(c, connections.values().iterator().next(), output);
 
-	this.init(c, connections.values().iterator().next(), output);
-
-	// the code is executed with as many kernels as the output layer neurons count
-	this.execute(targetLayer.getNeuronCount());
+	    // the code is executed with as many kernels as the output layer neurons count
+	    execute(targetLayer.getNeuronCount());
+	}
     }
 
     /**

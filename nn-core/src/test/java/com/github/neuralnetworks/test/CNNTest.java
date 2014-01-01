@@ -18,6 +18,7 @@ import com.github.neuralnetworks.calculation.ConnectionCalculatorImpl;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiAveragePooling2D;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2D;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiMaxPooling2D;
+import com.github.neuralnetworks.calculation.neuronfunctions.AparapiStochasticPooling2D;
 import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.Util;
 
@@ -127,56 +128,75 @@ public class CNNTest {
     }
 
     @Test
-    public void testMaxPooling() {
+    public void testPooling() {
 	Subsampling2DConnection c = ConnectionFactory.subsamplingConnection(new ConvGridLayer(4, 4, 2), 2, 2);
-	Matrix i1 = new Matrix(new float[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 15, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32, 31}, 1);
+	Matrix i1 = new Matrix(new float[] {0.5f, 1, 1, 2, 1.5f, 3, 2, 4, 2.5f, 5, 3, 6, 3.5f, 7, 4f, 8, 4.5f, 9, 5f, 10, 5.5f, 11, 6f, 12, 6.5f, 13, 7f, 14, 8f, 16, 7.5f, 15, 8.5f, 17, 9f, 18, 9.5f, 19, 10f, 20, 10.5f, 21, 11f, 22, 11.5f, 23, 12f, 24, 12.5f, 25, 13f, 26, 13.5f, 27, 14f, 28, 14.5f, 29, 15f, 30, 16f, 32, 15.5f, 31}, 2);
+	TreeMap<Connections, Matrix> map = new TreeMap<Connections, Matrix>();
+	map.put(c, i1);
 
-	Matrix o = new Matrix(8, 1);
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.JTP);
 
 	// max pooling
 	ConnectionCalculatorImpl calc = new ConnectionCalculatorImpl(new AparapiMaxPooling2D());
-
-	TreeMap<Connections, Matrix> map = new TreeMap<Connections, Matrix>();
-	map.put(c, i1);
-
-	Environment.getInstance().setExecutionMode(EXECUTION_MODE.JTP);
-
+	Matrix o = new Matrix(8, 2);
 	calc.calculate(map, o, c.getOutputLayer());
 
-	assertEquals(6, o.get(0, 0), 0);
-	assertEquals(8, o.get(0, 1), 0);
-	assertEquals(14, o.get(0, 2), 0);
-	assertEquals(16, o.get(0, 3), 0);
-	assertEquals(22, o.get(0, 4), 0);
-	assertEquals(24, o.get(0, 5), 0);
-	assertEquals(30, o.get(0, 6), 0);
-	assertEquals(32, o.get(0, 7), 0);
+	assertEquals(3, o.get(0, 0), 0);
+	assertEquals(4, o.get(1, 0), 0);
+	assertEquals(7, o.get(2, 0), 0);
+	assertEquals(8, o.get(3, 0), 0);
+	assertEquals(11, o.get(4, 0), 0);
+	assertEquals(12, o.get(5, 0), 0);
+	assertEquals(15, o.get(6, 0), 0);
+	assertEquals(16, o.get(7, 0), 0);
+
+	assertEquals(6, o.get(0, 1), 0);
+	assertEquals(8, o.get(1, 1), 0);
+	assertEquals(14, o.get(2, 1), 0);
+	assertEquals(16, o.get(3, 1), 0);
+	assertEquals(22, o.get(4, 1), 0);
+	assertEquals(24, o.get(5, 1), 0);
+	assertEquals(30, o.get(6, 1), 0);
+	assertEquals(32, o.get(7, 1), 0);
+
+	// average pooling
+	calc = new ConnectionCalculatorImpl(new AparapiAveragePooling2D());
+	o = new Matrix(8, 2);
+	calc.calculate(map, o, c.getOutputLayer());
+
+	assertEquals(1.75, o.get(0, 0), 0);
+	assertEquals(2.75, o.get(1, 0), 0);
+	assertEquals(5.75, o.get(2, 0), 0);
+	assertEquals(6.75, o.get(3, 0), 0);
+	assertEquals(9.75, o.get(4, 0), 0);
+	assertEquals(10.75, o.get(5, 0), 0);
+	assertEquals(13.75, o.get(6, 0), 0);
+	assertEquals(14.75, o.get(7, 0), 0);
+
+	assertEquals(3.5, o.get(0, 1), 0);
+	assertEquals(5.5, o.get(1, 1), 0);
+	assertEquals(11.5, o.get(2, 1), 0);
+	assertEquals(13.5, o.get(3, 1), 0);
+	assertEquals(19.5, o.get(4, 1), 0);
+	assertEquals(21.5, o.get(5, 1), 0);
+	assertEquals(27.5, o.get(6, 1), 0);
+	assertEquals(29.5, o.get(7, 1), 0);
     }
-    
+
     @Test
-    public void testAveragePooling() {
-	Subsampling2DConnection c = ConnectionFactory.subsamplingConnection(new ConvGridLayer(4, 4, 2), 2, 2);
-	Matrix i1 = new Matrix(new float[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 15, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32, 31}, 1);
-	
-	Matrix o = new Matrix(8, 1);
-	
-	// max pooling
-	ConnectionCalculatorImpl calc = new ConnectionCalculatorImpl(new AparapiAveragePooling2D());
-	
+    public void testStochasticPooling() {
+	Subsampling2DConnection c = ConnectionFactory.subsamplingConnection(new ConvGridLayer(3, 3, 1), 3, 3);
+	Matrix i1 = new Matrix(new float[] {1.6f, 0, 0, 0, 0, 0, 0, 0, 2.4f}, 2);
 	TreeMap<Connections, Matrix> map = new TreeMap<Connections, Matrix>();
 	map.put(c, i1);
-	
+
 	Environment.getInstance().setExecutionMode(EXECUTION_MODE.JTP);
-	
+
+	ConnectionCalculatorImpl calc = new ConnectionCalculatorImpl(new AparapiStochasticPooling2D());
+	Matrix o = new Matrix(1, 2);
 	calc.calculate(map, o, c.getOutputLayer());
-	
-	assertEquals(3.5, o.get(0, 0), 0);
-	assertEquals(5.5, o.get(0, 1), 0);
-	assertEquals(11.5, o.get(0, 2), 0);
-	assertEquals(13.5, o.get(0, 3), 0);
-	assertEquals(19.5, o.get(0, 4), 0);
-	assertEquals(21.5, o.get(0, 5), 0);
-	assertEquals(27.5, o.get(0, 6), 0);
-	assertEquals(29.5, o.get(0, 7), 0);
+
+	assertEquals(2.08, o.get(0, 0), 0.01);
+	assertEquals(2.08, o.get(0, 1), 0.01);
     }
 }

@@ -76,12 +76,11 @@ public class LayerCalculatorImpl implements LayerCalculator, Serializable {
 		    }
 		}
 
-		if (connections.size() > 0) {
-		    Matrix output = getLayerResult(calculatedLayers, results, currentLayer);
-		    cc.calculate(connections, output, currentLayer);
-		    result = true;
-		}
+		Matrix output = getLayerResult(calculatedLayers, results, currentLayer);
+		cc.calculate(connections, output, currentLayer);
 	    }
+
+	    result = true;
 
 	    inProgressLayers.remove(currentLayer);
 	    calculatedLayers.add(currentLayer);

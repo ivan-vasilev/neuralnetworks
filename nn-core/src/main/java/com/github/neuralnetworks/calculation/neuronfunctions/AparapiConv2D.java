@@ -77,13 +77,15 @@ public class AparapiConv2D extends Kernel implements ConnectionCalculator {
 
     @Override
     public void calculate(SortedMap<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
-	Conv2DConnection c = (Conv2DConnection) connections.keySet().iterator().next();
+	if (connections.size() > 0) {
+	    Conv2DConnection c = (Conv2DConnection) connections.keySet().iterator().next();
 
-	this.init(c, connections.values().iterator().next(), output);
+	    init(c, connections.values().iterator().next(), output);
 
-	ConvGridLayer tl = (ConvGridLayer) targetLayer;
+	    ConvGridLayer tl = (ConvGridLayer) targetLayer;
 
-	this.execute(tl.getNeuronCount());
+	    execute(tl.getNeuronCount());
+	}
     }
 
     /**

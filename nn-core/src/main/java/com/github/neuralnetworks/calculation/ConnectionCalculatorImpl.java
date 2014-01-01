@@ -45,29 +45,31 @@ public class ConnectionCalculatorImpl implements ConnectionCalculator {
 
     @Override
     public void calculate(SortedMap<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
-	SortedMap<Connections, Matrix> notBias = new TreeMap<>();
-	Set<GraphConnections> bias = new HashSet<>();
-
-	for (Entry<Connections, Matrix> e : connections.entrySet()) {
-	    Connections c = e.getKey();
-	    Matrix input = e.getValue();
-	    // bias layer scenarios
-	    if (c.getInputLayer() instanceof BiasLayer) {
-		bias.add((GraphConnections) c);
-	    } else {
-		notBias.put(c, input);
+	if (connections.size() > 0) {
+	    SortedMap<Connections, Matrix> notBias = new TreeMap<>();
+	    Set<GraphConnections> bias = new HashSet<>();
+	    
+	    for (Entry<Connections, Matrix> e : connections.entrySet()) {
+		Connections c = e.getKey();
+		Matrix input = e.getValue();
+		// bias layer scenarios
+		if (c.getInputLayer() instanceof BiasLayer) {
+		    bias.add((GraphConnections) c);
+		} else {
+		    notBias.put(c, input);
+		}
 	    }
-	}
-
-	calculateBias(bias, output);
-
-	if (notBias.size() > 0) {
-	    inputFunction.calculate(notBias, output, targetLayer);
-	}
-
-	if (activationFunctions != null) {
-	    for (ActivationFunction f : activationFunctions) {
-		f.value(output);
+	    
+	    calculateBias(bias, output);
+	    
+	    if (notBias.size() > 0) {
+		inputFunction.calculate(notBias, output, targetLayer);
+	    }
+	    
+	    if (activationFunctions != null) {
+		for (ActivationFunction f : activationFunctions) {
+		    f.value(output);
+		}
 	    }
 	}
     }

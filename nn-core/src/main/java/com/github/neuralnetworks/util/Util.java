@@ -6,7 +6,9 @@ import java.util.Map.Entry;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
+import com.github.neuralnetworks.calculation.LayerCalculatorImpl;
 import com.github.neuralnetworks.calculation.OutputError;
+import com.github.neuralnetworks.calculation.neuronfunctions.ConstantConnectionCalculator;
 
 /**
  * Util class
@@ -66,5 +68,11 @@ public class Util {
 
     public static Layer getOppositeLayer(Connections connection, Layer layer) {
 	return connection.getInputLayer() != layer ? connection.getInputLayer() : connection.getOutputLayer();
+    }
+
+    public static void populateBiasLayers(LayerCalculatorImpl lc, NeuralNetwork nn) {
+	for (Layer l : nn.getLayers()) {
+	    lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
+	}
     }
 }

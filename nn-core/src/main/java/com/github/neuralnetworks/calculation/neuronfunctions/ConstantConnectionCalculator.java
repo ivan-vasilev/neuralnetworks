@@ -17,6 +17,11 @@ public class ConstantConnectionCalculator implements ConnectionCalculator {
 
     private float value;
 
+    public ConstantConnectionCalculator() {
+	super();
+	this.value = 1;
+    }
+
     public ConstantConnectionCalculator(float value) {
 	super();
 	this.value = value;

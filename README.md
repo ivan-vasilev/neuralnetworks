@@ -58,8 +58,6 @@ Most of the data is represented as one-dimensional array by default (for example
 - AparapiSoftmax - softmax layer.
 - AparapiStochasticBinary - stochastic binary activation function (for RBMs).
 
-Each of these has two separate implementations for the feedforward (when the "target" layer is the actual output layer of the connection) and backpropagation phase (when the "output" layer is the input layer for the connection).
-
 ###Convolutional layer types
 
 - AparapiConv2DSigmoid - sigmoid convolutional layer.
