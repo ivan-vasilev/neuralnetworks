@@ -48,7 +48,7 @@ public class ConnectionCalculatorImpl implements ConnectionCalculator {
 	if (connections.size() > 0) {
 	    SortedMap<Connections, Matrix> notBias = new TreeMap<>();
 	    Set<GraphConnections> bias = new HashSet<>();
-	    
+
 	    for (Entry<Connections, Matrix> e : connections.entrySet()) {
 		Connections c = e.getKey();
 		Matrix input = e.getValue();

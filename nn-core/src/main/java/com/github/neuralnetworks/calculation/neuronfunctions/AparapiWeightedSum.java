@@ -77,14 +77,6 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
      * because of the Aparapi limitations) It is an array, because of the
      * combined connections
      */
-    protected int[] inputStartIndexes;
-
-    /**
-     * This is combined with the other properties to represent the
-     * FullyConnected connection (the FullyConnected class itself cannot be used
-     * because of the Aparapi limitations) It is an array, because of the
-     * combined connections
-     */
     protected int[] inputStartPositions;
 
     /**
@@ -157,7 +149,6 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
 
 	    this.series = inputConnections.size();
 	    this.weightsDimension = new int[series];
-	    this.inputStartIndexes = new int[series];
 	    this.inputStartPositions = new int[series];
 	    this.weightStartPositions = new int[series];
 	    this.weightsInitialStep = new int[series];
@@ -220,13 +211,12 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
 	    for (int k = 0; k < s; k++) {
 		// each element in the row/column
 		int inputStartPosition = inputStartPositions[k];
-		int inputStartIndex = inputStartIndexes[k];
 		int initialWeightIndex = weightStartPositions[k] + weightsInitialStep[k] * id;
 		int weightStep = weightsStep[k];
 		int dim = weightsDimension[k];
 
 		for (int j = 0; j < dim; j++) {
-		    value += input[inputStartPosition + (inputStartIndex + j) * ios + i] * weights[initialWeightIndex + j * weightStep];
+		    value += input[inputStartPosition + j * ios + i] * weights[initialWeightIndex + j * weightStep];
 		}
 	    }
 

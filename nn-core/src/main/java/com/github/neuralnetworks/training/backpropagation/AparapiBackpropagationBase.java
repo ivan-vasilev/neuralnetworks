@@ -83,14 +83,13 @@ public class AparapiBackpropagationBase extends AparapiWeightedSum {
 
 	for (int i = 0; i < s; i++) {
 	    int inputStartPosition = inputStartPositions[i];
-	    int inputStartIndex = inputStartIndexes[i];
 	    int initialWeightIndex = weightStartPositions[i] + weightsInitialStep[i] * getGlobalId();
 	    int weightStep = weightsStep[i];
 	    int dim = weightsDimension[i];
 
 	    for (int j = 0; j < dim; j++) {
 		int weightIndex = initialWeightIndex + j * weightStep;
-		float weightUpdate = lr * (input[inputStartPosition + (inputStartIndex + j) * ios + column] * activation - wd * weights[weightIndex]) + mm * weightUpdates[weightIndex];
+		float weightUpdate = lr * (input[inputStartPosition + j * ios + column] * activation - wd * weights[weightIndex]) + mm * weightUpdates[weightIndex];
 		weights[weightIndex] += weightUpdate;
 		weightUpdates[weightIndex] = weightUpdate;
 	    }
