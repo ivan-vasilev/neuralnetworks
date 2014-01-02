@@ -19,7 +19,7 @@ public class BackPropagationTanh extends BackPropagationConnectionCalculator {
 
 	@Override
 	protected void calcDerivativeBefore(float activation, float error, int outputId) {
-	    output[outputId] = 1 - activation * activation;
+	    output[outputId] = error * - error * activation * activation;
 	}
     }
 }

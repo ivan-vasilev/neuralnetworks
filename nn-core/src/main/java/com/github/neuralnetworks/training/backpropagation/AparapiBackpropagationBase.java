@@ -9,6 +9,7 @@ import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSum;
+import com.github.neuralnetworks.util.Util;
 
 /**
  * Aparapi Backpropagation base weighted sum
@@ -44,7 +45,7 @@ public class AparapiBackpropagationBase extends AparapiWeightedSum {
     @Override
     public void calculate(SortedMap<Connections, Matrix> inputConnections, Matrix outputMatrix, Layer targetLayer) {
 	super.calculate(inputConnections, outputMatrix, targetLayer);
-	if (inputConnections.size() > 1) {
+	if (inputConnections.size() > 2 || (inputConnections.size() > 1 && !Util.hasBias(inputConnections.keySet()))) {
 	    int i = 0;
 	    for (java.util.Map.Entry<Connections, Matrix> e : inputConnections.entrySet()) {
 		System.arraycopy(input, inputStartPositions[i], e.getValue().getElements(), 0, e.getValue().getElements().length);

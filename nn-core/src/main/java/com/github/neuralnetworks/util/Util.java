@@ -1,8 +1,10 @@
 package com.github.neuralnetworks.util;
 
 import java.text.NumberFormat;
+import java.util.Collection;
 import java.util.Map.Entry;
 
+import com.github.neuralnetworks.architecture.BiasLayer;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
@@ -74,5 +76,15 @@ public class Util {
 	for (Layer l : nn.getLayers()) {
 	    lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
 	}
+    }
+
+    public static boolean hasBias(Collection<Connections> connections) {
+	for (Connections c : connections) {
+	    if (c.getInputLayer() instanceof BiasLayer || c.getOutputLayer() instanceof BiasLayer) {
+		return true;
+	    }
+	}
+
+	return false;
     }
 }

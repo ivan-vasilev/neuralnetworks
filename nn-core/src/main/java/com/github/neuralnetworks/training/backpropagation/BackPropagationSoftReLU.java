@@ -19,7 +19,7 @@ public class BackPropagationSoftReLU extends BackPropagationConnectionCalculator
 
 	@Override
 	protected void calcDerivativeBefore(float activation, float error, int outputId) {
-	    output[outputId] = 1 / (1 + exp(-activation));
+	    output[outputId] = error * (1 / (1 + exp(-activation)));
 	}
     }
 }
