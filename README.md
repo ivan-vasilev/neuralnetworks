@@ -53,6 +53,7 @@ Most of the data is represented as one-dimensional array by default (for example
 ###Neuron types based on weighted sum
 
 - AparapiSigmoid - sigmoid activation function.
+- AparapiReLU - Rectified Linear Unit.
 - AparapiSoftReLU - softplus activation function.
 - AparapiTanh - tanh activation function.
 - AparapiSoftmax - softmax layer.
@@ -61,6 +62,7 @@ Most of the data is represented as one-dimensional array by default (for example
 ###Convolutional layer types
 
 - AparapiConv2DSigmoid - sigmoid convolutional layer.
+- AparapiConv2DSReLU - softmax convolutional layer.
 - AparapiConv2DSoftReLU - softmax convolutional layer.
 - AparapiConv2DTanh - tanh convolutional layer.
 

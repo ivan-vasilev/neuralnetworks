@@ -108,6 +108,7 @@ public class AparapiBackpropagationBase extends AparapiWeightedSum {
      * calculate derivative after weights update
      */
     protected void calcDerivativeAfter(float activation, float value, int outputId) {
+	output[outputId] = value;
     }
 
     public float[] getOutputActivation() {

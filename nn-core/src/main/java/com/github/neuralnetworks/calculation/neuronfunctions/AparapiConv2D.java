@@ -80,11 +80,14 @@ public class AparapiConv2D extends Kernel implements ConnectionCalculator {
 	if (connections.size() > 0) {
 	    Conv2DConnection c = (Conv2DConnection) connections.keySet().iterator().next();
 
-	    init(c, connections.values().iterator().next(), output);
+	    // currently works only as a feedforward (including bp)
+	    if (targetLayer == c.getOutputLayer()) {
+		init(c, connections.get(c), output);
+	    } else {
+		init(c, output, connections.get(c));
+	    }
 
-	    ConvGridLayer tl = (ConvGridLayer) targetLayer;
-
-	    execute(tl.getNeuronCount());
+	    execute(c.getOutputLayer().getNeuronCount());
 	}
     }
 
@@ -123,27 +126,14 @@ public class AparapiConv2D extends Kernel implements ConnectionCalculator {
     public void run() {
 	int id = getGlobalId();
 
-	// calculate sum based on feature map offsets and feature map weights
-	int ios = inputOutputSamples;
-	int inputId = ((id % outputFeatureMapLength) / outputColumns) * inputColumns + id % outputColumns;
-	int fmw = featureMapWeights;
-	int weightsStartId = fmw * (id / outputFeatureMapLength);
-
-	float sum = 0;
-	for (int p = 0; p < ios; p++) {
-	    sum = 0;
-	    for (int i = 0, j = weightsStartId; i < fmw; i++, j++) {
-		sum += input[(inputId + featureMapOffsets[i]) * ios + p] * weights[j];
-	    }
-
-	    output[id * ios + p] = activationFunction(sum);
-	}
+	conv(featureMapWeights * (id / outputFeatureMapLength), ((id % outputFeatureMapLength) / outputColumns) * inputColumns + id % outputColumns);
     }
 
     /**
-     * activation function after the convolution
+     * the actual convolution
+     * @param weightsStartId
+     * @param inputStartId
      */
-    protected float activationFunction(float value) {
-	return value;
+    protected void conv(int weightsStartId, int inputStartId) {
     }
 }

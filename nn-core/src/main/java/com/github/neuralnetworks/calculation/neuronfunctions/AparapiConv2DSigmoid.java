@@ -3,7 +3,7 @@ package com.github.neuralnetworks.calculation.neuronfunctions;
 /**
  * Sigmoid convolutional calculator
  */
-public class AparapiConv2DSigmoid extends AparapiConv2D {
+public class AparapiConv2DSigmoid extends AparapiConv2DFF {
 
     private static final long serialVersionUID = -7985734201416578973L;
 
