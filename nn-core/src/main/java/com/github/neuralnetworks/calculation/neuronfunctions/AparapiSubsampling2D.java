@@ -17,7 +17,7 @@ import com.github.neuralnetworks.util.Environment;
  * !!! IMPORTANT !!!
  * Aparapi only works one-dimensional arrays of primitive data types can only call member methods of the Kernel class itself.
  */
-public class AparapiSubsampling2D extends Kernel implements ConnectionCalculator {
+public abstract class AparapiSubsampling2D extends Kernel implements ConnectionCalculator {
 
     private static final long serialVersionUID = 8931101094464503687L;
     

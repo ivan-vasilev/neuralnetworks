@@ -13,16 +13,27 @@ public class AparapiConv2DBP extends AparapiConv2D {
     protected void conv(int weightsStartId, int inputStartId) {
 	int id = getGlobalId();
 
-	// calculate sum based on feature map offsets and feature map weights
 	int ios = inputOutputSamples;
 	int fmw = featureMapWeights;
 	float activation = 0;
 
 	for (int p = 0; p < ios; p++) {
-	    activation = output[id * ios + p];;
+	    activation = activationFunctionDerivative(output[id * ios + p]);;
+	    output[id * ios + p] = activation;
+
 	    for (int i = 0, j = weightsStartId; i < fmw; i++, j++) {
 		input[(inputStartId + featureMapOffsets[i]) * ios + p] += activation * weights[j];
 	    }
 	}
+    }
+
+    /**
+     * Derivative of the FF activation function
+     * 
+     * @param value
+     * @return
+     */
+    protected float activationFunctionDerivative(float value) {
+	return value;
     }
 }

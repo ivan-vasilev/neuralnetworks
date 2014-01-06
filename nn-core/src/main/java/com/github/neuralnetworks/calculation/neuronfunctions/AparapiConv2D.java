@@ -12,14 +12,13 @@ import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.util.Environment;
 
 /**
- * Convolution connection calculator (2d)
+ * Base class for convolution connection calculator (2d)
  * This connection accept as input a single training example (as opposed to the weighted sum which works with multiple).
  *
  * !!! IMPORTANT !!!
  * Aparapi only works one-dimensional arrays of primitive data types can only call member methods of the Kernel class itself.
- * 
  */
-public class AparapiConv2D extends Kernel implements ConnectionCalculator {
+public abstract class AparapiConv2D extends Kernel implements ConnectionCalculator {
 
     private static final long serialVersionUID = 8931101094464503687L;
 

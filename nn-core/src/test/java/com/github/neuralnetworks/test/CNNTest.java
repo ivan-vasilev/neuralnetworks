@@ -14,9 +14,10 @@ import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.Subsampling2DConnection;
 import com.github.neuralnetworks.architecture.types.ConnectionFactory;
 import com.github.neuralnetworks.architecture.types.DefaultNeuralNetwork;
-import com.github.neuralnetworks.calculation.ConnectionCalculatorImpl;
+import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiAveragePooling2D;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2D;
+import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2DFF;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiMaxPooling2D;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiStochasticPooling2D;
 import com.github.neuralnetworks.util.Environment;
@@ -66,7 +67,7 @@ public class CNNTest {
 
 	Matrix o = new Matrix(4, 1);
 
-	ConnectionCalculatorImpl conv = new ConnectionCalculatorImpl(new AparapiConv2D());
+	AparapiConv2D conv = new AparapiConv2DFF();
 
 	TreeMap<Connections, Matrix> map = new TreeMap<Connections, Matrix>();
 	map.put(c, i1);
@@ -107,7 +108,7 @@ public class CNNTest {
 	
 	Matrix o = new Matrix(8, 1);
 	
-	ConnectionCalculatorImpl conv = new ConnectionCalculatorImpl(new AparapiConv2D());
+	AparapiConv2D conv = new AparapiConv2DFF();
 	
 	TreeMap<Connections, Matrix> map = new TreeMap<Connections, Matrix>();
 	map.put(c, i1);
@@ -137,7 +138,7 @@ public class CNNTest {
 	Environment.getInstance().setExecutionMode(EXECUTION_MODE.JTP);
 
 	// max pooling
-	ConnectionCalculatorImpl calc = new ConnectionCalculatorImpl(new AparapiMaxPooling2D());
+	ConnectionCalculator calc = new AparapiMaxPooling2D();
 	Matrix o = new Matrix(8, 2);
 	calc.calculate(map, o, c.getOutputLayer());
 
@@ -160,7 +161,7 @@ public class CNNTest {
 	assertEquals(32, o.get(7, 1), 0);
 
 	// average pooling
-	calc = new ConnectionCalculatorImpl(new AparapiAveragePooling2D());
+	calc = new AparapiAveragePooling2D();
 	o = new Matrix(8, 2);
 	calc.calculate(map, o, c.getOutputLayer());
 
@@ -186,13 +187,13 @@ public class CNNTest {
     @Test
     public void testStochasticPooling() {
 	Subsampling2DConnection c = ConnectionFactory.subsamplingConnection(new ConvGridLayer(3, 3, 1), 3, 3);
-	Matrix i1 = new Matrix(new float[] {1.6f, 0, 0, 0, 0, 0, 0, 0, 2.4f}, 2);
+	Matrix i1 = new Matrix(new float[] {1.6f, 1.6f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2.4f, 2.4f}, 2);
 	TreeMap<Connections, Matrix> map = new TreeMap<Connections, Matrix>();
 	map.put(c, i1);
 
 	Environment.getInstance().setExecutionMode(EXECUTION_MODE.JTP);
 
-	ConnectionCalculatorImpl calc = new ConnectionCalculatorImpl(new AparapiStochasticPooling2D());
+	AparapiStochasticPooling2D calc = new AparapiStochasticPooling2D();
 	Matrix o = new Matrix(1, 2);
 	calc.calculate(map, o, c.getOutputLayer());
 
