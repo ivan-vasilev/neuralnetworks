@@ -5,7 +5,7 @@ import com.github.neuralnetworks.util.Properties;
 /**
  * Backpropagation connection calculator for tanh layers
  */
-public class BackPropagationTanh extends BackPropagationConnectionCalculator {
+public class BackPropagationTanh extends BackPropagationConnectionCalculatorImpl {
 
     private static final long serialVersionUID = 1178188233641224762L;
 
@@ -13,7 +13,7 @@ public class BackPropagationTanh extends BackPropagationConnectionCalculator {
 	super(properties, new AparapiBackpropTanh());
     }
 
-    public static class AparapiBackpropTanh extends AparapiBackpropagationBase {
+    public static class AparapiBackpropTanh extends AparapiBackpropagationFullyConnected {
 
 	private static final long serialVersionUID = -3580345016542506932L;
 

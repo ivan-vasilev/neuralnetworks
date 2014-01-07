@@ -21,14 +21,14 @@ public class BackPropagationLayerCalculatorImpl extends LayerCalculatorImpl impl
 
     @Override
     public void backpropagate(Set<Layer> calculatedLayers, Map<Layer, Matrix> activations, Map<Layer, Matrix> results, Layer layer) {
-	BackPropagationConnectionCalculator connectionCalculator = (BackPropagationConnectionCalculator) getConnectionCalculator(layer);
+	BackPropagationConnectionCalculatorImpl connectionCalculator = (BackPropagationConnectionCalculatorImpl) getConnectionCalculator(layer);
 	connectionCalculator.setActivations(activations);
 	super.calculate(calculatedLayers, results, layer);
     }
 
     @Override
     public void addConnectionCalculator(Layer layer, ConnectionCalculator calculator) {
-	if (!(calculator instanceof BackPropagationConnectionCalculator)) {
+	if (!(calculator instanceof BackPropagationConnectionCalculatorImpl)) {
 	    throw new IllegalArgumentException("Only BackPropagationConnectionCalculator is allowed");
 	}
 

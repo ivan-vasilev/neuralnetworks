@@ -5,7 +5,7 @@ import com.github.neuralnetworks.util.Properties;
 /**
  * Backpropagation connection calculator for relu units
  */
-public class BackPropagationReLU extends BackPropagationConnectionCalculator {
+public class BackPropagationReLU extends BackPropagationConnectionCalculatorImpl {
 
     private static final long serialVersionUID = 1178188233641224762L;
 
@@ -13,7 +13,7 @@ public class BackPropagationReLU extends BackPropagationConnectionCalculator {
 	super(properties, new AparapiBackpropReLU());
     }
 
-    public static class AparapiBackpropReLU extends AparapiBackpropagationBase {
+    public static class AparapiBackpropReLU extends AparapiBackpropagationFullyConnected {
 
 	private static final long serialVersionUID = -3580345016542506932L;
 

@@ -15,14 +15,14 @@ import com.github.neuralnetworks.util.Util;
  * Aparapi Backpropagation base weighted sum
  * Supports learning rate, momentum and weight decay
  */
-public class AparapiBackpropagationBase extends AparapiWeightedSum {
+public class AparapiBackpropagationFullyConnected extends AparapiWeightedSum implements BackpropagationConnectionCalculator {
 
     private static final long serialVersionUID = -5101971690861270462L;
 
     /**
      * Activation of the output layer from the feedforward phase
      */
-    protected float[] outputActivation;
+    protected float[] ffActivation;
 
     /**
      * Weight updates array
@@ -66,13 +66,13 @@ public class AparapiBackpropagationBase extends AparapiWeightedSum {
 	    storedWeightUpdates.put(targetLayer, weightUpdates);
 	}
 
-	outputActivation = activations.get(targetLayer).getElements();
+	ffActivation = activations.get(targetLayer).getElements();
     }
 
     @Override
     protected void after(float value, int row, int column) {
 	int outputIndex = outputIndex(row, column);
-	float activation = outputActivation[outputIndex];
+	float activation = ffActivation[outputIndex];
 	calcDerivativeBefore(activation, value, outputIndex);
 
 	int s = series;
@@ -111,58 +111,42 @@ public class AparapiBackpropagationBase extends AparapiWeightedSum {
 	output[outputId] = value;
     }
 
-    public float[] getOutputActivation() {
-        return outputActivation;
-    }
-
-    public void setOutputActivation(float[] outputActivation) {
-        this.outputActivation = outputActivation;
-    }
-
-    public float[] getWeightUpdates() {
-        return weightUpdates;
-    }
-
-    public void setWeightUpdates(float[] weightUpdates) {
-        this.weightUpdates = weightUpdates;
-    }
-
-    public Map<Layer, float[]> getStoredWeightUpdates() {
-        return storedWeightUpdates;
-    }
-
-    public void setStoredWeightUpdates(Map<Layer, float[]> storedWeightUpdates) {
-        this.storedWeightUpdates = storedWeightUpdates;
-    }
-
+    @Override
     public float getLearningRate() {
         return learningRate;
     }
 
+    @Override
     public void setLearningRate(float learningRate) {
         this.learningRate = learningRate;
     }
 
+    @Override
     public float getMomentum() {
         return momentum;
     }
 
+    @Override
     public void setMomentum(float momentum) {
         this.momentum = momentum;
     }
 
+    @Override
     public float getWeightDecay() {
         return weightDecay;
     }
 
+    @Override
     public void setWeightDecay(float weightDecay) {
         this.weightDecay = weightDecay;
     }
 
+    @Override
     public Map<Layer, Matrix> getActivations() {
         return activations;
     }
 
+    @Override
     public void setActivations(Map<Layer, Matrix> activations) {
         this.activations = activations;
     }

@@ -29,7 +29,6 @@ public class AparapiNoise implements InputCorruptor {
 	}
 
 	x.values = values;
-	x.corruptionLevel = corruptionLevel;
 
 	x.setExecutionMode(Environment.getInstance().getExecutionMode());
 

@@ -231,7 +231,6 @@ public class FFNNTest {
     /**
      * Simple xor backpropagation test
      */
-    @Ignore
     @Test
     public void testXORSigmoidBP() {
 	MultiLayerPerceptron mlp = NNFactory.mlpSigmoid(new int[] { 2, 4, 1 }, true);

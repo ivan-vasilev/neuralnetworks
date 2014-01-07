@@ -5,7 +5,7 @@ import com.github.neuralnetworks.util.Properties;
 /**
  * Backpropagation connection calculator for sigmoid layers
  */
-public class BackPropagationSigmoid extends BackPropagationConnectionCalculator {
+public class BackPropagationSigmoid extends BackPropagationConnectionCalculatorImpl {
 
     private static final long serialVersionUID = 1178188233641224762L;
 
@@ -13,7 +13,7 @@ public class BackPropagationSigmoid extends BackPropagationConnectionCalculator 
 	super(properties, new AparapiBackpropSigmoid());
     }
 
-    public static class AparapiBackpropSigmoid extends AparapiBackpropagationBase {
+    public static class AparapiBackpropSigmoid extends AparapiBackpropagationFullyConnected {
 
 	private static final long serialVersionUID = -3580345016542506932L;
 
