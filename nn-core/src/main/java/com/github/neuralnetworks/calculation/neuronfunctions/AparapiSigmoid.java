@@ -1,8 +1,7 @@
 package com.github.neuralnetworks.calculation.neuronfunctions;
 
-import com.github.neuralnetworks.calculation.ConnectionCalculatorImpl;
 
-public class AparapiSigmoid extends ConnectionCalculatorImpl {
+public class AparapiSigmoid extends ConnectionCalculatorFullyConnected {
 
     private static final long serialVersionUID = 5869298546838843306L;
 

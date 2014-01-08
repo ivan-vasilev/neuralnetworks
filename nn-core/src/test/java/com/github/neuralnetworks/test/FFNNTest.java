@@ -15,10 +15,10 @@ import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.types.MultiLayerPerceptron;
 import com.github.neuralnetworks.architecture.types.NNFactory;
-import com.github.neuralnetworks.calculation.ConnectionCalculatorImpl;
 import com.github.neuralnetworks.calculation.LayerCalculatorImpl;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSigmoid;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSum;
+import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculatorFullyConnected;
 import com.github.neuralnetworks.test.XorInputProvider.XorOutputError;
 import com.github.neuralnetworks.training.TrainerFactory;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationTrainer;
@@ -78,7 +78,7 @@ public class FFNNTest {
 	bcg.set(0, 0, 0.1f);
 	bcg.set(1, 0, 0.2f);
 
-	ConnectionCalculatorImpl aws = new ConnectionCalculatorImpl(new AparapiWeightedSum());
+	ConnectionCalculatorFullyConnected aws = new ConnectionCalculatorFullyConnected(new AparapiWeightedSum());
 
 	TreeMap<Connections, Matrix> map = new TreeMap<Connections, Matrix>();
 	map.put(c1, i1);
@@ -93,7 +93,7 @@ public class FFNNTest {
 
 	// with bias
 	map.put(bc, new Matrix(2, 2));
-	aws = new ConnectionCalculatorImpl(new AparapiWeightedSum());
+	aws = new ConnectionCalculatorFullyConnected(new AparapiWeightedSum());
 	aws.calculate(map, o, ol);
 
 	assertEquals(14.1, o.get(0, 0), 0.01);
@@ -104,7 +104,7 @@ public class FFNNTest {
 
 	// combined layers
 	map.put(c2, i2);
-	aws = new ConnectionCalculatorImpl(new AparapiWeightedSum());
+	aws = new ConnectionCalculatorFullyConnected(new AparapiWeightedSum());
 	aws.calculate(map, o, ol);
 
 	assertEquals(28.1, o.get(0, 0), 0.01);
@@ -161,7 +161,7 @@ public class FFNNTest {
 	bcg.set(0, 0, 0.1f);
 	bcg.set(1, 0, 0.2f);
 
-	ConnectionCalculatorImpl aws = new ConnectionCalculatorImpl(new AparapiWeightedSum());
+	ConnectionCalculatorFullyConnected aws = new ConnectionCalculatorFullyConnected(new AparapiWeightedSum());
 
 	TreeMap<Connections, Matrix> map = new TreeMap<Connections, Matrix>();
 	map.put(c1, i1);
@@ -176,7 +176,7 @@ public class FFNNTest {
 
 	// with bias
 	map.put(bc, new Matrix(2, 2));
-	aws = new ConnectionCalculatorImpl(new AparapiWeightedSum());
+	aws = new ConnectionCalculatorFullyConnected(new AparapiWeightedSum());
 	aws.calculate(map, o, ol);
 
 	assertEquals(14.1, o.get(0, 0), 0.01);
@@ -187,7 +187,7 @@ public class FFNNTest {
 
 	// combined layers
 	map.put(c2, i2);
-	aws = new ConnectionCalculatorImpl(new AparapiWeightedSum());
+	aws = new ConnectionCalculatorFullyConnected(new AparapiWeightedSum());
 	aws.calculate(map, o, ol);
 
 	assertEquals(28.1, o.get(0, 0), 0.01);

@@ -69,12 +69,9 @@ public class CNNTest {
 
 	AparapiConv2D conv = new AparapiConv2DFF();
 
-	TreeMap<Connections, Matrix> map = new TreeMap<Connections, Matrix>();
-	map.put(c, i1);
-
 	Environment.getInstance().setExecutionMode(EXECUTION_MODE.JTP);
 
-	conv.calculate(map, o, c.getOutputLayer());
+	conv.calculate(c, i1, o);
 
 	// most simple case
 	assertEquals(164, o.get(0, 0), 0);
@@ -109,13 +106,10 @@ public class CNNTest {
 	Matrix o = new Matrix(8, 1);
 	
 	AparapiConv2D conv = new AparapiConv2DFF();
-	
-	TreeMap<Connections, Matrix> map = new TreeMap<Connections, Matrix>();
-	map.put(c, i1);
-	
+
 	Environment.getInstance().setExecutionMode(EXECUTION_MODE.JTP);
 	
-	conv.calculate(map, o, c.getOutputLayer());
+	conv.calculate(c, i1, o);
 	
 	assertEquals(164, o.get(0, 0), 0);
 	assertEquals(184, o.get(0, 1), 0);

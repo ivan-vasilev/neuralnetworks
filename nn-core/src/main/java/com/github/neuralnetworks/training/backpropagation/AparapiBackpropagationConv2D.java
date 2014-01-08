@@ -3,6 +3,7 @@ package com.github.neuralnetworks.training.backpropagation;
 import java.util.Map;
 import java.util.SortedMap;
 
+import com.github.neuralnetworks.architecture.BiasLayer;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
 import com.github.neuralnetworks.architecture.Layer;
@@ -42,7 +43,31 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements Backp
 
     @Override
     public void calculate(SortedMap<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
-	super.calculate(connections, output, targetLayer);
+	Conv2DConnection c = null;
+	Conv2DConnection bias = null;
+
+	for (Connections con : connections.keySet()) {
+	    if (con instanceof Conv2DConnection) {
+		if (c.getInputLayer() instanceof BiasLayer) {
+		    bias = (Conv2DConnection) con;
+		} else {
+		    c = (Conv2DConnection) con;
+		}
+	    }
+	}
+
+	if (bias != null) {
+	    
+	}
+
+	if (c != null) {
+	    // currently works only as a feedforward (including bp)
+	    if (targetLayer == c.getOutputLayer()) {
+		super.calculate(c, connections.get(c), output);
+	    } else {
+		super.calculate(c, output, connections.get(c));
+	    }
+	}
     }
 
     @Override

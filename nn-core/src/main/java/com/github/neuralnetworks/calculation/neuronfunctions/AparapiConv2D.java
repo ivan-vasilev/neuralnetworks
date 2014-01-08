@@ -1,26 +1,23 @@
 package com.github.neuralnetworks.calculation.neuronfunctions;
 
-import java.util.SortedMap;
+import java.io.Serializable;
 
 import com.amd.aparapi.Kernel;
-import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
 import com.github.neuralnetworks.architecture.ConvGridLayer;
-import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
-import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.util.Environment;
 
 /**
- * Base class for convolution connection calculator (2d)
+ * Base class for convolutional operations (2d)
  * This connection accept as input a single training example (as opposed to the weighted sum which works with multiple).
  *
  * !!! IMPORTANT !!!
  * Aparapi only works one-dimensional arrays of primitive data types can only call member methods of the Kernel class itself.
  */
-public abstract class AparapiConv2D extends Kernel implements ConnectionCalculator {
+public abstract class AparapiConv2D extends Kernel implements Serializable {
 
-    private static final long serialVersionUID = 8931101094464503687L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * input column count (columns of image for example)
@@ -74,18 +71,9 @@ public abstract class AparapiConv2D extends Kernel implements ConnectionCalculat
      */
     protected Conv2DConnection current;
 
-    @Override
-    public void calculate(SortedMap<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
-	if (connections.size() > 0) {
-	    Conv2DConnection c = (Conv2DConnection) connections.keySet().iterator().next();
-
-	    // currently works only as a feedforward (including bp)
-	    if (targetLayer == c.getOutputLayer()) {
-		init(c, connections.get(c), output);
-	    } else {
-		init(c, output, connections.get(c));
-	    }
-
+    public void calculate(Conv2DConnection c, Matrix input, Matrix output) {
+	if (c != null) {
+	    init(c, input, output);
 	    execute(c.getOutputLayer().getNeuronCount());
 	}
     }

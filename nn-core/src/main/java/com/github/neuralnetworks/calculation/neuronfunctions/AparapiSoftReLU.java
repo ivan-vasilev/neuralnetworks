@@ -1,11 +1,10 @@
 package com.github.neuralnetworks.calculation.neuronfunctions;
 
-import com.github.neuralnetworks.calculation.ConnectionCalculatorImpl;
 
 /**
  * Soft Rectified linear unit
  */
-public class AparapiSoftReLU extends ConnectionCalculatorImpl {
+public class AparapiSoftReLU extends ConnectionCalculatorFullyConnected {
 
     private static final long serialVersionUID = -6602713983386107132L;
 

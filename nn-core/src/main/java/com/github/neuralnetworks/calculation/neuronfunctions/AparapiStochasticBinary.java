@@ -5,13 +5,12 @@ import java.util.SortedMap;
 import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
-import com.github.neuralnetworks.calculation.ConnectionCalculatorImpl;
 import com.github.neuralnetworks.training.random.RandomInitializer;
 
 /**
  * Stochastic binary activation function (for RBMs for example)
  */
-public class AparapiStochasticBinary extends ConnectionCalculatorImpl {
+public class AparapiStochasticBinary extends ConnectionCalculatorFullyConnected {
 
     private static final long serialVersionUID = 5869298546838843306L;
 

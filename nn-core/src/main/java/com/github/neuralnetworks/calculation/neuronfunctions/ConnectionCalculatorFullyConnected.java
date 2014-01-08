@@ -1,4 +1,4 @@
-package com.github.neuralnetworks.calculation;
+package com.github.neuralnetworks.calculation.neuronfunctions;
 
 import java.util.HashSet;
 import java.util.List;
@@ -12,12 +12,11 @@ import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
-import com.github.neuralnetworks.calculation.neuronfunctions.ActivationFunction;
+import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.util.UniqueList;
 
 /**
- * Default implementation for Connection calculator
- * Each inbound connection is calculated separately and the results are combined in the "output" matrix
+ * Default implementation of Connection calculator for fully connected layers
  * Biases are also added
  * After all the input functions are calculated there is a list of activation functions that can be applied to the result
  * This class differs from LayerCalculatorImpl in the fact that LayerCalculatorImpl traverses the graph of layers, where ConnectionCalculatorImpl only deals with the connections passed as parameter
@@ -27,7 +26,7 @@ import com.github.neuralnetworks.util.UniqueList;
  * This is done, because it is assumed that implementations will provide a way for calculating many input results at once.
  * Each column of the matrix represents a single input. For example if the network is trained to classify MNIST images, each column of the input matrix will represent single MNIST image.
  */
-public class ConnectionCalculatorImpl implements ConnectionCalculator {
+public class ConnectionCalculatorFullyConnected implements ConnectionCalculator {
 
     private static final long serialVersionUID = -5405654469496055017L;
 
@@ -38,7 +37,7 @@ public class ConnectionCalculatorImpl implements ConnectionCalculator {
      */
     protected List<ActivationFunction> activationFunctions;
 
-    public ConnectionCalculatorImpl(ConnectionCalculator inputFunction) {
+    public ConnectionCalculatorFullyConnected(ConnectionCalculator inputFunction) {
 	super();
 	this.inputFunction = inputFunction;
     }
