@@ -93,10 +93,14 @@ public abstract class AparapiSubsampling2D extends Kernel implements ConnectionC
     public void calculate(SortedMap<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
 	if (connections.size() > 0) {
 	    Subsampling2DConnection c = (Subsampling2DConnection) connections.keySet().iterator().next();
-	    init(c, connections.values().iterator().next(), output);
+	    if (targetLayer == c.getOutputLayer()) {
+		init(c, connections.values().iterator().next(), output);
+	    } else {
+		init(c, output, connections.values().iterator().next());
+	    }
 
 	    // the code is executed with as many kernels as the output layer neurons count
-	    execute(targetLayer.getNeuronCount());
+	    execute(c.getOutputLayer().getNeuronCount());
 	}
     }
 
