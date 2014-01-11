@@ -1,5 +1,8 @@
 package com.github.neuralnetworks.calculation.neuronfunctions;
 
+import com.github.neuralnetworks.architecture.Conv2DConnection;
+import com.github.neuralnetworks.architecture.Layer;
+
 /**
  * Sigmoid convolutional calculator
  */
@@ -7,13 +10,18 @@ public class AparapiConv2DSigmoid extends ConnectionCalculatorConv {
 
     private static final long serialVersionUID = -5265802399836825652L;
 
-    public AparapiConv2DSigmoid() {
-	super(new AparapiConv2DSigmoidFunction());
+    @Override
+    protected AparapiConv2D createInputFunction(Conv2DConnection c, int inputOutputSamples, Layer targetLayer) {
+	return new AparapiConv2DSigmoidFunction(c, inputOutputSamples, targetLayer);
     }
 
     public static class AparapiConv2DSigmoidFunction extends AparapiConv2DFF {
 
 	private static final long serialVersionUID = -7985734201416578973L;
+
+	public AparapiConv2DSigmoidFunction(Conv2DConnection c, int inputOutputSamples, Layer targetLayer) {
+	    super(c, inputOutputSamples, targetLayer);
+	}
 
 	@Override
 	protected float activationFunction(float value) {

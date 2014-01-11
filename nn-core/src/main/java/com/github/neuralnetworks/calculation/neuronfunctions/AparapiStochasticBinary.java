@@ -5,6 +5,7 @@ import java.util.SortedMap;
 import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
+import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.training.random.RandomInitializer;
 
 /**
@@ -14,8 +15,16 @@ public class AparapiStochasticBinary extends ConnectionCalculatorFullyConnected 
 
     private static final long serialVersionUID = 5869298546838843306L;
 
+    protected RandomInitializer randominitializer;
+
     public AparapiStochasticBinary(RandomInitializer randominitializer) {
-	super(new AparapiStochasticBinaryFunction(randominitializer));
+	super();
+	this.randominitializer = randominitializer;
+    }
+
+    @Override
+    protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Matrix> inputConnections, int inputOutputSamples, Layer targetLayer) {
+	return new AparapiStochasticBinaryFunction(inputConnections, inputOutputSamples, targetLayer, randominitializer);
     }
 
     public static class AparapiStochasticBinaryFunction extends AparapiWeightedSum {
@@ -31,10 +40,10 @@ public class AparapiStochasticBinary extends ConnectionCalculatorFullyConnected 
 	 * random initializer
 	 */
 	private RandomInitializer randomInitializer;
-
-	public AparapiStochasticBinaryFunction(RandomInitializer randominitializer) {
-	    super();
-	    randomInitializer = randominitializer;
+	
+	public AparapiStochasticBinaryFunction(SortedMap<GraphConnections, Matrix> inputConnections, int inputOutputSamples, Layer targetLayer, RandomInitializer randomInitializer) {
+	    super(inputConnections, inputOutputSamples, targetLayer);
+	    this.randomInitializer = randomInitializer;
 	}
 
 	/* (non-Javadoc)

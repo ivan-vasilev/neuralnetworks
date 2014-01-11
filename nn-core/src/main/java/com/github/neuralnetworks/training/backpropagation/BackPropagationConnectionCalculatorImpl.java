@@ -1,11 +1,13 @@
 package com.github.neuralnetworks.training.backpropagation;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import com.github.neuralnetworks.architecture.BiasLayer;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
@@ -17,52 +19,56 @@ import com.github.neuralnetworks.util.Properties;
  * Connection calculator for the backpropagation phase of the algorithm
  * The difference with the regular ConnectionCalculatorImpl is that forwardBackprop's and backwardBackprop's properties (learing rate, momentum, weight decay) are updated before each propagation
  */
-public class BackPropagationConnectionCalculatorImpl implements ConnectionCalculator {
+public abstract class BackPropagationConnectionCalculatorImpl implements ConnectionCalculator {
 
     private static final long serialVersionUID = -8854054073444883314L;
 
     private Properties properties;
-    private BackpropagationConnectionCalculator backprop;
+    protected Map<Connections, BackpropagationConnectionCalculator> connectionCalculators;
+    protected Set<BackpropagationConnectionCalculator> calculators;
+    protected Layer currentLayer;
+    protected int inputOutputSamples;
 
-    public BackPropagationConnectionCalculatorImpl(Properties properties, BackpropagationConnectionCalculator backprop) {
+    public BackPropagationConnectionCalculatorImpl(Properties properties) {
 	this.properties = properties;
-	this.backprop = backprop;
+	this.connectionCalculators = new HashMap<>();
+	this.calculators = new HashSet<>();
     }
 
     @Override
     public void calculate(SortedMap<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
-	SortedMap<Connections, Matrix> noBias = new TreeMap<>();
-	SortedMap<Connections, Matrix> bias = new TreeMap<>();
-	Matrix biasOutput = null;
-	Layer biasLayer = null;
+	SortedMap<Connections, Matrix> chunk = new TreeMap<>();
 	for (Entry<Connections, Matrix> e : connections.entrySet()) {
-	    Connections c = e.getKey();
-	    Matrix input = e.getValue();
-	    if (c.getInputLayer() instanceof BiasLayer) {
-		bias.put(c, output);
-		biasOutput = input;
-		biasLayer = c.getInputLayer();
-	    } else {
-		noBias.put(c, input);
+	    if (!connectionCalculators.containsKey(e.getKey()) || targetLayer != currentLayer || inputOutputSamples != output.getColumns()) {
+		chunk.put(e.getKey(), e.getValue());
 	    }
 	}
 
-	if (noBias.size() > 0) {
-	    backprop.setLearningRate(getLearningRate());
-	    backprop.setMomentum(getMomentum());
-	    backprop.setWeightDecay(getWeightDecay());
-	    backprop.setActivations(getActivations());
-	    backprop.calculate(noBias, output, targetLayer);
+	if (chunk.size() > 0) {
+	    addBackpropFunction(chunk, connectionCalculators, output.getColumns(), targetLayer);
+	    calculators.addAll(connectionCalculators.values());
 	}
 
-	if (bias.size() > 0) {
-	    backprop.setLearningRate(getLearningRate());
-	    backprop.setMomentum(getMomentum());
-	    backprop.setWeightDecay(0);
-	    backprop.setActivations(getActivations());
-	    backprop.calculate(bias, biasOutput, biasLayer);
+	for (BackpropagationConnectionCalculator bc : calculators) {
+	    chunk.clear();
+
+	    for (Entry<Connections, Matrix> e : connections.entrySet()) {
+		if (connectionCalculators.get(e.getKey()) == bc) {
+		    chunk.put(e.getKey(), e.getValue());
+		}
+	    }
+
+	    if (chunk.size() > 0) {
+		bc.setLearningRate(getLearningRate());
+		bc.setMomentum(getMomentum());
+		bc.setWeightDecay(getWeightDecay());
+		bc.setActivations(getActivations());
+		bc.calculate(chunk, output, targetLayer);
+	    }
 	}
     }
+
+    protected abstract void addBackpropFunction(SortedMap<Connections, Matrix> inputConnections, Map<Connections, BackpropagationConnectionCalculator> connectionCalculators, int inputOutputSamples, Layer targetLayer);
 
     public float getLearningRate() {
 	return properties.getParameter(Constants.LEARNING_RATE);

@@ -5,6 +5,7 @@ import java.io.Serializable;
 import com.amd.aparapi.Kernel;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
 import com.github.neuralnetworks.architecture.ConvGridLayer;
+import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.util.Environment;
 
@@ -22,22 +23,22 @@ public abstract class AparapiConv2D extends Kernel implements Serializable {
     /**
      * input column count (columns of image for example)
      */
-    protected int inputColumns;
+    protected final int inputColumns;
 
     /**
      * output column count (columns of image for example)
      */
-    protected int outputColumns;
+    protected final int outputColumns;
 
     /**
      * number of samples per calculation (for example number of images)
      */
-    protected int inputOutputSamples;
+    protected final int inputOutputSamples;
 
     /**
      * output columns * output rows
      */
-    protected int outputFeatureMapLength;
+    protected final int outputFeatureMapLength;
 
     /**
      * input
@@ -52,24 +53,49 @@ public abstract class AparapiConv2D extends Kernel implements Serializable {
     /**
      * combined feature weights of all feature maps
      */
-    @Local
+    //@Local TODO
     protected float[] weights;
     
     /**
      * weights for single feature map
      */
-    protected int featureMapWeights;
+    protected final int featureMapWeights;
 
     /**
      * input offset for each feature map in respect to the start index
      */
-    @Local
-    protected int[] featureMapOffsets;
+    //@Local TODO
+    protected final int[] featureMapOffsets;
 
     /**
      * current connection
      */
     protected Conv2DConnection current;
+
+    public AparapiConv2D(Conv2DConnection c, int inputOutputSamples, Layer targetLayer) {
+	super();
+
+	ConvGridLayer inputLayer = (ConvGridLayer) c.getInputLayer();
+	ConvGridLayer outputLayer = (ConvGridLayer) c.getOutputLayer();
+
+	this.weights = c.getWeights();
+	this.inputOutputSamples = inputOutputSamples;
+	this.inputColumns = inputLayer.getFeatureMapColumns();
+	this.outputColumns = outputLayer.getFeatureMapColumns();
+	this.outputFeatureMapLength = outputLayer.getFeatureMapLength();
+	this.featureMapWeights = c.getWeights().length / outputLayer.getFilters();
+	this.featureMapOffsets = new int[featureMapWeights];
+
+	for (int i = 0, offset = 0; i < inputLayer.getFilters(); i++) {
+	    for (int j = 0; j < c.getKernelRows(); j++) {
+		for (int k = 0; k < c.getKernelColumns(); k++) {
+		    featureMapOffsets[offset++] = i * inputLayer.getFeatureMapLength() + j * inputLayer.getFeatureMapColumns() + k;
+		}
+	    }
+	}
+
+	setExecutionMode(Environment.getInstance().getExecutionMode());
+    }
 
     public void calculate(Conv2DConnection c, Matrix input, Matrix output) {
 	if (c != null) {
@@ -82,31 +108,8 @@ public abstract class AparapiConv2D extends Kernel implements Serializable {
      * Converts connection, input and output data to one dimensional arrays (because of the Aparapi limitations)
      */
     protected void init(Conv2DConnection c, Matrix input, Matrix output) {
-	this.inputOutputSamples = input.getColumns();
-	setExecutionMode(Environment.getInstance().getExecutionMode());
-
-	if (current != c) {
-	    current = c;
-
-	    ConvGridLayer inputLayer = (ConvGridLayer) c.getInputLayer();
-	    ConvGridLayer outputLayer = (ConvGridLayer) c.getOutputLayer();
-	    this.input = input.getElements();
-	    this.output = output.getElements();
-	    this.weights = c.getWeights();
-	    this.inputColumns = inputLayer.getFeatureMapColumns();
-	    this.outputColumns = outputLayer.getFeatureMapColumns();
-	    this.outputFeatureMapLength = outputLayer.getFeatureMapLength();
-	    this.featureMapWeights = c.getWeights().length / outputLayer.getFilters();
-	    this.featureMapOffsets = new int[featureMapWeights];
-
-	    for (int i = 0, offset = 0; i < inputLayer.getFilters(); i++) {
-		for (int j = 0; j < c.getKernelRows(); j++) {
-		    for (int k = 0; k < c.getKernelColumns(); k++) {
-			featureMapOffsets[offset++] = i * inputLayer.getFeatureMapLength() + j * inputLayer.getFeatureMapColumns() + k;
-		    }
-		}
-	    }
-	}
+	this.input = input.getElements();
+	this.output = output.getElements();
     }
 
     @Override

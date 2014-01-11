@@ -67,7 +67,7 @@ public class CNNTest {
 
 	Matrix o = new Matrix(4, 1);
 
-	AparapiConv2D conv = new AparapiConv2DFF();
+	AparapiConv2D conv = new AparapiConv2DFF(c, 1, c.getOutputLayer());
 
 	Environment.getInstance().setExecutionMode(EXECUTION_MODE.JTP);
 
@@ -105,7 +105,7 @@ public class CNNTest {
 	
 	Matrix o = new Matrix(8, 1);
 	
-	AparapiConv2D conv = new AparapiConv2DFF();
+	AparapiConv2D conv = new AparapiConv2DFF(c, 1, c.getOutputLayer());
 
 	Environment.getInstance().setExecutionMode(EXECUTION_MODE.JTP);
 	

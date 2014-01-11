@@ -41,6 +41,10 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements Backp
      */
     protected Map<Layer, Matrix> activations;
 
+    public AparapiBackpropagationConv2D(Conv2DConnection c, int inputOutputSamples, Layer targetLayer) {
+	super(c, inputOutputSamples, targetLayer);
+    }
+
     @Override
     public void calculate(SortedMap<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
 	Conv2DConnection c = null;

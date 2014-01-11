@@ -2,6 +2,7 @@ package com.github.neuralnetworks.test;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.junit.Ignore;
@@ -11,10 +12,12 @@ import com.amd.aparapi.Kernel.EXECUTION_MODE;
 import com.github.neuralnetworks.architecture.BiasLayer;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.FullyConnected;
+import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.types.MultiLayerPerceptron;
 import com.github.neuralnetworks.architecture.types.NNFactory;
+import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.calculation.LayerCalculatorImpl;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSigmoid;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSum;
@@ -78,7 +81,15 @@ public class FFNNTest {
 	bcg.set(0, 0, 0.1f);
 	bcg.set(1, 0, 0.2f);
 
-	ConnectionCalculatorFullyConnected aws = new ConnectionCalculatorFullyConnected(new AparapiWeightedSum());
+	ConnectionCalculatorFullyConnected aws = new ConnectionCalculatorFullyConnected() {
+
+	    private static final long serialVersionUID = 1L;
+
+	    @Override
+	    protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Matrix> inputConnections, int inputOutputSamples, Layer targetLayer) {
+		return new AparapiWeightedSum(inputConnections, inputOutputSamples, targetLayer);
+	    }
+	};
 
 	TreeMap<Connections, Matrix> map = new TreeMap<Connections, Matrix>();
 	map.put(c1, i1);
@@ -93,7 +104,16 @@ public class FFNNTest {
 
 	// with bias
 	map.put(bc, new Matrix(2, 2));
-	aws = new ConnectionCalculatorFullyConnected(new AparapiWeightedSum());
+	aws = new ConnectionCalculatorFullyConnected() {
+
+	    private static final long serialVersionUID = 1L;
+
+	    @Override
+	    protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Matrix> inputConnections, int inputOutputSamples, Layer targetLayer) {
+		return new AparapiWeightedSum(inputConnections, inputOutputSamples, targetLayer);
+	    }
+	};
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.JTP);
 	aws.calculate(map, o, ol);
 
 	assertEquals(14.1, o.get(0, 0), 0.01);
@@ -104,7 +124,15 @@ public class FFNNTest {
 
 	// combined layers
 	map.put(c2, i2);
-	aws = new ConnectionCalculatorFullyConnected(new AparapiWeightedSum());
+	aws = new ConnectionCalculatorFullyConnected() {
+
+	    private static final long serialVersionUID = 1L;
+
+	    @Override
+	    protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Matrix> inputConnections, int inputOutputSamples, Layer targetLayer) {
+		return new AparapiWeightedSum(inputConnections, inputOutputSamples, targetLayer);
+	    }
+	};
 	aws.calculate(map, o, ol);
 
 	assertEquals(28.1, o.get(0, 0), 0.01);
@@ -161,7 +189,15 @@ public class FFNNTest {
 	bcg.set(0, 0, 0.1f);
 	bcg.set(1, 0, 0.2f);
 
-	ConnectionCalculatorFullyConnected aws = new ConnectionCalculatorFullyConnected(new AparapiWeightedSum());
+	ConnectionCalculatorFullyConnected aws = new ConnectionCalculatorFullyConnected() {
+
+	    private static final long serialVersionUID = 1L;
+
+	    @Override
+	    protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Matrix> inputConnections, int inputOutputSamples, Layer targetLayer) {
+		return new AparapiWeightedSum(inputConnections, inputOutputSamples, targetLayer);
+	    }
+	};
 
 	TreeMap<Connections, Matrix> map = new TreeMap<Connections, Matrix>();
 	map.put(c1, i1);
@@ -176,7 +212,15 @@ public class FFNNTest {
 
 	// with bias
 	map.put(bc, new Matrix(2, 2));
-	aws = new ConnectionCalculatorFullyConnected(new AparapiWeightedSum());
+	aws = new ConnectionCalculatorFullyConnected() {
+
+	    private static final long serialVersionUID = 1L;
+
+	    @Override
+	    protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Matrix> inputConnections, int inputOutputSamples, Layer targetLayer) {
+		return new AparapiWeightedSum(inputConnections, inputOutputSamples, targetLayer);
+	    }
+	};
 	aws.calculate(map, o, ol);
 
 	assertEquals(14.1, o.get(0, 0), 0.01);
@@ -187,7 +231,15 @@ public class FFNNTest {
 
 	// combined layers
 	map.put(c2, i2);
-	aws = new ConnectionCalculatorFullyConnected(new AparapiWeightedSum());
+	aws = new ConnectionCalculatorFullyConnected() {
+
+	    private static final long serialVersionUID = 1L;
+
+	    @Override
+	    protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Matrix> inputConnections, int inputOutputSamples, Layer targetLayer) {
+		return new AparapiWeightedSum(inputConnections, inputOutputSamples, targetLayer);
+	    }
+	};
 	aws.calculate(map, o, ol);
 
 	assertEquals(28.1, o.get(0, 0), 0.01);
@@ -216,7 +268,8 @@ public class FFNNTest {
 	cg2.set(0, 1, 0.9f);
 
 	@SuppressWarnings("unchecked")
-	BackPropagationTrainer<MultiLayerPerceptron> bpt = TrainerFactory.backPropagationSigmoid(mlp, new SimpleInputProvider(new float[][] { { 0.35f, 0.9f } }, new float[][] { { 0.5f } }, 1), new SimpleInputProvider(new float[][] { { 0.35f, 0.9f } }, new float[][] { { 0.5f } }, 1), null, null, 1f, 0f, 0f);
+	BackPropagationTrainer<MultiLayerPerceptron> bpt = TrainerFactory.backPropagationSigmoid(mlp, new SimpleInputProvider(new float[][] { { 0.35f, 0.9f } }, new float[][] { { 0.5f } }, 1), new SimpleInputProvider(new float[][] { { 0.35f, 0.9f } }, new float[][] { { 0.5f } }, 1), null, null, 1f,
+		0f, 0f);
 	Environment.getInstance().setExecutionMode(EXECUTION_MODE.JTP);
 	bpt.train();
 
@@ -236,12 +289,12 @@ public class FFNNTest {
 	MultiLayerPerceptron mlp = NNFactory.mlpSigmoid(new int[] { 2, 4, 1 }, true);
 	@SuppressWarnings("unchecked")
 	BackPropagationTrainer<MultiLayerPerceptron> bpt = TrainerFactory.backPropagationSigmoid(mlp, new XorInputProvider(1000), new XorInputProvider(1), new XorOutputError(), new AparapiXORShiftInitializer(-0.01f, 0.01f), 1f, 0.5f, 0f);
-	//Environment.getInstance().setExecutionMode(EXECUTION_MODE.JTP);
+	// Environment.getInstance().setExecutionMode(EXECUTION_MODE.JTP);
 	bpt.train();
 	bpt.test();
 	assertEquals(0, bpt.getOutputError().getTotalNetworkError(), 0.1);
     }
-    
+
     /**
      * Simple xor backpropagation test
      */
@@ -255,7 +308,7 @@ public class FFNNTest {
 
 	@SuppressWarnings("unchecked")
 	BackPropagationTrainer<MultiLayerPerceptron> bpt = TrainerFactory.backPropagationSigmoid(mlp, new XorInputProvider(1000), new XorInputProvider(1), new XorOutputError(), new AparapiXORShiftInitializer(-0.01f, 0.01f), 1f, 0.5f, 0f);
-	//Environment.getInstance().setExecutionMode(EXECUTION_MODE.JTP);
+	// Environment.getInstance().setExecutionMode(EXECUTION_MODE.JTP);
 	bpt.train();
 	bpt.test();
 	assertEquals(0, bpt.getOutputError().getTotalNetworkError(), 0.1);

@@ -26,22 +26,20 @@ import com.github.neuralnetworks.util.UniqueList;
  * This is done, because it is assumed that implementations will provide a way for calculating many input results at once.
  * Each column of the matrix represents a single input. For example if the network is trained to classify MNIST images, each column of the input matrix will represent single MNIST image.
  */
-public class ConnectionCalculatorFullyConnected implements ConnectionCalculator {
+public abstract class ConnectionCalculatorFullyConnected implements ConnectionCalculator {
 
     private static final long serialVersionUID = -5405654469496055017L;
 
     protected ConnectionCalculator inputFunction;
+    protected Layer currentLayer;
+    protected int inputOutputSamples;
 
     /**
      * Activation functions
      */
     protected List<ActivationFunction> activationFunctions;
 
-    public ConnectionCalculatorFullyConnected(ConnectionCalculator inputFunction) {
-	super();
-	this.inputFunction = inputFunction;
-    }
-
+    @SuppressWarnings("unchecked")
     @Override
     public void calculate(SortedMap<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
 	if (connections.size() > 0) {
@@ -62,6 +60,13 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator 
 	    calculateBias(bias, output);
 	    
 	    if (notBias.size() > 0) {
+		// new input function is required
+		if (inputFunction == null || targetLayer != currentLayer || inputOutputSamples != output.getColumns()) {
+		    currentLayer = targetLayer;
+		    inputOutputSamples = output.getColumns();
+		    inputFunction = createInputFunction((SortedMap<GraphConnections, Matrix>) ((SortedMap<?, ?>) notBias), inputOutputSamples, targetLayer);
+		}
+
 		inputFunction.calculate(notBias, output, targetLayer);
 	    }
 	    
@@ -83,6 +88,8 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator 
 	    }
 	}
     }
+
+    protected abstract ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Matrix> inputConnections, int inputOutputSamples, Layer targetLayer);
 
     public void addActivationFunction(ActivationFunction activationFunction) {
 	if (activationFunctions == null) {

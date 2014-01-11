@@ -84,7 +84,7 @@ public abstract class AparapiSubsampling2D extends Kernel implements ConnectionC
     /**
      * Contains the offset in the input array for each cell of the current region. The offset is calculated in respect to the first cell of the region
      */
-    @Local
+    //@Local TODO
     protected int[] featureMapOffsets;
 
     protected Subsampling2DConnection current;

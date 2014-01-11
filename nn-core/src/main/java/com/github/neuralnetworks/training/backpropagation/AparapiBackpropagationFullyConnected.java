@@ -42,9 +42,14 @@ public class AparapiBackpropagationFullyConnected extends AparapiWeightedSum imp
      */
     protected Map<Layer, Matrix> activations;
 
+    public AparapiBackpropagationFullyConnected(SortedMap<GraphConnections, Matrix> inputConnections, int inputOutputSamples, Layer targetLayer) {
+	super(inputConnections, inputOutputSamples, targetLayer);
+    }
+
     @Override
     public void calculate(SortedMap<Connections, Matrix> inputConnections, Matrix outputMatrix, Layer targetLayer) {
 	super.calculate(inputConnections, outputMatrix, targetLayer);
+
 	if (inputConnections.size() > 2 || (inputConnections.size() > 1 && !Util.hasBias(inputConnections.keySet()))) {
 	    int i = 0;
 	    for (java.util.Map.Entry<Connections, Matrix> e : inputConnections.entrySet()) {
