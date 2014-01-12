@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import com.github.neuralnetworks.architecture.BiasLayer;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
@@ -37,38 +38,48 @@ public abstract class BackPropagationConnectionCalculatorImpl implements Connect
 
     @Override
     public void calculate(SortedMap<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
-	SortedMap<Connections, Matrix> chunk = new TreeMap<>();
+	SortedMap<Connections, Integer> chunk = new TreeMap<>();
 	for (Entry<Connections, Matrix> e : connections.entrySet()) {
 	    if (!connectionCalculators.containsKey(e.getKey()) || targetLayer != currentLayer || inputOutputSamples != output.getColumns()) {
-		chunk.put(e.getKey(), e.getValue());
+		chunk.put(e.getKey(), e.getValue().getElements().length);
 	    }
 	}
 
 	if (chunk.size() > 0) {
 	    addBackpropFunction(chunk, connectionCalculators, output.getColumns(), targetLayer);
 	    calculators.addAll(connectionCalculators.values());
+	    inputOutputSamples = output.getColumns();
+	    currentLayer = targetLayer;
 	}
 
+	SortedMap<Connections, Matrix> chunkCalc = new TreeMap<>();
 	for (BackpropagationConnectionCalculator bc : calculators) {
-	    chunk.clear();
+	    chunkCalc.clear();
+
+	    Layer l = targetLayer;
 
 	    for (Entry<Connections, Matrix> e : connections.entrySet()) {
 		if (connectionCalculators.get(e.getKey()) == bc) {
-		    chunk.put(e.getKey(), e.getValue());
+		    if (e.getKey().getInputLayer() instanceof BiasLayer) {
+			chunkCalc.put(e.getKey(), output);
+			l = e.getKey().getInputLayer();
+		    } else {
+			chunkCalc.put(e.getKey(), e.getValue());
+		    }
 		}
 	    }
 
-	    if (chunk.size() > 0) {
+	    if (chunkCalc.size() > 0) {
 		bc.setLearningRate(getLearningRate());
 		bc.setMomentum(getMomentum());
 		bc.setWeightDecay(getWeightDecay());
 		bc.setActivations(getActivations());
-		bc.calculate(chunk, output, targetLayer);
+		bc.calculate(chunkCalc, output, l);
 	    }
 	}
     }
 
-    protected abstract void addBackpropFunction(SortedMap<Connections, Matrix> inputConnections, Map<Connections, BackpropagationConnectionCalculator> connectionCalculators, int inputOutputSamples, Layer targetLayer);
+    protected abstract void addBackpropFunction(SortedMap<Connections, Integer> inputConnections, Map<Connections, BackpropagationConnectionCalculator> connectionCalculators, int inputOutputSamples, Layer targetLayer);
 
     public float getLearningRate() {
 	return properties.getParameter(Constants.LEARNING_RATE);

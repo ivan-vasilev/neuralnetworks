@@ -42,7 +42,7 @@ public class AparapiBackpropagationFullyConnected extends AparapiWeightedSum imp
      */
     protected Map<Layer, Matrix> activations;
 
-    public AparapiBackpropagationFullyConnected(SortedMap<GraphConnections, Matrix> inputConnections, int inputOutputSamples, Layer targetLayer) {
+    public AparapiBackpropagationFullyConnected(SortedMap<GraphConnections, Integer> inputConnections, int inputOutputSamples, Layer targetLayer) {
 	super(inputConnections, inputOutputSamples, targetLayer);
     }
 

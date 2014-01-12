@@ -5,10 +5,10 @@ import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import com.github.neuralnetworks.architecture.BiasLayer;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.util.Properties;
 
 /**
@@ -23,11 +23,16 @@ public class BackPropagationTanh extends BackPropagationConnectionCalculatorImpl
     }
 
     @Override
-    protected void addBackpropFunction(SortedMap<Connections, Matrix> inputConnections, Map<Connections, BackpropagationConnectionCalculator> connectionCalculators, int inputOutputSamples, Layer targetLayer) {
-	for (Entry<Connections, Matrix> e : inputConnections.entrySet()) {
-	    SortedMap<GraphConnections, Matrix> m = new TreeMap<>();
-	    m.put((GraphConnections) e.getKey(), e.getValue());
-	    connectionCalculators.put(e.getKey(), new AparapiBackpropTanh(m, inputOutputSamples, targetLayer));
+    protected void addBackpropFunction(SortedMap<Connections, Integer> inputConnections, Map<Connections, BackpropagationConnectionCalculator> connectionCalculators, int inputOutputSamples, Layer targetLayer) {
+	for (Entry<Connections, Integer> e : inputConnections.entrySet()) {
+	    SortedMap<GraphConnections, Integer> m = new TreeMap<>();
+	    if (e.getKey().getInputLayer() instanceof BiasLayer) {
+		m.put((GraphConnections) e.getKey(), inputOutputSamples);
+		connectionCalculators.put(e.getKey(), new AparapiBackpropTanh(m, e.getValue(), e.getKey().getOutputLayer()));
+	    } else {
+		m.put((GraphConnections) e.getKey(), e.getValue());
+		connectionCalculators.put(e.getKey(), new AparapiBackpropTanh(m, inputOutputSamples, targetLayer));
+	    }
 	}
     }
 
@@ -35,7 +40,7 @@ public class BackPropagationTanh extends BackPropagationConnectionCalculatorImpl
 
 	private static final long serialVersionUID = -3580345016542506932L;
 
-	public AparapiBackpropTanh(SortedMap<GraphConnections, Matrix> inputConnections, int inputOutputSamples, Layer targetLayer) {
+	public AparapiBackpropTanh(SortedMap<GraphConnections, Integer> inputConnections, int inputOutputSamples, Layer targetLayer) {
 	    super(inputConnections, inputOutputSamples, targetLayer);
 	}
 

@@ -64,7 +64,12 @@ public abstract class ConnectionCalculatorFullyConnected implements ConnectionCa
 		if (inputFunction == null || targetLayer != currentLayer || inputOutputSamples != output.getColumns()) {
 		    currentLayer = targetLayer;
 		    inputOutputSamples = output.getColumns();
-		    inputFunction = createInputFunction((SortedMap<GraphConnections, Matrix>) ((SortedMap<?, ?>) notBias), inputOutputSamples, targetLayer);
+		    SortedMap<GraphConnections, Integer> map = new TreeMap<>();
+		    for (Entry<Connections, Matrix> e : notBias.entrySet()) {
+			map.put((GraphConnections) e.getKey(), e.getValue().getElements().length);
+		    }
+
+		    inputFunction = createInputFunction(map, inputOutputSamples, targetLayer);
 		}
 
 		inputFunction.calculate(notBias, output, targetLayer);
@@ -89,7 +94,7 @@ public abstract class ConnectionCalculatorFullyConnected implements ConnectionCa
 	}
     }
 
-    protected abstract ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Matrix> inputConnections, int inputOutputSamples, Layer targetLayer);
+    protected abstract ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Integer> inputConnections, int inputOutputSamples, Layer targetLayer);
 
     public void addActivationFunction(ActivationFunction activationFunction) {
 	if (activationFunctions == null) {

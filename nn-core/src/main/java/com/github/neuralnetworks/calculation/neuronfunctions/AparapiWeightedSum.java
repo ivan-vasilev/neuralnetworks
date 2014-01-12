@@ -107,7 +107,7 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
      */
     protected Layer currentLayer;
 
-    public AparapiWeightedSum(SortedMap<GraphConnections, Matrix> inputConnections, int inputOutputSamples, Layer targetLayer) {
+    public AparapiWeightedSum(SortedMap<GraphConnections, Integer> inputConnections, int inputOutputSamples, Layer targetLayer) {
 	super();
 
 	this.currentLayer = targetLayer;
@@ -120,11 +120,11 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
 	this.weightsStep = new int[series];
 
 	int totalInputSize = 0, totalWeightSize = 0, i = 0;
-	for (java.util.Map.Entry<GraphConnections, Matrix> e : inputConnections.entrySet()) {
+	for (java.util.Map.Entry<GraphConnections, Integer> e : inputConnections.entrySet()) {
 	    Matrix cg = e.getKey().getConnectionGraph();
 
 	    inputStartPositions[i] = totalInputSize;
-	    totalInputSize += e.getValue().getElements().length;
+	    totalInputSize += e.getValue();
 	    weightStartPositions[i] = totalWeightSize;
 	    totalWeightSize += e.getKey().getConnectionGraph().getElements().length;
 
@@ -143,7 +143,7 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
 	}
 
 	if (inputConnections.size() == 1) {
-	    java.util.Map.Entry<GraphConnections, Matrix> e = inputConnections.entrySet().iterator().next();
+	    java.util.Map.Entry<GraphConnections, Integer> e = inputConnections.entrySet().iterator().next();
 	    this.weights = e.getKey().getConnectionGraph().getElements();
 	} else {
 	    this.weights = storedWeights.get(totalWeightSize);
@@ -153,14 +153,13 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
 	    }
 
 	    i = 0;
-	    for (java.util.Map.Entry<GraphConnections, Matrix> e : inputConnections.entrySet()) {
+	    for (java.util.Map.Entry<GraphConnections, Integer> e : inputConnections.entrySet()) {
 		System.arraycopy(e.getKey().getConnectionGraph().getElements(), 0, weights, weightStartPositions[i], e.getKey().getConnectionGraph().getElements().length);
 		i++;
 	    }
 	}
 
 	setExecutionMode(Environment.getInstance().getExecutionMode());
-
     }
 
     @SuppressWarnings("unchecked")

@@ -4,7 +4,6 @@ import java.util.SortedMap;
 
 import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
 
 /**
@@ -19,13 +18,13 @@ public class AparapiReLU extends ConnectionCalculatorFullyConnected {
     }
 
     @Override
-    protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Matrix> inputConnections, int inputOutputSamples, Layer targetLayer) {
+    protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Integer> inputConnections, int inputOutputSamples, Layer targetLayer) {
 	return new AparapiReLUFunction(inputConnections, inputOutputSamples, targetLayer);
     }
 
     public static class AparapiReLUFunction extends AparapiWeightedSum {
 	
-	public AparapiReLUFunction(SortedMap<GraphConnections, Matrix> inputConnections, int inputOutputSamples, Layer targetLayer) {
+	public AparapiReLUFunction(SortedMap<GraphConnections, Integer> inputConnections, int inputOutputSamples, Layer targetLayer) {
 	    super(inputConnections, inputOutputSamples, targetLayer);
 	}
 

@@ -7,7 +7,6 @@ import com.github.neuralnetworks.architecture.BiasLayer;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
 import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.util.Properties;
 
 /**
@@ -22,7 +21,7 @@ public class BackPropagationConv2DSoftReLU extends BackPropagationConnectionCalc
     }
 
     @Override
-    protected void addBackpropFunction(SortedMap<Connections, Matrix> inputConnections, Map<Connections, BackpropagationConnectionCalculator> connectionCalculators, int inputOutputSamples, Layer targetLayer) {
+    protected void addBackpropFunction(SortedMap<Connections, Integer> inputConnections, Map<Connections, BackpropagationConnectionCalculator> connectionCalculators, int inputOutputSamples, Layer targetLayer) {
 	Conv2DConnection con = null;
 	for (Connections c : inputConnections.keySet()) {
 	    if (c instanceof Conv2DConnection && !(c.getInputLayer() instanceof BiasLayer)) {

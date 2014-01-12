@@ -23,7 +23,7 @@ public class AparapiStochasticBinary extends ConnectionCalculatorFullyConnected 
     }
 
     @Override
-    protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Matrix> inputConnections, int inputOutputSamples, Layer targetLayer) {
+    protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Integer> inputConnections, int inputOutputSamples, Layer targetLayer) {
 	return new AparapiStochasticBinaryFunction(inputConnections, inputOutputSamples, targetLayer, randominitializer);
     }
 
@@ -41,7 +41,7 @@ public class AparapiStochasticBinary extends ConnectionCalculatorFullyConnected 
 	 */
 	private RandomInitializer randomInitializer;
 	
-	public AparapiStochasticBinaryFunction(SortedMap<GraphConnections, Matrix> inputConnections, int inputOutputSamples, Layer targetLayer, RandomInitializer randomInitializer) {
+	public AparapiStochasticBinaryFunction(SortedMap<GraphConnections, Integer> inputConnections, int inputOutputSamples, Layer targetLayer, RandomInitializer randomInitializer) {
 	    super(inputConnections, inputOutputSamples, targetLayer);
 	    this.randomInitializer = randomInitializer;
 	}

@@ -86,7 +86,7 @@ public class FFNNTest {
 	    private static final long serialVersionUID = 1L;
 
 	    @Override
-	    protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Matrix> inputConnections, int inputOutputSamples, Layer targetLayer) {
+	    protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Integer> inputConnections, int inputOutputSamples, Layer targetLayer) {
 		return new AparapiWeightedSum(inputConnections, inputOutputSamples, targetLayer);
 	    }
 	};
@@ -109,11 +109,11 @@ public class FFNNTest {
 	    private static final long serialVersionUID = 1L;
 
 	    @Override
-	    protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Matrix> inputConnections, int inputOutputSamples, Layer targetLayer) {
+	    protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Integer> inputConnections, int inputOutputSamples, Layer targetLayer) {
 		return new AparapiWeightedSum(inputConnections, inputOutputSamples, targetLayer);
 	    }
 	};
-	Environment.getInstance().setExecutionMode(EXECUTION_MODE.JTP);
+	//Environment.getInstance().setExecutionMode(EXECUTION_MODE.JTP);
 	aws.calculate(map, o, ol);
 
 	assertEquals(14.1, o.get(0, 0), 0.01);
@@ -129,7 +129,7 @@ public class FFNNTest {
 	    private static final long serialVersionUID = 1L;
 
 	    @Override
-	    protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Matrix> inputConnections, int inputOutputSamples, Layer targetLayer) {
+	    protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Integer> inputConnections, int inputOutputSamples, Layer targetLayer) {
 		return new AparapiWeightedSum(inputConnections, inputOutputSamples, targetLayer);
 	    }
 	};
@@ -194,7 +194,7 @@ public class FFNNTest {
 	    private static final long serialVersionUID = 1L;
 
 	    @Override
-	    protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Matrix> inputConnections, int inputOutputSamples, Layer targetLayer) {
+	    protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Integer> inputConnections, int inputOutputSamples, Layer targetLayer) {
 		return new AparapiWeightedSum(inputConnections, inputOutputSamples, targetLayer);
 	    }
 	};
@@ -217,7 +217,7 @@ public class FFNNTest {
 	    private static final long serialVersionUID = 1L;
 
 	    @Override
-	    protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Matrix> inputConnections, int inputOutputSamples, Layer targetLayer) {
+	    protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Integer> inputConnections, int inputOutputSamples, Layer targetLayer) {
 		return new AparapiWeightedSum(inputConnections, inputOutputSamples, targetLayer);
 	    }
 	};
@@ -236,7 +236,7 @@ public class FFNNTest {
 	    private static final long serialVersionUID = 1L;
 
 	    @Override
-	    protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Matrix> inputConnections, int inputOutputSamples, Layer targetLayer) {
+	    protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Integer> inputConnections, int inputOutputSamples, Layer targetLayer) {
 		return new AparapiWeightedSum(inputConnections, inputOutputSamples, targetLayer);
 	    }
 	};
@@ -270,7 +270,7 @@ public class FFNNTest {
 	@SuppressWarnings("unchecked")
 	BackPropagationTrainer<MultiLayerPerceptron> bpt = TrainerFactory.backPropagationSigmoid(mlp, new SimpleInputProvider(new float[][] { { 0.35f, 0.9f } }, new float[][] { { 0.5f } }, 1), new SimpleInputProvider(new float[][] { { 0.35f, 0.9f } }, new float[][] { { 0.5f } }, 1), null, null, 1f,
 		0f, 0f);
-	Environment.getInstance().setExecutionMode(EXECUTION_MODE.JTP);
+	//Environment.getInstance().setExecutionMode(EXECUTION_MODE.JTP);
 	bpt.train();
 
 	assertEquals(0.09916, cg1.get(0, 0), 0.01);
@@ -286,10 +286,10 @@ public class FFNNTest {
      */
     @Test
     public void testXORSigmoidBP() {
-	MultiLayerPerceptron mlp = NNFactory.mlpSigmoid(new int[] { 2, 4, 1 }, true);
+	MultiLayerPerceptron mlp = NNFactory.mlpSigmoid(new int[] { 2, 6, 1 }, false);
 	@SuppressWarnings("unchecked")
 	BackPropagationTrainer<MultiLayerPerceptron> bpt = TrainerFactory.backPropagationSigmoid(mlp, new XorInputProvider(1000), new XorInputProvider(1), new XorOutputError(), new AparapiXORShiftInitializer(-0.01f, 0.01f), 1f, 0.5f, 0f);
-	// Environment.getInstance().setExecutionMode(EXECUTION_MODE.JTP);
+	//Environment.getInstance().setExecutionMode(EXECUTION_MODE.JTP);
 	bpt.train();
 	bpt.test();
 	assertEquals(0, bpt.getOutputError().getTotalNetworkError(), 0.1);
@@ -308,7 +308,7 @@ public class FFNNTest {
 
 	@SuppressWarnings("unchecked")
 	BackPropagationTrainer<MultiLayerPerceptron> bpt = TrainerFactory.backPropagationSigmoid(mlp, new XorInputProvider(1000), new XorInputProvider(1), new XorOutputError(), new AparapiXORShiftInitializer(-0.01f, 0.01f), 1f, 0.5f, 0f);
-	// Environment.getInstance().setExecutionMode(EXECUTION_MODE.JTP);
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.GPU);
 	bpt.train();
 	bpt.test();
 	assertEquals(0, bpt.getOutputError().getTotalNetworkError(), 0.1);
