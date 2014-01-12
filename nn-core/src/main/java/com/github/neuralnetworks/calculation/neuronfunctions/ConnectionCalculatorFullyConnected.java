@@ -39,7 +39,6 @@ public abstract class ConnectionCalculatorFullyConnected implements ConnectionCa
      */
     protected List<ActivationFunction> activationFunctions;
 
-    @SuppressWarnings("unchecked")
     @Override
     public void calculate(SortedMap<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
 	if (connections.size() > 0) {

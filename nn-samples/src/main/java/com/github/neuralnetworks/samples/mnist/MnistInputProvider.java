@@ -1,4 +1,4 @@
-package com.github.neuralnetworks.input.mnist;
+package com.github.neuralnetworks.samples.mnist;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;

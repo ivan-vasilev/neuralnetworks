@@ -1,9 +1,15 @@
-package com.github.neuralnetworks.input.mnist;
+package com.github.neuralnetworks.samples.mnist;
 
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.input.InputConverter;
+import com.github.neuralnetworks.input.ScalingInputModifier;
 
 public class MnistInputConverter extends InputConverter {
+
+    public MnistInputConverter() {
+	super();
+	addModifier(new ScalingInputModifier(255));
+    }
 
     @Override
     public Matrix convert(Object[] input) {

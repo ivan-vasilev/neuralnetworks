@@ -286,10 +286,10 @@ public class FFNNTest {
      */
     @Test
     public void testXORSigmoidBP() {
-	MultiLayerPerceptron mlp = NNFactory.mlpSigmoid(new int[] { 2, 6, 1 }, true);
+	MultiLayerPerceptron mlp = NNFactory.mlpSigmoid(new int[] { 2, 4, 4, 1 }, false);
 	@SuppressWarnings("unchecked")
 	BackPropagationTrainer<MultiLayerPerceptron> bpt = TrainerFactory.backPropagationSigmoid(mlp, new XorInputProvider(1000), new XorInputProvider(1), new XorOutputError(), new AparapiXORShiftInitializer(-0.01f, 0.01f), 1f, 0.5f, 0f);
-	//Environment.getInstance().setExecutionMode(EXECUTION_MODE.JTP);
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.JTP);
 	bpt.train();
 	bpt.test();
 	assertEquals(0, bpt.getOutputError().getTotalNetworkError(), 0.1);
@@ -301,7 +301,7 @@ public class FFNNTest {
     @Ignore
     @Test
     public void testXORReLUBP() {
-	MultiLayerPerceptron mlp = NNFactory.mlpRelu(new int[] { 2, 4, }, true, new AparapiSigmoid());
+	MultiLayerPerceptron mlp = NNFactory.mlpRelu(new int[] { 2, 4, 4, }, true, new AparapiSigmoid());
 	mlp.addLayer(new Layer(1), true);
 	LayerCalculatorImpl lc = (LayerCalculatorImpl) mlp.getLayerCalculator();
 	lc.addConnectionCalculator(mlp.getOutputLayer(), new AparapiSigmoid());
