@@ -2,18 +2,25 @@ package com.github.neuralnetworks.samples.mnist;
 
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.input.InputConverter;
+import com.github.neuralnetworks.util.Util;
 
 public class MnistTargetMultiNeuronOutputConverter implements InputConverter {
 
+    private Matrix convertedTarget;
+
     @Override
     public Matrix convert(Object[] input) {
-	Matrix m = new Matrix(10, input.length);
+	if (convertedTarget == null || convertedTarget.getColumns() != input.length) {
+	    convertedTarget = new Matrix(10, input.length);
+	} else {
+	    Util.fillArray(convertedTarget.getElements(), 0);
+	}
 
 	for (int i = 0; i < input.length; i++) {
 	    int val = (int) input[i];
-	    m.set(val, i, 1);
+	    convertedTarget.set(val, i, 1);
 	}
 
-	return m;
+	return convertedTarget;
     }
 }

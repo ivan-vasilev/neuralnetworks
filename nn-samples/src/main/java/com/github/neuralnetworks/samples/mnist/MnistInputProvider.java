@@ -28,6 +28,7 @@ public class MnistInputProvider implements TrainingInputProvider {
     private Random random;
     private final InputConverter targetConverter;
     private Matrix tempImages;
+    private byte[] current;
 
     /**
      * List of modifiers to apply on the input data after the conversion
@@ -49,6 +50,7 @@ public class MnistInputProvider implements TrainingInputProvider {
 	    inputSize = images.readInt();
 	    rows = images.readInt();
 	    cols = images.readInt();
+	    current = new byte[rows * cols];
 
 	    random = new Random();
 	    reset();
@@ -118,8 +120,9 @@ public class MnistInputProvider implements TrainingInputProvider {
 	try {
 	    for (int i = 0; i < indexes.length; i++) {
 		images.seek(16 + size * indexes[i]);
+		images.readFully(current);
 		for (int j = 0; j < size; j++) {
-		    tempImages.set(j, i, images.readUnsignedByte());
+		    tempImages.set(j, i, current[j]);
 		}
 	    }
 	} catch (IOException e) {
