@@ -3,7 +3,7 @@ package com.github.neuralnetworks.samples.mnist;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.input.InputConverter;
 
-public class MnistTargetMultiNeuronOutputConverter extends InputConverter {
+public class MnistTargetMultiNeuronOutputConverter implements InputConverter {
 
     @Override
     public Matrix convert(Object[] input) {

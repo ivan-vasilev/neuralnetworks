@@ -1,81 +1,36 @@
 package com.github.neuralnetworks.training;
 
 import com.github.neuralnetworks.architecture.Matrix;
-import com.github.neuralnetworks.input.InputConverter;
 
 /**
  * Training input data with target value default implementation
  */
 public class TrainingInputDataImpl implements TrainingInputData {
 
-    private Object[] realInput;
-    private Object[] realTarget;
-
-    /**
-     * Converting input to Matrix
-     */
-    private InputConverter inputConverter;
-
-    /**
-     * Converting target to Matrix
-     */
-    private InputConverter targetConverter;
+    private Matrix input;
+    private Matrix target;
 
     public TrainingInputDataImpl() {
 	super();
     }
 
-    public TrainingInputDataImpl(Object[] realInput) {
+    public TrainingInputDataImpl(Matrix input) {
 	super();
-	this.realInput = realInput;
+	this.input = input;
     }
 
-    public TrainingInputDataImpl(Object[] realInput, Object[] realTarget, InputConverter inputConverter, InputConverter targetConverter) {
-	this.realInput = realInput;
-	this.realTarget = realTarget;
-	this.inputConverter = inputConverter;
-	this.targetConverter = targetConverter;
-    }
-
-    public Object[] getRealTarget() {
-	return realTarget;
-    }
-
-    public void setRealTarget(Object[] target) {
-	this.realTarget = target;
-    }
-
-    public Object[] getRealInput() {
-	return realInput;
-    }
-
-    public void setRealInput(Object[] realInput) {
-	this.realInput = realInput;
+    public TrainingInputDataImpl(Matrix input, Matrix target) {
+	this.input = input;
+	this.target = target;
     }
 
     @Override
     public Matrix getInput() {
-	return inputConverter.getConvertedInput(realInput);
+	return input;
     }
 
     @Override
     public Matrix getTarget() {
-	return targetConverter.getConvertedInput(realTarget);
-    }
-
-    public InputConverter getInputConverter() {
-	return inputConverter;
-    }
-
-    public void setInputConverter(InputConverter inputConverter) {
-	this.inputConverter = inputConverter;
-    }
-
-    public InputConverter getTargetConverter() {
-        return targetConverter;
-    }
-
-    public void setTargetConverter(InputConverter targetConverter) {
-        this.targetConverter = targetConverter;
+	return target;
     }
 }

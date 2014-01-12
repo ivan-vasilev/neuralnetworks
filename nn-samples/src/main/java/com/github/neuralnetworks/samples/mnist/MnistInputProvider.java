@@ -6,15 +6,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.input.InputConverter;
+import com.github.neuralnetworks.input.InputModifier;
 import com.github.neuralnetworks.training.TrainingInputData;
 import com.github.neuralnetworks.training.TrainingInputDataImpl;
 import com.github.neuralnetworks.training.TrainingInputProvider;
 
 /**
- * 
  * MNIST data set with random order
- * 
  */
 public class MnistInputProvider implements TrainingInputProvider {
 
@@ -26,15 +26,18 @@ public class MnistInputProvider implements TrainingInputProvider {
     private final int batchSize;
     private List<Integer> elementsOrder;
     private Random random;
-    private final InputConverter inputConverter;
     private final InputConverter targetConverter;
-    private Integer[][] tempImages;
+    private Matrix tempImages;
 
-    public MnistInputProvider(String imagesFile, String labelsFile, int batchSize, InputConverter inputConverter, InputConverter targetConverter) {
+    /**
+     * List of modifiers to apply on the input data after the conversion
+     */
+    private List<InputModifier> inputModifiers;
+
+    public MnistInputProvider(String imagesFile, String labelsFile, int batchSize, InputConverter targetConverter) {
 	super();
 
 	this.batchSize = batchSize;
-	this.inputConverter = inputConverter;
 	this.targetConverter = targetConverter;
 
 	try {
@@ -64,7 +67,16 @@ public class MnistInputProvider implements TrainingInputProvider {
 		indexes[i] = elementsOrder.remove(random.nextInt(elementsOrder.size()));
 	    }
 
-	    result = new TrainingInputDataImpl(getImages(indexes), getLabels(indexes), inputConverter, targetConverter);
+	    Matrix input = getImages(indexes);
+	    if (inputModifiers != null) {
+		for (InputModifier im : inputModifiers) {
+		    input = im.modify(input);
+		}
+	    }
+
+	    Matrix target = targetConverter.convert(getLabels(indexes));
+
+	    result = new TrainingInputDataImpl(input, target);
 	}
 
 	return result;
@@ -83,17 +95,31 @@ public class MnistInputProvider implements TrainingInputProvider {
 	return inputSize;
     }
 
-    private Integer[][] getImages(int[] indexes) {
+    public void addInputModifier(InputModifier modifier) {
+	if (inputModifiers == null) {
+	    inputModifiers = new ArrayList<>();
+	}
+
+	inputModifiers.add(modifier);
+    }
+
+    public void removeModifier(InputModifier modifier) {
+	if (inputModifiers != null) {
+	    inputModifiers.remove(modifier);
+	}
+    }
+
+    private Matrix getImages(int[] indexes) {
 	int size = cols * rows;
-	if (tempImages == null || tempImages.length != indexes.length) {
-	    tempImages = new Integer[indexes.length][size];
+	if (tempImages == null || tempImages.getRows() != indexes.length) {
+	    tempImages = new Matrix(size, indexes.length);
 	}
 
 	try {
 	    for (int i = 0; i < indexes.length; i++) {
 		images.seek(16 + size * indexes[i]);
 		for (int j = 0; j < size; j++) {
-		    tempImages[i][j] = images.readUnsignedByte();
+		    tempImages.set(j, i, images.readUnsignedByte());
 		}
 	    }
 	} catch (IOException e) {
