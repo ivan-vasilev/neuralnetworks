@@ -28,7 +28,7 @@ public class BackPropagationReLU extends BackPropagationConnectionCalculatorImpl
 	    SortedMap<GraphConnections, Integer> m = new TreeMap<>();
 	    if (e.getKey().getInputLayer() instanceof BiasLayer) {
 		m.put((GraphConnections) e.getKey(), inputOutputSamples);
-		connectionCalculators.put(e.getKey(), new AparapiBackpropReLU(m, e.getValue(), e.getKey().getOutputLayer()));
+		connectionCalculators.put(e.getKey(), new AparapiBackpropReLU(m, e.getValue(), e.getKey().getInputLayer()));
 	    } else {
 		m.put((GraphConnections) e.getKey(), e.getValue());
 		connectionCalculators.put(e.getKey(), new AparapiBackpropReLU(m, inputOutputSamples, targetLayer));

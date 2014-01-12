@@ -56,13 +56,14 @@ public abstract class BackPropagationConnectionCalculatorImpl implements Connect
 	for (BackpropagationConnectionCalculator bc : calculators) {
 	    chunkCalc.clear();
 
-	    Layer l = targetLayer;
-
+	    Layer target = targetLayer;
+	    Matrix out = output;
 	    for (Entry<Connections, Matrix> e : connections.entrySet()) {
 		if (connectionCalculators.get(e.getKey()) == bc) {
 		    if (e.getKey().getInputLayer() instanceof BiasLayer) {
 			chunkCalc.put(e.getKey(), output);
-			l = e.getKey().getInputLayer();
+			target = e.getKey().getInputLayer();
+			out = e.getValue();
 		    } else {
 			chunkCalc.put(e.getKey(), e.getValue());
 		    }
@@ -74,7 +75,7 @@ public abstract class BackPropagationConnectionCalculatorImpl implements Connect
 		bc.setMomentum(getMomentum());
 		bc.setWeightDecay(getWeightDecay());
 		bc.setActivations(getActivations());
-		bc.calculate(chunkCalc, output, l);
+		bc.calculate(chunkCalc, out, target);
 	    }
 	}
     }
