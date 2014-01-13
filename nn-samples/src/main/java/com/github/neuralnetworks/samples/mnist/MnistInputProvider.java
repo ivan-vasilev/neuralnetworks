@@ -122,7 +122,7 @@ public class MnistInputProvider implements TrainingInputProvider {
 		images.seek(16 + size * indexes[i]);
 		images.readFully(current);
 		for (int j = 0; j < size; j++) {
-		    tempImages.set(j, i, current[j]);
+		    tempImages.set(j, i, current[j] & 0xFF);
 		}
 	    }
 	} catch (IOException e) {

@@ -6,6 +6,7 @@ import com.github.neuralnetworks.architecture.types.RBM;
 import com.github.neuralnetworks.calculation.OutputError;
 import com.github.neuralnetworks.calculation.RBMLayerCalculator;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationAutoencoder;
+import com.github.neuralnetworks.training.backpropagation.BackPropagationFullyConnected;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationLayerCalculatorImpl;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationReLU;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationSigmoid;
@@ -33,7 +34,11 @@ public class TrainerFactory {
 	t.getProperties().setParameter(Constants.BACKPROPAGATION, lc);
 	for (Layer l : nn.getLayers()) {
 	    if (nn.getOutputLayer() != l) {
-		lc.addConnectionCalculator(l, new BackPropagationSigmoid(t.getProperties()));
+		if (nn.getInputLayer() != l) {
+		    lc.addConnectionCalculator(l, new BackPropagationSigmoid(t.getProperties()));
+		} else {
+		    lc.addConnectionCalculator(l, new BackPropagationFullyConnected(t.getProperties()));
+		}
 	    }
 	}
 
@@ -48,7 +53,11 @@ public class TrainerFactory {
 	t.getProperties().setParameter(Constants.BACKPROPAGATION, lc);
 	for (Layer l : nn.getLayers()) {
 	    if (nn.getOutputLayer() != l) {
-		lc.addConnectionCalculator(l, new BackPropagationSoftReLU(t.getProperties()));
+		if (nn.getInputLayer() != l) {
+		    lc.addConnectionCalculator(l, new BackPropagationSoftReLU(t.getProperties()));
+		} else {
+		    lc.addConnectionCalculator(l, new BackPropagationFullyConnected(t.getProperties()));
+		}
 	    }
 	}
 
@@ -62,8 +71,10 @@ public class TrainerFactory {
 	BackPropagationLayerCalculatorImpl lc = new BackPropagationLayerCalculatorImpl();
 	t.getProperties().setParameter(Constants.BACKPROPAGATION, lc);
 	for (Layer l : nn.getLayers()) {
-	    if (nn.getOutputLayer() != l) {
+	    if (nn.getInputLayer() != l) {
 		lc.addConnectionCalculator(l, new BackPropagationReLU(t.getProperties()));
+	    } else {
+		lc.addConnectionCalculator(l, new BackPropagationFullyConnected(t.getProperties()));
 	    }
 	}
 	
@@ -77,8 +88,10 @@ public class TrainerFactory {
 	BackPropagationLayerCalculatorImpl lc = new BackPropagationLayerCalculatorImpl();
 	t.getProperties().setParameter(Constants.BACKPROPAGATION, lc);
 	for (Layer l : nn.getLayers()) {
-	    if (nn.getOutputLayer() != l) {
+	    if (nn.getInputLayer() != l) {
 		lc.addConnectionCalculator(l, new BackPropagationTanh(t.getProperties()));
+	    } else {
+		lc.addConnectionCalculator(l, new BackPropagationFullyConnected(t.getProperties()));
 	    }
 	}
 
