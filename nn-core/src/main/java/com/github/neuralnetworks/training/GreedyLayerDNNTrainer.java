@@ -11,6 +11,9 @@ import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.architecture.types.DeepNeuralNetwork;
 import com.github.neuralnetworks.calculation.LayerCalculator;
 import com.github.neuralnetworks.events.TrainingEvent;
+import com.github.neuralnetworks.training.events.MiniBatchFinishedEvent;
+import com.github.neuralnetworks.training.events.TrainingFinishedEvent;
+import com.github.neuralnetworks.training.events.TrainingStartedEvent;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
 
@@ -40,7 +43,7 @@ public class GreedyLayerDNNTrainer extends Trainer<DeepNeuralNetwork> {
 	    deepInput.nn = nn;
 	    while ((deepInput.baseInput = getTrainingInputProvider().getNextInput()) != null) {
 		trainer.learnInput(deepInput);
-		triggerEvent(new SampleFromLayerFinished(this, deepInput.baseInput, trainer));
+		triggerEvent(new MiniBatchFromLayerFinished(this, deepInput.baseInput, trainer));
 	    }
 
 	    triggerEvent(new LayerTrainingFinished(this, trainer));
@@ -107,15 +110,15 @@ public class GreedyLayerDNNTrainer extends Trainer<DeepNeuralNetwork> {
     }
 
     /**
-     * Triggered when a training sample is finished
+     * Triggered when a training mini batch is finished
      */
-    public static class SampleFromLayerFinished extends SampleFinishedEvent {
+    public static class MiniBatchFromLayerFinished extends MiniBatchFinishedEvent {
 
 	private static final long serialVersionUID = 2155527437110587968L;
 
 	public OneStepTrainer<?> currentTrainer;
 
-	public SampleFromLayerFinished(GreedyLayerDNNTrainer source, TrainingInputData input, OneStepTrainer<?> currentTrainer) {
+	public MiniBatchFromLayerFinished(GreedyLayerDNNTrainer source, TrainingInputData input, OneStepTrainer<?> currentTrainer) {
 	    super(source, input);
 	    this.currentTrainer = currentTrainer;
 	}

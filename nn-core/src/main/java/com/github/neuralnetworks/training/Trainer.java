@@ -15,6 +15,9 @@ import com.github.neuralnetworks.calculation.LayerCalculator;
 import com.github.neuralnetworks.calculation.OutputError;
 import com.github.neuralnetworks.events.TrainingEvent;
 import com.github.neuralnetworks.events.TrainingEventListener;
+import com.github.neuralnetworks.training.events.MiniBatchFinishedEvent;
+import com.github.neuralnetworks.training.events.TestingFinishedEvent;
+import com.github.neuralnetworks.training.events.TestingStartedEvent;
 import com.github.neuralnetworks.training.random.RandomInitializer;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
@@ -62,6 +65,8 @@ public abstract class Trainer<N extends NeuralNetwork> {
 	LayerCalculator c = getLayerCalculator();
 
 	if (ip != null && e != null && n != null && c != null) {
+	    triggerEvent(new TestingStartedEvent(this));
+
 	    Set<Layer> calculatedLayers = new UniqueList<>();
 	    Map<Layer, Matrix> results = new HashMap<>();
 	    TrainingInputData input = null;
@@ -77,11 +82,11 @@ public abstract class Trainer<N extends NeuralNetwork> {
 		    Util.fillArray(m.getElements(), 0);
 		}
 		
-		triggerEvent(new SampleFinishedEvent(this, input));
+		triggerEvent(new MiniBatchFinishedEvent(this, input));
 	    }
 	    
 	    triggerEvent(new TestingFinishedEvent(this));
-	    
+
 	    return e.getTotalNetworkError();
 	}
 
@@ -183,45 +188,6 @@ public abstract class Trainer<N extends NeuralNetwork> {
 		    r.initialize(((GraphConnections) c).getConnectionGraph().getElements());
 		}
 	    }
-	}
-    }
-    
-    public static class TrainingStartedEvent extends TrainingEvent {
-	
-	private static final long serialVersionUID = -5239379347414855784L;
-	
-	public TrainingStartedEvent(Trainer<?> source) {
-	    super(source);
-	}
-    }
-
-    public static class TrainingFinishedEvent extends TrainingEvent {
-
-	private static final long serialVersionUID = -5239379347414855784L;
-
-	public TrainingFinishedEvent(Trainer<?> source) {
-	    super(source);
-	}
-    }
-
-    public static class SampleFinishedEvent extends TrainingEvent {
-
-	private static final long serialVersionUID = -5239379347414855784L;
-
-	public TrainingInputData data;
-
-	public SampleFinishedEvent(Trainer<?> source, TrainingInputData data) {
-	    super(source);
-	    this.data = data;
-	}
-    }
-
-    public static class TestingFinishedEvent extends TrainingEvent {
-
-	private static final long serialVersionUID = -5239379347414855784L;
-
-	public TestingFinishedEvent(Trainer<?> source) {
-	    super(source);
 	}
     }
 }

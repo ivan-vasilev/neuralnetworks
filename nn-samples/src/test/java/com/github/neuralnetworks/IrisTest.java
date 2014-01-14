@@ -16,6 +16,7 @@ import com.github.neuralnetworks.samples.iris.IrisInputProvider;
 import com.github.neuralnetworks.samples.iris.IrisTargetMultiNeuronOutputConverter;
 import com.github.neuralnetworks.training.TrainerFactory;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationTrainer;
+import com.github.neuralnetworks.training.events.LogTrainingListener;
 import com.github.neuralnetworks.training.random.MersenneTwisterRandomInitializer;
 
 /**
@@ -29,20 +30,20 @@ public class IrisTest {
     @Test
     public void testIrisMultipleSigmoidBP() {
 	MultiLayerPerceptron mlp = NNFactory.mlpSigmoid(new int[] { 4, 12, 3 }, true);
-	IrisInputProvider trainInputProvider = new IrisInputProvider(1000, 100000, new IrisTargetMultiNeuronOutputConverter());
+	IrisInputProvider trainInputProvider = new IrisInputProvider(1000, 1000, new IrisTargetMultiNeuronOutputConverter());
 	IrisInputProvider testInputProvider = new IrisInputProvider(1000, 1000, new IrisTargetMultiNeuronOutputConverter());
 	@SuppressWarnings("unchecked")
 	BackPropagationTrainer<MultiLayerPerceptron> bpt = TrainerFactory.backPropagationSigmoid(mlp, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 1f, 0.5f, 0f);
 	//Environment.getInstance().setExecutionMode(EXECUTION_MODE.JTP);
-	long s = System.currentTimeMillis();
+
+	bpt.addEventListener(new LogTrainingListener());
+
 	bpt.train();
-	System.out.println("Time: " + (System.currentTimeMillis() - s) / 100);
 	LayerCalculatorImpl lc = (LayerCalculatorImpl) mlp.getLayerCalculator();
 	ConnectionCalculatorFullyConnected cc = (ConnectionCalculatorFullyConnected) lc.getConnectionCalculator(mlp.getOutputLayer());
 	cc.addActivationFunction(new SoftmaxFunction());
 
 	bpt.test();
-	System.out.println("Error: " + bpt.getOutputError().getTotalNetworkError());
 	assertEquals(0, bpt.getOutputError().getTotalNetworkError(), 0.1);
     }
 

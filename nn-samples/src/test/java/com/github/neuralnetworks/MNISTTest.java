@@ -13,6 +13,7 @@ import com.github.neuralnetworks.samples.mnist.MnistInputProvider;
 import com.github.neuralnetworks.samples.mnist.MnistTargetMultiNeuronOutputConverter;
 import com.github.neuralnetworks.training.TrainerFactory;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationTrainer;
+import com.github.neuralnetworks.training.events.LogTrainingListener;
 import com.github.neuralnetworks.training.random.MersenneTwisterRandomInitializer;
 
 /**
@@ -33,6 +34,8 @@ public class MnistTest {
 	@SuppressWarnings("unchecked")
 	BackPropagationTrainer<MultiLayerPerceptron> bpt = TrainerFactory.backPropagationSigmoid(mlp, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.02f, 0.5f, 0f);
 	//Environment.getInstance().setExecutionMode(EXECUTION_MODE.JTP);
+	bpt.addEventListener(new LogTrainingListener());
+
 	bpt.train();
 	bpt.test();
 	assertEquals(0, bpt.getOutputError().getTotalNetworkError(), 0.1);

@@ -1,6 +1,9 @@
 package com.github.neuralnetworks.training;
 
 import com.github.neuralnetworks.architecture.NeuralNetwork;
+import com.github.neuralnetworks.training.events.MiniBatchFinishedEvent;
+import com.github.neuralnetworks.training.events.TrainingFinishedEvent;
+import com.github.neuralnetworks.training.events.TrainingStartedEvent;
 import com.github.neuralnetworks.util.Properties;
 
 /**
@@ -27,7 +30,7 @@ public abstract class OneStepTrainer<N extends NeuralNetwork> extends Trainer<N>
 	TrainingInputData input = null;
 	while ((input = getTrainingInputProvider().getNextInput()) != null) {
 	    learnInput(input);
-	    triggerEvent(new SampleFinishedEvent(this, input));
+	    triggerEvent(new MiniBatchFinishedEvent(this, input));
 	}
 
 	triggerEvent(new TrainingFinishedEvent(this));
