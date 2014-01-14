@@ -2,11 +2,13 @@ package com.github.neuralnetworks;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.github.neuralnetworks.architecture.types.MultiLayerPerceptron;
 import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.calculation.LayerCalculatorImpl;
+import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSigmoid;
 import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculatorFullyConnected;
 import com.github.neuralnetworks.calculation.neuronfunctions.SoftmaxFunction;
 import com.github.neuralnetworks.input.MultipleNeuronsOutputError;
@@ -22,11 +24,35 @@ import com.github.neuralnetworks.training.random.MersenneTwisterRandomInitialize
 public class IrisTest {
 
     /**
-     * Simple mnist backpropagation test
+     * Simple iris backpropagation test
      */
     @Test
     public void testIrisMultipleSigmoidBP() {
-	MultiLayerPerceptron mlp = NNFactory.mlpSigmoid(new int[] { 4, 12, 12, 3 }, true);
+	MultiLayerPerceptron mlp = NNFactory.mlpSigmoid(new int[] { 4, 12, 3 }, true);
+	IrisInputProvider trainInputProvider = new IrisInputProvider(1000, 100000, new IrisTargetMultiNeuronOutputConverter());
+	IrisInputProvider testInputProvider = new IrisInputProvider(1000, 1000, new IrisTargetMultiNeuronOutputConverter());
+	@SuppressWarnings("unchecked")
+	BackPropagationTrainer<MultiLayerPerceptron> bpt = TrainerFactory.backPropagationSigmoid(mlp, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 1f, 0.5f, 0f);
+	//Environment.getInstance().setExecutionMode(EXECUTION_MODE.JTP);
+	long s = System.currentTimeMillis();
+	bpt.train();
+	System.out.println("Time: " + (System.currentTimeMillis() - s) / 100);
+	LayerCalculatorImpl lc = (LayerCalculatorImpl) mlp.getLayerCalculator();
+	ConnectionCalculatorFullyConnected cc = (ConnectionCalculatorFullyConnected) lc.getConnectionCalculator(mlp.getOutputLayer());
+	cc.addActivationFunction(new SoftmaxFunction());
+
+	bpt.test();
+	System.out.println("Error: " + bpt.getOutputError().getTotalNetworkError());
+	assertEquals(0, bpt.getOutputError().getTotalNetworkError(), 0.1);
+    }
+
+    /**
+     * Simple iris backpropagation test
+     */
+    @Ignore
+    @Test
+    public void testIrisMultipleSoftReLUBP() {
+	MultiLayerPerceptron mlp = NNFactory.mlpSoftRelu(new int[] { 4, 12, 12, 3 }, true, new AparapiSigmoid());
 	IrisInputProvider trainInputProvider = new IrisInputProvider(1000, 1000, new IrisTargetMultiNeuronOutputConverter());
 	IrisInputProvider testInputProvider = new IrisInputProvider(1000, 1000, new IrisTargetMultiNeuronOutputConverter());
 	@SuppressWarnings("unchecked")

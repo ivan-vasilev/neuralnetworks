@@ -37,8 +37,10 @@ public class NNFactory {
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	result.setLayerCalculator(lc);
 	for (Layer l : result.getLayers()) {
-	    if (!(l instanceof BiasLayer) && l != result.getInputLayer()) {
-		lc.addConnectionCalculator(l, new AparapiSigmoid());
+	    if (!(l instanceof BiasLayer)) {
+		if (l != result.getInputLayer()) {
+		    lc.addConnectionCalculator(l, new AparapiSigmoid());
+		}
 	    } else {
 		lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
 	    }
@@ -53,11 +55,13 @@ public class NNFactory {
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	result.setLayerCalculator(lc);
 	for (Layer l : result.getLayers()) {
-	    if (!(l instanceof BiasLayer) && l != result.getInputLayer()) {
-		if (outputCC != null && result.getOutputLayer() == l) {
-		    lc.addConnectionCalculator(l, outputCC);
-		} else {
-		    lc.addConnectionCalculator(l, new AparapiSigmoid());
+	    if (!(l instanceof BiasLayer)) {
+		if (l != result.getInputLayer()) {
+		    if (outputCC != null && result.getOutputLayer() == l) {
+			lc.addConnectionCalculator(l, outputCC);
+		    } else {
+			lc.addConnectionCalculator(l, new AparapiSigmoid());
+		    }
 		}
 	    } else {
 		lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
@@ -73,11 +77,13 @@ public class NNFactory {
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	result.setLayerCalculator(lc);
 	for (Layer l : result.getLayers()) {
-	    if (!(l instanceof BiasLayer) && l != result.getInputLayer()) {
-		if (outputCC != null && result.getOutputLayer() == l) {
-		    lc.addConnectionCalculator(l, outputCC);
-		} else {
-		    lc.addConnectionCalculator(l, new AparapiSoftReLU());
+	    if (!(l instanceof BiasLayer)) {
+		if (l != result.getInputLayer()) {
+		    if (outputCC != null && result.getOutputLayer() == l) {
+			lc.addConnectionCalculator(l, outputCC);
+		    } else {
+			lc.addConnectionCalculator(l, new AparapiSoftReLU());
+		    }
 		}
 	    } else {
 		lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
@@ -93,11 +99,13 @@ public class NNFactory {
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	result.setLayerCalculator(lc);
 	for (Layer l : result.getLayers()) {
-	    if (!(l instanceof BiasLayer) && l != result.getInputLayer()) {
-		if (outputCC != null && result.getOutputLayer() == l) {
-		    lc.addConnectionCalculator(l, outputCC);
-		} else {
-		    lc.addConnectionCalculator(l, new AparapiReLU());
+	    if (!(l instanceof BiasLayer)) {
+		if (l != result.getInputLayer()) {
+		    if (outputCC != null && result.getOutputLayer() == l) {
+			lc.addConnectionCalculator(l, outputCC);
+		    } else {
+			lc.addConnectionCalculator(l, new AparapiReLU());
+		    }
 		}
 	    } else {
 		lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
@@ -113,11 +121,13 @@ public class NNFactory {
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	result.setLayerCalculator(lc);
 	for (Layer l : result.getLayers()) {
-	    if (!(l instanceof BiasLayer) && l != result.getInputLayer()) {
-		if (outputCC != null && result.getOutputLayer() == l) {
-		    lc.addConnectionCalculator(l, outputCC);
-		} else {
-		    lc.addConnectionCalculator(l, new AparapiTanh());
+	    if (!(l instanceof BiasLayer)) {
+		if (l != result.getInputLayer()) {
+		    if (outputCC != null && result.getOutputLayer() == l) {
+			lc.addConnectionCalculator(l, outputCC);
+		    } else {
+			lc.addConnectionCalculator(l, new AparapiTanh());
+		    }
 		}
 	    } else {
 		lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
@@ -137,7 +147,7 @@ public class NNFactory {
 	ae.setLayerCalculator(lc);
 	lc.addConnectionCalculator(hidden, new AparapiSigmoid());
 	lc.addConnectionCalculator(output, new AparapiSigmoid());
-	
+
 	return ae;
     }
 
@@ -322,8 +332,10 @@ public class NNFactory {
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	result.setLayerCalculator(lc);
 	for (Layer l : result.getLayers()) {
-	    if (!(l instanceof BiasLayer) && l != result.getInputLayer()) {
-		lc.addConnectionCalculator(l, new AparapiSoftReLU());
+	    if (!(l instanceof BiasLayer)) {
+		if (l != result.getInputLayer()) {
+		    lc.addConnectionCalculator(l, new AparapiSoftReLU());
+		}
 	    } else {
 		lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
 	    }
@@ -338,8 +350,10 @@ public class NNFactory {
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	result.setLayerCalculator(lc);
 	for (Layer l : result.getLayers()) {
-	    if (!(l instanceof BiasLayer) && l != result.getInputLayer()) {
-		lc.addConnectionCalculator(l, new AparapiReLU());
+	    if (!(l instanceof BiasLayer)) {
+		if (l != result.getInputLayer()) {
+		    lc.addConnectionCalculator(l, new AparapiReLU());
+		}
 	    } else {
 		lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
 	    }
@@ -354,8 +368,10 @@ public class NNFactory {
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	result.setLayerCalculator(lc);
 	for (Layer l : result.getLayers()) {
-	    if (!(l instanceof BiasLayer) && l != result.getInputLayer()) {
-		lc.addConnectionCalculator(l, new AparapiTanh());
+	    if (!(l instanceof BiasLayer)) {
+		if (l != result.getInputLayer()) {
+		    lc.addConnectionCalculator(l, new AparapiTanh());
+		}
 	    } else {
 		lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
 	    }
@@ -382,8 +398,10 @@ public class NNFactory {
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	sae.setLayerCalculator(lc);
 	for (Layer l : sae.getLayers()) {
-	    if (!(l instanceof BiasLayer) && l != sae.getInputLayer()) {
-		lc.addConnectionCalculator(l, new AparapiSigmoid());
+	    if (!(l instanceof BiasLayer)) {
+		if (l != sae.getInputLayer()) {
+		    lc.addConnectionCalculator(l, new AparapiSigmoid());
+		}
 	    } else {
 		lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
 	    }
@@ -398,8 +416,10 @@ public class NNFactory {
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	sae.setLayerCalculator(lc);
 	for (Layer l : sae.getLayers()) {
-	    if (!(l instanceof BiasLayer) && l != sae.getInputLayer()) {
-		lc.addConnectionCalculator(l, new AparapiSoftReLU());
+	    if (!(l instanceof BiasLayer)) {
+		if (l != sae.getInputLayer()) {
+		    lc.addConnectionCalculator(l, new AparapiSoftReLU());
+		}
 	    } else {
 		lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
 	    }
@@ -414,8 +434,10 @@ public class NNFactory {
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	sae.setLayerCalculator(lc);
 	for (Layer l : sae.getLayers()) {
-	    if (!(l instanceof BiasLayer) && l != sae.getInputLayer()) {
-		lc.addConnectionCalculator(l, new AparapiReLU());
+	    if (!(l instanceof BiasLayer)) {
+		if (l != sae.getInputLayer()) {
+		    lc.addConnectionCalculator(l, new AparapiReLU());
+		}
 	    } else {
 		lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
 	    }
@@ -430,8 +452,10 @@ public class NNFactory {
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	sae.setLayerCalculator(lc);
 	for (Layer l : sae.getLayers()) {
-	    if (!(l instanceof BiasLayer) && l != sae.getInputLayer()) {
-		lc.addConnectionCalculator(l, new AparapiTanh());
+	    if (!(l instanceof BiasLayer)) {
+		if (l != sae.getInputLayer()) {
+		    lc.addConnectionCalculator(l, new AparapiTanh());
+		}
 	    } else {
 		lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
 	    }

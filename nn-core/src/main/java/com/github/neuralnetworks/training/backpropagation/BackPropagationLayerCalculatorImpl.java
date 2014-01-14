@@ -5,6 +5,7 @@ import java.util.Set;
 
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
+import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.calculation.LayerCalculatorImpl;
 
@@ -20,10 +21,22 @@ public class BackPropagationLayerCalculatorImpl extends LayerCalculatorImpl impl
     }
 
     @Override
-    public void backpropagate(Set<Layer> calculatedLayers, Map<Layer, Matrix> activations, Map<Layer, Matrix> results, Layer layer) {
-	BackPropagationConnectionCalculatorImpl connectionCalculator = (BackPropagationConnectionCalculatorImpl) getConnectionCalculator(layer);
-	connectionCalculator.setActivations(activations);
-	super.calculate(calculatedLayers, results, layer);
+    public void backpropagate(NeuralNetwork nn, Set<Layer> calculatedLayers, Map<Layer, Matrix> activations, Map<Layer, Matrix> results) {
+	Layer currentLayer = nn.getInputLayer();
+
+	while (currentLayer != null) {
+	    BackPropagationConnectionCalculatorImpl connectionCalculator = (BackPropagationConnectionCalculatorImpl) getConnectionCalculator(currentLayer);
+	    connectionCalculator.setActivations(activations);
+	    super.calculate(calculatedLayers, results, currentLayer);
+
+	    currentLayer = null;
+	    for (Layer l : nn.getLayers()) {
+		if (!calculatedLayers.contains(l)) {
+		    currentLayer = l;
+		    break;
+		}
+	    }
+	}
     }
 
     @Override

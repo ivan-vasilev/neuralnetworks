@@ -59,6 +59,6 @@ public class BackPropagationTrainer<N extends NeuralNetwork> extends OneStepTrai
 	calculatedLayers.clear();
 	calculatedLayers.add(nn.getOutputLayer());
 	BackPropagationLayerCalculator blc = getProperties().getParameter(Constants.BACKPROPAGATION);
-	blc.backpropagate(calculatedLayers, activations, backpropagation, nn.getInputLayer());
+	blc.backpropagate(nn, calculatedLayers, activations, backpropagation);
     }
 }

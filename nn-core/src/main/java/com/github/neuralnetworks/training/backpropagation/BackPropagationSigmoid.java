@@ -26,7 +26,7 @@ public class BackPropagationSigmoid extends BackPropagationConnectionCalculatorI
     protected void addBackpropFunction(SortedMap<Connections, Integer> inputConnections, Map<Connections, BackpropagationConnectionCalculator> connectionCalculators, int inputOutputSamples, Layer targetLayer) {
 	for (Entry<Connections, Integer> e : inputConnections.entrySet()) {
 	    SortedMap<GraphConnections, Integer> m = new TreeMap<>();
-	    if (e.getKey().getInputLayer() instanceof BiasLayer) {
+	    if (e.getKey().getInputLayer() instanceof BiasLayer && targetLayer != e.getKey().getInputLayer()) {
 		m.put((GraphConnections) e.getKey(), inputOutputSamples);
 		connectionCalculators.put(e.getKey(), new AparapiBackpropSigmoid(m, e.getValue(), e.getKey().getInputLayer()));
 	    } else {

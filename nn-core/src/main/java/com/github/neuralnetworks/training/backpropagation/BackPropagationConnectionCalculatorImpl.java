@@ -60,7 +60,7 @@ public abstract class BackPropagationConnectionCalculatorImpl implements Connect
 	    Matrix out = output;
 	    for (Entry<Connections, Matrix> e : connections.entrySet()) {
 		if (connectionCalculators.get(e.getKey()) == bc) {
-		    if (e.getKey().getInputLayer() instanceof BiasLayer) {
+		    if (e.getKey().getInputLayer() instanceof BiasLayer && e.getKey().getInputLayer() != targetLayer) {
 			chunkCalc.put(e.getKey(), output);
 			target = e.getKey().getInputLayer();
 			out = e.getValue();
