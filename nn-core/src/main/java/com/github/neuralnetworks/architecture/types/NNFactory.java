@@ -46,6 +46,26 @@ public class NNFactory {
 
 	return result;
     }
+    
+    public static MultiLayerPerceptron mlpSigmoid(int[] layers, boolean addBias, ConnectionCalculator outputCC) {
+	MultiLayerPerceptron result = mlp(layers, addBias);
+	
+	LayerCalculatorImpl lc = new LayerCalculatorImpl();
+	result.setLayerCalculator(lc);
+	for (Layer l : result.getLayers()) {
+	    if (!(l instanceof BiasLayer) && l != result.getInputLayer()) {
+		if (outputCC != null && result.getOutputLayer() == l) {
+		    lc.addConnectionCalculator(l, outputCC);
+		} else {
+		    lc.addConnectionCalculator(l, new AparapiSigmoid());
+		}
+	    } else {
+		lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
+	    }
+	}
+	
+	return result;
+    }
 
     public static MultiLayerPerceptron mlpSoftRelu(int[] layers, boolean addBias, ConnectionCalculator outputCC) {
 	MultiLayerPerceptron result = mlp(layers, addBias);

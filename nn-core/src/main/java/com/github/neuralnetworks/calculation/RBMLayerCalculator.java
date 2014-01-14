@@ -90,7 +90,7 @@ public class RBMLayerCalculator extends LayerCalculatorImpl {
     }
 
     @Override
-    protected ConnectionCalculator getConnectionCalculator(Layer layer) {
+    public ConnectionCalculator getConnectionCalculator(Layer layer) {
 	return connectionCalculator != null ? connectionCalculator : super.getConnectionCalculator(layer);
     }
 }

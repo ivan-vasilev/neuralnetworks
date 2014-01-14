@@ -36,7 +36,7 @@ public class IrisInputProvider implements TrainingInputProvider {
 
     @Override
     public TrainingInputData getNextInput() {
-	if (currentInputCount * batchSize < totalInputSize) {
+	if (currentInputCount < totalInputSize) {
 	    currentInputCount += batchSize;
 
 	    for (int i = 0; i < batchSize; i++) {

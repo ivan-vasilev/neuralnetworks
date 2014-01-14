@@ -91,14 +91,6 @@ public class LayerCalculatorImpl implements LayerCalculator, Serializable {
 	return result;
     }
 
-    protected ConnectionCalculator getConnectionCalculator(Layer layer) {
-	if (calculators != null) {
-	    return calculators.get(layer);
-	}
-
-	return null;
-    }
-
     protected Matrix getLayerResult(Set<Layer> calculatedLayers, Map<Layer, Matrix> results, Layer layer) {
 	Matrix result = results.get(layer);
 	int columns = getInputColumns(calculatedLayers, results);
@@ -128,6 +120,14 @@ public class LayerCalculatorImpl implements LayerCalculator, Serializable {
 	}
 
 	calculators.put(layer, calculator);
+    }
+
+    public ConnectionCalculator getConnectionCalculator(Layer layer) {
+	if (calculators != null) {
+	    return calculators.get(layer);
+	}
+
+	return null;
     }
 
     public void removeConnectionCalculator(Layer layer) {
