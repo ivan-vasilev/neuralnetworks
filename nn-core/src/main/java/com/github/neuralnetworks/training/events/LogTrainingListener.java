@@ -1,10 +1,5 @@
 package com.github.neuralnetworks.training.events;
 
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
-
 import com.github.neuralnetworks.events.TrainingEvent;
 import com.github.neuralnetworks.events.TrainingEventListener;
 import com.github.neuralnetworks.training.Trainer;
@@ -14,49 +9,56 @@ import com.github.neuralnetworks.training.Trainer;
  */
 public class LogTrainingListener implements TrainingEventListener {
 
-    private final static Logger LOGGER = Logger.getLogger("training");
-    static {
-	LOGGER.setLevel(Level.ALL);
-	ConsoleHandler handler = new ConsoleHandler();
-	handler.setFormatter(new SimpleFormatter());
-	LOGGER.addHandler(handler);
-    }
-
     private long startTime;
     private long finishTime;
     private long miniBatchTotalTime;
     private long lastMiniBatchFinishTime;
     private int miniBatches;
+    private boolean logMiniBatches = false;
+
+    public LogTrainingListener() {
+	super();
+    }
+
+    public LogTrainingListener(boolean logMiniBatches) {
+	super();
+	this.logMiniBatches = logMiniBatches;
+    }
 
     @Override
     public void handleEvent(TrainingEvent event) {
 	if (event instanceof TrainingStartedEvent || event instanceof TestingStartedEvent) {
 	    reset();
 	    lastMiniBatchFinishTime = startTime = System.currentTimeMillis();
+
+	    if (event instanceof TrainingStartedEvent) {
+		System.out.println("TRAINING:");
+	    } else if (event instanceof TestingStartedEvent) {
+		System.out.println();
+		System.out.println("TESTING:");
+	    }
 	} else if (event instanceof TrainingFinishedEvent || event instanceof TestingFinishedEvent) {
 	    finishTime = System.currentTimeMillis();
-	    StringBuilder sb = new StringBuilder();
 	    String s = System.getProperty("line.separator");
-	    sb.append(s);
 
-	    if (event instanceof TrainingFinishedEvent) {
-		sb.append("TRAINING:" + s);
-	    } else if (event instanceof TestingFinishedEvent) {
-		sb.append("TESTING:" + s);
-	    }
-
-	    sb.append(((finishTime - startTime) / 1000) + "s (" + (finishTime - startTime) + "ms) total time" + s);
-	    sb.append((miniBatchTotalTime / miniBatches) + " ms (" + (miniBatchTotalTime / (miniBatches * 1000)) + " s) per minibatch of " + miniBatches + " mini batches" + s);
+	    StringBuilder sb = new StringBuilder();
+	    sb.append(((finishTime - startTime) / 1000f) + " s  total time" + s);
+	    sb.append((miniBatchTotalTime / (miniBatches * 1000f)) + " s  per minibatch of " + miniBatches + " mini batches" + s);
 	    if (event instanceof TestingFinishedEvent) {
 		Trainer<?> t = (Trainer<?>) event.getSource();
 		sb.append(t.getOutputError().getTotalNetworkError() + " (" + (t.getOutputError().getTotalNetworkError() * 100) + "%) error" + s);
 	    }
 
-	    LOGGER.info(sb.toString());
+	    System.out.print(sb.toString());
 	} else if (event instanceof MiniBatchFinishedEvent) {
-	    miniBatchTotalTime += System.currentTimeMillis() - lastMiniBatchFinishTime;
-	    lastMiniBatchFinishTime = System.currentTimeMillis();
 	    miniBatches++;
+	    long miniBatchTime = System.currentTimeMillis() - lastMiniBatchFinishTime;
+	    miniBatchTotalTime += miniBatchTime;
+	    lastMiniBatchFinishTime = System.currentTimeMillis();
+
+	    if (logMiniBatches) {
+		System.out.println("MB" + miniBatches + " " + (miniBatchTime / 1000f) + " s");
+	    }
 	} else if (event instanceof TestingFinishedEvent) {
 	    miniBatches++;
 	}

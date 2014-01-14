@@ -24,6 +24,7 @@ public class MnistTest {
     /**
      * Simple mnist backpropagation test
      */
+    @Ignore
     @Test
     public void testMnistMultipleSigmoidBP() {
 	MultiLayerPerceptron mlp = NNFactory.mlpSigmoid(new int[] { 784, 10 }, true);
@@ -44,10 +45,9 @@ public class MnistTest {
     /**
      * Simple mnist backpropagation test
      */
-    @Ignore
     @Test
     public void testMnistMultipleSigmoidBP2() {
-	MultiLayerPerceptron mlp = NNFactory.mlpSigmoid(new int[] { 784, 1024, 10 }, true);
+	MultiLayerPerceptron mlp = NNFactory.mlpSigmoid(new int[] { 784, 256, 10 }, true);
 	MnistInputProvider trainInputProvider = new MnistInputProvider("train-images.idx3-ubyte", "train-labels.idx1-ubyte", 1000, new MnistTargetMultiNeuronOutputConverter());
 	trainInputProvider.addInputModifier(new ScalingInputModifier(255));
 	MnistInputProvider testInputProvider = new MnistInputProvider("t10k-images.idx3-ubyte", "t10k-labels.idx1-ubyte", 1000, new MnistTargetMultiNeuronOutputConverter());
@@ -55,9 +55,10 @@ public class MnistTest {
 	@SuppressWarnings("unchecked")
 	BackPropagationTrainer<MultiLayerPerceptron> bpt = TrainerFactory.backPropagationSigmoid(mlp, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.02f, 0.5f, 0f);
 	//Environment.getInstance().setExecutionMode(EXECUTION_MODE.JTP);
+	bpt.addEventListener(new LogTrainingListener(true));
+
 	bpt.train();
 	bpt.test();
-	System.out.println("Error: " + bpt.getOutputError().getTotalNetworkError());
 	assertEquals(0, bpt.getOutputError().getTotalNetworkError(), 0.1);
     }
 

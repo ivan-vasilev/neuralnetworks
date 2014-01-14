@@ -12,7 +12,7 @@ public class MultipleNeuronsOutputError implements OutputError {
     public void addItem(Matrix networkOutput, Matrix targetOutput) {
 	for (int i = 0; i < targetOutput.getColumns(); i++, count++) {
 	    int val = 0;
-	    for (int j = 0; j < 3; j++) {
+	    for (int j = 0; j < targetOutput.getRows(); j++) {
 		if (targetOutput.get(j, i) == 1) {
 		    val = j;
 		    break;
