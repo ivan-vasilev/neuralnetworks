@@ -29,8 +29,16 @@ public class TrainingInputDataImpl implements TrainingInputData {
 	return input;
     }
 
+    public void setInput(Matrix input) {
+        this.input = input;
+    }
+
     @Override
     public Matrix getTarget() {
 	return target;
+    }
+
+    public void setTarget(Matrix target) {
+        this.target = target;
     }
 }

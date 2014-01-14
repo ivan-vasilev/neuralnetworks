@@ -1,9 +1,9 @@
-package com.github.neuralnetworks.samples.mnist;
+package com.github.neuralnetworks.input;
 
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.calculation.OutputError;
 
-public class MnistMultipleNeuronsOutputError implements OutputError {
+public class MultipleNeuronsOutputError implements OutputError {
 
     private float totalNetworkError;
     private int count;
@@ -12,7 +12,7 @@ public class MnistMultipleNeuronsOutputError implements OutputError {
     public void addItem(Matrix networkOutput, Matrix targetOutput) {
 	for (int i = 0; i < targetOutput.getColumns(); i++, count++) {
 	    int val = 0;
-	    for (int j = 0; j < 10; j++) {
+	    for (int j = 0; j < 3; j++) {
 		if (targetOutput.get(j, i) == 1) {
 		    val = j;
 		    break;
