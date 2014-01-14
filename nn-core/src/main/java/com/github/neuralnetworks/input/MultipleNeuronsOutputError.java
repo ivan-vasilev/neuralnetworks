@@ -11,19 +11,30 @@ public class MultipleNeuronsOutputError implements OutputError {
     @Override
     public void addItem(Matrix networkOutput, Matrix targetOutput) {
 	for (int i = 0; i < targetOutput.getColumns(); i++, count++) {
-	    int val = 0;
-	    for (int j = 0; j < targetOutput.getRows(); j++) {
-		if (targetOutput.get(j, i) == 1) {
-		    val = j;
-		    break;
+	    boolean hasDifferentValues = false;
+	    for (int j = 0; j < networkOutput.getRows(); j++) {
+		if (networkOutput.get(j, i) != networkOutput.get(0, i)) {
+		    hasDifferentValues = true;
 		}
 	    }
-
-	    for (int j = 0; j < networkOutput.getRows(); j++) {
-		if (j != val && networkOutput.get(j, i) > networkOutput.get(val, i)) {
-		    totalNetworkError++;
-		    break;
+	    
+	    if (hasDifferentValues) {
+		int val = 0;
+		for (int j = 0; j < targetOutput.getRows(); j++) {
+		    if (targetOutput.get(j, i) == 1) {
+			val = j;
+			break;
+		    }
 		}
+		
+		for (int j = 0; j < networkOutput.getRows(); j++) {
+		    if (j != val && networkOutput.get(j, i) > networkOutput.get(val, i)) {
+			totalNetworkError++;
+			break;
+		    }
+		}
+	    } else {
+		totalNetworkError++;
 	    }
 	}
     }

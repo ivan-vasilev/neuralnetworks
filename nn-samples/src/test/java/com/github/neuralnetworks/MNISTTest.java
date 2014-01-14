@@ -24,7 +24,6 @@ public class MnistTest {
     /**
      * Simple mnist backpropagation test
      */
-    @Ignore
     @Test
     public void testMnistMultipleSigmoidBP() {
 	MultiLayerPerceptron mlp = NNFactory.mlpSigmoid(new int[] { 784, 10 }, true);
@@ -45,6 +44,7 @@ public class MnistTest {
     /**
      * Simple mnist backpropagation test
      */
+    @Ignore
     @Test
     public void testMnistMultipleSigmoidBP2() {
 	MultiLayerPerceptron mlp = NNFactory.mlpSigmoid(new int[] { 784, 256, 10 }, true);
