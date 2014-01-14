@@ -185,6 +185,15 @@ public abstract class Trainer<N extends NeuralNetwork> {
 	    }
 	}
     }
+    
+    public static class TrainingStartedEvent extends TrainingEvent {
+	
+	private static final long serialVersionUID = -5239379347414855784L;
+	
+	public TrainingStartedEvent(Trainer<?> source) {
+	    super(source);
+	}
+    }
 
     public static class TrainingFinishedEvent extends TrainingEvent {
 

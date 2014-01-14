@@ -29,6 +29,8 @@ public class GreedyLayerDNNTrainer extends Trainer<DeepNeuralNetwork> {
      */
     @Override
     public void train() {
+	triggerEvent(new TrainingStartedEvent(this));
+
 	TrainingInputProvider inputProvider = getTrainingInputProvider();
 	DeepNeuralNetwork dnn = getNeuralNetwork();
 	DeepTrainingInputData deepInput = new DeepTrainingInputData(getNeuralNetwork(), getLayerCalculator());
@@ -43,6 +45,8 @@ public class GreedyLayerDNNTrainer extends Trainer<DeepNeuralNetwork> {
 
 	    triggerEvent(new LayerTrainingFinished(this, trainer));
 	}
+
+	triggerEvent(new TrainingFinishedEvent(this));
     }
 
     public Map<NeuralNetwork, OneStepTrainer<?>> getTrainers() {

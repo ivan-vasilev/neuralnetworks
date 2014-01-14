@@ -29,6 +29,7 @@ public class BackPropagationTrainer<N extends NeuralNetwork> extends OneStepTrai
     public BackPropagationTrainer() {
 	super();
 	activations = new HashMap<Layer, Matrix>();
+	backpropagation = new HashMap<Layer, Matrix>();
     }
 
     public BackPropagationTrainer(Properties properties) {
