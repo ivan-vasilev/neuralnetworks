@@ -284,13 +284,12 @@ public class FFNNTest {
     /**
      * Simple xor backpropagation test
      */
-    @Ignore
     @Test
     public void testXORSigmoidBP() {
 	MultiLayerPerceptron mlp = NNFactory.mlpSigmoid(new int[] { 2, 4, 1 }, true);
 	@SuppressWarnings("unchecked")
 	BackPropagationTrainer<MultiLayerPerceptron> bpt = TrainerFactory.backPropagationSigmoid(mlp, new XorInputProvider(1000), new XorInputProvider(1), new XorOutputError(), new AparapiXORShiftInitializer(-0.01f, 0.01f), 1f, 0.5f, 0f);
-	//Environment.getInstance().setExecutionMode(EXECUTION_MODE.JTP);
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.GPU);
 	bpt.train();
 	bpt.test();
 	assertEquals(0, bpt.getOutputError().getTotalNetworkError(), 0.1);

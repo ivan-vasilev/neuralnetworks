@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
+import com.github.neuralnetworks.architecture.BiasLayer;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
@@ -42,6 +43,12 @@ public class BackPropagationLayerCalculatorImpl extends LayerCalculatorBase impl
 
 	while (layersQueue.size() > 0) {
 	    Layer l = layersQueue.poll();
+	    if (l instanceof BiasLayer && !activations.containsKey(l)) {
+		Matrix m = getLayerResult(results, l);
+		Util.fillArray(m.getElements(), 1);
+		activations.put(l, m);
+	    }
+
 	    for (Connections c : l.getConnections()) {
 		if (!visitedConnections.contains(c)) {
 		    connections.add(new ConnectionCalculateCandidate(c, Util.getOppositeLayer(c, l)));
