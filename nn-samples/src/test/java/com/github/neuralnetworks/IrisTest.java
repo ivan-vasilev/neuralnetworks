@@ -29,11 +29,11 @@ public class IrisTest {
      */
     @Test
     public void testIrisMultipleSigmoidBP() {
-	MultiLayerPerceptron mlp = NNFactory.mlpSigmoid(new int[] { 4, 12, 3 }, true);
-	IrisInputProvider trainInputProvider = new IrisInputProvider(10000, 10000, new IrisTargetMultiNeuronOutputConverter(), true);
-	IrisInputProvider testInputProvider = new IrisInputProvider(150, 150, new IrisTargetMultiNeuronOutputConverter(), false);
+	MultiLayerPerceptron mlp = NNFactory.mlpSigmoid(new int[] { 4, 8, 3 }, true);
+	IrisInputProvider trainInputProvider = new IrisInputProvider(1, 1, new IrisTargetMultiNeuronOutputConverter(), true, true);
+	IrisInputProvider testInputProvider = new IrisInputProvider(150, 150, new IrisTargetMultiNeuronOutputConverter(), false, true);
 	@SuppressWarnings("unchecked")
-	BackPropagationTrainer<MultiLayerPerceptron> bpt = TrainerFactory.backPropagationSigmoid(mlp, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new MersenneTwisterRandomInitializer(0f, 0.01f), 0.01f, 0.5f, 0f);
+	BackPropagationTrainer<MultiLayerPerceptron> bpt = TrainerFactory.backPropagationSigmoid(mlp, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new MersenneTwisterRandomInitializer(-0.2f, 0.2f), 0.1f, 0.5f, 0f);
 	//Environment.getInstance().setExecutionMode(EXECUTION_MODE.JTP);
 
 	bpt.addEventListener(new LogTrainingListener());
@@ -54,8 +54,8 @@ public class IrisTest {
     @Test
     public void testIrisMultipleSoftReLUBP() {
 	MultiLayerPerceptron mlp = NNFactory.mlpSoftRelu(new int[] { 4, 12, 12, 3 }, true, new AparapiSigmoid());
-	IrisInputProvider trainInputProvider = new IrisInputProvider(1000, 1000, new IrisTargetMultiNeuronOutputConverter(), true);
-	IrisInputProvider testInputProvider = new IrisInputProvider(1000, 1000, new IrisTargetMultiNeuronOutputConverter(), false);
+	IrisInputProvider trainInputProvider = new IrisInputProvider(1000, 1000, new IrisTargetMultiNeuronOutputConverter(), true, true);
+	IrisInputProvider testInputProvider = new IrisInputProvider(1000, 1000, new IrisTargetMultiNeuronOutputConverter(), false, true);
 	@SuppressWarnings("unchecked")
 	BackPropagationTrainer<MultiLayerPerceptron> bpt = TrainerFactory.backPropagationSigmoid(mlp, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 1f, 0.5f, 0f);
 	//Environment.getInstance().setExecutionMode(EXECUTION_MODE.JTP);

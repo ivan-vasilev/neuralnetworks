@@ -39,7 +39,7 @@ Calculation
 
 This tier is propagating data through the network. It takes advantage of the graph structure of the network. There are two main base components:
 - LayerCalculator (defualt implementation LayerCalculatorImpl) - propagates data through the graph. It receives target layer and input data clamped to a given layer (considered an input layer). It ensures that the data is propagated through the layers in the correct order and that all the connections in the graph are calculated. For example, in Backpropagation feedforward phase the training data is clamped to the input layer and the target layer is the network output layer. In the bp phase the output error derivative is clamped as "input" to the network output layer and the target layer is the network input layer.
-- ConnectionCalculator (default implementation ConnectionCalculatorImpl) - base class for all neuron types (sigmoid, rectifiers, convolutional etc.). After the order of calculation of the layers is determined by LayerCalculator, then the list of input connections for each layer is calculated by the ConnectionCalculator.
+- ConnectionCalculator - base class for all neuron types (sigmoid, rectifiers, convolutional etc.). After the order of calculation of the layers is determined by LayerCalculator, then the list of input connections for each layer is calculated by the ConnectionCalculator.
 
 ###GPU
 

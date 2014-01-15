@@ -1,20 +1,29 @@
 package com.github.neuralnetworks.training.backpropagation;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
+import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
-import com.github.neuralnetworks.calculation.LayerCalculatorImpl;
+import com.github.neuralnetworks.calculation.LayerCalculatorBase;
+import com.github.neuralnetworks.util.Util;
 
 /**
  * Aparapi implementation of the backpropagation algorithm
  */
-public class BackPropagationLayerCalculatorImpl extends LayerCalculatorImpl implements BackPropagationLayerCalculator {
+public class BackPropagationLayerCalculatorImpl extends LayerCalculatorBase implements BackPropagationLayerCalculator {
 
     private static final long serialVersionUID = 1L;
+
+    private Map<Layer, Matrix> activations;
 
     public BackPropagationLayerCalculatorImpl() {
 	super();
@@ -22,21 +31,37 @@ public class BackPropagationLayerCalculatorImpl extends LayerCalculatorImpl impl
 
     @Override
     public void backpropagate(NeuralNetwork nn, Set<Layer> calculatedLayers, Map<Layer, Matrix> activations, Map<Layer, Matrix> results) {
-	Layer currentLayer = nn.getInputLayer();
+	this.activations = activations;
 
-	while (currentLayer != null) {
-	    BackPropagationConnectionCalculatorImpl connectionCalculator = (BackPropagationConnectionCalculatorImpl) getConnectionCalculator(currentLayer);
-	    connectionCalculator.setActivations(activations);
-	    super.calculate(calculatedLayers, results, currentLayer);
+	Layer currentLayer = nn.getOutputLayer();
 
-	    currentLayer = null;
-	    for (Layer l : nn.getLayers()) {
-		if (!calculatedLayers.contains(l)) {
-		    currentLayer = l;
-		    break;
+	Queue<Layer> layersQueue = new LinkedList<>();
+	layersQueue.add(currentLayer);
+	Set<Connections> visitedConnections = new HashSet<>();
+	List<ConnectionCalculateCandidate> connections = new ArrayList<>();
+
+	while (layersQueue.size() > 0) {
+	    Layer l = layersQueue.poll();
+	    for (Connections c : l.getConnections()) {
+		if (!visitedConnections.contains(c)) {
+		    connections.add(new ConnectionCalculateCandidate(c, Util.getOppositeLayer(c, l)));
+		    layersQueue.add(Util.getOppositeLayer(c, l));
+		    visitedConnections.add(c);
 		}
 	    }
 	}
+
+	calculate(results, connections);
+    }
+
+    @Override
+    public ConnectionCalculator getConnectionCalculator(Layer layer) {
+	ConnectionCalculator cc = super.getConnectionCalculator(layer);
+	if (cc != null) {
+	    ((BackPropagationConnectionCalculatorImpl) cc).setActivations(activations);
+	}
+
+	return cc;
     }
 
     @Override

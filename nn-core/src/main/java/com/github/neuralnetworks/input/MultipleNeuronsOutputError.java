@@ -15,6 +15,7 @@ public class MultipleNeuronsOutputError implements OutputError {
 	    for (int j = 0; j < networkOutput.getRows(); j++) {
 		if (networkOutput.get(j, i) != networkOutput.get(0, i)) {
 		    hasDifferentValues = true;
+		    break;
 		}
 	    }
 	    

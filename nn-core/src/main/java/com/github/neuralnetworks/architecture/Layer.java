@@ -1,7 +1,7 @@
 package com.github.neuralnetworks.architecture;
 
 import java.io.Serializable;
-import java.util.Set;
+import java.util.List;
 
 import com.github.neuralnetworks.util.UniqueList;
 
@@ -22,7 +22,7 @@ public class Layer implements Serializable {
     /**
      * Set of links to other layers
      */
-    private Set<Connections> connections;
+    private List<Connections> connections;
     
     public Layer() {
 	super();
@@ -43,19 +43,11 @@ public class Layer implements Serializable {
 	this.neuronCount = neuronCount;
     }
 
-//    public ConnectionCalculator getConnectionCalculator() {
-//	return connectionCalculator;
-//    }
-//
-//    public void setConnectionCalculator(ConnectionCalculator connectionCalculator) {
-//	this.connectionCalculator = connectionCalculator;
-//    }
-
-    public Set<Connections> getConnections() {
+    public List<Connections> getConnections() {
 	return connections;
     }
 
-    public void setConnections(Set<Connections> connections) {
+    public void setConnections(List<Connections> connections) {
 	this.connections = connections;
     }
 
