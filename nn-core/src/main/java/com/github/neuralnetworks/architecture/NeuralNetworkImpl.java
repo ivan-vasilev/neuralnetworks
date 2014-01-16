@@ -1,5 +1,6 @@
 package com.github.neuralnetworks.architecture;
 
+import java.util.List;
 import java.util.Set;
 
 import com.github.neuralnetworks.calculation.LayerCalculator;
@@ -76,8 +77,8 @@ public abstract class NeuralNetworkImpl implements NeuralNetwork {
      * The list is retrieved by iterating over all the layers. Only connections that have both layers in this network are returned.
      */
     @Override
-    public Set<Connections> getConnections() {
-	Set<Connections> result = new UniqueList<>();
+    public List<Connections> getConnections() {
+	List<Connections> result = new UniqueList<>();
 	if (layers != null) {
 	    for (Layer l : layers) {
 		if (l.getConnections() != null) {

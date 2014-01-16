@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.SortedMap;
 
 import com.amd.aparapi.Kernel;
+import com.amd.aparapi.Kernel.EXECUTION_MODE;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;

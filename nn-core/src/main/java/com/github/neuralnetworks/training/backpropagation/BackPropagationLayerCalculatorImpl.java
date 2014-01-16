@@ -44,7 +44,7 @@ public class BackPropagationLayerCalculatorImpl extends LayerCalculatorBase impl
 	while (layersQueue.size() > 0) {
 	    Layer l = layersQueue.poll();
 	    if (l instanceof BiasLayer && !activations.containsKey(l)) {
-		Matrix m = getLayerResult(results, l);
+		Matrix m = getLayerResult(activations, l);
 		Util.fillArray(m.getElements(), 1);
 		activations.put(l, m);
 	    }

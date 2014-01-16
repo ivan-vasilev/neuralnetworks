@@ -64,7 +64,7 @@ public class XorInputProvider implements TrainingInputProvider {
 	@Override
 	public void addItem(Matrix networkOutput, Matrix targetOutput) {
 	    for (int i = 0; i < targetOutput.getColumns(); i++, size++) {
-		networkError += Math.abs(networkOutput.get(0, i) - targetOutput.get(0, i));
+		networkError += Math.abs(Math.abs(networkOutput.get(0, i)) - Math.abs(targetOutput.get(0, i)));
 	    }
 	}
 

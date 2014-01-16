@@ -27,6 +27,7 @@ public abstract class BackPropagationConnectionCalculatorImpl implements Connect
     private Properties properties;
     protected Map<Connections, BackpropagationConnectionCalculator> connectionCalculators;
     protected Set<BackpropagationConnectionCalculator> calculators;
+    protected Map<Layer, Matrix> activations;
     protected Layer currentLayer;
     protected int inputOutputSamples;
 
@@ -95,10 +96,10 @@ public abstract class BackPropagationConnectionCalculatorImpl implements Connect
     }
 
     public Map<Layer, Matrix> getActivations() {
-	return properties.getParameter(Constants.ACTIVATIONS);
+	return activations;
     }
     
     public void setActivations(Map<Layer, Matrix> activations) {
-	properties.setParameter(Constants.ACTIVATIONS, activations);
+	this.activations = activations;
     }
 }

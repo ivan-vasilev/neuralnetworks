@@ -1,5 +1,6 @@
 package com.github.neuralnetworks.architecture;
 
+import java.util.List;
 import java.util.Set;
 
 import com.github.neuralnetworks.calculation.LayerCalculator;
@@ -35,7 +36,7 @@ public interface NeuralNetwork {
     /**
      * @return all the connections in this network
      */
-    public Set<Connections> getConnections();
+    public List<Connections> getConnections();
 
     /**
      * LayerCalculator associated to this network

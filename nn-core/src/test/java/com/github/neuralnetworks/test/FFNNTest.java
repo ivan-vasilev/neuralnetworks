@@ -2,6 +2,7 @@ package com.github.neuralnetworks.test;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -18,13 +19,12 @@ import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.types.MultiLayerPerceptron;
 import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
-import com.github.neuralnetworks.calculation.LayerCalculatorImpl;
-import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSigmoid;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSum;
 import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculatorFullyConnected;
 import com.github.neuralnetworks.test.XorInputProvider.XorOutputError;
 import com.github.neuralnetworks.training.TrainerFactory;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationTrainer;
+import com.github.neuralnetworks.training.events.LogTrainingListener;
 import com.github.neuralnetworks.training.random.AparapiXORShiftInitializer;
 import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.Util;
@@ -282,17 +282,55 @@ public class FFNNTest {
     }
 
     /**
-     * Simple xor backpropagation test
+     * Simple backpropagation test with specific values
      */
     @Test
-    public void testXORSigmoidBP() {
-	MultiLayerPerceptron mlp = NNFactory.mlpSigmoid(new int[] { 2, 4, 1 }, true);
+    public void testSigmoidBP2() {
+	MultiLayerPerceptron mlp = NNFactory.mlpSigmoid(new int[] { 3, 2, 1 }, true);
+	List<Connections> c = mlp.getConnections();
+	FullyConnected c1 = (FullyConnected) c.get(0);
+	Matrix cg1 = c1.getConnectionGraph();
+	cg1.set(0, 0, 0.2f);
+	cg1.set(0, 1, 0.4f);
+	cg1.set(0, 2, -0.5f);
+	cg1.set(1, 0, -0.3f);
+	cg1.set(1, 1, 0.1f);
+	cg1.set(1, 2, 0.2f);
+
+	FullyConnected cb1 = (FullyConnected) c.get(1);
+	Matrix cgb1 = cb1.getConnectionGraph();
+	cgb1.set(0, 0, -0.4f);
+	cgb1.set(0, 1, 0.2f);
+
+	FullyConnected c2 = (FullyConnected) c.get(2);
+	Matrix cg2 = c2.getConnectionGraph();
+	cg2.set(0, 0, -0.3f);
+	cg2.set(0, 1, -0.2f);
+
+	FullyConnected cb2 = (FullyConnected) c.get(3);
+	Matrix cgb2 = cb2.getConnectionGraph();
+	cgb2.set(0, 0, 0.1f);
+
 	@SuppressWarnings("unchecked")
-	BackPropagationTrainer<MultiLayerPerceptron> bpt = TrainerFactory.backPropagationSigmoid(mlp, new XorInputProvider(1000), new XorInputProvider(1), new XorOutputError(), new AparapiXORShiftInitializer(-0.01f, 0.01f), 1f, 0.5f, 0f);
-	Environment.getInstance().setExecutionMode(EXECUTION_MODE.GPU);
+	BackPropagationTrainer<MultiLayerPerceptron> bpt = TrainerFactory.backPropagationSigmoid(mlp, new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, new float[][] { { 1 } }, 1), new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, new float[][] { { 1 } }, 1), null, null, 0.9f,
+		0f, 0f);
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.JTP);
 	bpt.train();
-	bpt.test();
-	assertEquals(0, bpt.getOutputError().getTotalNetworkError(), 0.1);
+
+	assertEquals(0.192, cg1.get(0, 0), 0.001);
+	assertEquals(0.4, cg1.get(0, 1), 0.001);
+	assertEquals(-0.508, cg1.get(0, 2), 0.001);
+	assertEquals(-0.306, cg1.get(1, 0), 0.001);
+	assertEquals(0.1, cg1.get(1, 1), 0.001);
+	assertEquals(0.194, cg1.get(1, 2), 0.001);
+
+	assertEquals(-0.261, cg2.get(0, 0), 0.001);
+	assertEquals(-0.138, cg2.get(0, 1), 0.001);
+
+	assertEquals(-0.408, cgb1.get(0, 0), 0.001);
+	assertEquals(0.194, cgb1.get(0, 1), 0.001);
+
+	assertEquals(0.218, cgb2.get(0, 0), 0.001);
     }
 
     /**
@@ -300,15 +338,12 @@ public class FFNNTest {
      */
     @Ignore
     @Test
-    public void testXORReLUBP() {
-	MultiLayerPerceptron mlp = NNFactory.mlpRelu(new int[] { 2, 4, 4, }, true, new AparapiSigmoid());
-	mlp.addLayer(new Layer(1), true);
-	LayerCalculatorImpl lc = (LayerCalculatorImpl) mlp.getLayerCalculator();
-	lc.addConnectionCalculator(mlp.getOutputLayer(), new AparapiSigmoid());
-
+    public void testXORSigmoidBP() {
+	MultiLayerPerceptron mlp = NNFactory.mlpSigmoid(new int[] { 2, 8, 1 }, true);
 	@SuppressWarnings("unchecked")
-	BackPropagationTrainer<MultiLayerPerceptron> bpt = TrainerFactory.backPropagationSigmoid(mlp, new XorInputProvider(1000), new XorInputProvider(1), new XorOutputError(), new AparapiXORShiftInitializer(-0.01f, 0.01f), 1f, 0.5f, 0f);
+	BackPropagationTrainer<MultiLayerPerceptron> bpt = TrainerFactory.backPropagationSigmoid(mlp, new XorInputProvider(10000), new XorInputProvider(1), new XorOutputError(), new AparapiXORShiftInitializer(-0.01f, 0.01f), 0.2f, 0.5f, 0f);
 	Environment.getInstance().setExecutionMode(EXECUTION_MODE.GPU);
+	bpt.addEventListener(new LogTrainingListener());
 	bpt.train();
 	bpt.test();
 	assertEquals(0, bpt.getOutputError().getTotalNetworkError(), 0.1);
