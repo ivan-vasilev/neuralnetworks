@@ -171,7 +171,7 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
 	    } else {
 		setExecutionMode(Environment.getInstance().getExecutionMode());
 	    }
-	    setExecutionMode(EXECUTION_MODE.GPU);
+
 	    execute(outputMatrix.getRows());
 	}
     }
