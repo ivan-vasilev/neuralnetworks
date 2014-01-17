@@ -23,15 +23,15 @@ public class BackPropagationTanh extends BackPropagationConnectionCalculatorImpl
     }
 
     @Override
-    protected void addBackpropFunction(SortedMap<Connections, Integer> inputConnections, Map<Connections, BackpropagationConnectionCalculator> connectionCalculators, int inputOutputSamples, Layer targetLayer) {
+    protected void addBackpropFunction(SortedMap<Connections, Integer> inputConnections, Map<Connections, BackpropagationConnectionCalculator> connectionCalculators, Layer targetLayer) {
 	for (Entry<Connections, Integer> e : inputConnections.entrySet()) {
 	    SortedMap<GraphConnections, Integer> m = new TreeMap<>();
 	    if (e.getKey().getInputLayer() instanceof BiasLayer && targetLayer != e.getKey().getInputLayer()) {
-		m.put((GraphConnections) e.getKey(), inputOutputSamples);
+		m.put((GraphConnections) e.getKey(), miniBatchSize);
 		connectionCalculators.put(e.getKey(), new AparapiBackpropTanh(m, e.getValue(), e.getKey().getInputLayer()));
 	    } else {
 		m.put((GraphConnections) e.getKey(), e.getValue());
-		connectionCalculators.put(e.getKey(), new AparapiBackpropTanh(m, inputOutputSamples, targetLayer));
+		connectionCalculators.put(e.getKey(), new AparapiBackpropTanh(m, miniBatchSize, targetLayer));
 	    }
 	}
     }
@@ -40,13 +40,19 @@ public class BackPropagationTanh extends BackPropagationConnectionCalculatorImpl
 
 	private static final long serialVersionUID = -3580345016542506932L;
 
-	public AparapiBackpropTanh(SortedMap<GraphConnections, Integer> inputConnections, int inputOutputSamples, Layer targetLayer) {
-	    super(inputConnections, inputOutputSamples, targetLayer);
+	public AparapiBackpropTanh(SortedMap<GraphConnections, Integer> inputConnections, int miniBatchSize, Layer targetLayer) {
+	    super(inputConnections, miniBatchSize, targetLayer);
 	}
 
 	@Override
-	protected void calcDerivativeAfter(float activation, float error, int outputId) {
-	    output[outputId] = error * - error * activation * activation;
+	protected void calcDerivative() {
+	    float error = 0, activation = 0;
+
+	    for (int i = getGlobalId() * miniBatchSize, endIndex = (getGlobalId() + 1) * miniBatchSize; i < endIndex; i++) {
+		error = output[i];
+		activation = ffActivation[i];
+		output[i] = error * -error * activation * activation;
+	    }
 	}
     }
 }

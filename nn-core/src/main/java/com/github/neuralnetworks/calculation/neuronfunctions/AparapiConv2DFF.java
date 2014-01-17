@@ -10,8 +10,8 @@ public class AparapiConv2DFF extends AparapiConv2D {
 
     private static final long serialVersionUID = 5048904661076337615L;
 
-    public AparapiConv2DFF(Conv2DConnection c, int inputOutputSamples, Layer targetLayer) {
-	super(c, inputOutputSamples, targetLayer);
+    public AparapiConv2DFF(Conv2DConnection c, int miniBatchSize, Layer targetLayer) {
+	super(c, miniBatchSize, targetLayer);
     }
 
     @Override
@@ -19,17 +19,17 @@ public class AparapiConv2DFF extends AparapiConv2D {
 	int id = getGlobalId();
 
 	// calculate sum based on feature map offsets and feature map weights
-	int ios = inputOutputSamples;
+	int miniBatch = miniBatchSize;
 	int fmw = featureMapWeights;
 	float sum = 0;
 
-	for (int p = 0; p < ios; p++) {
+	for (int p = 0; p < miniBatch; p++) {
 	    sum = 0;
 	    for (int i = 0, j = weightsStartId; i < fmw; i++, j++) {
-		sum += input[(inputStartId + featureMapOffsets[i]) * ios + p] * weights[j];
+		sum += input[(inputStartId + featureMapOffsets[i]) * miniBatch + p] * weights[j];
 	    }
 
-	    output[id * ios + p] = activationFunction(sum);
+	    output[id * miniBatch + p] = activationFunction(sum);
 	}
     }
 

@@ -21,7 +21,7 @@ public class BackPropagationConv2DSoftReLU extends BackPropagationConnectionCalc
     }
 
     @Override
-    protected void addBackpropFunction(SortedMap<Connections, Integer> inputConnections, Map<Connections, BackpropagationConnectionCalculator> connectionCalculators, int inputOutputSamples, Layer targetLayer) {
+    protected void addBackpropFunction(SortedMap<Connections, Integer> inputConnections, Map<Connections, BackpropagationConnectionCalculator> connectionCalculators, Layer targetLayer) {
 	Conv2DConnection con = null;
 	for (Connections c : inputConnections.keySet()) {
 	    if (c instanceof Conv2DConnection && !(c.getInputLayer() instanceof BiasLayer)) {
@@ -31,7 +31,7 @@ public class BackPropagationConv2DSoftReLU extends BackPropagationConnectionCalc
 	}
 
 	if (con != null) {
-	    connectionCalculators.put(con, new AparapiBackpropConv2DSoftReLU(con, inputOutputSamples, targetLayer));
+	    connectionCalculators.put(con, new AparapiBackpropConv2DSoftReLU(con, miniBatchSize, targetLayer));
 	}
     }
 
@@ -39,8 +39,8 @@ public class BackPropagationConv2DSoftReLU extends BackPropagationConnectionCalc
 
 	private static final long serialVersionUID = -3580345016542506932L;
 
-	public AparapiBackpropConv2DSoftReLU(Conv2DConnection c, int inputOutputSamples, Layer targetLayer) {
-	    super(c, inputOutputSamples, targetLayer);
+	public AparapiBackpropConv2DSoftReLU(Conv2DConnection c, int miniBatchSize, Layer targetLayer) {
+	    super(c, miniBatchSize, targetLayer);
 	}
 
 	@Override

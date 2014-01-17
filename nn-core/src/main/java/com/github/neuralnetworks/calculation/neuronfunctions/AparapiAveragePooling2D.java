@@ -10,16 +10,16 @@ public class AparapiAveragePooling2D extends AparapiSubsampling2D {
     @Override
     protected void pool(int inputStartIndex) {
 	int rl = regionLength;
-	int ios = inputOutputSamples;
+	int miniBatch = miniBatchSize;
 	float sum = 0;
 
-	for (int i = 0; i < ios; i++) {
+	for (int i = 0; i < miniBatch; i++) {
 	    sum = 0;
 	    for (int j = 0; j < rl; j++) {
-		sum += input[(inputStartIndex + featureMapOffsets[j]) * ios + i];
+		sum += input[(inputStartIndex + featureMapOffsets[j]) * miniBatch + i];
 	    }
 	    
-	    output[getGlobalId() * ios + i] = sum / rl;
+	    output[getGlobalId() * miniBatch + i] = sum / rl;
 	}
     }
 }

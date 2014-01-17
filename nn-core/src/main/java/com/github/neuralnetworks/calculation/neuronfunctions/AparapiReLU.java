@@ -13,26 +13,27 @@ public class AparapiReLU extends ConnectionCalculatorFullyConnected {
 
     private static final long serialVersionUID = -6602713983386107132L;
 
-    public AparapiReLU() {
-	super();
-    }
-
     @Override
-    protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Integer> inputConnections, int inputOutputSamples, Layer targetLayer) {
-	return new AparapiReLUFunction(inputConnections, inputOutputSamples, targetLayer);
+    protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Integer> inputConnections, Layer targetLayer) {
+	return new AparapiReLUFunction(inputConnections, miniBatchSize, targetLayer);
     }
 
     public static class AparapiReLUFunction extends AparapiWeightedSum {
-	
-	public AparapiReLUFunction(SortedMap<GraphConnections, Integer> inputConnections, int inputOutputSamples, Layer targetLayer) {
-	    super(inputConnections, inputOutputSamples, targetLayer);
+
+	public AparapiReLUFunction(SortedMap<GraphConnections, Integer> inputConnections, int miniBatchSize, Layer targetLayer) {
+	    super(inputConnections, miniBatchSize, targetLayer);
 	}
 
 	private static final long serialVersionUID = 2572354641295173835L;
-	
+
 	@Override
-	protected void after(float value, int row, int column) {
-	    output[outputIndex(row, column)] = max(0, value);
+	protected void after() {
+	    int mb = miniBatchSize;
+	    int outputId = getGlobalId() * mb;
+	    
+	    for (int i = 0; i < mb; i++) {
+		output[outputId + i] = max(0, output[outputId + i]);
+	    }
 	}
     }
 }

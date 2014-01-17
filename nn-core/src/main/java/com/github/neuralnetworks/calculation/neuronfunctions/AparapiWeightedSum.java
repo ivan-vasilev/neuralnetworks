@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.SortedMap;
 
 import com.amd.aparapi.Kernel;
-import com.amd.aparapi.Kernel.EXECUTION_MODE;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
@@ -32,7 +31,7 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
     /**
      * Number of input samples that will be calculated simultaneously
      */
-    protected final int inputOutputSamples;
+    protected final int miniBatchSize;
 
     /**
      * Number of input connections that will be "combined" for simultaneous
@@ -108,11 +107,11 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
      */
     protected Layer currentLayer;
 
-    public AparapiWeightedSum(SortedMap<GraphConnections, Integer> inputConnections, int inputOutputSamples, Layer targetLayer) {
+    public AparapiWeightedSum(SortedMap<GraphConnections, Integer> inputConnections, int miniBatchSize, Layer targetLayer) {
 	super();
 
 	this.currentLayer = targetLayer;
-	this.inputOutputSamples = inputOutputSamples;
+	this.miniBatchSize = miniBatchSize;
 	this.series = inputConnections.size();
 	this.weightsDimension = new int[series];
 	this.inputStartPositions = new int[series];
@@ -168,11 +167,11 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
 	    init((SortedMap<GraphConnections, Matrix>) ((SortedMap<?, ?>) input), outputMatrix, targetLayer);
 	    // depending on the number of processors an execution mode is selected
 	    if (outputMatrix.getRows() <= Runtime.getRuntime().availableProcessors() * 5) {
-		setExecutionMode(EXECUTION_MODE.JTP);
+		setExecutionMode(EXECUTION_MODE.GPU);
 	    } else {
 		setExecutionMode(Environment.getInstance().getExecutionMode());
 	    }
-
+	    setExecutionMode(EXECUTION_MODE.GPU);
 	    execute(outputMatrix.getRows());
 	}
     }
@@ -211,38 +210,33 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
     public void run() {
 	int id = getGlobalId();
 
-	int ios = inputOutputSamples;
+	int miniBatch = miniBatchSize;
 	int s = series;
+	int inputStartPosition = 0, initialWeightIndex = 0, weightStep = 0, dim = 0;
 	float value = 0;
 
 	// each input example
-	for (int i = 0; i < ios; i++) {
+	for (int i = 0; i < miniBatch; i++) {
 	    // each connection (of the combined connections)
-	    value = output[outputIndex(id, i)];
+	    value = output[id * miniBatch + i];
 	    for (int k = 0; k < s; k++) {
 		// each element in the row/column
-		int inputStartPosition = inputStartPositions[k];
-		int initialWeightIndex = weightStartPositions[k] + weightsInitialStep[k] * id;
-		int weightStep = weightsStep[k];
-		int dim = weightsDimension[k];
+		inputStartPosition = inputStartPositions[k];
+		initialWeightIndex = weightStartPositions[k] + weightsInitialStep[k] * id;
+		weightStep = weightsStep[k];
+		dim = weightsDimension[k];
 
 		for (int j = 0; j < dim; j++) {
-		    value += input[inputStartPosition + j * ios + i] * weights[initialWeightIndex + j * weightStep];
+		    value += input[inputStartPosition + j * miniBatch + i] * weights[initialWeightIndex + j * weightStep];
 		}
 	    }
 
-	    after(value, id, i);
+	    output[id * miniBatch + i] = value;
 	}
+
+	after();
     }
 
-    protected void after(float value, int row, int column) {
-	output[outputIndex(row, column)] = value;
-    }
-
-    /**
-     * helper method for retrieving output value based on row, column and series
-     */
-    protected int outputIndex(int row, int column) {
-	return row * inputOutputSamples + column;
+    protected void after() {
     }
 }

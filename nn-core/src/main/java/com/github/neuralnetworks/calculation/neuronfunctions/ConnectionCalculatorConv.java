@@ -20,7 +20,7 @@ public abstract class ConnectionCalculatorConv implements ConnectionCalculator {
 
     protected AparapiConv2D inputFunction;
     protected Layer currentLayer;
-    protected int inputOutputSamples;
+    protected int miniBatchSize;
 
     @Override
     public void calculate(SortedMap<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
@@ -49,7 +49,7 @@ public abstract class ConnectionCalculatorConv implements ConnectionCalculator {
 	}
     }
 
-    protected abstract AparapiConv2D createInputFunction(Conv2DConnection c, int inputOutputSamples, Layer targetLayer);
+    protected abstract AparapiConv2D createInputFunction(Conv2DConnection c, int miniBatchSize, Layer targetLayer);
 
     protected void calculateBias(Conv2DConnection bias, Matrix output) {
 	if (bias != null) {

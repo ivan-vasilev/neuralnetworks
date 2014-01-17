@@ -10,19 +10,19 @@ public class AparapiMaxPooling2D extends AparapiSubsampling2D {
     @Override
     protected void pool(int inputStartIndex) {
 	int rl = regionLength;
-	int ios = inputOutputSamples;
+	int miniBatch = miniBatchSize;
 	float max = 0;
 
-	for (int i = 0; i < ios; i++) {
-	    max = input[(inputStartIndex + featureMapOffsets[0]) * ios + i];
+	for (int i = 0; i < miniBatch; i++) {
+	    max = input[(inputStartIndex + featureMapOffsets[0]) * miniBatch + i];
 	    for (int j = 1; j < rl; j++) {
-		float v = input[(inputStartIndex + featureMapOffsets[j]) * ios + i];
+		float v = input[(inputStartIndex + featureMapOffsets[j]) * miniBatch + i];
 		if (v > max) {
 		    max = v;
 		}
 	    }
 
-	    output[getGlobalId() * ios + i] = max;
+	    output[getGlobalId() * miniBatch + i] = max;
 	}
     }
 }

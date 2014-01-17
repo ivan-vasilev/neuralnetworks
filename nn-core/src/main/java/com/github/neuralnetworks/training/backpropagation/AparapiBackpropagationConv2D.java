@@ -41,8 +41,8 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements Backp
      */
     protected Map<Layer, Matrix> activations;
 
-    public AparapiBackpropagationConv2D(Conv2DConnection c, int inputOutputSamples, Layer targetLayer) {
-	super(c, inputOutputSamples, targetLayer);
+    public AparapiBackpropagationConv2D(Conv2DConnection c, int miniBatchSize, Layer targetLayer) {
+	super(c, miniBatchSize, targetLayer);
     }
 
     @Override
@@ -93,19 +93,19 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements Backp
     protected void conv(int weightsStartId, int inputStartId) {
 	int id = getGlobalId();
 
-	int ios = inputOutputSamples;
+	int miniBatch = miniBatchSize;
 	int fmw = featureMapWeights;
 	float activation = 0;
 	int inputId = 0;
 
-	for (int p = 0; p < ios; p++) {
-	    activation = activationFunctionDerivative(output[id * ios + p]);;
-	    output[id * ios + p] = activation;
+	for (int p = 0; p < miniBatch; p++) {
+	    activation = activationFunctionDerivative(output[id * miniBatch + p]);;
+	    output[id * miniBatch + p] = activation;
 
 	    for (int i = 0, j = weightsStartId; i < fmw; i++, j++) {
-		inputId = (inputStartId + featureMapOffsets[i]) * ios + p;
+		inputId = (inputStartId + featureMapOffsets[i]) * miniBatch + p;
 		input[inputId] += activation * weights[j];
-		weightUpdates[j * ios + p] += activation * ffActivation[inputId];
+		weightUpdates[j * miniBatch + p] += activation * ffActivation[inputId];
 	    }
 	}
     }

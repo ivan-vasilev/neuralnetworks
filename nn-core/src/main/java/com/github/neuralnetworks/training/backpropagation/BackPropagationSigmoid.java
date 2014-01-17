@@ -23,30 +23,34 @@ public class BackPropagationSigmoid extends BackPropagationConnectionCalculatorI
     }
 
     @Override
-    protected void addBackpropFunction(SortedMap<Connections, Integer> inputConnections, Map<Connections, BackpropagationConnectionCalculator> connectionCalculators, int inputOutputSamples, Layer targetLayer) {
+    protected void addBackpropFunction(SortedMap<Connections, Integer> inputConnections, Map<Connections, BackpropagationConnectionCalculator> connectionCalculators, Layer targetLayer) {
 	for (Entry<Connections, Integer> e : inputConnections.entrySet()) {
 	    SortedMap<GraphConnections, Integer> m = new TreeMap<>();
 	    if (e.getKey().getInputLayer() instanceof BiasLayer && targetLayer != e.getKey().getInputLayer()) {
-		m.put((GraphConnections) e.getKey(), inputOutputSamples);
-		connectionCalculators.put(e.getKey(), new AparapiBackpropSigmoid(m, e.getValue(), e.getKey().getInputLayer()));
+		m.put((GraphConnections) e.getKey(), miniBatchSize);
+		connectionCalculators.put(e.getKey(), new AparapiBackpropSigmoid(m, miniBatchSize, e.getKey().getInputLayer()));
 	    } else {
 		m.put((GraphConnections) e.getKey(), e.getValue());
-		connectionCalculators.put(e.getKey(), new AparapiBackpropSigmoid(m, inputOutputSamples, targetLayer));
+		connectionCalculators.put(e.getKey(), new AparapiBackpropSigmoid(m, miniBatchSize, targetLayer));
 	    }
 	}
     }
 
     public static class AparapiBackpropSigmoid extends AparapiBackpropagationFullyConnected {
 
-	public AparapiBackpropSigmoid(SortedMap<GraphConnections, Integer> inputConnections, int inputOutputSamples, Layer targetLayer) {
-	    super(inputConnections, inputOutputSamples, targetLayer);
+	public AparapiBackpropSigmoid(SortedMap<GraphConnections, Integer> inputConnections, int miniBatchSize, Layer targetLayer) {
+	    super(inputConnections, miniBatchSize, targetLayer);
 	}
 
 	private static final long serialVersionUID = -3580345016542506932L;
 
 	@Override
-	protected void calcDerivativeAfter(float activation, float error, int outputId) {
-	    output[outputId] = error * activation * (1 - activation);
+	protected void calcDerivative() {
+	    float activation = 0;
+	    for (int i = getGlobalId() * miniBatchSize, endIndex = (getGlobalId() + 1) * miniBatchSize; i < endIndex; i++) {
+		activation = ffActivation[i];
+		output[i] = output[i] * activation * (1 - activation);
+	    }
 	}
     }
 }

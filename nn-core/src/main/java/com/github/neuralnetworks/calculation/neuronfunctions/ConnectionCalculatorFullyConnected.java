@@ -32,12 +32,17 @@ public abstract class ConnectionCalculatorFullyConnected implements ConnectionCa
 
     protected ConnectionCalculator inputFunction;
     protected Layer currentLayer;
-    protected int inputOutputSamples;
+    protected int miniBatchSize;
 
     /**
      * Activation functions
      */
     protected List<ActivationFunction> activationFunctions;
+
+    
+    public ConnectionCalculatorFullyConnected() {
+	super();
+    }
 
     @Override
     public void calculate(SortedMap<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
@@ -60,15 +65,15 @@ public abstract class ConnectionCalculatorFullyConnected implements ConnectionCa
 	    
 	    if (notBias.size() > 0) {
 		// new input function is required
-		if (inputFunction == null || targetLayer != currentLayer || inputOutputSamples != output.getColumns()) {
+		if (inputFunction == null || targetLayer != currentLayer || miniBatchSize != output.getColumns()) {
 		    currentLayer = targetLayer;
-		    inputOutputSamples = output.getColumns();
+		    miniBatchSize = output.getColumns();
 		    SortedMap<GraphConnections, Integer> map = new TreeMap<>();
 		    for (Entry<Connections, Matrix> e : notBias.entrySet()) {
 			map.put((GraphConnections) e.getKey(), e.getValue().getElements().length);
 		    }
 
-		    inputFunction = createInputFunction(map, inputOutputSamples, targetLayer);
+		    inputFunction = createInputFunction(map, targetLayer);
 		}
 
 		inputFunction.calculate(notBias, output, targetLayer);
@@ -93,7 +98,7 @@ public abstract class ConnectionCalculatorFullyConnected implements ConnectionCa
 	}
     }
 
-    protected abstract ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Integer> inputConnections, int inputOutputSamples, Layer targetLayer);
+    protected abstract ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Integer> inputConnections, Layer targetLayer);
 
     public void addActivationFunction(ActivationFunction activationFunction) {
 	if (activationFunctions == null) {

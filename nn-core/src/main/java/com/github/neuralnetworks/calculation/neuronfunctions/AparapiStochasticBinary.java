@@ -18,13 +18,12 @@ public class AparapiStochasticBinary extends ConnectionCalculatorFullyConnected 
     protected RandomInitializer randominitializer;
 
     public AparapiStochasticBinary(RandomInitializer randominitializer) {
-	super();
 	this.randominitializer = randominitializer;
     }
 
     @Override
-    protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Integer> inputConnections, int inputOutputSamples, Layer targetLayer) {
-	return new AparapiStochasticBinaryFunction(inputConnections, inputOutputSamples, targetLayer, randominitializer);
+    protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Integer> inputConnections, Layer targetLayer) {
+	return new AparapiStochasticBinaryFunction(inputConnections, miniBatchSize, targetLayer, randominitializer);
     }
 
     public static class AparapiStochasticBinaryFunction extends AparapiWeightedSum {
@@ -40,15 +39,21 @@ public class AparapiStochasticBinary extends ConnectionCalculatorFullyConnected 
 	 * random initializer
 	 */
 	private RandomInitializer randomInitializer;
-	
-	public AparapiStochasticBinaryFunction(SortedMap<GraphConnections, Integer> inputConnections, int inputOutputSamples, Layer targetLayer, RandomInitializer randomInitializer) {
-	    super(inputConnections, inputOutputSamples, targetLayer);
+
+	public AparapiStochasticBinaryFunction(SortedMap<GraphConnections, Integer> inputConnections, int miniBatchSize, Layer targetLayer, RandomInitializer randomInitializer) {
+	    super(inputConnections, miniBatchSize, targetLayer);
 	    this.randomInitializer = randomInitializer;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSumByRows#init(java.util.SortedMap, com.github.neuralnetworks.architecture.Matrix, com.github.neuralnetworks.architecture.Layer)
-	 * Unfortunately there isn't yet random implementation that works for Aparapi, so this step is done sequential
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.github.neuralnetworks.calculation.neuronfunctions.
+	 * AparapiWeightedSumByRows#init(java.util.SortedMap,
+	 * com.github.neuralnetworks.architecture.Matrix,
+	 * com.github.neuralnetworks.architecture.Layer) Unfortunately there
+	 * isn't yet random implementation that works for Aparapi, so this step
+	 * is done sequential
 	 */
 	@Override
 	protected void init(SortedMap<GraphConnections, Matrix> input, Matrix outputMatrix, Layer targetLayer) {
@@ -61,12 +66,16 @@ public class AparapiStochasticBinary extends ConnectionCalculatorFullyConnected 
 	}
 
 	@Override
-	protected void after(float value, int row, int column) {
-	    int outputId = outputIndex(row, column);
-	    if (random[outputId] < 1 / (1 + exp(-value))) {
-		output[outputId] = 1;
-	    } else {
-		output[outputId] = 0;
+	protected void after() {
+	    int mb = miniBatchSize;
+	    int outputId = getGlobalId() * mb;
+	    
+	    for (int i = 0; i < mb; i++) {
+		if (random[outputId + i] < 1 / (1 + exp(-output[outputId + i]))) {
+		    output[outputId + i] = 1;
+		} else {
+		    output[outputId + i] = 0;
+		}
 	    }
 	}
     }

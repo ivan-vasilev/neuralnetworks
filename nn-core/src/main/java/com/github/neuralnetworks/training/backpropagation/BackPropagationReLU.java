@@ -23,15 +23,15 @@ public class BackPropagationReLU extends BackPropagationConnectionCalculatorImpl
     }
 
     @Override
-    protected void addBackpropFunction(SortedMap<Connections, Integer> inputConnections, Map<Connections, BackpropagationConnectionCalculator> connectionCalculators, int inputOutputSamples, Layer targetLayer) {
+    protected void addBackpropFunction(SortedMap<Connections, Integer> inputConnections, Map<Connections, BackpropagationConnectionCalculator> connectionCalculators, Layer targetLayer) {
 	for (Entry<Connections, Integer> e : inputConnections.entrySet()) {
 	    SortedMap<GraphConnections, Integer> m = new TreeMap<>();
 	    if (e.getKey().getInputLayer() instanceof BiasLayer && targetLayer != e.getKey().getInputLayer()) {
-		m.put((GraphConnections) e.getKey(), inputOutputSamples);
-		connectionCalculators.put(e.getKey(), new AparapiBackpropReLU(m, e.getValue(), e.getKey().getInputLayer()));
+		m.put((GraphConnections) e.getKey(), miniBatchSize);
+		connectionCalculators.put(e.getKey(), new AparapiBackpropReLU(m, miniBatchSize, e.getKey().getInputLayer()));
 	    } else {
 		m.put((GraphConnections) e.getKey(), e.getValue());
-		connectionCalculators.put(e.getKey(), new AparapiBackpropReLU(m, inputOutputSamples, targetLayer));
+		connectionCalculators.put(e.getKey(), new AparapiBackpropReLU(m, miniBatchSize, targetLayer));
 	    }
 	}
     }
@@ -40,16 +40,16 @@ public class BackPropagationReLU extends BackPropagationConnectionCalculatorImpl
 
 	private static final long serialVersionUID = -3580345016542506932L;
 
-	public AparapiBackpropReLU(SortedMap<GraphConnections, Integer> inputConnections, int inputOutputSamples, Layer targetLayer) {
-	    super(inputConnections, inputOutputSamples, targetLayer);
+	public AparapiBackpropReLU(SortedMap<GraphConnections, Integer> inputConnections, int miniBatchSize, Layer targetLayer) {
+	    super(inputConnections, miniBatchSize, targetLayer);
 	}
 	
 	@Override
-	protected void calcDerivativeAfter(float activation, float error, int outputId) {
-	    if (activation > 0) {
-		output[outputId] = error;
-	    } else {
-		output[outputId] = 0;
+	protected void calcDerivative() {
+	    for (int i = getGlobalId() * miniBatchSize, endIndex = (getGlobalId() + 1) * miniBatchSize; i < endIndex; i++) {
+		if (ffActivation[i] <= 0) {
+		    output[i] = 0;
+		}
 	    }
 	}
     }

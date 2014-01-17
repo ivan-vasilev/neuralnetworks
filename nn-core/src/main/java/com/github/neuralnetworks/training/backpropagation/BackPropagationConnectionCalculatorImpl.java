@@ -29,7 +29,7 @@ public abstract class BackPropagationConnectionCalculatorImpl implements Connect
     protected Set<BackpropagationConnectionCalculator> calculators;
     protected Map<Layer, Matrix> activations;
     protected Layer currentLayer;
-    protected int inputOutputSamples;
+    protected int miniBatchSize;
 
     public BackPropagationConnectionCalculatorImpl(Properties properties) {
 	this.properties = properties;
@@ -41,16 +41,16 @@ public abstract class BackPropagationConnectionCalculatorImpl implements Connect
     public void calculate(SortedMap<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
 	SortedMap<Connections, Integer> chunk = new TreeMap<>();
 	for (Entry<Connections, Matrix> e : connections.entrySet()) {
-	    if (!connectionCalculators.containsKey(e.getKey()) || targetLayer != currentLayer || inputOutputSamples != output.getColumns()) {
+	    if (!connectionCalculators.containsKey(e.getKey()) || targetLayer != currentLayer || miniBatchSize != output.getColumns()) {
 		chunk.put(e.getKey(), e.getValue().getElements().length);
 	    }
 	}
 
 	if (chunk.size() > 0) {
-	    addBackpropFunction(chunk, connectionCalculators, output.getColumns(), targetLayer);
-	    calculators.addAll(connectionCalculators.values());
-	    inputOutputSamples = output.getColumns();
+	    miniBatchSize = output.getColumns();
 	    currentLayer = targetLayer;
+	    addBackpropFunction(chunk, connectionCalculators, targetLayer);
+	    calculators.addAll(connectionCalculators.values());
 	}
 
 	SortedMap<Connections, Matrix> chunkCalc = new TreeMap<>();
@@ -81,10 +81,14 @@ public abstract class BackPropagationConnectionCalculatorImpl implements Connect
 	}
     }
 
-    protected abstract void addBackpropFunction(SortedMap<Connections, Integer> inputConnections, Map<Connections, BackpropagationConnectionCalculator> connectionCalculators, int inputOutputSamples, Layer targetLayer);
+    protected abstract void addBackpropFunction(SortedMap<Connections, Integer> inputConnections, Map<Connections, BackpropagationConnectionCalculator> connectionCalculators, Layer targetLayer);
 
     public float getLearningRate() {
 	return properties.getParameter(Constants.LEARNING_RATE);
+    }
+
+    public int getMiniBatchSize() {
+	return miniBatchSize;
     }
 
     public float getMomentum() {

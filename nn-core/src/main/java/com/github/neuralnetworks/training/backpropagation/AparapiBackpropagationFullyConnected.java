@@ -12,8 +12,8 @@ import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSum;
 import com.github.neuralnetworks.util.Util;
 
 /**
- * Aparapi Backpropagation base weighted sum
- * Supports learning rate, momentum and weight decay
+ * Aparapi Backpropagation base weighted sum Supports learning rate, momentum
+ * and weight decay
  */
 public class AparapiBackpropagationFullyConnected extends AparapiWeightedSum implements BackpropagationConnectionCalculator {
 
@@ -42,8 +42,8 @@ public class AparapiBackpropagationFullyConnected extends AparapiWeightedSum imp
      */
     protected Map<Layer, Matrix> activations;
 
-    public AparapiBackpropagationFullyConnected(SortedMap<GraphConnections, Integer> inputConnections, int inputOutputSamples, Layer targetLayer) {
-	super(inputConnections, inputOutputSamples, targetLayer);
+    public AparapiBackpropagationFullyConnected(SortedMap<GraphConnections, Integer> inputConnections, int miniBatchSize, Layer targetLayer) {
+	super(inputConnections, miniBatchSize, targetLayer);
     }
 
     @Override
@@ -75,84 +75,82 @@ public class AparapiBackpropagationFullyConnected extends AparapiWeightedSum imp
     }
 
     @Override
-    protected void after(float value, int row, int column) {
-	int outputIndex = outputIndex(row, column);
-	float activation = ffActivation[outputIndex];
-	calcDerivativeBefore(activation, value, outputIndex);
-
+    protected void after() {
 	int s = series;
-	int ios = inputOutputSamples;
+	int miniBatch = miniBatchSize;
+	int row = getGlobalId() * miniBatch;
 	float lr = learningRate;
 	float wd = weightDecay;
 	float mm = momentum;
+	float weightUpdate = 0;
+	int inputStartPosition = 0, initialWeightIndex = 0, weightStep = 0, dim = 0, weightIndex = 0;
 
 	for (int i = 0; i < s; i++) {
-	    int inputStartPosition = inputStartPositions[i];
-	    int initialWeightIndex = weightStartPositions[i] + weightsInitialStep[i] * getGlobalId();
-	    int weightStep = weightsStep[i];
-	    int dim = weightsDimension[i];
+	    inputStartPosition = inputStartPositions[i];
+	    initialWeightIndex = weightStartPositions[i] + weightsInitialStep[i] * getGlobalId();
+	    weightStep = weightsStep[i];
+	    dim = weightsDimension[i];
 
 	    for (int j = 0; j < dim; j++) {
-		int weightIndex = initialWeightIndex + j * weightStep;
-		float weightUpdate = lr * (input[inputStartPosition + j * ios + column] * activation - wd * weights[weightIndex]) + mm * weightUpdates[weightIndex];
+		weightUpdate = 0;
+		for (int column = 0; column < miniBatch; column++) {
+		    weightUpdate += input[inputStartPosition + j * miniBatch + column] * ffActivation[row + column];
+		}
+
+		weightIndex = initialWeightIndex + j * weightStep;
+		weightUpdate /= miniBatch;
+		weightUpdate = lr * (weightUpdate / miniBatch) - wd * weights[weightIndex] + mm * weightUpdates[weightIndex];
 		weights[weightIndex] += weightUpdate;
 		weightUpdates[weightIndex] = weightUpdate;
 	    }
 	}
 
-	calcDerivativeAfter(activation, value, outputIndex);
-    }
-
-    /**
-     * calculate derivative before weights update
-     */
-    protected void calcDerivativeBefore(float activation, float value, int outputId) {
+	calcDerivative();
     }
 
     /**
      * calculate derivative after weights update
      */
-    protected void calcDerivativeAfter(float activation, float value, int outputId) {
-	output[outputId] = value;
+    protected void calcDerivative() {
     }
 
     @Override
     public float getLearningRate() {
-        return learningRate;
+	return learningRate;
     }
 
     @Override
     public void setLearningRate(float learningRate) {
-        this.learningRate = learningRate;
+	this.learningRate = learningRate;
     }
 
     @Override
     public float getMomentum() {
-        return momentum;
+	return momentum;
     }
 
     @Override
     public void setMomentum(float momentum) {
-        this.momentum = momentum;
+	this.momentum = momentum;
     }
 
     @Override
     public float getWeightDecay() {
-        return weightDecay;
+	return weightDecay;
     }
 
     @Override
     public void setWeightDecay(float weightDecay) {
-        this.weightDecay = weightDecay;
+	this.weightDecay = weightDecay;
     }
 
     @Override
     public Map<Layer, Matrix> getActivations() {
-        return activations;
+	return activations;
     }
 
     @Override
     public void setActivations(Map<Layer, Matrix> activations) {
-        this.activations = activations;
+	this.activations = activations;
     }
 }

@@ -9,29 +9,29 @@ public class AparapiStochasticPooling2D extends AparapiSubsampling2D {
 
     @Override
     protected void pool(int inputStartIndex) {
-	int ios = inputOutputSamples;
+	int miniBatch = miniBatchSize;
 	int rl = regionLength;
 	float sum = 0;
 	float result = 0;
 	float a = 0;
 
-	for (int i = 0; i < ios; i++) {
+	for (int i = 0; i < miniBatch; i++) {
 	    sum = 0;
 	    result = 0;
 
 	    for (int j = 0; j < rl; j++) {
-		sum += input[(inputStartIndex + featureMapOffsets[j]) * ios + i];
+		sum += input[(inputStartIndex + featureMapOffsets[j]) * miniBatch + i];
 	    }
 
 	    if (sum > 0) {
 		a = 0;
 		for (int j = 0; j < rl; j++) {
-		    a = input[(inputStartIndex + featureMapOffsets[j]) * ios + i];
+		    a = input[(inputStartIndex + featureMapOffsets[j]) * miniBatch + i];
 		    result += a * (a / sum);
 		}
 	    }
 
-	    output[getGlobalId() * ios + i] = result;
+	    output[getGlobalId() * miniBatch + i] = result;
 	}
     }
 }

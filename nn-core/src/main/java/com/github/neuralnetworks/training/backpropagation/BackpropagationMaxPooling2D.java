@@ -10,16 +10,16 @@ public class BackpropagationMaxPooling2D extends AparapiBackpropagationSubsampli
     @Override
     protected void pool(int inputStartIndex) {
 	int rl = regionLength;
-	int ios = inputOutputSamples;
+	int mbs = miniBatchSize;
 	int maxId = 0;
 	int ffActivationId = 0;
 	float max = 0;
 
-	for (int i = 0; i < ios; i++) {
-	    ffActivationId = (inputStartIndex + featureMapOffsets[0]) * ios + i;
+	for (int i = 0; i < mbs; i++) {
+	    ffActivationId = (inputStartIndex + featureMapOffsets[0]) * mbs + i;
 	    max = ffActivation[ffActivationId];
 	    for (int j = 1; j < rl; j++) {
-		ffActivationId = (inputStartIndex + featureMapOffsets[j]) * ios + i;
+		ffActivationId = (inputStartIndex + featureMapOffsets[j]) * mbs + i;
 		float v = ffActivation[ffActivationId];
 		if (v > max) {
 		    maxId = ffActivationId;
@@ -27,7 +27,7 @@ public class BackpropagationMaxPooling2D extends AparapiBackpropagationSubsampli
 		}
 	    }
 
-	    input[maxId] = output[getGlobalId() * ios + i];
+	    input[maxId] = output[getGlobalId() * mbs + i];
 	}
     }
 }

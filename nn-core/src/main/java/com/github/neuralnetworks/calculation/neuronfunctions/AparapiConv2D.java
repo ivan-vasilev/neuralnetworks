@@ -33,7 +33,7 @@ public abstract class AparapiConv2D extends Kernel implements Serializable {
     /**
      * number of samples per calculation (for example number of images)
      */
-    protected final int inputOutputSamples;
+    protected final int miniBatchSize;
 
     /**
      * output columns * output rows
@@ -72,14 +72,14 @@ public abstract class AparapiConv2D extends Kernel implements Serializable {
      */
     protected Conv2DConnection current;
 
-    public AparapiConv2D(Conv2DConnection c, int inputOutputSamples, Layer targetLayer) {
+    public AparapiConv2D(Conv2DConnection c, int miniBatchSize, Layer targetLayer) {
 	super();
 
 	ConvGridLayer inputLayer = (ConvGridLayer) c.getInputLayer();
 	ConvGridLayer outputLayer = (ConvGridLayer) c.getOutputLayer();
 
 	this.weights = c.getWeights();
-	this.inputOutputSamples = inputOutputSamples;
+	this.miniBatchSize = miniBatchSize;
 	this.inputColumns = inputLayer.getFeatureMapColumns();
 	this.outputColumns = outputLayer.getFeatureMapColumns();
 	this.outputFeatureMapLength = outputLayer.getFeatureMapLength();

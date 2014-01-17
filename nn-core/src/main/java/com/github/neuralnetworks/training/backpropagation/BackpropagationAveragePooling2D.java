@@ -10,13 +10,13 @@ public class BackpropagationAveragePooling2D extends AparapiBackpropagationSubsa
     @Override
     protected void pool(int inputStartIndex) {
 	int rl = regionLength;
-	int ios = inputOutputSamples;
+	int miniBatch = miniBatchSize;
 	float div = 0;
 
-	for (int i = 0; i < ios; i++) {
-	    div = output[getGlobalId() * ios + i] / rl;
+	for (int i = 0; i < miniBatch; i++) {
+	    div = output[getGlobalId() * miniBatch + i] / rl;
 	    for (int j = 0; j < rl; j++) {
-		input[(inputStartIndex + featureMapOffsets[j]) * ios + i] = div;
+		input[(inputStartIndex + featureMapOffsets[j]) * miniBatch + i] = div;
 	    }
 	}
     }

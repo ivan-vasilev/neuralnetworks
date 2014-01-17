@@ -23,15 +23,15 @@ public class BackPropagationFullyConnected extends BackPropagationConnectionCalc
     }
 
     @Override
-    protected void addBackpropFunction(SortedMap<Connections, Integer> inputConnections, Map<Connections, BackpropagationConnectionCalculator> connectionCalculators, int inputOutputSamples, Layer targetLayer) {
+    protected void addBackpropFunction(SortedMap<Connections, Integer> inputConnections, Map<Connections, BackpropagationConnectionCalculator> connectionCalculators, Layer targetLayer) {
 	for (Entry<Connections, Integer> e : inputConnections.entrySet()) {
 	    SortedMap<GraphConnections, Integer> m = new TreeMap<>();
 	    if (e.getKey().getInputLayer() instanceof BiasLayer && targetLayer != e.getKey().getInputLayer()) {
-		m.put((GraphConnections) e.getKey(), inputOutputSamples);
-		connectionCalculators.put(e.getKey(), new AparapiBackpropagationFullyConnected(m, e.getValue(), e.getKey().getInputLayer()));
+		m.put((GraphConnections) e.getKey(), miniBatchSize);
+		connectionCalculators.put(e.getKey(), new AparapiBackpropagationFullyConnected(m, miniBatchSize, e.getKey().getInputLayer()));
 	    } else {
 		m.put((GraphConnections) e.getKey(), e.getValue());
-		connectionCalculators.put(e.getKey(), new AparapiBackpropagationFullyConnected(m, inputOutputSamples, targetLayer));
+		connectionCalculators.put(e.getKey(), new AparapiBackpropagationFullyConnected(m, miniBatchSize, targetLayer));
 	    }
 	}
     }

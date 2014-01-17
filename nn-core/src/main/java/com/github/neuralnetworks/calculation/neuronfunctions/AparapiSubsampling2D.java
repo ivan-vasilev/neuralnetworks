@@ -44,7 +44,7 @@ public abstract class AparapiSubsampling2D extends Kernel implements ConnectionC
     /**
      * input samples count
      */
-    protected int inputOutputSamples;
+    protected int miniBatchSize;
 
     /**
      * subsampling region rows
@@ -111,7 +111,7 @@ public abstract class AparapiSubsampling2D extends Kernel implements ConnectionC
      * @param output
      */
     protected void init(Subsampling2DConnection c, Matrix input, Matrix output) {
-	this.inputOutputSamples = output.getColumns();
+	this.miniBatchSize = output.getColumns();
 
 	if (c != current) {
 	    current = c;
