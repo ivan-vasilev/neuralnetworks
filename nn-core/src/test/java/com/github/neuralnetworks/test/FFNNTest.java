@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.amd.aparapi.Kernel.EXECUTION_MODE;
@@ -335,13 +334,11 @@ public class FFNNTest {
      * 
      * Simple xor backpropagation test
      */
-    @Ignore
     @Test
     public void testXORSigmoidBP() {
 	MultiLayerPerceptron mlp = NNFactory.mlpSigmoid(new int[] { 2, 8, 1 }, true);
 	@SuppressWarnings("unchecked")
-	BackPropagationTrainer<MultiLayerPerceptron> bpt = TrainerFactory.backPropagationSigmoid(mlp, new XorInputProvider(2000), new XorInputProvider(1), new XorOutputError(), new AparapiXORShiftInitializer(-0.01f, 0.01f), 2f, 0.5f, 0f);
-	// Environment.getInstance().setExecutionMode(EXECUTION_MODE.GPU);
+	BackPropagationTrainer<MultiLayerPerceptron> bpt = TrainerFactory.backPropagationSigmoid(mlp, new XorInputProvider(1000), new XorInputProvider(1), new XorOutputError(), new AparapiXORShiftInitializer(-0.01f, 0.01f), 1f, 0.5f, 0f);
 	bpt.addEventListener(new LogTrainingListener());
 	bpt.train();
 	bpt.test();

@@ -98,8 +98,7 @@ public class AparapiBackpropagationFullyConnected extends AparapiWeightedSum imp
 		}
 
 		weightIndex = initialWeightIndex + j * weightStep;
-		weightUpdate /= miniBatch;
-		weightUpdate = lr * (weightUpdate / miniBatch) - wd * weights[weightIndex] + mm * weightUpdates[weightIndex];
+		weightUpdate = lr * (weightUpdate /*/ miniBatch*/) - wd * weights[weightIndex] + mm * weightUpdates[weightIndex];
 		weights[weightIndex] += weightUpdate;
 		weightUpdates[weightIndex] = weightUpdate;
 	    }

@@ -41,14 +41,8 @@ public class IrisInputProvider implements TrainingInputProvider {
     @Override
     public TrainingInputData getNextInput() {
 	if (currentInputCount < totalInputSize) {
-	    currentInputCount += batchSize;
-
-	    for (int i = 0; i < batchSize; i++) {
-		int k = i;
-		if (useRandom) {
-		    k = random.nextInt(150);
-		}
-
+	    for (int i = 0; i < batchSize; i++, currentInputCount++) {
+		int k = useRandom ? random.nextInt(150) : currentInputCount % 150;
 		for (int j = 0; j < dataset.getRows() - 1; j++) {
 		    currentExample.getInput().set(j, i, dataset.get(j, k));
 		}
