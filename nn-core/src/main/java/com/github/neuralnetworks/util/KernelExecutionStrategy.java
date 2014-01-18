@@ -42,4 +42,13 @@ public interface KernelExecutionStrategy {
 	    kernel.execute(Range.create(range, 1));
 	}
     }
+
+    public static class CPUKernelExecution implements KernelExecutionStrategy {
+
+	@Override
+	public void execute(Kernel kernel, int range) {
+	    kernel.setExecutionMode(EXECUTION_MODE.CPU);
+	    kernel.execute(range);
+	}
+    }
 }

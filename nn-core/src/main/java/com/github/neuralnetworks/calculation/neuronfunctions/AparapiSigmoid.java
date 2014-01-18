@@ -30,7 +30,7 @@ public class AparapiSigmoid extends ConnectionCalculatorFullyConnected {
 	protected void after() {
 	    int mb = miniBatchSize;
 	    int outputId = getGlobalId() * mb;
-	    
+
 	    for (int i = 0; i < mb; i++) {
 		output[outputId + i] = 1 / (1 + exp(-output[outputId + i]));
 	    }
