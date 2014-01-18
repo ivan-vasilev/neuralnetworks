@@ -100,7 +100,7 @@ public abstract class AparapiSubsampling2D extends Kernel implements ConnectionC
 	    }
 
 	    // the code is executed with as many kernels as the output layer neurons count
-	    execute(c.getOutputLayer().getNeuronCount());
+	    Environment.getInstance().getExecutionStrategy().execute(this, c.getOutputLayer().getNeuronCount());
 	}
     }
 
@@ -137,8 +137,6 @@ public abstract class AparapiSubsampling2D extends Kernel implements ConnectionC
 		}
 	    }
 	}
-
-	setExecutionMode(Environment.getInstance().getExecutionMode());
     }
 
     /* (non-Javadoc)

@@ -28,13 +28,12 @@ public class IrisTest {
     @Test
     public void testIrisMultipleSigmoidBP() {
 	MultiLayerPerceptron mlp = NNFactory.mlpSigmoid(new int[] { 4, 12, 3 }, true);
-	IrisInputProvider trainInputProvider = new IrisInputProvider(1, 40000, new IrisTargetMultiNeuronOutputConverter(), true, true);
-	IrisInputProvider testInputProvider = new IrisInputProvider(150, 150, new IrisTargetMultiNeuronOutputConverter(), false, true);
+	IrisInputProvider trainInputProvider = new IrisInputProvider(1, 100000, new IrisTargetMultiNeuronOutputConverter(), true, true);
+	IrisInputProvider testInputProvider = new IrisInputProvider(1, 150, new IrisTargetMultiNeuronOutputConverter(), false, true);
 	@SuppressWarnings("unchecked")
-	BackPropagationTrainer<MultiLayerPerceptron> bpt = TrainerFactory.backPropagationSigmoid(mlp, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new MersenneTwisterRandomInitializer(-0.1f, 0.1f), 1f, 0.5f, 0f);
-	//Environment.getInstance().setExecutionMode(EXECUTION_MODE.JTP);
+	BackPropagationTrainer<MultiLayerPerceptron> bpt = TrainerFactory.backPropagationSigmoid(mlp, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 1.5f, 0.5f, 0f);
 
-	bpt.addEventListener(new LogTrainingListener(true));
+	bpt.addEventListener(new LogTrainingListener());
 
 	bpt.train();
 	LayerCalculatorImpl lc = (LayerCalculatorImpl) mlp.getLayerCalculator();

@@ -57,7 +57,7 @@ public class LogTrainingListener implements TrainingEventListener {
 	    lastMiniBatchFinishTime = System.currentTimeMillis();
 
 	    if (logMiniBatches) {
-		System.out.println("MB" + miniBatches + " " + (miniBatchTime / 1000f) + " s");
+		System.out.println("MB " + miniBatches + " " + (miniBatchTime / 1000f) + " s");
 	    }
 	} else if (event instanceof TestingFinishedEvent) {
 	    miniBatches++;

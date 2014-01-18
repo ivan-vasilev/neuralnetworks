@@ -8,7 +8,6 @@ import java.util.TreeMap;
 
 import org.junit.Test;
 
-import com.amd.aparapi.Kernel.EXECUTION_MODE;
 import com.github.neuralnetworks.architecture.BiasLayer;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.FullyConnected;
@@ -25,7 +24,6 @@ import com.github.neuralnetworks.training.TrainerFactory;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationTrainer;
 import com.github.neuralnetworks.training.events.LogTrainingListener;
 import com.github.neuralnetworks.training.random.AparapiXORShiftInitializer;
-import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.Util;
 
 /**
@@ -268,7 +266,6 @@ public class FFNNTest {
 
 	@SuppressWarnings("unchecked")
 	BackPropagationTrainer<MultiLayerPerceptron> bpt = TrainerFactory.backPropagationSigmoid(mlp, new SimpleInputProvider(new float[][] { { 0.35f, 0.9f } }, new float[][] { { 0.5f } }, 1), new SimpleInputProvider(new float[][] { { 0.35f, 0.9f } }, new float[][] { { 0.5f } }, 1), null, null, 1f, 0f, 0f);
-	Environment.getInstance().setExecutionMode(EXECUTION_MODE.JTP);
 	bpt.train();
 
 	assertEquals(0.09916, cg1.get(0, 0), 0.01);

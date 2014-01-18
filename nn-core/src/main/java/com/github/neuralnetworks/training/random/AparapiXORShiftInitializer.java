@@ -29,25 +29,24 @@ public class AparapiXORShiftInitializer implements RandomInitializer {
     public void initialize(float[] array) {
 	XORShift kernel = kernels.get(array.length);
 	if (kernel == null) {
-	    kernels.put(array.length, kernel = new XORShift(array.length));
+	    kernels.put(array.length, kernel = new XORShift(array.length, start, range));
 	}
 
 	kernel.array = array;
-	kernel.start = start;
-	kernel.range = range;
 
-	kernel.setExecutionMode(Environment.getInstance().getExecutionMode());
-	kernel.execute(array.length);
+	Environment.getInstance().getExecutionStrategy().execute(kernel, array.length);
     }
 
     private static class XORShift extends XORShiftKernel {
 
 	private float[] array;
-	private float start;
-	private float range;
+	private final float start;
+	private final float range;
 
-	public XORShift(int maximumRange) {
+	public XORShift(int maximumRange, float start, float range) {
 	    super(maximumRange);
+	    this.start = start;
+	    this.range = range;
 	}
 
 	@Override

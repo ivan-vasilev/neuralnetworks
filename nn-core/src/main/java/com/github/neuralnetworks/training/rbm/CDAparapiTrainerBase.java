@@ -51,8 +51,7 @@ public abstract class CDAparapiTrainerBase extends CDTrainerBase {
 	weightUpdatesKernel.setMomentum(getMomentum());
 	weightUpdatesKernel.setWeightDecay(getWeightDecay());
 	weightUpdatesKernel.setMiniBatchSize(posPhaseVisible.getColumns());
-	weightUpdatesKernel.setExecutionMode(Environment.getInstance().getExecutionMode());
-	weightUpdatesKernel.execute(rbm.getMainConnections().getConnectionGraph().getElements().length);
+	Environment.getInstance().getExecutionStrategy().execute(weightUpdatesKernel, rbm.getMainConnections().getConnectionGraph().getElements().length);
 
 	// update visible bias
 	if (visibleBiasUpdatesKernel != null) {
@@ -61,8 +60,7 @@ public abstract class CDAparapiTrainerBase extends CDTrainerBase {
 	    visibleBiasUpdatesKernel.setLearningRate(getLearningRate());
 	    visibleBiasUpdatesKernel.setMomentum(getMomentum());
 	    visibleBiasUpdatesKernel.setMiniBatchSize(posPhaseVisible.getColumns());
-	    visibleBiasUpdatesKernel.setExecutionMode(Environment.getInstance().getExecutionMode());
-	    visibleBiasUpdatesKernel.execute(rbm.getVisibleBiasConnections().getConnectionGraph().getElements().length);
+	    Environment.getInstance().getExecutionStrategy().execute(visibleBiasUpdatesKernel, rbm.getVisibleBiasConnections().getConnectionGraph().getElements().length);
 	}
 
 	// update hidden bias
@@ -72,8 +70,7 @@ public abstract class CDAparapiTrainerBase extends CDTrainerBase {
 	    hiddenBiasUpdatesKernel.setLearningRate(getLearningRate());
 	    hiddenBiasUpdatesKernel.setMomentum(getMomentum());
 	    hiddenBiasUpdatesKernel.setMiniBatchSize(posPhaseHidden.getColumns());
-	    hiddenBiasUpdatesKernel.setExecutionMode(Environment.getInstance().getExecutionMode());
-	    hiddenBiasUpdatesKernel.execute(rbm.getHiddenBiasConnections().getConnectionGraph().getElements().length);
+	    Environment.getInstance().getExecutionStrategy().execute(hiddenBiasUpdatesKernel, rbm.getHiddenBiasConnections().getConnectionGraph().getElements().length);
 	}
     }
 

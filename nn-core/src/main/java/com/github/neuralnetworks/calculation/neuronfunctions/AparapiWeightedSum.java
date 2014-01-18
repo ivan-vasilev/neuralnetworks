@@ -165,14 +165,7 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
     public void calculate(SortedMap<Connections, Matrix> input, Matrix outputMatrix, Layer targetLayer) {
 	if (input.size() > 0) {
 	    init((SortedMap<GraphConnections, Matrix>) ((SortedMap<?, ?>) input), outputMatrix, targetLayer);
-	    // depending on the number of processors an execution mode is selected
-	    if (outputMatrix.getRows() <= Runtime.getRuntime().availableProcessors() * 5) {
-		setExecutionMode(EXECUTION_MODE.CPU);
-	    } else {
-		setExecutionMode(Environment.getInstance().getExecutionMode());
-	    }
-
-	    execute(outputMatrix.getRows());
+	    Environment.getInstance().getExecutionStrategy().execute(this, outputMatrix.getRows());
 	}
     }
 

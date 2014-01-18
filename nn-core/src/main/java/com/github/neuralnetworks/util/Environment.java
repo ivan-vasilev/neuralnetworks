@@ -1,6 +1,6 @@
 package com.github.neuralnetworks.util;
 
-import com.amd.aparapi.Kernel.EXECUTION_MODE;
+import com.github.neuralnetworks.util.KernelExecutionStrategy.DefaultKernelExecution;
 
 /**
  * Singleton for environment variables (can be used for debugging)
@@ -12,7 +12,7 @@ public class Environment {
     /**
      * Determnines whether the code will be executed on the GPU or the CPU
      */
-    private EXECUTION_MODE executionMode;
+    private KernelExecutionStrategy executionStrategy;
 
     /**
      * is debug
@@ -20,16 +20,16 @@ public class Environment {
     private boolean debug;
 
     private Environment() {
-	executionMode = EXECUTION_MODE.GPU;
+	executionStrategy = new DefaultKernelExecution();
 	debug = true;
     }
 
-    public EXECUTION_MODE getExecutionMode() {
-        return executionMode;
+    public KernelExecutionStrategy getExecutionStrategy() {
+        return executionStrategy;
     }
 
-    public void setExecutionMode(EXECUTION_MODE executionMode) {
-        this.executionMode = executionMode;
+    public void setExecutionStrategy(KernelExecutionStrategy executionStrategy) {
+        this.executionStrategy = executionStrategy;
     }
 
     public static Environment getInstance() {
