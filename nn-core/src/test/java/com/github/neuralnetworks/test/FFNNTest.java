@@ -19,11 +19,8 @@ import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSum;
 import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculatorFullyConnected;
-import com.github.neuralnetworks.test.XorInputProvider.XorOutputError;
 import com.github.neuralnetworks.training.TrainerFactory;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationTrainer;
-import com.github.neuralnetworks.training.events.LogTrainingListener;
-import com.github.neuralnetworks.training.random.AparapiXORShiftInitializer;
 import com.github.neuralnetworks.util.Util;
 
 /**
@@ -325,20 +322,5 @@ public class FFNNTest {
 	assertEquals(0.194, cgb1.get(0, 1), 0.001);
 
 	assertEquals(0.218, cgb2.get(0, 0), 0.001);
-    }
-
-    /**
-     * 
-     * Simple xor backpropagation test
-     */
-    @Test
-    public void testXORSigmoidBP() {
-	MultiLayerPerceptron mlp = NNFactory.mlpSigmoid(new int[] { 2, 8, 1 }, true);
-	@SuppressWarnings("unchecked")
-	BackPropagationTrainer<MultiLayerPerceptron> bpt = TrainerFactory.backPropagationSigmoid(mlp, new XorInputProvider(1000), new XorInputProvider(1), new XorOutputError(), new AparapiXORShiftInitializer(-0.01f, 0.01f), 1f, 0.5f, 0f);
-	bpt.addEventListener(new LogTrainingListener());
-	bpt.train();
-	bpt.test();
-	assertEquals(0, bpt.getOutputError().getTotalNetworkError(), 0.1);
     }
 }
