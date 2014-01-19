@@ -8,7 +8,7 @@ import java.util.Set;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
-import com.github.neuralnetworks.architecture.types.DeepNeuralNetwork;
+import com.github.neuralnetworks.architecture.types.DNN;
 import com.github.neuralnetworks.calculation.LayerCalculator;
 import com.github.neuralnetworks.events.TrainingEvent;
 import com.github.neuralnetworks.training.events.MiniBatchFinishedEvent;
@@ -20,7 +20,7 @@ import com.github.neuralnetworks.util.Properties;
 /**
  * Default implementation for deep network trainer
  */
-public class GreedyLayerDNNTrainer<N extends DeepNeuralNetwork<?>> extends Trainer<N> {
+public class GreedyLayerDNNTrainer<N extends DNN<? extends NeuralNetwork>> extends Trainer<N> {
 
     public GreedyLayerDNNTrainer(Properties properties) {
 	super(properties);
@@ -35,8 +35,9 @@ public class GreedyLayerDNNTrainer<N extends DeepNeuralNetwork<?>> extends Train
 	triggerEvent(new TrainingStartedEvent(this));
 
 	TrainingInputProvider inputProvider = getTrainingInputProvider();
-	DeepNeuralNetwork<?> dnn = getNeuralNetwork();
-	DeepTrainingInputData deepInput = new DeepTrainingInputData(getNeuralNetwork(), getLayerCalculator());
+	DNN<?> dnn = getNeuralNetwork();
+	@SuppressWarnings("unchecked")
+	DeepTrainingInputData deepInput = new DeepTrainingInputData((DNN<NeuralNetwork>) getNeuralNetwork(), getLayerCalculator());
 	for (NeuralNetwork nn : dnn.getNeuralNetworks()) {
 	    OneStepTrainer<?> trainer = getTrainers().get(nn);
 	    inputProvider.reset();
@@ -63,13 +64,13 @@ public class GreedyLayerDNNTrainer<N extends DeepNeuralNetwork<?>> extends Train
      */
     private static class DeepTrainingInputData implements TrainingInputData {
 
-	private DeepNeuralNetwork<?> dnn;
+	private DNN<NeuralNetwork> dnn;
 	private NeuralNetwork nn;
 	private TrainingInputData baseInput;
 	private LayerCalculator calculator;
 	private Map<Layer, Matrix> results;
 
-	public DeepTrainingInputData(DeepNeuralNetwork<?> dnn, LayerCalculator calculator) {
+	public DeepTrainingInputData(DNN<NeuralNetwork> dnn, LayerCalculator calculator) {
 	    super();
 	    this.dnn = dnn;
 	    this.calculator = calculator;
@@ -80,7 +81,7 @@ public class GreedyLayerDNNTrainer<N extends DeepNeuralNetwork<?>> extends Train
 	public Matrix getInput() {
 	    Matrix result = null;
 	    Layer inputLayer = dnn.getInputLayer();
-	    Layer currentLayer = nn.getInputLayer();
+	    Layer currentLayer = dnn.getOutputLayer(nn);
 
 	    if (inputLayer != currentLayer) {
 		Matrix input = baseInput.getInput();

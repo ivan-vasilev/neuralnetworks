@@ -3,15 +3,18 @@ package com.github.neuralnetworks.architecture.types;
 import java.util.Collection;
 import java.util.List;
 
+import com.github.neuralnetworks.architecture.BiasLayer;
+import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.util.UniqueList;
+import com.github.neuralnetworks.util.Util;
 
 /**
  * Default implementation of the DeepNeuralNetwork interface
  */
-public abstract class DNN<N extends NeuralNetwork> extends NeuralNetworkImpl implements DeepNeuralNetwork<N> {
+public abstract class DNN<N extends NeuralNetwork> extends NeuralNetworkImpl {
 
     /**
      * List of networks in the network
@@ -23,7 +26,6 @@ public abstract class DNN<N extends NeuralNetwork> extends NeuralNetworkImpl imp
 	this.neuralNetworks = new UniqueList<>();
     }
 
-    @Override
     public List<N> getNeuralNetworks() {
 	return neuralNetworks;
     }
@@ -42,6 +44,25 @@ public abstract class DNN<N extends NeuralNetwork> extends NeuralNetworkImpl imp
      * @param nn
      */
     protected abstract Collection<Layer> getRelevantLayers(N nn);
+
+    /**
+     * @param nn
+     * @return the output layer of nn in the context of the deep network
+     */
+    public Layer getOutputLayer(N nn) {
+	Layer output = nn.getOutputLayer();
+	if (!getLayers().contains(output)) {
+	    for (Connections c : output.getConnections()) {
+		Layer opposite = Util.getOppositeLayer(c, output);
+		if (!(opposite instanceof BiasLayer) && getLayers().contains(opposite)) {
+		    output = opposite;
+		    break;
+		}
+	    }
+	}
+
+	return output;
+    }
 
     public NeuralNetwork getFirstNeuralNetwork() {
 	if (neuralNetworks != null && neuralNetworks.size() > 0) {
