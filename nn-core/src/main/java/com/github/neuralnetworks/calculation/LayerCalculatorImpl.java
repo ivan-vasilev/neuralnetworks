@@ -58,9 +58,9 @@ public class LayerCalculatorImpl extends LayerCalculatorBase implements LayerCal
 
 	if (calculatedLayers.contains(currentLayer)) {
 	    result = true;
-	} else if (!inProgressLayers.contains(currentLayer) && neuralNetwork.getLayers().contains(currentLayer)) {
+	} else if (!inProgressLayers.contains(currentLayer)) {
 	    inProgressLayers.add(currentLayer);
-	    for (Connections c : currentLayer.getConnections()) {
+	    for (Connections c : currentLayer.getConnections(neuralNetwork)) {
 		Layer opposite = Util.getOppositeLayer(c, currentLayer);
 		if (orderConnections(neuralNetwork, opposite, calculatedLayers, inProgressLayers, calculateCandidates)) {
 		    calculateCandidates.add(new ConnectionCalculateCandidate(c, currentLayer));

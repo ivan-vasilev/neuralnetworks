@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import com.github.neuralnetworks.util.UniqueList;
+import com.github.neuralnetworks.util.Util;
 
 /**
  * A layer of neurons. Each layer contains a set of connections that link it to other layers.
@@ -41,6 +42,21 @@ public class Layer implements Serializable {
 
     public void setNeuronCount(int neuronCount) {
 	this.neuronCount = neuronCount;
+    }
+
+    /**
+     * @param network
+     * @return list of connections within the specific neural network
+     */
+    public List<Connections> getConnections(NeuralNetwork network) {
+	List<Connections> result = new UniqueList<Connections>();
+	for (Connections c : connections) {
+	    if (network.getLayers().contains(Util.getOppositeLayer(c, this))) {
+		result.add(c);
+	    }
+	}
+
+	return result;
     }
 
     public List<Connections> getConnections() {
