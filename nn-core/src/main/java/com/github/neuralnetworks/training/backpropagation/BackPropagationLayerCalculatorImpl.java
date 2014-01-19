@@ -50,9 +50,10 @@ public class BackPropagationLayerCalculatorImpl extends LayerCalculatorBase impl
 	    }
 
 	    for (Connections c : l.getConnections()) {
-		if (!visitedConnections.contains(c)) {
-		    connections.add(new ConnectionCalculateCandidate(c, Util.getOppositeLayer(c, l)));
-		    layersQueue.add(Util.getOppositeLayer(c, l));
+		Layer opposite = Util.getOppositeLayer(c, l);
+		if (!visitedConnections.contains(c) && nn.getLayers().contains(opposite)) {
+		    connections.add(new ConnectionCalculateCandidate(c, opposite));
+		    layersQueue.add(opposite);
 		    visitedConnections.add(c);
 		}
 	    }

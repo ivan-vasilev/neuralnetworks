@@ -9,6 +9,7 @@ import java.util.Set;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
+import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.util.UniqueList;
 import com.github.neuralnetworks.util.Util;
 
@@ -22,9 +23,9 @@ public class LayerCalculatorImpl extends LayerCalculatorBase implements LayerCal
     private static final long serialVersionUID = 1L;
 
     @Override
-    public void calculate(Set<Layer> calculatedLayers, Map<Layer, Matrix> results, Layer layer) {
+    public void calculate(NeuralNetwork neuralNetwork, Layer layer, Set<Layer> calculatedLayers, Map<Layer, Matrix> results) {
 	List<ConnectionCalculateCandidate> ccc = new ArrayList<ConnectionCalculateCandidate>();
-	orderConnections(calculatedLayers, new UniqueList<Layer>(), ccc, layer);
+	orderConnections(neuralNetwork, layer, calculatedLayers, new UniqueList<Layer>(), ccc);
 	calculate(results, ccc);
     }
 
@@ -49,18 +50,19 @@ public class LayerCalculatorImpl extends LayerCalculatorBase implements LayerCal
      * @param inProgressLayers - layers which are currently calculated, but are not yet finished - not all connections to the layer are calculated and the result of the propagation through this layer cannot be used for another calculations
      * @param calculateCandidates - order of calculation
      * @param currentLayer - the layer which is currently being calculated.
+     * @param neuralNetwork - the neural network.
      * @return
      */
-    protected boolean orderConnections(Set<Layer> calculatedLayers, Set<Layer> inProgressLayers, List<ConnectionCalculateCandidate> calculateCandidates, Layer currentLayer) {
+    protected boolean orderConnections(NeuralNetwork neuralNetwork, Layer currentLayer, Set<Layer> calculatedLayers, Set<Layer> inProgressLayers, List<ConnectionCalculateCandidate> calculateCandidates) {
 	boolean result = false;
 
 	if (calculatedLayers.contains(currentLayer)) {
 	    result = true;
-	} else if (!inProgressLayers.contains(currentLayer)) {
+	} else if (!inProgressLayers.contains(currentLayer) && neuralNetwork.getLayers().contains(currentLayer)) {
 	    inProgressLayers.add(currentLayer);
 	    for (Connections c : currentLayer.getConnections()) {
 		Layer opposite = Util.getOppositeLayer(c, currentLayer);
-		if (orderConnections(calculatedLayers, inProgressLayers, calculateCandidates, opposite)) {
+		if (orderConnections(neuralNetwork, opposite, calculatedLayers, inProgressLayers, calculateCandidates)) {
 		    calculateCandidates.add(new ConnectionCalculateCandidate(c, currentLayer));
 		}
 	    }

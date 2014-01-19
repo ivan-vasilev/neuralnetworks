@@ -7,6 +7,7 @@ import java.util.Set;
 
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
+import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.architecture.types.RBM;
 
 /**
@@ -17,14 +18,12 @@ public class RBMLayerCalculator extends LayerCalculatorImpl {
 
     private static final long serialVersionUID = -7524966192939615856L;
 
-    protected RBM rbm;
     protected ConnectionCalculator connectionCalculator;
     protected Set<Layer> calculatedLayers;
     protected Map<Layer, Matrix> results;
 
-    public RBMLayerCalculator(RBM rbm) {
+    public RBMLayerCalculator() {
 	super();
-	this.rbm = rbm;
 	calculatedLayers = new HashSet<>();
 	results = new HashMap<>();
     }
@@ -34,30 +33,31 @@ public class RBMLayerCalculator extends LayerCalculatorImpl {
      * takes into account the gibbs sampling - if the target "layer" is the input layer then the hidden layer is calculated first and then the visible
      */
     @Override
-    public void calculate(Set<Layer> calculatedLayers, Map<Layer, Matrix> results, Layer layer) {
+    public void calculate(NeuralNetwork neuralNetwork, Layer layer, Set<Layer> calculatedLayers, Map<Layer, Matrix> results) {
+	RBM rbm = (RBM) neuralNetwork;
 	Layer visibleLayer = rbm.getVisibleLayer();
 	Layer hiddenLayer = rbm.getHiddenLayer();
 
 	// gibbs sampling first
 	if ((layer == visibleLayer || layer == rbm.getDataOutputLayer()) && layer != hiddenLayer && calculatedLayers.contains(visibleLayer)) {
-	    super.calculate(calculatedLayers, results, hiddenLayer);
+	    super.calculate(neuralNetwork, hiddenLayer, calculatedLayers, results);
 	    calculatedLayers.clear();
 	    calculatedLayers.add(hiddenLayer);
-	    super.calculate(calculatedLayers, results, visibleLayer);
+	    super.calculate(neuralNetwork, visibleLayer, calculatedLayers, results);
 	} else {
-	    super.calculate(calculatedLayers, results, layer);
+	    super.calculate(neuralNetwork, layer, calculatedLayers, results);
 	}
     }
 
-    public void calculateVisibleLayer(Matrix visibleLayerResults, Matrix hiddenLayerResults) {
-	this.calculateVisibleLayer(visibleLayerResults, hiddenLayerResults, null);
+    public void calculateVisibleLayer(RBM rbm, Matrix visibleLayerResults, Matrix hiddenLayerResults) {
+	this.calculateVisibleLayer(rbm, visibleLayerResults, hiddenLayerResults, null);
     }
 
-    public void calculateHiddenLayer(Matrix visibleLayerResults, Matrix hiddenLayerResults) {
-	this.calculateHiddenLayer(visibleLayerResults, hiddenLayerResults, null);
+    public void calculateHiddenLayer(RBM rbm, Matrix visibleLayerResults, Matrix hiddenLayerResults) {
+	this.calculateHiddenLayer(rbm, visibleLayerResults, hiddenLayerResults, null);
     }
 
-    public void calculateVisibleLayer(Matrix visibleLayerResults, Matrix hiddenLayerResults, ConnectionCalculator connectionCalculator) {
+    public void calculateVisibleLayer(RBM rbm, Matrix visibleLayerResults, Matrix hiddenLayerResults, ConnectionCalculator connectionCalculator) {
 	this.connectionCalculator = connectionCalculator;
 
 	Layer visibleLayer = rbm.getVisibleLayer();
@@ -70,10 +70,10 @@ public class RBMLayerCalculator extends LayerCalculatorImpl {
 	results.put(visibleLayer, visibleLayerResults);
 	results.put(hiddenLayer, hiddenLayerResults);
 
-	super.calculate(calculatedLayers, results, visibleLayer);
+	super.calculate(rbm, visibleLayer, calculatedLayers, results);
     }
 
-    public void calculateHiddenLayer(Matrix visibleLayerResults, Matrix hiddenLayerResults, ConnectionCalculator connectionCalculator) {
+    public void calculateHiddenLayer(RBM rbm, Matrix visibleLayerResults, Matrix hiddenLayerResults, ConnectionCalculator connectionCalculator) {
 	this.connectionCalculator = connectionCalculator;
 
 	Layer visibleLayer = rbm.getVisibleLayer();
@@ -86,7 +86,7 @@ public class RBMLayerCalculator extends LayerCalculatorImpl {
 	results.put(visibleLayer, visibleLayerResults);
 	results.put(hiddenLayer, hiddenLayerResults);
 
-	super.calculate(calculatedLayers, results, hiddenLayer);
+	super.calculate(rbm, hiddenLayer, calculatedLayers, results);
     }
 
     @Override

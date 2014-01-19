@@ -29,11 +29,11 @@ public class IrisTest {
      */
     @Test
     public void testIrisMultipleSigmoidBP() {
-	MultiLayerPerceptron mlp = NNFactory.mlpSigmoid(new int[] { 4, 100, 3 }, true);
+	MultiLayerPerceptron mlp = NNFactory.mlpSigmoid(new int[] { 4, 24, 3 }, true);
 	IrisInputProvider trainInputProvider = new IrisInputProvider(100, 100000, new IrisTargetMultiNeuronOutputConverter(), true, true);
 	IrisInputProvider testInputProvider = new IrisInputProvider(1, 150, new IrisTargetMultiNeuronOutputConverter(), false, true);
 	@SuppressWarnings("unchecked")
-	BackPropagationTrainer<MultiLayerPerceptron> bpt = TrainerFactory.backPropagationSigmoid(mlp, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.02f, 0.5f, 0.001f);
+	BackPropagationTrainer<MultiLayerPerceptron> bpt = TrainerFactory.backPropagationSigmoid(mlp, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.02f, 0.5f, 0f);
 
 	bpt.addEventListener(new LogTrainingListener());
 

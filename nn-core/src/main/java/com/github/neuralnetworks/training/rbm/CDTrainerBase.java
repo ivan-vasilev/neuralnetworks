@@ -63,14 +63,14 @@ public abstract class CDTrainerBase extends OneStepTrainer<RBM> {
 	RBMLayerCalculator calculator = (RBMLayerCalculator) getLayerCalculator();
 
 	// calculate hidden layer positive phase
-	calculator.calculateHiddenLayer(posPhaseVisible, posPhaseHidden, getHiddenConnectionCalculator(0));
+	calculator.calculateHiddenLayer(getNeuralNetwork(), posPhaseVisible, posPhaseHidden, getHiddenConnectionCalculator(0));
 
 	triggerEvent(new SamplingStepEvent(this, 0));
 
 	// Gibbs sampling
 	for (int i = 1; i <= getGibbsSamplingCount(); i++) {
-	    calculator.calculateVisibleLayer(negPhaseVisible, negPhaseHidden, getVisibleConnectionCalculator(i));
-	    calculator.calculateHiddenLayer(negPhaseVisible, negPhaseHidden, getHiddenConnectionCalculator(i));
+	    calculator.calculateVisibleLayer(getNeuralNetwork(), negPhaseVisible, negPhaseHidden, getVisibleConnectionCalculator(i));
+	    calculator.calculateHiddenLayer(getNeuralNetwork(), negPhaseVisible, negPhaseHidden, getHiddenConnectionCalculator(i));
 	    triggerEvent(new SamplingStepEvent(this, i));
 	}
 

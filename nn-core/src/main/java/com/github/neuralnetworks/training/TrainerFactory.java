@@ -187,7 +187,7 @@ public class TrainerFactory {
 	p.setParameter(Constants.NEURAL_NETWORK, rbm);
 	p.setParameter(Constants.TRAINING_INPUT_PROVIDER, trainingSet);
 	p.setParameter(Constants.TESTING_INPUT_PROVIDER, testingSet);
-	p.setParameter(Constants.LAYER_CALCULATOR, new RBMLayerCalculator(rbm));
+	p.setParameter(Constants.LAYER_CALCULATOR, new RBMLayerCalculator());
 	p.setParameter(Constants.LEARNING_RATE, learningRate);
 	p.setParameter(Constants.MOMENTUM, momentum);
 	p.setParameter(Constants.WEIGHT_DECAY, weightDecay);

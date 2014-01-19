@@ -75,7 +75,7 @@ public abstract class Trainer<N extends NeuralNetwork> {
 		calculatedLayers.clear();
 		calculatedLayers.add(n.getInputLayer());
 		results.put(n.getInputLayer(), input.getInput());
-		c.calculate(calculatedLayers, results, n.getDataOutputLayer());
+		c.calculate(n, n.getDataOutputLayer(), calculatedLayers, results);
 		e.addItem(results.get(n.getDataOutputLayer()), input.getTarget());
 		
 		for (Matrix m : results.values()) {

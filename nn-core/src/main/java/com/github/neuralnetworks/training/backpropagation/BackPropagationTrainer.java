@@ -51,7 +51,7 @@ public class BackPropagationTrainer<N extends NeuralNetwork> extends OneStepTrai
 	activations.put(nn.getInputLayer(), data.getInput());
 	calculatedLayers.add(nn.getInputLayer());
 	LayerCalculator lc = getLayerCalculator();
-	lc.calculate(calculatedLayers, activations, nn.getOutputLayer());
+	lc.calculate(nn, nn.getOutputLayer(), calculatedLayers, activations);
 
 	OutputErrorDerivative d = getProperties().getParameter(Constants.OUTPUT_ERROR_DERIVATIVE);
 	Matrix outputErrorDerivative = d.getOutputErrorDerivative(activations.get(nn.getOutputLayer()), data.getTarget());

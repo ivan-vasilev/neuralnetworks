@@ -5,6 +5,7 @@ import java.util.Set;
 
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
+import com.github.neuralnetworks.architecture.NeuralNetwork;
 
 /**
  * The implementations of this interface provide a way of propagating results
@@ -28,6 +29,8 @@ public interface LayerCalculator {
      *            - where the results are written
      * @param layer
      *            - current layer
+     * @param neuralNetwork
+     *            - the network of context for calculation
      */
-    public void calculate(Set<Layer> calculatedLayers, Map<Layer, Matrix> results, Layer layer);
+    public void calculate(NeuralNetwork neuralNetwork, Layer layer, Set<Layer> calculatedLayers, Map<Layer, Matrix> results);
 }
