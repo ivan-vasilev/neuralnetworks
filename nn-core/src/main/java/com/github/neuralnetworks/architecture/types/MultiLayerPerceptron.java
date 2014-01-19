@@ -23,14 +23,4 @@ public class MultiLayerPerceptron extends NeuralNetworkImpl {
 
 	return this;
     }
-
-    @Override
-    public Layer getOutputLayer() {
-	return getNoOutboundConnectionsLayer();
-    }
-
-    @Override
-    public Layer getDataOutputLayer() {
-	return getNoOutboundConnectionsLayer();
-    }
 }

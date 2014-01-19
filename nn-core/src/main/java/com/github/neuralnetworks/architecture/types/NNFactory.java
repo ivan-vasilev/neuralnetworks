@@ -304,7 +304,7 @@ public class NNFactory {
 
 	DBN result = new DBN();
 	for (int i = 0; i < layers.length; i++) {
-	    result.addLayer(new Layer(layers[i]), addBias);
+	    result.addLevel(new Layer(layers[i]), addBias);
 	}
 
 	return result;

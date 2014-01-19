@@ -71,14 +71,4 @@ public class RBM extends NeuralNetworkImpl {
     public Layer getHiddenLayer() {
 	return mainConnections.getOutputLayer();
     }
-
-    @Override
-    public Layer getOutputLayer() {
-	return getNoOutboundConnectionsLayer();
-    }
-
-    @Override
-    public Layer getDataOutputLayer() {
-	return getNoOutboundConnectionsLayer();
-    }
 }

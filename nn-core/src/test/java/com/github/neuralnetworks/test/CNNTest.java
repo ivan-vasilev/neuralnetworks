@@ -10,9 +10,9 @@ import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
 import com.github.neuralnetworks.architecture.ConvGridLayer;
 import com.github.neuralnetworks.architecture.Matrix;
+import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.architecture.Subsampling2DConnection;
 import com.github.neuralnetworks.architecture.types.ConnectionFactory;
-import com.github.neuralnetworks.architecture.types.DefaultNeuralNetwork;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiAveragePooling2D;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2D;
@@ -49,7 +49,7 @@ public class CNNTest {
 
     @Test
     public void testConvolutions() {
-	DefaultNeuralNetwork nn = new DefaultNeuralNetwork();
+	NeuralNetworkImpl nn = new NeuralNetworkImpl();
 	Conv2DConnection c = ConnectionFactory.convConnection(new ConvGridLayer(3, 3, 2), 2, 2, 1);
 	nn.addConnection(c);
 	c.getWeights()[0] = 1;

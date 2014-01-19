@@ -39,7 +39,7 @@ public class RBMLayerCalculator extends LayerCalculatorImpl {
 	Layer hiddenLayer = rbm.getHiddenLayer();
 
 	// gibbs sampling first
-	if ((layer == visibleLayer || layer == rbm.getDataOutputLayer()) && layer != hiddenLayer && calculatedLayers.contains(visibleLayer)) {
+	if ((layer == visibleLayer || layer == rbm.getOutputLayer()) && layer != hiddenLayer && calculatedLayers.contains(visibleLayer)) {
 	    super.calculate(neuralNetwork, hiddenLayer, calculatedLayers, results);
 	    calculatedLayers.clear();
 	    calculatedLayers.add(hiddenLayer);

@@ -20,7 +20,7 @@ import com.github.neuralnetworks.util.Properties;
 /**
  * Default implementation for deep network trainer
  */
-public class GreedyLayerDNNTrainer extends Trainer<DeepNeuralNetwork> {
+public class GreedyLayerDNNTrainer<N extends DeepNeuralNetwork<?>> extends Trainer<N> {
 
     public GreedyLayerDNNTrainer(Properties properties) {
 	super(properties);
@@ -35,7 +35,7 @@ public class GreedyLayerDNNTrainer extends Trainer<DeepNeuralNetwork> {
 	triggerEvent(new TrainingStartedEvent(this));
 
 	TrainingInputProvider inputProvider = getTrainingInputProvider();
-	DeepNeuralNetwork dnn = getNeuralNetwork();
+	DeepNeuralNetwork<?> dnn = getNeuralNetwork();
 	DeepTrainingInputData deepInput = new DeepTrainingInputData(getNeuralNetwork(), getLayerCalculator());
 	for (NeuralNetwork nn : dnn.getNeuralNetworks()) {
 	    OneStepTrainer<?> trainer = getTrainers().get(nn);
@@ -63,13 +63,13 @@ public class GreedyLayerDNNTrainer extends Trainer<DeepNeuralNetwork> {
      */
     private static class DeepTrainingInputData implements TrainingInputData {
 
-	private DeepNeuralNetwork dnn;
+	private DeepNeuralNetwork<?> dnn;
 	private NeuralNetwork nn;
 	private TrainingInputData baseInput;
 	private LayerCalculator calculator;
 	private Map<Layer, Matrix> results;
 
-	public DeepTrainingInputData(DeepNeuralNetwork dnn, LayerCalculator calculator) {
+	public DeepTrainingInputData(DeepNeuralNetwork<?> dnn, LayerCalculator calculator) {
 	    super();
 	    this.dnn = dnn;
 	    this.calculator = calculator;
@@ -118,7 +118,7 @@ public class GreedyLayerDNNTrainer extends Trainer<DeepNeuralNetwork> {
 
 	public OneStepTrainer<?> currentTrainer;
 
-	public MiniBatchFromLayerFinished(GreedyLayerDNNTrainer source, TrainingInputData input, OneStepTrainer<?> currentTrainer) {
+	public MiniBatchFromLayerFinished(GreedyLayerDNNTrainer<?> source, TrainingInputData input, OneStepTrainer<?> currentTrainer) {
 	    super(source, input);
 	    this.currentTrainer = currentTrainer;
 	}

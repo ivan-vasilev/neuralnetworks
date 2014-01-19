@@ -31,14 +31,7 @@ public class BackPropagationAutoencoder extends BackPropagationTrainer<Autoencod
 	    autoencoderTrainingInputData = new AutoencoderTrainingInputData();
 	}
 	autoencoderTrainingInputData.setBaseInput(data);
-
-	Autoencoder nn = getNeuralNetwork();
-	boolean useHiddenLayerAsOutput = nn.getUseHiddenLayerAsOutput();
-	nn.setUseHiddenLayerAsOutput(false);
-
 	super.learnInput(autoencoderTrainingInputData);
-
-	nn.setUseHiddenLayerAsOutput(useHiddenLayerAsOutput);
     }
     
     public InputCorruptor getInputCorruptor() {
