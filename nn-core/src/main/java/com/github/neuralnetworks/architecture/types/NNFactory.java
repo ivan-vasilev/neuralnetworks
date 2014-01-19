@@ -2,6 +2,8 @@ package com.github.neuralnetworks.architecture.types;
 
 import com.github.neuralnetworks.architecture.BiasLayer;
 import com.github.neuralnetworks.architecture.Layer;
+import com.github.neuralnetworks.architecture.NeuralNetwork;
+import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.calculation.LayerCalculatorImpl;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiReLU;
@@ -11,7 +13,6 @@ import com.github.neuralnetworks.calculation.neuronfunctions.AparapiStochasticBi
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiTanh;
 import com.github.neuralnetworks.calculation.neuronfunctions.ConstantConnectionCalculator;
 import com.github.neuralnetworks.training.random.AparapiXORShiftInitializer;
-import com.github.neuralnetworks.util.Util;
 
 /**
  * Factory class for neural networks
@@ -31,33 +32,13 @@ public class NNFactory {
 	return result;
     }
 
-    public static MultiLayerPerceptron mlpSigmoid(int[] layers, boolean addBias) {
-	MultiLayerPerceptron result = mlp(layers, addBias);
-
+    public static void nnSigmoid(NeuralNetworkImpl nn, ConnectionCalculator outputCC) {
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
-	result.setLayerCalculator(lc);
-	for (Layer l : result.getLayers()) {
+	nn.setLayerCalculator(lc);
+	for (Layer l : nn.getLayers()) {
 	    if (!(l instanceof BiasLayer)) {
-		if (l != result.getInputLayer()) {
-		    lc.addConnectionCalculator(l, new AparapiSigmoid());
-		}
-	    } else {
-		lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
-	    }
-	}
-
-	return result;
-    }
-    
-    public static MultiLayerPerceptron mlpSigmoid(int[] layers, boolean addBias, ConnectionCalculator outputCC) {
-	MultiLayerPerceptron result = mlp(layers, addBias);
-	
-	LayerCalculatorImpl lc = new LayerCalculatorImpl();
-	result.setLayerCalculator(lc);
-	for (Layer l : result.getLayers()) {
-	    if (!(l instanceof BiasLayer)) {
-		if (l != result.getInputLayer()) {
-		    if (outputCC != null && result.getOutputLayer() == l) {
+		if (l != nn.getInputLayer()) {
+		    if (outputCC != null && nn.getOutputLayer() == l) {
 			lc.addConnectionCalculator(l, outputCC);
 		    } else {
 			lc.addConnectionCalculator(l, new AparapiSigmoid());
@@ -67,19 +48,15 @@ public class NNFactory {
 		lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
 	    }
 	}
-	
-	return result;
     }
 
-    public static MultiLayerPerceptron mlpSoftRelu(int[] layers, boolean addBias, ConnectionCalculator outputCC) {
-	MultiLayerPerceptron result = mlp(layers, addBias);
-
+    public static void nnSoftRelu(NeuralNetworkImpl nn, ConnectionCalculator outputCC) {
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
-	result.setLayerCalculator(lc);
-	for (Layer l : result.getLayers()) {
+	nn.setLayerCalculator(lc);
+	for (Layer l : nn.getLayers()) {
 	    if (!(l instanceof BiasLayer)) {
-		if (l != result.getInputLayer()) {
-		    if (outputCC != null && result.getOutputLayer() == l) {
+		if (l != nn.getInputLayer()) {
+		    if (outputCC != null && nn.getOutputLayer() == l) {
 			lc.addConnectionCalculator(l, outputCC);
 		    } else {
 			lc.addConnectionCalculator(l, new AparapiSoftReLU());
@@ -89,19 +66,15 @@ public class NNFactory {
 		lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
 	    }
 	}
-
-	return result;
     }
-
-    public static MultiLayerPerceptron mlpRelu(int[] layers, boolean addBias, ConnectionCalculator outputCC) {
-	MultiLayerPerceptron result = mlp(layers, addBias);
-	
+    
+    public static void nnRelu(NeuralNetworkImpl nn, ConnectionCalculator outputCC) {
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
-	result.setLayerCalculator(lc);
-	for (Layer l : result.getLayers()) {
+	nn.setLayerCalculator(lc);
+	for (Layer l : nn.getLayers()) {
 	    if (!(l instanceof BiasLayer)) {
-		if (l != result.getInputLayer()) {
-		    if (outputCC != null && result.getOutputLayer() == l) {
+		if (l != nn.getInputLayer()) {
+		    if (outputCC != null && nn.getOutputLayer() == l) {
 			lc.addConnectionCalculator(l, outputCC);
 		    } else {
 			lc.addConnectionCalculator(l, new AparapiReLU());
@@ -111,19 +84,15 @@ public class NNFactory {
 		lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
 	    }
 	}
-	
-	return result;
     }
-
-    public static MultiLayerPerceptron mlpTanh(int[] layers, boolean addBias, ConnectionCalculator outputCC) {
-	MultiLayerPerceptron result = mlp(layers, addBias);
-
+    
+    public static void nnTanh(NeuralNetworkImpl nn, ConnectionCalculator outputCC) {
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
-	result.setLayerCalculator(lc);
-	for (Layer l : result.getLayers()) {
+	nn.setLayerCalculator(lc);
+	for (Layer l : nn.getLayers()) {
 	    if (!(l instanceof BiasLayer)) {
-		if (l != result.getInputLayer()) {
-		    if (outputCC != null && result.getOutputLayer() == l) {
+		if (l != nn.getInputLayer()) {
+		    if (outputCC != null && nn.getOutputLayer() == l) {
 			lc.addConnectionCalculator(l, outputCC);
 		    } else {
 			lc.addConnectionCalculator(l, new AparapiTanh());
@@ -133,166 +102,164 @@ public class NNFactory {
 		lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
 	    }
 	}
+    }
 
+    public static MultiLayerPerceptron mlpSigmoid(int[] layers, boolean addBias) {
+	MultiLayerPerceptron result = mlp(layers, addBias);
+	nnSigmoid(result, null);
 	return result;
     }
 
+    public static MultiLayerPerceptron mlpSoftRelu(int[] layers, boolean addBias, ConnectionCalculator outputCC) {
+	MultiLayerPerceptron result = mlp(layers, addBias);
+	nnSoftRelu(result, outputCC);
+	return result;
+    }
+
+    public static MultiLayerPerceptron mlpRelu(int[] layers, boolean addBias, ConnectionCalculator outputCC) {
+	MultiLayerPerceptron result = mlp(layers, addBias);
+	nnRelu(result, outputCC);
+	return result;
+    }
+
+    public static MultiLayerPerceptron mlpTanh(int[] layers, boolean addBias, ConnectionCalculator outputCC) {
+	MultiLayerPerceptron result = mlp(layers, addBias);
+	nnTanh(result, outputCC);
+	return result;
+    }
+
+    public static Autoencoder autoencoder(int visibleCount, int hiddenCount, boolean addBias) {
+	return new Autoencoder(new Layer(visibleCount), new Layer(hiddenCount), new Layer(visibleCount), addBias);
+    }
+
     public static Autoencoder autoencoderSigmoid(int visibleCount, int hiddenCount, boolean addBias) {
-	Layer visible = new Layer(visibleCount);
-	Layer hidden = new Layer(hiddenCount);
-	Layer output = new Layer(visibleCount);
-	Autoencoder ae = new Autoencoder(visible, hidden, output, addBias);
-
-	LayerCalculatorImpl lc = new LayerCalculatorImpl();
-	ae.setLayerCalculator(lc);
-	lc.addConnectionCalculator(hidden, new AparapiSigmoid());
-	lc.addConnectionCalculator(output, new AparapiSigmoid());
-
+	Autoencoder ae = autoencoder(visibleCount, hiddenCount, addBias);
+	nnSigmoid(ae, null);
 	return ae;
     }
 
-    public static Autoencoder autoencoderSoftReLU(int visibleCount, int hiddenCount, boolean addBias) {
-	Layer visible = new Layer(visibleCount);
-	Layer hidden = new Layer(hiddenCount);
-	Layer output = new Layer(visibleCount);
-	Autoencoder ae = new Autoencoder(visible, hidden, output, addBias);
-
-	LayerCalculatorImpl lc = new LayerCalculatorImpl();
-	ae.setLayerCalculator(lc);
-	lc.addConnectionCalculator(hidden, new AparapiSoftReLU());
-	lc.addConnectionCalculator(output, new AparapiSoftReLU());
-	if (addBias) {
-	    Util.populateBiasLayers(lc, ae);
-	}
-
+    public static Autoencoder autoencoderSoftReLU(int visibleCount, int hiddenCount, boolean addBias, ConnectionCalculator outputCC) {
+	Autoencoder ae = autoencoder(visibleCount, hiddenCount, addBias);
+	nnSoftRelu(ae, outputCC);
 	return ae;
     }
     
-    public static Autoencoder autoencoderReLU(int visibleCount, int hiddenCount, boolean addBias) {
-	Layer visible = new Layer(visibleCount);
-	Layer hidden = new Layer(hiddenCount);
-	Layer output = new Layer(visibleCount);
-	Autoencoder ae = new Autoencoder(visible, hidden, output, addBias);
-	
-	LayerCalculatorImpl lc = new LayerCalculatorImpl();
-	ae.setLayerCalculator(lc);
-	lc.addConnectionCalculator(hidden, new AparapiReLU());
-	lc.addConnectionCalculator(output, new AparapiReLU());
-	if (addBias) {
-	    Util.populateBiasLayers(lc, ae);
-	}
-	
+    public static Autoencoder autoencoderReLU(int visibleCount, int hiddenCount, boolean addBias, ConnectionCalculator outputCC) {
+	Autoencoder ae = autoencoder(visibleCount, hiddenCount, addBias);
+	nnRelu(ae, outputCC);
 	return ae;
     }
 
-    public static Autoencoder autoencoderTanh(int visibleCount, int hiddenCount, boolean addBias) {
-	Layer visible = new Layer(visibleCount);
-	Layer hidden = new Layer(hiddenCount);
-	Layer output = new Layer(visibleCount);
-	Autoencoder ae = new Autoencoder(visible, hidden, output, addBias);
-
-	LayerCalculatorImpl lc = new LayerCalculatorImpl();
-	ae.setLayerCalculator(lc);
-	lc.addConnectionCalculator(hidden, new AparapiTanh());
-	lc.addConnectionCalculator(output, new AparapiTanh());
-	if (addBias) {
-	    Util.populateBiasLayers(lc, ae);
-	}
-
+    public static Autoencoder autoencoderTanh(int visibleCount, int hiddenCount, boolean addBias, ConnectionCalculator outputCC) {
+	Autoencoder ae = autoencoder(visibleCount, hiddenCount, addBias);
+	nnTanh(ae, outputCC);
 	return ae;
+    }
+
+    public static RBM rbm(int visibleCount, int hiddenCount, boolean addBias) {
+	return new RBM(new Layer(visibleCount), new Layer(hiddenCount), addBias, addBias);
     }
 
     public static RBM rbmSigmoidSigmoid(int visibleCount, int hiddenCount, boolean addBias) {
-	RBM rbm = new RBM(new Layer(visibleCount), new Layer(hiddenCount), addBias, addBias);
+	RBM rbm = rbm(visibleCount, hiddenCount, addBias);
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	rbm.setLayerCalculator(lc);
 	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiSigmoid());
 	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiSigmoid());
 	if (addBias) {
-	    Util.populateBiasLayers(lc, rbm);
+	    populateBiasLayers(lc, rbm);
 	}
 
 	return rbm;
     }
 
     public static RBM rbmSoftReluSoftRelu(int visibleCount, int hiddenCount, boolean addBias) {
-	RBM rbm = new RBM(new Layer(visibleCount), new Layer(hiddenCount), addBias, addBias);
+	RBM rbm = rbm(visibleCount, hiddenCount, addBias);
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	rbm.setLayerCalculator(lc);
 	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiSoftReLU());
 	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiSoftReLU());
 	if (addBias) {
-	    Util.populateBiasLayers(lc, rbm);
+	    populateBiasLayers(lc, rbm);
 	}
 
 	return rbm;
     }
     
     public static RBM rbmReluRelu(int visibleCount, int hiddenCount, boolean addBias) {
-	RBM rbm = new RBM(new Layer(visibleCount), new Layer(hiddenCount), addBias, addBias);
+	RBM rbm = rbm(visibleCount, hiddenCount, addBias);
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	rbm.setLayerCalculator(lc);
 	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiReLU());
 	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiReLU());
 	if (addBias) {
-	    Util.populateBiasLayers(lc, rbm);
+	    populateBiasLayers(lc, rbm);
 	}
 	
 	return rbm;
     }
 
     public static RBM rbmTanhTanh(int visibleCount, int hiddenCount, boolean addBias) {
-	RBM rbm = new RBM(new Layer(visibleCount), new Layer(hiddenCount), addBias, addBias);
+	RBM rbm = rbm(visibleCount, hiddenCount, addBias);
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	rbm.setLayerCalculator(lc);
 	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiTanh());
 	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiTanh());
 	if (addBias) {
-	    Util.populateBiasLayers(lc, rbm);
+	    populateBiasLayers(lc, rbm);
 	}
 
 	return rbm;
     }
 
     public static RBM rbmSigmoidBinary(int visibleCount, int hiddenCount, boolean addBias) {
-	RBM rbm = new RBM(new Layer(visibleCount), new Layer(hiddenCount), addBias, addBias);
+	RBM rbm = rbm(visibleCount, hiddenCount, addBias);
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	rbm.setLayerCalculator(lc);
 	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiSigmoid());
 	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiStochasticBinary(new AparapiXORShiftInitializer()));
 	if (addBias) {
-	    Util.populateBiasLayers(lc, rbm);
+	    populateBiasLayers(lc, rbm);
 	}
 
 	return rbm;
     }
 
     public static RBM rbmSoftReluBinary(int visibleCount, int hiddenCount, boolean addBias) {
-	RBM rbm = new RBM(new Layer(visibleCount), new Layer(hiddenCount), addBias, addBias);
+	RBM rbm = rbm(visibleCount, hiddenCount, addBias);
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	rbm.setLayerCalculator(lc);
 	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiSoftReLU());
 	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiStochasticBinary(new AparapiXORShiftInitializer()));
+	if (addBias) {
+	    populateBiasLayers(lc, rbm);
+	}
 
 	return rbm;
     }
     
     public static RBM rbmReluBinary(int visibleCount, int hiddenCount, boolean addBias) {
-	RBM rbm = new RBM(new Layer(visibleCount), new Layer(hiddenCount), addBias, addBias);
+	RBM rbm = rbm(visibleCount, hiddenCount, addBias);
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	rbm.setLayerCalculator(lc);
 	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiReLU());
 	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiStochasticBinary(new AparapiXORShiftInitializer()));
-	
+	if (addBias) {
+	    populateBiasLayers(lc, rbm);
+	}
+
 	return rbm;
     }
 
     public static RBM rbmTanhBinary(int visibleCount, int hiddenCount, boolean addBias) {
-	RBM rbm = new RBM(new Layer(visibleCount), new Layer(hiddenCount), addBias, addBias);
+	RBM rbm = rbm(visibleCount, hiddenCount, addBias);
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	rbm.setLayerCalculator(lc);
 	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiTanh());
 	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiStochasticBinary(new AparapiXORShiftInitializer()));
+	if (addBias) {
+	    populateBiasLayers(lc, rbm);
+	}
 
 	return rbm;
     }
@@ -312,71 +279,25 @@ public class NNFactory {
 
     public static DBN dbnSigmoid(int[] layers, boolean addBias) {
 	DBN result = dbn(layers, addBias);
-
-	LayerCalculatorImpl lc = new LayerCalculatorImpl();
-	result.setLayerCalculator(lc);
-	for (Layer l : result.getLayers()) {
-	    if (!(l instanceof BiasLayer) && l != result.getInputLayer()) {
-		lc.addConnectionCalculator(l, new AparapiSigmoid());
-	    } else {
-		lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
-	    }
-	}
-
+	nnSigmoid(result, null);
 	return result;
     }
     
     public static DBN dbnSoftReLU(int[] layers, boolean addBias) {
 	DBN result = dbn(layers, addBias);
-
-	LayerCalculatorImpl lc = new LayerCalculatorImpl();
-	result.setLayerCalculator(lc);
-	for (Layer l : result.getLayers()) {
-	    if (!(l instanceof BiasLayer)) {
-		if (l != result.getInputLayer()) {
-		    lc.addConnectionCalculator(l, new AparapiSoftReLU());
-		}
-	    } else {
-		lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
-	    }
-	}
-
+	nnSoftRelu(result, null);
 	return result;
     }
     
     public static DBN dbnReLU(int[] layers, boolean addBias) {
 	DBN result = dbn(layers, addBias);
-	
-	LayerCalculatorImpl lc = new LayerCalculatorImpl();
-	result.setLayerCalculator(lc);
-	for (Layer l : result.getLayers()) {
-	    if (!(l instanceof BiasLayer)) {
-		if (l != result.getInputLayer()) {
-		    lc.addConnectionCalculator(l, new AparapiReLU());
-		}
-	    } else {
-		lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
-	    }
-	}
-	
+	nnRelu(result, null);
 	return result;
     }
 
     public static DBN dbnTanh(int[] layers, boolean addBias) {
 	DBN result = dbn(layers, addBias);
-
-	LayerCalculatorImpl lc = new LayerCalculatorImpl();
-	result.setLayerCalculator(lc);
-	for (Layer l : result.getLayers()) {
-	    if (!(l instanceof BiasLayer)) {
-		if (l != result.getInputLayer()) {
-		    lc.addConnectionCalculator(l, new AparapiTanh());
-		}
-	    } else {
-		lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
-	    }
-	}
-
+	nnTanh(result, null);
 	return result;
     }
     public static StackedAutoencoder sae(int[] layers, boolean addBias) {
@@ -394,73 +315,31 @@ public class NNFactory {
 
     public static StackedAutoencoder saeSigmoid(int[] layers, boolean addBias) {
 	StackedAutoencoder sae = sae(layers, addBias);
-
-	LayerCalculatorImpl lc = new LayerCalculatorImpl();
-	sae.setLayerCalculator(lc);
-	for (Layer l : sae.getLayers()) {
-	    if (!(l instanceof BiasLayer)) {
-		if (l != sae.getInputLayer()) {
-		    lc.addConnectionCalculator(l, new AparapiSigmoid());
-		}
-	    } else {
-		lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
-	    }
-	}
-
+	nnSigmoid(sae, null);
 	return sae;
     }
 
     public static StackedAutoencoder saeSoftReLU(int[] layers, int hiddenCount, boolean addBias) {
 	StackedAutoencoder sae = sae(layers, addBias);
-
-	LayerCalculatorImpl lc = new LayerCalculatorImpl();
-	sae.setLayerCalculator(lc);
-	for (Layer l : sae.getLayers()) {
-	    if (!(l instanceof BiasLayer)) {
-		if (l != sae.getInputLayer()) {
-		    lc.addConnectionCalculator(l, new AparapiSoftReLU());
-		}
-	    } else {
-		lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
-	    }
-	}
-
+	nnSoftRelu(sae, null);
 	return sae;
     }
-    
+
     public static StackedAutoencoder saeReLU(int[] layers, int hiddenCount, boolean addBias) {
 	StackedAutoencoder sae = sae(layers, addBias);
-	
-	LayerCalculatorImpl lc = new LayerCalculatorImpl();
-	sae.setLayerCalculator(lc);
-	for (Layer l : sae.getLayers()) {
-	    if (!(l instanceof BiasLayer)) {
-		if (l != sae.getInputLayer()) {
-		    lc.addConnectionCalculator(l, new AparapiReLU());
-		}
-	    } else {
-		lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
-	    }
-	}
-	
+	nnRelu(sae, null);
 	return sae;
     }
-    
+
     public static StackedAutoencoder saeTanh(int[] layers, int hiddenCount, boolean addBias) {
 	StackedAutoencoder sae = sae(layers, addBias);
-
-	LayerCalculatorImpl lc = new LayerCalculatorImpl();
-	sae.setLayerCalculator(lc);
-	for (Layer l : sae.getLayers()) {
-	    if (!(l instanceof BiasLayer)) {
-		if (l != sae.getInputLayer()) {
-		    lc.addConnectionCalculator(l, new AparapiTanh());
-		}
-	    } else {
-		lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
-	    }
-	}
-
+	nnTanh(sae, null);
 	return sae;
+    }
+
+    public static void populateBiasLayers(LayerCalculatorImpl lc, NeuralNetwork nn) {
+	for (Layer l : nn.getLayers()) {
+	    lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
+	}
     }
 }
