@@ -42,7 +42,7 @@ public class RBM extends NeuralNetworkImpl {
 	if (addVisibleBias) {
 	    Layer visibleBiasLayer = new BiasLayer();
 	    addLayer(visibleBiasLayer);
-	    visibleBiasConnections = new FullyConnected(visibleLayer, visibleBiasLayer);
+	    visibleBiasConnections = new FullyConnected(visibleBiasLayer, visibleLayer);
 	}
 
 	if (addHiddenBias) {

@@ -260,6 +260,7 @@ public class NNFactory {
 	nnTanh(result, null);
 	return result;
     }
+
     public static StackedAutoencoder sae(int[] layers, boolean addBias) {
 	if (layers == null || layers.length <= 1) {
 	    throw new IllegalArgumentException("more than one layer is required");

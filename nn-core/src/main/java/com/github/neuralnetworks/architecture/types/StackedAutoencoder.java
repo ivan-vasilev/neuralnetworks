@@ -36,8 +36,8 @@ public class StackedAutoencoder extends DNN<Autoencoder> {
 	layers.add(nn.getHiddenLayer());
 	layers.add(nn.getInputLayer());
 
-	if (nn.getHiddenLayer() != null) {
-	    layers.add(nn.getHiddenLayer());
+	if (nn.getHiddenBiasLayer() != null) {
+	    layers.add(nn.getHiddenBiasLayer());
 	}
 
 	return layers;

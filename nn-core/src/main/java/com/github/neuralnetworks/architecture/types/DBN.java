@@ -1,9 +1,10 @@
 package com.github.neuralnetworks.architecture.types;
 
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.List;
 
 import com.github.neuralnetworks.architecture.Layer;
+import com.github.neuralnetworks.util.UniqueList;
 
 /**
  * Deep Belief Network
@@ -23,7 +24,7 @@ public class DBN extends DNN<RBM> {
     public DBN addLevel(Layer layer, boolean addBias) {
 	Layer currentOutputLayer = getOutputLayer();
 	if (currentOutputLayer != null) {
-	    addNeuralNetwork(new RBM(currentOutputLayer, layer, false, addBias));
+	    addNeuralNetwork(new RBM(currentOutputLayer, layer, addBias, addBias));
 	} else {
 	    addLayer(layer);
 	}
@@ -33,14 +34,9 @@ public class DBN extends DNN<RBM> {
 
     @Override
     protected Collection<Layer> getRelevantLayers(RBM nn) {
-	Collection<Layer> result = null;
-	if (getNeuralNetworks().size() == 0 && nn.getVisibleBiasConnections() != null) {
-	    result = new HashSet<Layer>();
-	    result.addAll(nn.getLayers());
-	    result.remove(nn.getVisibleBiasConnections().getInputLayer());
-	} else {
-	    result = nn.getLayers();
-	}
+	List<Layer> result = new UniqueList<Layer>();
+	result.addAll(nn.getLayers());
+	result.remove(nn.getVisibleBiasConnections().getInputLayer());
 
 	return result;
     }
