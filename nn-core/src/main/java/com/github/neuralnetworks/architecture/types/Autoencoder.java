@@ -2,15 +2,13 @@ package com.github.neuralnetworks.architecture.types;
 
 import com.github.neuralnetworks.architecture.BiasLayer;
 import com.github.neuralnetworks.architecture.Connections;
-import com.github.neuralnetworks.architecture.FullyConnected;
 import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.util.Util;
 
 /**
  * Autoencoder
  */
-public class Autoencoder extends NeuralNetworkImpl {
+public class Autoencoder extends MultiLayerPerceptron {
 
     private Layer hiddenLayer;
 
@@ -19,23 +17,8 @@ public class Autoencoder extends NeuralNetworkImpl {
 
 	// layers are added
 	addLayer(inputLayer);
-	addLayer(hiddenLayer);
-	addLayer(outputLayer);
-
-	// connections are created
-	new FullyConnected(inputLayer, outputLayer);
-	new FullyConnected(inputLayer, outputLayer);
-
-	// biases are added
-	if (addBias) {
-	    Layer hiddenBiasLayer = new BiasLayer();
-	    addLayer(hiddenBiasLayer);
-	    new FullyConnected(hiddenBiasLayer, hiddenLayer);
-
-	    Layer outputBiasLayer = new BiasLayer();
-	    addLayer(outputBiasLayer);
-	    new FullyConnected(outputBiasLayer, outputLayer);
-	}
+	addLayer(hiddenLayer, addBias);
+	addLayer(outputLayer, addBias);
     }
 
     public BiasLayer getHiddenBiasLayer() {

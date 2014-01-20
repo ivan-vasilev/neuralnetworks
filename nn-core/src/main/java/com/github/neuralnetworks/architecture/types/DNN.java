@@ -7,14 +7,13 @@ import com.github.neuralnetworks.architecture.BiasLayer;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
-import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.util.UniqueList;
 import com.github.neuralnetworks.util.Util;
 
 /**
  * Default implementation of the DeepNeuralNetwork interface
  */
-public abstract class DNN<N extends NeuralNetwork> extends NeuralNetworkImpl {
+public abstract class DNN<N extends NeuralNetwork> extends MultiLayerPerceptron {
 
     /**
      * List of networks in the network
@@ -64,7 +63,7 @@ public abstract class DNN<N extends NeuralNetwork> extends NeuralNetworkImpl {
 	return output;
     }
 
-    public NeuralNetwork getFirstNeuralNetwork() {
+    public N getFirstNeuralNetwork() {
 	if (neuralNetworks != null && neuralNetworks.size() > 0) {
 	    return neuralNetworks.get(0);
 	}
@@ -72,7 +71,7 @@ public abstract class DNN<N extends NeuralNetwork> extends NeuralNetworkImpl {
 	return null;
     }
 
-    public NeuralNetwork getLastNeuralNetwork() {
+    public N getLastNeuralNetwork() {
 	if (neuralNetworks != null && neuralNetworks.size() > 0) {
 	    return neuralNetworks.get(neuralNetworks.size() - 1);
 	}

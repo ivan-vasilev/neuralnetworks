@@ -36,7 +36,9 @@ public class DBN extends DNN<RBM> {
     protected Collection<Layer> getRelevantLayers(RBM nn) {
 	List<Layer> result = new UniqueList<Layer>();
 	result.addAll(nn.getLayers());
-	result.remove(nn.getVisibleBiasConnections().getInputLayer());
+	if (nn.getVisibleBiasConnections() != null) {
+	    result.remove(nn.getVisibleBiasConnections().getInputLayer());
+	}
 
 	return result;
     }
