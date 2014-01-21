@@ -33,6 +33,8 @@ public class RBMLayerCalculator extends LayerCalculatorImpl {
      */
     @Override
     public void calculate(NeuralNetwork neuralNetwork, Layer layer, Set<Layer> calculatedLayers, Map<Layer, Matrix> results) {
+	this.results = results;
+
 	RBM rbm = (RBM) neuralNetwork;
 	Layer visibleLayer = rbm.getVisibleLayer();
 	Layer hiddenLayer = rbm.getHiddenLayer();
@@ -55,7 +57,6 @@ public class RBMLayerCalculator extends LayerCalculatorImpl {
 	calculatedLayers.clear();
 	calculatedLayers.add(hiddenLayer);
 
-	results.clear();
 	results.put(visibleLayer, visibleLayerResults);
 	results.put(hiddenLayer, hiddenLayerResults);
 
@@ -69,7 +70,6 @@ public class RBMLayerCalculator extends LayerCalculatorImpl {
 	calculatedLayers.clear();
 	calculatedLayers.add(visibleLayer);
 
-	results.clear();
 	results.put(visibleLayer, visibleLayerResults);
 	results.put(hiddenLayer, hiddenLayerResults);
 

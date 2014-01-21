@@ -3,7 +3,6 @@ package com.github.neuralnetworks.test;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
-import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.junit.Test;
@@ -11,13 +10,11 @@ import org.junit.Test;
 import com.github.neuralnetworks.architecture.BiasLayer;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.FullyConnected;
-import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.types.MultiLayerPerceptron;
 import com.github.neuralnetworks.architecture.types.NNFactory;
-import com.github.neuralnetworks.calculation.ConnectionCalculator;
-import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSum;
+import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSumConnectionCalculator;
 import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculatorFullyConnected;
 import com.github.neuralnetworks.training.TrainerFactory;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationTrainer;
@@ -75,15 +72,7 @@ public class FFNNTest {
 	bcg.set(0, 0, 0.1f);
 	bcg.set(1, 0, 0.2f);
 
-	ConnectionCalculatorFullyConnected aws = new ConnectionCalculatorFullyConnected() {
-
-	    private static final long serialVersionUID = 1L;
-
-	    @Override
-	    protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Integer> inputConnections, Layer targetLayer) {
-		return new AparapiWeightedSum(inputConnections, miniBatchSize, targetLayer);
-	    }
-	};
+	ConnectionCalculatorFullyConnected aws = new AparapiWeightedSumConnectionCalculator();
 
 	TreeMap<Connections, Matrix> map = new TreeMap<Connections, Matrix>();
 	map.put(c1, i1);
@@ -98,15 +87,7 @@ public class FFNNTest {
 
 	// with bias
 	map.put(bc, new Matrix(2, 2));
-	aws = new ConnectionCalculatorFullyConnected() {
-
-	    private static final long serialVersionUID = 1L;
-
-	    @Override
-	    protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Integer> inputConnections, Layer targetLayer) {
-		return new AparapiWeightedSum(inputConnections, miniBatchSize, targetLayer);
-	    }
-	};
+	aws = new AparapiWeightedSumConnectionCalculator();
 	// Environment.getInstance().setExecutionMode(EXECUTION_MODE.JTP);
 	aws.calculate(map, o, ol);
 
@@ -118,15 +99,7 @@ public class FFNNTest {
 
 	// combined layers
 	map.put(c2, i2);
-	aws = new ConnectionCalculatorFullyConnected() {
-
-	    private static final long serialVersionUID = 1L;
-
-	    @Override
-	    protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Integer> inputConnections, Layer targetLayer) {
-		return new AparapiWeightedSum(inputConnections, miniBatchSize, targetLayer);
-	    }
-	};
+	aws = new AparapiWeightedSumConnectionCalculator();
 	aws.calculate(map, o, ol);
 
 	assertEquals(28.1, o.get(0, 0), 0.01);
@@ -183,15 +156,7 @@ public class FFNNTest {
 	bcg.set(0, 0, 0.1f);
 	bcg.set(1, 0, 0.2f);
 
-	ConnectionCalculatorFullyConnected aws = new ConnectionCalculatorFullyConnected() {
-
-	    private static final long serialVersionUID = 1L;
-
-	    @Override
-	    protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Integer> inputConnections, Layer targetLayer) {
-		return new AparapiWeightedSum(inputConnections, miniBatchSize, targetLayer);
-	    }
-	};
+	ConnectionCalculatorFullyConnected aws = new AparapiWeightedSumConnectionCalculator();
 
 	TreeMap<Connections, Matrix> map = new TreeMap<Connections, Matrix>();
 	map.put(c1, i1);
@@ -206,15 +171,7 @@ public class FFNNTest {
 
 	// with bias
 	map.put(bc, new Matrix(2, 2));
-	aws = new ConnectionCalculatorFullyConnected() {
-
-	    private static final long serialVersionUID = 1L;
-
-	    @Override
-	    protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Integer> inputConnections, Layer targetLayer) {
-		return new AparapiWeightedSum(inputConnections, miniBatchSize, targetLayer);
-	    }
-	};
+	aws = new AparapiWeightedSumConnectionCalculator();
 	aws.calculate(map, o, ol);
 
 	assertEquals(14.1, o.get(0, 0), 0.01);
@@ -225,15 +182,7 @@ public class FFNNTest {
 
 	// combined layers
 	map.put(c2, i2);
-	aws = new ConnectionCalculatorFullyConnected() {
-
-	    private static final long serialVersionUID = 1L;
-
-	    @Override
-	    protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Integer> inputConnections, Layer targetLayer) {
-		return new AparapiWeightedSum(inputConnections, miniBatchSize, targetLayer);
-	    }
-	};
+	aws = new AparapiWeightedSumConnectionCalculator();
 	aws.calculate(map, o, ol);
 
 	assertEquals(28.1, o.get(0, 0), 0.01);

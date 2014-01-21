@@ -12,6 +12,7 @@ import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSigmoid;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSoftReLU;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiStochasticBinary;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiTanh;
+import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSumConnectionCalculator;
 import com.github.neuralnetworks.calculation.neuronfunctions.ConstantConnectionCalculator;
 import com.github.neuralnetworks.training.random.AparapiXORShiftInitializer;
 
@@ -159,6 +160,14 @@ public class NNFactory {
 
     public static RBM rbm(int visibleCount, int hiddenCount, boolean addBias) {
 	return new RBM(new Layer(visibleCount), new Layer(hiddenCount), addBias, addBias);
+    }
+    
+    public static void rbmWeightedSumWeightedSum(RBM rbm) {
+	RBMLayerCalculator lc = new RBMLayerCalculator();
+	rbm.setLayerCalculator(lc);
+	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiWeightedSumConnectionCalculator());
+	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiWeightedSumConnectionCalculator());
+	populateBiasLayers(lc, rbm);
     }
 
     public static void rbmSigmoidSigmoid(RBM rbm) {
