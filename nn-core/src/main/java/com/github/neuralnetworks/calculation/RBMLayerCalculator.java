@@ -18,7 +18,6 @@ public class RBMLayerCalculator extends LayerCalculatorImpl {
 
     private static final long serialVersionUID = -7524966192939615856L;
 
-    protected ConnectionCalculator connectionCalculator;
     protected Set<Layer> calculatedLayers;
     protected Map<Layer, Matrix> results;
 
@@ -50,16 +49,6 @@ public class RBMLayerCalculator extends LayerCalculatorImpl {
     }
 
     public void calculateVisibleLayer(RBM rbm, Matrix visibleLayerResults, Matrix hiddenLayerResults) {
-	this.calculateVisibleLayer(rbm, visibleLayerResults, hiddenLayerResults, null);
-    }
-
-    public void calculateHiddenLayer(RBM rbm, Matrix visibleLayerResults, Matrix hiddenLayerResults) {
-	this.calculateHiddenLayer(rbm, visibleLayerResults, hiddenLayerResults, null);
-    }
-
-    public void calculateVisibleLayer(RBM rbm, Matrix visibleLayerResults, Matrix hiddenLayerResults, ConnectionCalculator connectionCalculator) {
-	this.connectionCalculator = connectionCalculator;
-
 	Layer visibleLayer = rbm.getVisibleLayer();
 	Layer hiddenLayer = rbm.getHiddenLayer();
 
@@ -73,9 +62,7 @@ public class RBMLayerCalculator extends LayerCalculatorImpl {
 	super.calculate(rbm, visibleLayer, calculatedLayers, results);
     }
 
-    public void calculateHiddenLayer(RBM rbm, Matrix visibleLayerResults, Matrix hiddenLayerResults, ConnectionCalculator connectionCalculator) {
-	this.connectionCalculator = connectionCalculator;
-
+    public void calculateHiddenLayer(RBM rbm, Matrix visibleLayerResults, Matrix hiddenLayerResults) {
 	Layer visibleLayer = rbm.getVisibleLayer();
 	Layer hiddenLayer = rbm.getHiddenLayer();
 
@@ -87,10 +74,5 @@ public class RBMLayerCalculator extends LayerCalculatorImpl {
 	results.put(hiddenLayer, hiddenLayerResults);
 
 	super.calculate(rbm, hiddenLayer, calculatedLayers, results);
-    }
-
-    @Override
-    public ConnectionCalculator getConnectionCalculator(Layer layer) {
-	return connectionCalculator != null ? connectionCalculator : super.getConnectionCalculator(layer);
     }
 }

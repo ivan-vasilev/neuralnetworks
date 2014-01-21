@@ -6,6 +6,7 @@ import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.calculation.LayerCalculatorImpl;
+import com.github.neuralnetworks.calculation.RBMLayerCalculator;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiReLU;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSigmoid;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSoftReLU;
@@ -161,7 +162,7 @@ public class NNFactory {
     }
 
     public static void rbmSigmoidSigmoid(RBM rbm) {
-	LayerCalculatorImpl lc = new LayerCalculatorImpl();
+	RBMLayerCalculator lc = new RBMLayerCalculator();
 	rbm.setLayerCalculator(lc);
 	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiSigmoid());
 	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiSigmoid());
@@ -169,7 +170,7 @@ public class NNFactory {
     }
 
     public static void rbmSoftReluSoftRelu(RBM rbm) {
-	LayerCalculatorImpl lc = new LayerCalculatorImpl();
+	RBMLayerCalculator lc = new RBMLayerCalculator();
 	rbm.setLayerCalculator(lc);
 	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiSoftReLU());
 	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiSoftReLU());
@@ -177,7 +178,7 @@ public class NNFactory {
     }
     
     public static void rbmReluRelu(RBM rbm) {
-	LayerCalculatorImpl lc = new LayerCalculatorImpl();
+	RBMLayerCalculator lc = new RBMLayerCalculator();
 	rbm.setLayerCalculator(lc);
 	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiReLU());
 	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiReLU());
@@ -185,7 +186,7 @@ public class NNFactory {
     }
 
     public static void rbmTanhTanh(RBM rbm) {
-	LayerCalculatorImpl lc = new LayerCalculatorImpl();
+	RBMLayerCalculator lc = new RBMLayerCalculator();
 	rbm.setLayerCalculator(lc);
 	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiTanh());
 	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiTanh());
@@ -193,7 +194,7 @@ public class NNFactory {
     }
 
     public static void rbmSigmoidBinary(RBM rbm) {
-	LayerCalculatorImpl lc = new LayerCalculatorImpl();
+	RBMLayerCalculator lc = new RBMLayerCalculator();
 	rbm.setLayerCalculator(lc);
 	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiSigmoid());
 	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiStochasticBinary(new AparapiXORShiftInitializer()));
@@ -201,7 +202,7 @@ public class NNFactory {
     }
 
     public static void rbmSoftReluBinary(RBM rbm) {
-	LayerCalculatorImpl lc = new LayerCalculatorImpl();
+	RBMLayerCalculator lc = new RBMLayerCalculator();
 	rbm.setLayerCalculator(lc);
 	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiSoftReLU());
 	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiStochasticBinary(new AparapiXORShiftInitializer()));
@@ -209,7 +210,7 @@ public class NNFactory {
     }
     
     public static void rbmReluBinary(RBM rbm) {
-	LayerCalculatorImpl lc = new LayerCalculatorImpl();
+	RBMLayerCalculator lc = new RBMLayerCalculator();
 	rbm.setLayerCalculator(lc);
 	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiReLU());
 	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiStochasticBinary(new AparapiXORShiftInitializer()));
@@ -217,7 +218,7 @@ public class NNFactory {
     }
 
     public static void rbmTanhBinary(RBM rbm) {
-	LayerCalculatorImpl lc = new LayerCalculatorImpl();
+	RBMLayerCalculator lc = new RBMLayerCalculator();
 	rbm.setLayerCalculator(lc);
 	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiTanh());
 	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiStochasticBinary(new AparapiXORShiftInitializer()));
@@ -300,7 +301,9 @@ public class NNFactory {
 
     public static void populateBiasLayers(LayerCalculatorImpl lc, NeuralNetwork nn) {
 	for (Layer l : nn.getLayers()) {
-	    lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
+	    if (l instanceof BiasLayer) {
+		lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
+	    }
 	}
     }
 }
