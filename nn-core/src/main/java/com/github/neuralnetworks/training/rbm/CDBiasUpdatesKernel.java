@@ -28,12 +28,13 @@ public class CDBiasUpdatesKernel extends Kernel {
     private float[] negPhase;
     private float learningRate;
     private float momentum;
-    private int miniBatchSize;
+    private final int miniBatchSize;
 
-    public CDBiasUpdatesKernel(float[] hiddenBiasWeights) {
+    public CDBiasUpdatesKernel(float[] hiddenBiasWeights, int miniBatchSize) {
 	super();
 	this.biasWeights = hiddenBiasWeights;
 	this.biasUpdates = new float[hiddenBiasWeights.length];
+	this.miniBatchSize = miniBatchSize;
     }
 
     public CDBiasUpdatesKernel(float[] hiddenBiasWeights, float[] posPhase, float[] negPhase, float learningRate, float momentum, int miniBatchSize) {
@@ -113,9 +114,5 @@ public class CDBiasUpdatesKernel extends Kernel {
 
     public int getMiniBatchSize() {
         return miniBatchSize;
-    }
-
-    public void setMiniBatchSize(int miniBatchSize) {
-        this.miniBatchSize = miniBatchSize;
     }
 }

@@ -13,17 +13,18 @@ public class CDWeightUpdatesKernel extends Kernel {
     private float[] negPhaseVisible;
     private float[] weights;
     private float[] weightUpdates;
-    private int weightColumns;
+    private final int weightColumns;
+    private final int miniBatchSize;
     private float learningRate;
     private float momentum;
     private float weightDecay;
-    private int miniBatchSize;
 
-    public CDWeightUpdatesKernel(float[] weights, int weightColumns) {
+    public CDWeightUpdatesKernel(float[] weights, int weightColumns, int miniBatchSize) {
 	super();
 	this.weights = weights;
 	this.weightUpdates = new float[weights.length];
 	this.weightColumns = weightColumns;
+	this.miniBatchSize = miniBatchSize;
     }
 
     public CDWeightUpdatesKernel(float[] posPhaseVisible, float[] posPhaseHidden, float[] negPhaseVisible, float[] negPhaseHidden, float[] weights, int weightColumns, float learningRate, float momentum, float weightDecay, int miniBatchSize) {
@@ -44,17 +45,30 @@ public class CDWeightUpdatesKernel extends Kernel {
     @Override
     public void run() {
 	int id = getGlobalId();
-	int visibleId = (id % weightColumns) * miniBatchSize;
-	int hiddenId = (id / weightColumns) * miniBatchSize;
-	float weightUpdate = 0;
 	int mbs = miniBatchSize;
-	for (int i = 0; i < mbs; i++) {
-	    weightUpdate += posPhaseHidden[hiddenId + i] * posPhaseVisible[visibleId + i] - negPhaseHidden[hiddenId + i] * negPhaseVisible[visibleId + i];
-	}
+	int wc = weightColumns;
+	int s = getGlobalSize();
+	int hiddenId = id * mbs;
+	float lr = learningRate;
+	float wd = weightDecay;
+	float mm = momentum;
 
-	weightUpdate = learningRate * (weightUpdate / miniBatchSize - weightDecay * weights[id]) + momentum * weightUpdates[id];
-	weights[id] += weightUpdate;
-	weightUpdates[id] = weightUpdate;
+	int visibleId = 0, weightId = 0;
+	float weightUpdate = 0;
+
+	for (int i = 0; i < s; i++) {
+	    visibleId = i * mbs;
+	    weightUpdate = 0;
+
+	    for (int j = 0; j < mbs; j++) {
+		weightUpdate += posPhaseHidden[hiddenId + j] * posPhaseVisible[visibleId + j] - negPhaseHidden[hiddenId + j] * negPhaseVisible[visibleId + j];
+	    }
+
+	    weightId = id * wc + i;
+	    weightUpdate = lr * (weightUpdate / mbs - wd * weights[weightId]) + mm * weightUpdates[weightId];
+	    weights[weightId] += weightUpdate;
+	    weightUpdates[weightId] = weightUpdate;
+	}
     }
 
     public float[] getPosPhaseHidden() {
@@ -104,10 +118,6 @@ public class CDWeightUpdatesKernel extends Kernel {
         return weightColumns;
     }
 
-    public void setWeightColumns(int weightColumns) {
-        this.weightColumns = weightColumns;
-    }
-
     public float getLearningRate() {
         return learningRate;
     }
@@ -134,9 +144,5 @@ public class CDWeightUpdatesKernel extends Kernel {
 
     public int getMiniBatchSize() {
         return miniBatchSize;
-    }
-
-    public void setMiniBatchSize(int miniBatchSize) {
-        this.miniBatchSize = miniBatchSize;
     }
 }

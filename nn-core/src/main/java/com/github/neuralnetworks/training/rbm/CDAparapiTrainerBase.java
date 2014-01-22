@@ -43,6 +43,12 @@ public abstract class CDAparapiTrainerBase extends CDTrainerBase {
     protected void updateWeights(Matrix posPhaseVisible, Matrix posPhaseHidden, Matrix negPhaseVisible, Matrix negPhaseHidden) {
 	RBM rbm = getNeuralNetwork();
 
+	int mbs = posPhaseHidden.getColumns();
+
+	if (weightUpdatesKernel == null || weightUpdatesKernel.getMiniBatchSize() != mbs) {
+	    weightUpdatesKernel = new CDWeightUpdatesKernel(rbm.getMainConnections().getConnectionGraph().getElements(), rbm.getMainConnections().getConnectionGraph().getColumns(), mbs);
+	}
+
 	weightUpdatesKernel.setPosPhaseVisible(posPhaseVisible.getElements());
 	weightUpdatesKernel.setPosPhaseHidden(posPhaseHidden.getElements());
 	weightUpdatesKernel.setNegPhaseVisible(negPhaseVisible.getElements());
@@ -50,51 +56,42 @@ public abstract class CDAparapiTrainerBase extends CDTrainerBase {
 	weightUpdatesKernel.setLearningRate(getLearningRate());
 	weightUpdatesKernel.setMomentum(getMomentum());
 	weightUpdatesKernel.setWeightDecay(getWeightDecay());
-	weightUpdatesKernel.setMiniBatchSize(posPhaseVisible.getColumns());
-	Environment.getInstance().getExecutionStrategy().execute(weightUpdatesKernel, rbm.getMainConnections().getConnectionGraph().getElements().length);
+	Environment.getInstance().getExecutionStrategy().execute(weightUpdatesKernel, rbm.getMainConnections().getConnectionGraph().getRows());
 
 	// update visible bias
-	if (visibleBiasUpdatesKernel != null) {
+	if (rbm.getVisibleBiasConnections() != null) {
+	    if (visibleBiasUpdatesKernel == null || visibleBiasUpdatesKernel.getMiniBatchSize() != mbs) {
+		visibleBiasUpdatesKernel = new CDBiasUpdatesKernel(rbm.getVisibleBiasConnections().getConnectionGraph().getElements(), mbs);
+	    }
+
 	    visibleBiasUpdatesKernel.setPosPhase(posPhaseVisible.getElements());
 	    visibleBiasUpdatesKernel.setNegPhase(negPhaseVisible.getElements());
 	    visibleBiasUpdatesKernel.setLearningRate(getLearningRate());
 	    visibleBiasUpdatesKernel.setMomentum(getMomentum());
-	    visibleBiasUpdatesKernel.setMiniBatchSize(posPhaseVisible.getColumns());
 	    Environment.getInstance().getExecutionStrategy().execute(visibleBiasUpdatesKernel, rbm.getVisibleBiasConnections().getConnectionGraph().getElements().length);
 	}
 
 	// update hidden bias
-	if (hiddenBiasUpdatesKernel != null) {
+	if (rbm.getHiddenBiasConnections() != null) {
+	    if (hiddenBiasUpdatesKernel == null || hiddenBiasUpdatesKernel.getMiniBatchSize() != mbs) {
+		hiddenBiasUpdatesKernel = new CDBiasUpdatesKernel(rbm.getHiddenBiasConnections().getConnectionGraph().getElements(), mbs);
+	    }
+
 	    hiddenBiasUpdatesKernel.setPosPhase(posPhaseHidden.getElements());
 	    hiddenBiasUpdatesKernel.setNegPhase(negPhaseHidden.getElements());
 	    hiddenBiasUpdatesKernel.setLearningRate(getLearningRate());
 	    hiddenBiasUpdatesKernel.setMomentum(getMomentum());
-	    hiddenBiasUpdatesKernel.setMiniBatchSize(posPhaseHidden.getColumns());
 	    Environment.getInstance().getExecutionStrategy().execute(hiddenBiasUpdatesKernel, rbm.getHiddenBiasConnections().getConnectionGraph().getElements().length);
 	}
     }
 
     protected void init() {
-	RBM nn = getNeuralNetwork();
-
 	if (!properties.containsKey(Constants.HIDDEN_CONNECTION_CALCULATOR)) {
 	    properties.setParameter(Constants.HIDDEN_CONNECTION_CALCULATOR, new AparapiStochasticBinary(new AparapiXORShiftInitializer()));
 	}
 
 	if (!properties.containsKey(Constants.VISIBLE_CONNECTION_CALCULATOR)) {
 	    properties.setParameter(Constants.VISIBLE_CONNECTION_CALCULATOR, new AparapiSigmoid());
-	}
-
-	if (weightUpdatesKernel == null) {
-	    weightUpdatesKernel = new CDWeightUpdatesKernel(nn.getMainConnections().getConnectionGraph().getElements(), nn.getMainConnections().getConnectionGraph().getColumns());
-	}
-
-	if (visibleBiasUpdatesKernel == null && nn.getVisibleBiasConnections() != null) {
-	    visibleBiasUpdatesKernel = new CDBiasUpdatesKernel(nn.getVisibleBiasConnections().getConnectionGraph().getElements());
-	}
-
-	if (hiddenBiasUpdatesKernel == null && nn.getHiddenBiasConnections() != null) {
-	    hiddenBiasUpdatesKernel = new CDBiasUpdatesKernel(nn.getHiddenBiasConnections().getConnectionGraph().getElements());
 	}
     }
 
