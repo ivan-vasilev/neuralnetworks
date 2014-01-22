@@ -78,7 +78,7 @@ public class MultipleNeuronsOutputError implements OutputError {
 	    }
 	}
 
-	return tuples.size() > 0 ? (nullCount + totalNetworkError) / (tuples.size() + nullCount) : 0;
+	return (tuples.size() + nullCount) > 0 ? (nullCount + totalNetworkError) / (tuples.size() + nullCount) : 0;
     }
 
     private Map<Integer, Integer> outputToTarget() {
