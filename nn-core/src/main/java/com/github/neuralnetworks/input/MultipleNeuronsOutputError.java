@@ -1,16 +1,37 @@
 package com.github.neuralnetworks.input;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.calculation.OutputError;
 
 public class MultipleNeuronsOutputError implements OutputError {
 
-    private float totalNetworkError;
-    private int count;
+    private List<OutputTargetTuple> tuples;
+    private Map<Integer, Integer> outputToTarget;
+    private int nullCount;
+    private int dim;
+
+    public MultipleNeuronsOutputError() {
+	super();
+	this.tuples = new ArrayList<>();
+	this.dim = -1;
+    }
 
     @Override
     public void addItem(Matrix networkOutput, Matrix targetOutput) {
-	for (int i = 0; i < targetOutput.getColumns(); i++, count++) {
+	if (dim == -1) {
+	    dim = targetOutput.getRows();
+	}
+
+	if (networkOutput.getRows() != dim || targetOutput.getRows() != dim) {
+	    throw new IllegalArgumentException("Dimensions don't match");
+	}
+
+	for (int i = 0; i < targetOutput.getColumns(); i++) {
 	    boolean hasDifferentValues = false;
 	    for (int j = 0; j < networkOutput.getRows(); j++) {
 		if (networkOutput.get(j, i) != networkOutput.get(0, i)) {
@@ -20,28 +41,82 @@ public class MultipleNeuronsOutputError implements OutputError {
 	    }
 	    
 	    if (hasDifferentValues) {
-		int val = 0;
+		int targetPos = 0;
 		for (int j = 0; j < targetOutput.getRows(); j++) {
 		    if (targetOutput.get(j, i) == 1) {
-			val = j;
+			targetPos = j;
 			break;
 		    }
 		}
-		
+
+		int outputPos = 0;
+		float max = networkOutput.get(0, i);
 		for (int j = 0; j < networkOutput.getRows(); j++) {
-		    if (j != val && networkOutput.get(j, i) > networkOutput.get(val, i)) {
-			totalNetworkError++;
-			break;
+		    if (networkOutput.get(j, i) > max) {
+			max = networkOutput.get(j, i);
+			outputPos = j;
 		    }
 		}
+
+		tuples.add(new OutputTargetTuple(outputPos, targetPos));
 	    } else {
-		totalNetworkError++;
+		nullCount++;
 	    }
 	}
     }
 
     @Override
     public float getTotalNetworkError() {
-	return count > 0 ? totalNetworkError / count : 0;
+	if (outputToTarget == null) {
+	    outputToTarget = outputToTarget();
+	}
+
+	float totalNetworkError = 0;
+	for (OutputTargetTuple t : tuples) {
+	    if (!outputToTarget.get(t.outputPos).equals(t.targetPos)) {
+		totalNetworkError++;
+	    }
+	}
+
+	return tuples.size() > 0 ? (nullCount + totalNetworkError) / tuples.size() : 0;
+    }
+
+    private Map<Integer, Integer> outputToTarget() {
+	Map<Integer, Integer> result = new HashMap<>();
+	Map<Integer, int[]> targetToOutput = new HashMap<>();
+	for (OutputTargetTuple t : tuples) {
+	    if (!targetToOutput.containsKey(t.targetPos)) {
+		targetToOutput.put(t.targetPos, new int[dim]);
+	    }
+
+	    targetToOutput.get(t.targetPos)[t.outputPos]++;
+	}
+
+	for (int i = 0; i < dim; i++) {
+	    int[] d = targetToOutput.get(i);
+	    if (d != null) {
+		int max = 0;
+		for (int j = 0; j < dim; j++) {
+		    if (d[j] > d[max]) {
+			max = j;
+		    }
+		}
+
+		result.put(i, max);
+	    }
+	}
+
+	return result;
+    }
+
+    private static class OutputTargetTuple {
+
+	public OutputTargetTuple(Integer outputPos, Integer targetPos) {
+	    this.outputPos = outputPos;
+	    this.targetPos = targetPos;
+	}
+
+	public Integer outputPos;
+	public Integer targetPos;
     }
 }
