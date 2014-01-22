@@ -14,6 +14,18 @@ public class UniqueList<E> extends ArrayList<E> implements Set<E> {
 
     private static final long serialVersionUID = 2378661871806423556L;
 
+    public UniqueList() {
+	super();
+    }
+
+    public UniqueList(Collection<? extends E> arg0) {
+	super(arg0);
+    }
+
+    public UniqueList(int arg0) {
+	super(arg0);
+    }
+
     @Override
     public boolean add(E e) {
 	if (!contains(e)) {

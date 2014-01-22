@@ -52,11 +52,13 @@ public class CDBiasUpdatesKernel extends Kernel {
     public void run() {
 	int id = getGlobalId();
 	float weightUpdate = 0;
-	for (int i = 0; i < miniBatchSize; i++) {
-	    weightUpdate += posPhase[id * miniBatchSize + i] - negPhase[id * miniBatchSize + i];
+	int mbs = miniBatchSize;
+
+	for (int i = 0; i < mbs; i++) {
+	    weightUpdate += posPhase[id * mbs + i] - negPhase[id * mbs + i];
 	}
 
-	weightUpdate = learningRate * (weightUpdate / miniBatchSize) + momentum * biasUpdates[id];
+	weightUpdate = learningRate * (weightUpdate / mbs) + momentum * biasUpdates[id];
 	biasWeights[id] += weightUpdate;
 	biasUpdates[id] = weightUpdate;
     }

@@ -8,6 +8,10 @@ import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.architecture.types.RBM;
 import com.github.neuralnetworks.calculation.RBMLayerCalculator;
+import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSigmoid;
+import com.github.neuralnetworks.training.TrainerFactory;
+import com.github.neuralnetworks.training.rbm.PCDAparapiTrainer;
+import com.github.neuralnetworks.util.Constants;
 
 public class RBMTest {
 
@@ -104,5 +108,46 @@ public class RBMTest {
 
 	assertEquals(0.332, visible.get(0, 0), 0.001);
 	assertEquals(0.525, visible.get(1, 0), 0.001);
+    }
+
+    @Test
+    public void testContrastiveDivergence() {
+	RBM rbm = NNFactory.rbm(3, 2, true);
+
+	Matrix cg1 = rbm.getMainConnections().getConnectionGraph();
+	cg1.set(0, 0, 0.2f);
+	cg1.set(0, 1, 0.4f);
+	cg1.set(0, 2, -0.5f);
+	cg1.set(1, 0, -0.3f);
+	cg1.set(1, 1, 0.1f);
+	cg1.set(1, 2, 0.2f);
+
+	Matrix cgb1 = rbm.getVisibleBiasConnections().getConnectionGraph();
+	cgb1.set(0, 0, 0f);
+	cgb1.set(1, 0, 0f);
+	cgb1.set(2, 0, 0f);
+
+	Matrix cgb2 = rbm.getHiddenBiasConnections().getConnectionGraph();
+	cgb2.set(0, 0, -0.4f);
+	cgb2.set(1, 0, 0.2f);
+
+	PCDAparapiTrainer t = TrainerFactory.pcdTrainer(rbm, new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, null, 1), null, null, null, 1f, 0f, 0f, 1);
+	t.getProperties().setParameter(Constants.HIDDEN_CONNECTION_CALCULATOR, new AparapiSigmoid());
+	t.getProperties().setParameter(Constants.VISIBLE_CONNECTION_CALCULATOR, new AparapiSigmoid());
+	t.train();
+
+	assertEquals(0.2 + 0.13203661, cg1.get(0, 0), 0.00001);
+	assertEquals(0.4 - 0.22863509,  cg1.get(0, 1), 0.00001);
+	assertEquals(-0.5 + 0.12887852, cg1.get(0, 2), 0.00001);
+	assertEquals(-0.3 + 0.26158813, cg1.get(1, 0), 0.00001);
+	assertEquals(0.1 - 0.3014404,  cg1.get(1, 1), 0.00001);
+	assertEquals(0.2 + 0.25742438, cg1.get(1, 2), 0.00001);
+
+	assertEquals(0.52276707, cgb1.get(0, 0), 0.00001);
+	assertEquals(- 0.54617375, cgb1.get(1, 0), 0.00001);
+	assertEquals(0.51522285, cgb1.get(2, 0), 0.00001);
+
+	assertEquals(-0.4 - 0.08680013, cgb2.get(0, 0), 0.00001);
+	assertEquals(0.2 - 0.02693379, cgb2.get(1, 0), 0.00001);
     }
 }

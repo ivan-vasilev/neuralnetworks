@@ -52,10 +52,9 @@ public abstract class CDTrainerBase extends OneStepTrainer<RBM> {
 	posPhaseVisible = data.getInput();
 	if (miniBatchSize != posPhaseVisible.getColumns()) {
 	    miniBatchSize = posPhaseVisible.getColumns();
-
-	    this.negPhaseVisible = new Matrix(nn.getVisibleLayer().getNeuronCount(), miniBatchSize);
-	    this.posPhaseHidden = new Matrix(nn.getHiddenLayer().getNeuronCount(), miniBatchSize);
-	    this.negPhaseHidden = new Matrix(nn.getHiddenLayer().getNeuronCount(), miniBatchSize);
+	    negPhaseVisible = new Matrix(nn.getVisibleLayer().getNeuronCount(), miniBatchSize);
+	    posPhaseHidden = new Matrix(nn.getHiddenLayer().getNeuronCount(), miniBatchSize);
+	    negPhaseHidden = new Matrix(nn.getHiddenLayer().getNeuronCount(), miniBatchSize);
 	}
 
 	triggerEvent(new SamplingStepEvent(this, -1));
@@ -64,17 +63,17 @@ public abstract class CDTrainerBase extends OneStepTrainer<RBM> {
 
 	// calculate hidden layer positive phase
 	calculator.addConnectionCalculator(nn.getHiddenLayer(), getHiddenConnectionCalculator(0));
-	calculator.calculateHiddenLayer(getNeuralNetwork(), posPhaseVisible, posPhaseHidden);
+	calculator.calculateHiddenLayer(nn, posPhaseVisible, posPhaseHidden);
 
 	triggerEvent(new SamplingStepEvent(this, 0));
 
 	// Gibbs sampling
 	for (int i = 1; i <= getGibbsSamplingCount(); i++) {
 	    calculator.addConnectionCalculator(nn.getVisibleLayer(), getVisibleConnectionCalculator(i));
-	    calculator.calculateVisibleLayer(getNeuralNetwork(), negPhaseVisible, negPhaseHidden);
+	    calculator.calculateVisibleLayer(nn, negPhaseVisible, negPhaseHidden);
 
 	    calculator.addConnectionCalculator(nn.getHiddenLayer(), getHiddenConnectionCalculator(i));
-	    calculator.calculateHiddenLayer(getNeuralNetwork(), negPhaseVisible, negPhaseHidden);
+	    calculator.calculateHiddenLayer(nn, negPhaseVisible, negPhaseHidden);
 
 	    triggerEvent(new SamplingStepEvent(this, i));
 	}

@@ -47,7 +47,6 @@ public class CDWeightUpdatesKernel extends Kernel {
 	int id = getGlobalId();
 	int mbs = miniBatchSize;
 	int wc = weightColumns;
-	int s = getGlobalSize();
 	int hiddenId = id * mbs;
 	float lr = learningRate;
 	float wd = weightDecay;
@@ -56,7 +55,7 @@ public class CDWeightUpdatesKernel extends Kernel {
 	int visibleId = 0, weightId = 0;
 	float weightUpdate = 0;
 
-	for (int i = 0; i < s; i++) {
+	for (int i = 0; i < wc; i++) {
 	    visibleId = i * mbs;
 	    weightUpdate = 0;
 

@@ -21,6 +21,11 @@ public class NeuralNetworkImpl implements NeuralNetwork {
 	this.layers = new UniqueList<Layer>();
     }
 
+    public NeuralNetworkImpl(List<Layer> layers) {
+	super();
+	this.layers = new UniqueList<Layer>(layers);
+    }
+
     @Override
     public LayerCalculator getLayerCalculator() {
         return layerCalculator;
@@ -33,6 +38,10 @@ public class NeuralNetworkImpl implements NeuralNetwork {
     @Override
     public Set<Layer> getLayers() {
 	return layers;
+    }
+
+    public void setLayers(Set<Layer> layers) {
+        this.layers = layers;
     }
 
     /* (non-Javadoc)
