@@ -1,5 +1,6 @@
 package com.github.neuralnetworks.training.events;
 
+import com.github.neuralnetworks.calculation.OutputError;
 import com.github.neuralnetworks.events.TrainingEvent;
 import com.github.neuralnetworks.events.TrainingEventListener;
 import com.github.neuralnetworks.training.Trainer;
@@ -46,7 +47,8 @@ public class LogTrainingListener implements TrainingEventListener {
 	    sb.append((miniBatchTotalTime / (miniBatches * 1000f)) + " s  per minibatch of " + miniBatches + " mini batches" + s);
 	    if (event instanceof TestingFinishedEvent) {
 		Trainer<?> t = (Trainer<?>) event.getSource();
-		sb.append(t.getOutputError().getTotalNetworkError() + " (" + (t.getOutputError().getTotalNetworkError() * 100) + "%) error" + s);
+		OutputError oe = t.getOutputError();
+		sb.append(oe.getTotalErrorSamples() + "/" + oe.getTotalInputSize() + " samples (" + oe.getTotalNetworkError() + ", " + (oe.getTotalNetworkError() * 100) + "%) error" + s);
 	    }
 
 	    System.out.print(sb.toString());

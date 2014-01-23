@@ -8,4 +8,6 @@ import com.github.neuralnetworks.architecture.Matrix;
 public interface OutputError {
     public void addItem(Matrix networkOutput, Matrix targetOutput);
     public float getTotalNetworkError();
+    public int getTotalErrorSamples();
+    public int getTotalInputSize();
 }

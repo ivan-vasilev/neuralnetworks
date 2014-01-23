@@ -19,4 +19,14 @@ public class XorOutputError implements OutputError {
     public float getTotalNetworkError() {
 	return size > 0 ? networkError / size : 0;
     }
+
+    @Override
+    public int getTotalErrorSamples() {
+	return size;
+    }
+
+    @Override
+    public int getTotalInputSize() {
+	return size;
+    }
 }

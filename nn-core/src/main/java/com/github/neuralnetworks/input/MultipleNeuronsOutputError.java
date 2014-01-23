@@ -39,7 +39,7 @@ public class MultipleNeuronsOutputError implements OutputError {
 		    break;
 		}
 	    }
-	    
+
 	    if (hasDifferentValues) {
 		int targetPos = 0;
 		for (int j = 0; j < targetOutput.getRows(); j++) {
@@ -67,18 +67,28 @@ public class MultipleNeuronsOutputError implements OutputError {
 
     @Override
     public float getTotalNetworkError() {
+	return getTotalInputSize() > 0 ? ((float) getTotalErrorSamples()) / getTotalInputSize() : 0;
+    }
+
+    @Override
+    public int getTotalErrorSamples() {
 	if (outputToTarget == null) {
 	    outputToTarget = outputToTarget();
 	}
 
-	float totalNetworkError = 0;
+	int errorSamples = 0;
 	for (OutputTargetTuple t : tuples) {
 	    if (!outputToTarget.get(t.outputPos).equals(t.targetPos)) {
-		totalNetworkError++;
+		errorSamples++;
 	    }
 	}
 
-	return (tuples.size() + nullCount) > 0 ? (nullCount + totalNetworkError) / (tuples.size() + nullCount) : 0;
+	return nullCount + errorSamples;
+    }
+
+    @Override
+    public int getTotalInputSize() {
+	return tuples.size() + nullCount;
     }
 
     private Map<Integer, Integer> outputToTarget() {
