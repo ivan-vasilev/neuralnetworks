@@ -64,7 +64,7 @@ public class CDWeightUpdatesKernel extends Kernel {
 	    }
 
 	    weightId = id * wc + i;
-	    weightUpdate = lr * (weightUpdate / mbs - wd * weights[weightId]) + mm * weightUpdates[weightId];
+	    weightUpdate = lr * (weightUpdate /*/ mbs*/ - wd * weights[weightId]) + mm * weightUpdates[weightId];
 	    weights[weightId] += weightUpdate;
 	    weightUpdates[weightId] = weightUpdate;
 	}

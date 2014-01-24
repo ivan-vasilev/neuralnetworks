@@ -87,4 +87,4 @@ Contrastive Divergence and Deep training has been implemented following the guid
 http://www.iro.umontreal.ca/~lisa/publications2/index.php/publications/show/239 and http://www.cs.toronto.edu/~hinton/absps/guideTR.pdf.
 
 ###Input data
-Input is provided to the neural network by the trainers via TrainingInputProvider interface. Eeach TrainingInputProvider provides training examples in the form of TrainingInputData (default implementation is TrainingInputDataImpl). The input can be modified by a list of InputModifiers - for example MeanInputModifier (for subtracting the mean value) and ScalingInputModifier (scaling within a range). Currently MnistInputProvider is implemented.
+Input is provided to the neural network by the trainers via TrainingInputProvider interface. Eeach TrainingInputProvider provides training examples in the form of TrainingInputData (default implementation is TrainingInputDataImpl). The input can be modified by a list of InputModifiers - for example MeanInputModifier (for subtracting the mean value) and ScalingInputModifier (scaling within a range). Currently MnistInputProvider and IrisInputProvider are implemented.

@@ -33,10 +33,10 @@ public class LogTrainingListener implements TrainingEventListener {
 	    lastMiniBatchFinishTime = startTime = System.currentTimeMillis();
 
 	    if (event instanceof TrainingStartedEvent) {
-		System.out.println("TRAINING:");
+		System.out.println("TRAINING...");
 	    } else if (event instanceof TestingStartedEvent) {
 		System.out.println();
-		System.out.println("TESTING:");
+		System.out.println("TESTING...");
 	    }
 	} else if (event instanceof TrainingFinishedEvent || event instanceof TestingFinishedEvent) {
 	    finishTime = System.currentTimeMillis();

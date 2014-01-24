@@ -22,7 +22,6 @@ import com.github.neuralnetworks.training.random.RandomInitializer;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
 import com.github.neuralnetworks.util.UniqueList;
-import com.github.neuralnetworks.util.Util;
 
 /**
  * Base class for training (used for both supervised and unsupervised learning)
@@ -62,7 +61,7 @@ public abstract class Trainer<N extends NeuralNetwork> {
 	TrainingInputProvider ip = getTestingInputProvider();
 	OutputError e = getOutputError();
 	NeuralNetwork n = getNeuralNetwork();
-	LayerCalculator c = getLayerCalculator();
+	LayerCalculator c = n.getLayerCalculator() != null ? n.getLayerCalculator() : getLayerCalculator();
 
 	if (ip != null && e != null && n != null && c != null) {
 	    triggerEvent(new TestingStartedEvent(this));
@@ -77,11 +76,7 @@ public abstract class Trainer<N extends NeuralNetwork> {
 		results.put(n.getInputLayer(), input.getInput());
 		c.calculate(n, n.getOutputLayer(), calculatedLayers, results);
 		e.addItem(results.get(n.getOutputLayer()), input.getTarget());
-		
-		for (Matrix m : results.values()) {
-		    Util.fillArray(m.getElements(), 0);
-		}
-		
+
 		triggerEvent(new MiniBatchFinishedEvent(this, input));
 	    }
 	    
