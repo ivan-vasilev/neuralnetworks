@@ -107,7 +107,7 @@ public class MultipleNeuronsOutputError implements OutputError {
 	    if (d != null) {
 		int max = 0;
 		for (int j = 0; j < dim; j++) {
-		    if (d[j] > d[max] && !result.values().contains(max)) {
+		    if (d[j] > d[max] && !result.values().contains(j)) {
 			max = j;
 		    }
 		}

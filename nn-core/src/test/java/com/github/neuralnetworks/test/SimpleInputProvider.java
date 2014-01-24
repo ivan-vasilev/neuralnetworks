@@ -9,48 +9,30 @@ import com.github.neuralnetworks.training.TrainingInputProvider;
  */
 public class SimpleInputProvider implements TrainingInputProvider {
 
-    private Matrix input;
-    private Matrix target;
+    private float[][] input;
+    private float[][] target;
+    private SimpleTrainingInputData data;
     private int count;
+    private int miniBatchSize;
     private int current;
 
-    public SimpleInputProvider(float[][] input, float[][] target, int count) {
+    public SimpleInputProvider(float[][] input, float[][] target, int count, int miniBatchSize) {
 	super();
 
 	this.count = count;
+	this.miniBatchSize = miniBatchSize;
+
+	data = new SimpleTrainingInputData(null, null);
 
 	if (input != null) {
-	    this.input = new Matrix(input[0].length, input.length);
-	    
-	    for (int i = 0; i < input.length; i++) {
-		for (int j = 0; j < input[i].length; j++) {
-		    this.input.set(j, i, input[i][j]);
-		}
-	    }
+	    this.input  = input;
+	    data.setInput(new Matrix(input[0].length, miniBatchSize));
 	}
 
 	if (target != null) {
-	    this.target = new Matrix(target[0].length, target.length);
-
-	    for (int i = 0; i < target.length; i++) {
-		for (int j = 0; j < target[i].length; j++) {
-		    this.target.set(j, i, target[i][j]);
-		}
-	    }
+	    this.target = target;
+	    data.setTarget(new Matrix(target[0].length, miniBatchSize));
 	}
-    }
-
-    public SimpleInputProvider(Matrix input, int count) {
-	super();
-	this.input = input;
-	this.count = count;
-    }
-
-    public SimpleInputProvider(Matrix input, Matrix target, int count) {
-	super();
-	this.input = input;
-	this.target = target;
-	this.count = count;
     }
 
     @Override
@@ -65,11 +47,25 @@ public class SimpleInputProvider implements TrainingInputProvider {
 
     @Override
     public TrainingInputData getNextInput() {
-	if (current++ == count) {
-	    return null;
+	if (current < count) {
+	    for (int i = 0; i < miniBatchSize; i++, current++) {
+		if (input != null) {
+		    for (int j = 0; j < input[current % input.length].length; j++) {
+			data.getInput().set(j, i, input[current % input.length][j]);
+		    }
+		}
+
+		if (target != null) {
+		    for (int j = 0; j < target[current % target.length].length; j++) {
+			data.getTarget().set(j, i, target[current % target.length][j]);
+		    }
+		}
+	    }
+
+	    return data;
 	}
 
-	return new SimpleTrainingInputData(input, target);
+	return null;
     }
 
     private static class SimpleTrainingInputData implements TrainingInputData {
@@ -88,9 +84,17 @@ public class SimpleInputProvider implements TrainingInputProvider {
 	    return input;
 	}
 
+	public void setInput(Matrix input) {
+	    this.input = input;
+	}
+
 	@Override
 	public Matrix getTarget() {
 	    return target;
+	}
+
+	public void setTarget(Matrix target) {
+	    this.target = target;
 	}
     }
 }

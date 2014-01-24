@@ -31,7 +31,9 @@ public class DNNTest {
 
 	assertEquals(false, dbn.getLayers().contains(dbn.getFirstNeuralNetwork().getVisibleBiasConnections().getInputLayer()));
 	assertEquals(false, dbn.getLayers().contains(dbn.getLastNeuralNetwork().getVisibleBiasConnections().getInputLayer()));
-	
+
+	assertEquals(true, dbn.getFirstNeuralNetwork().getHiddenLayer() == dbn.getLastNeuralNetwork().getVisibleLayer());
+
 	assertEquals(true, dbn.getOutputLayer().equals(dbn.getLastNeuralNetwork().getHiddenLayer()));
     }
 
@@ -52,5 +54,7 @@ public class DNNTest {
 	assertEquals(false, sae.getLayers().contains(sae.getFirstNeuralNetwork().getOutputLayer()));
 	assertEquals(false, sae.getLayers().contains(sae.getLastNeuralNetwork().getOutputLayer()));
 	assertEquals(true, sae.getOutputLayer().equals(sae.getLastNeuralNetwork().getHiddenLayer()));
+
+	assertEquals(true, sae.getFirstNeuralNetwork().getHiddenLayer() == sae.getLastNeuralNetwork().getInputLayer());
     }
 }
