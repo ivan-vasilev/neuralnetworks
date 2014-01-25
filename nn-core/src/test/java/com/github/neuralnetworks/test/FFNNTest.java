@@ -2,7 +2,11 @@ package com.github.neuralnetworks.test;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.junit.Test;
@@ -18,6 +22,8 @@ import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSumC
 import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculatorFullyConnected;
 import com.github.neuralnetworks.training.TrainerFactory;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationTrainer;
+import com.github.neuralnetworks.util.Environment;
+import com.github.neuralnetworks.util.KernelExecutionStrategy.JTPKernelExecution;
 import com.github.neuralnetworks.util.Util;
 
 /**
@@ -271,5 +277,47 @@ public class FFNNTest {
 	assertEquals(0.194, cgb1.get(0, 1), 0.001);
 
 	assertEquals(0.218, cgb2.get(0, 0), 0.001);
+    }
+
+    @Test
+    public void testParallelNetworks() {
+	MultiLayerPerceptron mlp = new MultiLayerPerceptron();
+	Layer input = new Layer(2);
+	mlp.addLayer(input);
+
+	Layer leaf1 = new Layer(3);
+	FullyConnected fc1 = new FullyConnected(input, leaf1);
+	Util.fillArray(fc1.getConnectionGraph().getElements(), 0.1f);
+	mlp.addConnection(fc1);
+
+	Layer leaf2 = new Layer(3);
+	FullyConnected fc2 = new FullyConnected(input, leaf2);
+	Util.fillArray(fc2.getConnectionGraph().getElements(), 0.2f);
+	mlp.addConnection(fc2);
+
+	Layer output = new Layer(1);
+	FullyConnected fc3 = new FullyConnected(leaf1, output);
+	Util.fillArray(fc3.getConnectionGraph().getElements(), 0.3f);
+	mlp.addConnection(fc3);
+	FullyConnected fc4 = new FullyConnected(leaf2, output);
+	Util.fillArray(fc4.getConnectionGraph().getElements(), 0.4f);
+	mlp.addConnection(fc4);
+
+	NNFactory.nnWeightedSum(mlp, null);
+
+	Matrix i = new Matrix(new float [] {2, 2}, 1);
+	Set<Layer> calculated = new HashSet<>();
+	calculated.add(mlp.getInputLayer());
+
+	Map<Layer, Matrix> results = new HashMap<>();
+	results.put(input, i);
+
+	Environment.getInstance().setExecutionStrategy(new JTPKernelExecution());
+
+	mlp.getLayerCalculator().calculate(mlp, output, calculated, results);
+
+	Matrix o = results.get(output);
+
+	assertEquals(1.32, o.get(0, 0), 0.000001);
     }
 }

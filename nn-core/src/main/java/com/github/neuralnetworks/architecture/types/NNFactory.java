@@ -13,6 +13,7 @@ import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSoftReLU;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiStochasticBinary;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiTanh;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSumConnectionCalculator;
+import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculatorFullyConnected;
 import com.github.neuralnetworks.calculation.neuronfunctions.ConstantConnectionCalculator;
 import com.github.neuralnetworks.training.random.AparapiXORShiftInitializer;
 
@@ -32,6 +33,24 @@ public class NNFactory {
 	}
 
 	return result;
+    }
+    
+    public static void nnWeightedSum(NeuralNetworkImpl nn, ConnectionCalculator outputCC) {
+	LayerCalculatorImpl lc = new LayerCalculatorImpl();
+	nn.setLayerCalculator(lc);
+	for (Layer l : nn.getLayers()) {
+	    if (!(l instanceof BiasLayer)) {
+		if (l != nn.getInputLayer()) {
+		    if (outputCC != null && nn.getOutputLayer() == l) {
+			lc.addConnectionCalculator(l, outputCC);
+		    } else {
+			lc.addConnectionCalculator(l, new ConnectionCalculatorFullyConnected());
+		    }
+		}
+	    } else {
+		lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
+	    }
+	}
     }
 
     public static void nnSigmoid(NeuralNetworkImpl nn, ConnectionCalculator outputCC) {

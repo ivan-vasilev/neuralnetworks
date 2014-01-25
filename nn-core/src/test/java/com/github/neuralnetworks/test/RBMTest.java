@@ -14,6 +14,7 @@ import com.github.neuralnetworks.training.TrainerFactory;
 import com.github.neuralnetworks.training.TrainingInputProvider;
 import com.github.neuralnetworks.training.events.LogTrainingListener;
 import com.github.neuralnetworks.training.random.MersenneTwisterRandomInitializer;
+import com.github.neuralnetworks.training.rbm.CDAparapiTrainer;
 import com.github.neuralnetworks.training.rbm.PCDAparapiTrainer;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Environment;
@@ -165,11 +166,11 @@ public class RBMTest {
 	RBM rbm = NNFactory.rbm(6, 2, false);
 	NNFactory.rbmSigmoidSigmoid(rbm);
 
-	TrainingInputProvider trainInputProvider = new SimpleInputProvider(new float[][] {{1, 1, 1, 0, 0, 0}, {1, 0, 1, 0, 0, 0}, {0, 1, 1, 1, 0, 0}, {0, 0, 0, 1, 1, 1}, {0, 0, 1, 1, 1, 0}, {0, 0, 0, 1, 0, 1} }, null, 6000, 1);
+	TrainingInputProvider trainInputProvider = new SimpleInputProvider(new float[][] {{1, 1, 1, 0, 0, 0}, {1, 0, 1, 0, 0, 0}, {0, 1, 1, 1, 0, 0}, {0, 0, 0, 1, 1, 1}, {0, 0, 1, 1, 1, 0}, {0, 0, 0, 1, 0, 1} }, null, 1000, 1);
 	TrainingInputProvider testInputProvider =  new SimpleInputProvider(new float[][] {{1, 1, 1, 0, 0, 0}, {1, 0, 1, 0, 0, 0}, {0, 1, 1, 1, 0, 0}, {0, 0, 0, 1, 1, 1}, {0, 0, 1, 1, 1, 0}, {0, 0, 0, 1, 0, 1} }, new float[][] {{1, 0}, {1, 0}, {1, 0}, {0, 1}, {0, 1}, {0, 1} }, 6, 1);
 	MultipleNeuronsOutputError error = new MultipleNeuronsOutputError();
 
-	PCDAparapiTrainer t = TrainerFactory.pcdTrainer(rbm, trainInputProvider, testInputProvider, error, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.01f, 0.5f, 0f, 1);
+	CDAparapiTrainer t = TrainerFactory.cdTrainer(rbm, trainInputProvider, testInputProvider, error, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.02f, 0.5f, 0f, 1);
 	t.addEventListener(new LogTrainingListener());
 
 	Environment.getInstance().setExecutionStrategy(new SeqKernelExecution());
@@ -179,6 +180,31 @@ public class RBMTest {
 	t.train();
 	t.test();
 
+	assertEquals(0, t.getOutputError().getTotalNetworkError(), 0);
+    }
+    
+    /**
+     * Contrastive Divergence testing
+     */
+    @Test
+    public void testPersistentContrastiveDivergence() {
+	RBM rbm = NNFactory.rbm(6, 2, false);
+	NNFactory.rbmSigmoidSigmoid(rbm);
+	
+	TrainingInputProvider trainInputProvider = new SimpleInputProvider(new float[][] {{1, 1, 1, 0, 0, 0}, {1, 0, 1, 0, 0, 0}, {0, 1, 1, 1, 0, 0}, {0, 0, 0, 1, 1, 1}, {0, 0, 1, 1, 1, 0}, {0, 0, 0, 1, 0, 1} }, null, 600, 1);
+	TrainingInputProvider testInputProvider =  new SimpleInputProvider(new float[][] {{1, 1, 1, 0, 0, 0}, {1, 0, 1, 0, 0, 0}, {0, 1, 1, 1, 0, 0}, {0, 0, 0, 1, 1, 1}, {0, 0, 1, 1, 1, 0}, {0, 0, 0, 1, 0, 1} }, new float[][] {{1, 0}, {1, 0}, {1, 0}, {0, 1}, {0, 1}, {0, 1} }, 6, 1);
+	MultipleNeuronsOutputError error = new MultipleNeuronsOutputError();
+	
+	PCDAparapiTrainer t = TrainerFactory.pcdTrainer(rbm, trainInputProvider, testInputProvider, error, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.02f, 0.5f, 0f, 1);
+	t.addEventListener(new LogTrainingListener());
+	
+	Environment.getInstance().setExecutionStrategy(new SeqKernelExecution());
+	t.getProperties().setParameter(Constants.VISIBLE_CONNECTION_CALCULATOR, new AparapiSigmoid());
+	t.getProperties().setParameter(Constants.HIDDEN_CONNECTION_CALCULATOR, new AparapiSigmoid());
+	
+	t.train();
+	t.test();
+	
 	assertEquals(0, t.getOutputError().getTotalNetworkError(), 0);
     }
 }

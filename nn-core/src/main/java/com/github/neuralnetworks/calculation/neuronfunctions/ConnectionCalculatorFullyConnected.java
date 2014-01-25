@@ -26,7 +26,7 @@ import com.github.neuralnetworks.util.UniqueList;
  * This is done, because it is assumed that implementations will provide a way for calculating many input results at once.
  * Each column of the matrix represents a single input. For example if the network is trained to classify MNIST images, each column of the input matrix will represent single MNIST image.
  */
-public abstract class ConnectionCalculatorFullyConnected implements ConnectionCalculator {
+public class ConnectionCalculatorFullyConnected implements ConnectionCalculator {
 
     private static final long serialVersionUID = -5405654469496055017L;
 
@@ -98,7 +98,10 @@ public abstract class ConnectionCalculatorFullyConnected implements ConnectionCa
 	}
     }
 
-    protected abstract ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Integer> inputConnections, Layer targetLayer);
+
+    protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Integer> inputConnections, Layer targetLayer) {
+	return new AparapiWeightedSum(inputConnections, miniBatchSize, targetLayer);
+    }
 
     public void addActivationFunction(ActivationFunction activationFunction) {
 	if (activationFunctions == null) {
