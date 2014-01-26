@@ -8,7 +8,7 @@ To build this project you need gradle (http://www.gradle.org/) or maven (http://
 
 There are two projects:
 - nn-core - the full implementation is here.
-- nn-samples - various examples and InputProviders for popular training data sets (currently only MNIST is implemented).
+- nn-samples - various examples and InputProviders for popular training data sets (currently MNIST, IRIS and xor are implemented). Most of the examples are located under src/test/java and are implemented as unit tests. For example MnistTest contains various networks trained to the MNIST data set, where IrisTest contains networks trained on the IRIS dataset. 
 
 The design is tiered, each tier depending on the previous ones.
 

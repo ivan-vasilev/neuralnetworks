@@ -1,7 +1,10 @@
 package com.github.neuralnetworks.training;
 
+import java.util.Map;
+
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
+import com.github.neuralnetworks.architecture.types.DNN;
 import com.github.neuralnetworks.architecture.types.RBM;
 import com.github.neuralnetworks.calculation.OutputError;
 import com.github.neuralnetworks.calculation.RBMLayerCalculator;
@@ -17,6 +20,7 @@ import com.github.neuralnetworks.training.backpropagation.InputCorruptor;
 import com.github.neuralnetworks.training.backpropagation.MSEDerivative;
 import com.github.neuralnetworks.training.random.RandomInitializer;
 import com.github.neuralnetworks.training.rbm.CDAparapiTrainer;
+import com.github.neuralnetworks.training.rbm.DBNTrainer;
 import com.github.neuralnetworks.training.rbm.PCDAparapiTrainer;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
@@ -194,6 +198,26 @@ public class TrainerFactory {
 	p.setParameter(Constants.GIBBS_SAMPLING_COUNT, gibbsSampling);
 	p.setParameter(Constants.OUTPUT_ERROR, error);
 	p.setParameter(Constants.RANDOM_INITIALIZER, rand);
+
+	return p;
+    }
+
+    public static DNNLayerTrainer dnnLayerTrainer(DNN<?> dnn, Map<NeuralNetwork, OneStepTrainer<?>> layerTrainers, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error) {
+	return new DNNLayerTrainer(layerTrainerProperties(dnn, layerTrainers, trainingSet, testingSet, error));
+    }
+
+    public static DBNTrainer dbnTrainer(DNN<?> dnn, Map<NeuralNetwork, OneStepTrainer<?>> layerTrainers, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error) {
+	return new DBNTrainer(layerTrainerProperties(dnn, layerTrainers, trainingSet, testingSet, error));
+    }
+
+    protected static Properties layerTrainerProperties(DNN<?> dnn, Map<NeuralNetwork, OneStepTrainer<?>> layerTrainers, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error) {
+	Properties p = new Properties();
+	p.setParameter(Constants.NEURAL_NETWORK, dnn);
+	p.setParameter(Constants.TRAINING_INPUT_PROVIDER, trainingSet);
+	p.setParameter(Constants.TESTING_INPUT_PROVIDER, testingSet);
+	p.setParameter(Constants.LAYER_CALCULATOR, new RBMLayerCalculator());
+	p.setParameter(Constants.OUTPUT_ERROR, error);
+	p.setParameter(Constants.LAYER_TRAINERS, layerTrainers);
 
 	return p;
     }

@@ -141,7 +141,7 @@ public abstract class AparapiSubsampling2D extends Kernel implements ConnectionC
 
     /* (non-Javadoc)
      * @see com.amd.aparapi.Kernel#run()
-     * currentValues array is populated here. The values from this array are the ones that take part in the pooling in currentValuesUpdated
+     * input start index is calculated and passed to the pooling method
      */
     @Override
     public void run() {

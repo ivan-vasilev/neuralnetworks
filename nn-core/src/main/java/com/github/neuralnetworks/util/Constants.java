@@ -25,7 +25,7 @@ public class Constants {
     public static final String OUTPUT_ERROR_DERIVATIVE = "outputErrorDerivative";
     public static final String VISIBLE_CONNECTION_CALCULATOR = "visibleConnectionCalculator";
     public static final String HIDDEN_CONNECTION_CALCULATOR = "hiddenConnectionCalculator";
-    public static final String DEEP_TRAINERS = "deepTrainers";
+    public static final String LAYER_TRAINERS = "layerTrainers";
     public static final String WEIGHT_DECAY = "weightDecayTrainers";
     public static final String CORRUPTION_LEVEL = "corruptionLevel";
     public static final String CORRUPTOR = "corruptionInitializer";
