@@ -102,6 +102,22 @@ public class NeuralNetworkImpl implements NeuralNetwork {
     }
 
     /**
+     * @param inputLayer
+     * @param outputLayer
+     * @return Connection between the two layers if it exists
+     */
+    public Connections getConnection(Layer inputLayer, Layer outputLayer) {
+	for (Connections c : getConnections()) {
+	    if ((c.getInputLayer() == inputLayer && c.getOutputLayer() == outputLayer) ||
+		(c.getInputLayer() == outputLayer && c.getOutputLayer() == inputLayer)) {
+		return c;
+	    }
+	}
+
+	return null;
+    }
+
+    /**
      * Add layer to the network
      * @param layer
      * @return whether the layer was added successfully

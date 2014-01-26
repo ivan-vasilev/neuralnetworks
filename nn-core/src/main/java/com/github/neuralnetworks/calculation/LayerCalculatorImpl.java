@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.github.neuralnetworks.architecture.BiasLayer;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
@@ -46,32 +47,38 @@ public class LayerCalculatorImpl extends LayerCalculatorBase implements LayerCal
      * 
      * This allows for single code to be used for the whole backpropagation, but also for RBMs, autoencoders, etc
      * 
+     * @param neuralNetwork - the neural network.
      * @param calculatedLayers - layers that are fully calculated - the results for these layers can be used for calculating other parts of the network
      * @param inProgressLayers - layers which are currently calculated, but are not yet finished - not all connections to the layer are calculated and the result of the propagation through this layer cannot be used for another calculations
      * @param calculateCandidates - order of calculation
      * @param currentLayer - the layer which is currently being calculated.
-     * @param neuralNetwork - the neural network.
      * @return
      */
     protected boolean orderConnections(NeuralNetwork neuralNetwork, Layer currentLayer, Set<Layer> calculatedLayers, Set<Layer> inProgressLayers, List<ConnectionCalculateCandidate> calculateCandidates) {
 	boolean result = false;
 
-	if (calculatedLayers.contains(currentLayer)) {
+	if (calculatedLayers.contains(currentLayer) || currentLayer instanceof BiasLayer) {
 	    result = true;
 	} else if (!inProgressLayers.contains(currentLayer)) {
 	    inProgressLayers.add(currentLayer);
 	    List<ConnectionCalculateCandidate> currentCandidates = new ArrayList<ConnectionCalculateCandidate>();
 
+	    boolean hasNoBiasConnections = false;
 	    for (Connections c : currentLayer.getConnections(neuralNetwork)) {
 		Layer opposite = Util.getOppositeLayer(c, currentLayer);
 		if (orderConnections(neuralNetwork, opposite, calculatedLayers, inProgressLayers, calculateCandidates)) {
 		    currentCandidates.add(new ConnectionCalculateCandidate(c, currentLayer));
+
+		    if (!(opposite instanceof BiasLayer)) {
+			hasNoBiasConnections = true;
+		    }
 		}
 	    }
 
-	    calculateCandidates.addAll(currentCandidates);
-
-	    result = true;
+	    if (currentCandidates.size() > 0 && hasNoBiasConnections)  {
+		calculateCandidates.addAll(currentCandidates);
+		result = true;
+	    }
 
 	    inProgressLayers.remove(currentLayer);
 	    calculatedLayers.add(currentLayer);

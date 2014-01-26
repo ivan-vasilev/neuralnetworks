@@ -3,12 +3,17 @@ package com.github.neuralnetworks.test;
 import static org.junit.Assert.assertEquals;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Test;
 
+import com.github.neuralnetworks.architecture.GraphConnections;
+import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
+import com.github.neuralnetworks.architecture.types.Autoencoder;
 import com.github.neuralnetworks.architecture.types.DBN;
 import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.architecture.types.RBM;
@@ -19,6 +24,7 @@ import com.github.neuralnetworks.training.OneStepTrainer;
 import com.github.neuralnetworks.training.TrainerFactory;
 import com.github.neuralnetworks.training.rbm.PCDAparapiTrainer;
 import com.github.neuralnetworks.util.Constants;
+import com.github.neuralnetworks.util.Util;
 
 public class DNNTest {
 
@@ -68,6 +74,60 @@ public class DNNTest {
 	assertEquals(true, sae.getOutputLayer().equals(sae.getLastNeuralNetwork().getHiddenLayer()));
 
 	assertEquals(true, sae.getFirstNeuralNetwork().getHiddenLayer() == sae.getLastNeuralNetwork().getInputLayer());
+    }
+
+    @Test
+    public void testDBNCalculation() {
+	DBN dbn = NNFactory.dbn(new int [] {3, 2, 2}, true);
+	NNFactory.nnWeightedSum(dbn, null);
+
+	RBM firstRBM = dbn.getFirstNeuralNetwork();
+	Util.fillArray(firstRBM.getMainConnections().getConnectionGraph().getElements(), 0.2f);
+	Util.fillArray(firstRBM.getVisibleBiasConnections().getConnectionGraph().getElements(), 0.1f);
+	Util.fillArray(firstRBM.getHiddenBiasConnections().getConnectionGraph().getElements(), 0.3f);
+
+	RBM secondRBM = dbn.getLastNeuralNetwork();
+	Util.fillArray(secondRBM.getMainConnections().getConnectionGraph().getElements(), 0.4f);
+	Util.fillArray(secondRBM.getVisibleBiasConnections().getConnectionGraph().getElements(), 0.8f);
+	Util.fillArray(secondRBM.getHiddenBiasConnections().getConnectionGraph().getElements(), 0.5f);
+
+	Set<Layer> calculatedLayers = new HashSet<>();
+	calculatedLayers.add(dbn.getInputLayer());
+
+	Map<Layer, Matrix> results = new HashMap<>();
+	results.put(dbn.getInputLayer(), new Matrix(new float[] {1, 0, 1}, 1));
+	dbn.getLayerCalculator().calculate(dbn, dbn.getOutputLayer(), calculatedLayers, results);
+
+	assertEquals(1.06, results.get(dbn.getOutputLayer()).get(0, 0), 0.00001);
+	assertEquals(1.06, results.get(dbn.getOutputLayer()).get(1, 0), 0.00001);
+    }
+
+    @Test
+    public void testSAECalculation() {
+	StackedAutoencoder sae = NNFactory.sae(new int [] {3, 2, 2}, true);
+	NNFactory.nnWeightedSum(sae, null);
+
+	Autoencoder firstAE = sae.getFirstNeuralNetwork();
+	Util.fillArray(((GraphConnections) firstAE.getConnection(firstAE.getInputLayer(), firstAE.getHiddenLayer())).getConnectionGraph().getElements(), 0.2f);
+	Util.fillArray(((GraphConnections) firstAE.getConnection(firstAE.getHiddenBiasLayer(), firstAE.getHiddenLayer())).getConnectionGraph().getElements(), 0.3f);
+	Util.fillArray(((GraphConnections) firstAE.getConnection(firstAE.getHiddenLayer(), firstAE.getOutputLayer())).getConnectionGraph().getElements(), 0.8f);
+	Util.fillArray(((GraphConnections) firstAE.getConnection(firstAE.getOutputBiasLayer(), firstAE.getOutputLayer())).getConnectionGraph().getElements(), 0.9f);
+
+	Autoencoder secondAE = sae.getLastNeuralNetwork();
+	Util.fillArray(((GraphConnections) secondAE.getConnection(secondAE.getInputLayer(), secondAE.getHiddenLayer())).getConnectionGraph().getElements(), 0.4f);
+	Util.fillArray(((GraphConnections) secondAE.getConnection(secondAE.getHiddenBiasLayer(), secondAE.getHiddenLayer())).getConnectionGraph().getElements(), 0.5f);
+	Util.fillArray(((GraphConnections) secondAE.getConnection(secondAE.getHiddenLayer(), secondAE.getOutputLayer())).getConnectionGraph().getElements(), 0.7f);
+	Util.fillArray(((GraphConnections) secondAE.getConnection(secondAE.getOutputBiasLayer(), secondAE.getOutputLayer())).getConnectionGraph().getElements(), 0.9f);
+
+	Set<Layer> calculatedLayers = new HashSet<>();
+	calculatedLayers.add(sae.getInputLayer());
+
+	Map<Layer, Matrix> results = new HashMap<>();
+	results.put(sae.getInputLayer(), new Matrix(new float[] {1, 0, 1}, 1));
+	sae.getLayerCalculator().calculate(sae, sae.getOutputLayer(), calculatedLayers, results);
+
+	assertEquals(1.06, results.get(sae.getOutputLayer()).get(0, 0), 0.00001);
+	assertEquals(1.06, results.get(sae.getOutputLayer()).get(1, 0), 0.00001);
     }
 
     @Test
