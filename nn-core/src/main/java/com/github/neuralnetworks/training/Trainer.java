@@ -48,11 +48,9 @@ public abstract class Trainer<N extends NeuralNetwork> {
     }
 
     /**
-     * Default empty implementation of the training procedure
+     * Training method
      */
-    public void train() {
-	initializeWithRandom();
-    };
+    public abstract void train();
 
     /**
      * The network is tested via the testing input provider and the training error is aggregated for each example.
