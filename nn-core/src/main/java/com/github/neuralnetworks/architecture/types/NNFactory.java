@@ -10,12 +10,10 @@ import com.github.neuralnetworks.calculation.RBMLayerCalculator;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiReLU;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSigmoid;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSoftReLU;
-import com.github.neuralnetworks.calculation.neuronfunctions.AparapiStochasticBinary;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiTanh;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSumConnectionCalculator;
 import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculatorFullyConnected;
 import com.github.neuralnetworks.calculation.neuronfunctions.ConstantConnectionCalculator;
-import com.github.neuralnetworks.training.random.AparapiXORShiftInitializer;
 
 /**
  * Factory class for neural networks
@@ -219,42 +217,6 @@ public class NNFactory {
 	RBMLayerCalculator lc = new RBMLayerCalculator();
 	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiTanh());
 	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiTanh());
-	populateBiasLayers(lc, rbm);
-
-	return lc;
-    }
-
-    public static RBMLayerCalculator rbmSigmoidBinary(RBM rbm) {
-	RBMLayerCalculator lc = new RBMLayerCalculator();
-	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiSigmoid());
-	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiStochasticBinary(new AparapiXORShiftInitializer()));
-	populateBiasLayers(lc, rbm);
-
-	return lc;
-    }
-
-    public static RBMLayerCalculator rbmSoftReluBinary(RBM rbm) {
-	RBMLayerCalculator lc = new RBMLayerCalculator();
-	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiSoftReLU());
-	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiStochasticBinary(new AparapiXORShiftInitializer()));
-	populateBiasLayers(lc, rbm);
-
-	return lc;
-    }
-    
-    public static RBMLayerCalculator rbmReluBinary(RBM rbm) {
-	RBMLayerCalculator lc = new RBMLayerCalculator();
-	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiReLU());
-	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiStochasticBinary(new AparapiXORShiftInitializer()));
-	populateBiasLayers(lc, rbm);
-
-	return lc;
-    }
-
-    public static RBMLayerCalculator rbmTanhBinary(RBM rbm) {
-	RBMLayerCalculator lc = new RBMLayerCalculator();
-	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiTanh());
-	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiStochasticBinary(new AparapiXORShiftInitializer()));
 	populateBiasLayers(lc, rbm);
 
 	return lc;

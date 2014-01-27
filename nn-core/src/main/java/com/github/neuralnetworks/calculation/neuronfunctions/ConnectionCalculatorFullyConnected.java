@@ -35,7 +35,12 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator 
     protected int miniBatchSize;
 
     /**
-     * Activation functions
+     * Activation functions that are executed before the transfer function
+     */
+    protected List<ActivationFunction> preTransferFunctions;
+
+    /**
+     * Activation functions that are called after the transfer function
      */
     protected List<ActivationFunction> activationFunctions;
 
@@ -60,10 +65,16 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator 
 		    notBias.put(c, input);
 		}
 	    }
-	    
-	    calculateBias(bias, output);
-	    
+
 	    if (notBias.size() > 0) {
+		if (preTransferFunctions != null) {
+		    for (ActivationFunction f : preTransferFunctions) {
+			f.value(output);
+		    }
+		}
+
+		calculateBias(bias, output);
+
 		// new input function is required
 		if (inputFunction == null || targetLayer != currentLayer || miniBatchSize != output.getColumns()) {
 		    currentLayer = targetLayer;
@@ -77,11 +88,11 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator 
 		}
 
 		inputFunction.calculate(notBias, output, targetLayer);
-	    }
-	    
-	    if (activationFunctions != null) {
-		for (ActivationFunction f : activationFunctions) {
-		    f.value(output);
+
+		if (activationFunctions != null) {
+		    for (ActivationFunction f : activationFunctions) {
+			f.value(output);
+		    }
 		}
 	    }
 	}
@@ -101,6 +112,20 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator 
 
     protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Integer> inputConnections, Layer targetLayer) {
 	return new AparapiWeightedSum(inputConnections, miniBatchSize, targetLayer);
+    }
+    
+    public void addPreTransferFunction(ActivationFunction function) {
+	if (preTransferFunctions == null) {
+	    preTransferFunctions = new UniqueList<>();
+	}
+	
+	preTransferFunctions.add(function);
+    }
+    
+    public void removePreTransfer(ActivationFunction function) {
+	if (preTransferFunctions != null) {
+	    preTransferFunctions.remove(function);
+	}
     }
 
     public void addActivationFunction(ActivationFunction activationFunction) {
