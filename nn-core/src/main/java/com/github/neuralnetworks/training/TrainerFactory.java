@@ -19,9 +19,8 @@ import com.github.neuralnetworks.training.backpropagation.BackPropagationTrainer
 import com.github.neuralnetworks.training.backpropagation.InputCorruptor;
 import com.github.neuralnetworks.training.backpropagation.MSEDerivative;
 import com.github.neuralnetworks.training.random.RandomInitializer;
-import com.github.neuralnetworks.training.rbm.CDAparapiTrainer;
+import com.github.neuralnetworks.training.rbm.AparapiCDTrainer;
 import com.github.neuralnetworks.training.rbm.DBNTrainer;
-import com.github.neuralnetworks.training.rbm.PCDAparapiTrainer;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
 
@@ -178,15 +177,15 @@ public class TrainerFactory {
 	return p;
     }
     
-    public static CDAparapiTrainer cdTrainer(RBM rbm, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay, int gibbsSampling) {
-	return new CDAparapiTrainer(rbmProperties(rbm, trainingSet, testingSet, error, rand, learningRate, momentum, weightDecay, gibbsSampling));
+    public static AparapiCDTrainer cdTrainer(RBM rbm, RBMLayerCalculator lc, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay, int gibbsSampling) {
+	return new AparapiCDTrainer(rbmProperties(rbm, lc, trainingSet, testingSet, error, rand, learningRate, momentum, weightDecay, gibbsSampling, false));
     }
 
-    public static PCDAparapiTrainer pcdTrainer(RBM rbm, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay, int gibbsSampling) {
-	return new PCDAparapiTrainer(rbmProperties(rbm, trainingSet, testingSet, error, rand, learningRate, momentum, weightDecay, gibbsSampling));
+    public static AparapiCDTrainer pcdTrainer(RBM rbm, RBMLayerCalculator lc, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay, int gibbsSampling) {
+	return new AparapiCDTrainer(rbmProperties(rbm, lc, trainingSet, testingSet, error, rand, learningRate, momentum, weightDecay, gibbsSampling, true));
     }
 
-    protected static Properties rbmProperties(RBM rbm, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay, int gibbsSampling) {
+    protected static Properties rbmProperties(RBM rbm, RBMLayerCalculator lc, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay, int gibbsSampling, boolean resetRBM) {
 	Properties p = new Properties();
 	p.setParameter(Constants.NEURAL_NETWORK, rbm);
 	p.setParameter(Constants.TRAINING_INPUT_PROVIDER, trainingSet);
@@ -198,6 +197,8 @@ public class TrainerFactory {
 	p.setParameter(Constants.GIBBS_SAMPLING_COUNT, gibbsSampling);
 	p.setParameter(Constants.OUTPUT_ERROR, error);
 	p.setParameter(Constants.RANDOM_INITIALIZER, rand);
+	p.setParameter(Constants.RESET_RBM, resetRBM);
+	p.setParameter(Constants.LAYER_CALCULATOR, lc);
 
 	return p;
     }

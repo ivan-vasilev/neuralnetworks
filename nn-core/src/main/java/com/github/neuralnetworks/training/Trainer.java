@@ -11,7 +11,6 @@ import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
-import com.github.neuralnetworks.calculation.LayerCalculator;
 import com.github.neuralnetworks.calculation.OutputError;
 import com.github.neuralnetworks.events.TrainingEvent;
 import com.github.neuralnetworks.events.TrainingEventListener;
@@ -59,9 +58,8 @@ public abstract class Trainer<N extends NeuralNetwork> {
 	TrainingInputProvider ip = getTestingInputProvider();
 	OutputError e = getOutputError();
 	NeuralNetwork n = getNeuralNetwork();
-	LayerCalculator c = n.getLayerCalculator() != null ? n.getLayerCalculator() : getLayerCalculator();
 
-	if (ip != null && e != null && n != null && c != null) {
+	if (ip != null && e != null && n != null && n.getLayerCalculator() != null) {
 	    triggerEvent(new TestingStartedEvent(this));
 
 	    Set<Layer> calculatedLayers = new UniqueList<>();
@@ -72,7 +70,7 @@ public abstract class Trainer<N extends NeuralNetwork> {
 		calculatedLayers.clear();
 		calculatedLayers.add(n.getInputLayer());
 		results.put(n.getInputLayer(), input.getInput());
-		c.calculate(n, n.getOutputLayer(), calculatedLayers, results);
+		n.getLayerCalculator().calculate(n, n.getOutputLayer(), calculatedLayers, results);
 		e.addItem(results.get(n.getOutputLayer()), input.getTarget());
 
 		triggerEvent(new MiniBatchFinishedEvent(this, input));
@@ -124,14 +122,6 @@ public abstract class Trainer<N extends NeuralNetwork> {
 
     public void setOutputError(OutputError outputError) {
 	properties.setParameter(Constants.OUTPUT_ERROR, outputError);
-    }
-
-    public LayerCalculator getLayerCalculator() {
-	return properties.getParameter(Constants.LAYER_CALCULATOR);
-    }
-
-    public void setLayerCalculator(LayerCalculator layerCalculator) {
-	properties.setParameter(Constants.LAYER_CALCULATOR, layerCalculator);
     }
     
     public RandomInitializer getRandomInitializer() {

@@ -2,9 +2,14 @@ package com.github.neuralnetworks;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.github.neuralnetworks.architecture.NeuralNetwork;
+import com.github.neuralnetworks.architecture.types.DBN;
 import com.github.neuralnetworks.architecture.types.MultiLayerPerceptron;
 import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.architecture.types.RBM;
@@ -14,13 +19,17 @@ import com.github.neuralnetworks.calculation.neuronfunctions.SoftmaxFunction;
 import com.github.neuralnetworks.input.MultipleNeuronsOutputError;
 import com.github.neuralnetworks.samples.iris.IrisInputProvider;
 import com.github.neuralnetworks.samples.iris.IrisTargetMultiNeuronOutputConverter;
+import com.github.neuralnetworks.training.OneStepTrainer;
 import com.github.neuralnetworks.training.TrainerFactory;
+import com.github.neuralnetworks.training.TrainingInputProvider;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationTrainer;
 import com.github.neuralnetworks.training.events.LogTrainingListener;
 import com.github.neuralnetworks.training.random.MersenneTwisterRandomInitializer;
-import com.github.neuralnetworks.training.rbm.PCDAparapiTrainer;
+import com.github.neuralnetworks.training.rbm.AparapiCDTrainer;
+import com.github.neuralnetworks.training.rbm.DBNTrainer;
 import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.KernelExecutionStrategy.CPUKernelExecution;
+import com.github.neuralnetworks.util.KernelExecutionStrategy.SeqKernelExecution;
 
 /**
  * Iris test
@@ -30,17 +39,18 @@ public class IrisTest {
     /**
      * Simple iris backpropagation test
      */
+    @Ignore
     @Test
     public void testMLPSigmoidBP() {
-	MultiLayerPerceptron mlp = NNFactory.mlpSigmoid(new int[] { 4, 64, 3 }, true);
-	IrisInputProvider trainInputProvider = new IrisInputProvider(100, 1000000, new IrisTargetMultiNeuronOutputConverter(), false, true);
+	MultiLayerPerceptron mlp = NNFactory.mlpSigmoid(new int[] { 4, 2, 3 }, true);
+	IrisInputProvider trainInputProvider = new IrisInputProvider(150, 1500000, new IrisTargetMultiNeuronOutputConverter(), false, true);
 	IrisInputProvider testInputProvider = new IrisInputProvider(1, 150, new IrisTargetMultiNeuronOutputConverter(), false, true);
 	@SuppressWarnings("unchecked")
 	BackPropagationTrainer<MultiLayerPerceptron> bpt = TrainerFactory.backPropagationSigmoid(mlp, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.01f, 0.5f, 0f);
 
 	bpt.addEventListener(new LogTrainingListener());
 
-	Environment.getInstance().setExecutionStrategy(new CPUKernelExecution());
+	Environment.getInstance().setExecutionStrategy(new SeqKernelExecution());
 
 	bpt.train();
 	LayerCalculatorImpl lc = (LayerCalculatorImpl) mlp.getLayerCalculator();
@@ -57,14 +67,49 @@ public class IrisTest {
     @Ignore
     @Test
     public void testRBMCDSigmoidBP() {
-	RBM rbm = NNFactory.rbm(4, 3, true);
+	RBM rbm = NNFactory.rbm(4, 3, false);
+	rbm.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
 
-	IrisInputProvider trainInputProvider = new IrisInputProvider(100, 100000, new IrisTargetMultiNeuronOutputConverter(), true, true);
-	IrisInputProvider testInputProvider = new IrisInputProvider(1, 150, new IrisTargetMultiNeuronOutputConverter(), false, true);
+	TrainingInputProvider trainInputProvider = new IrisInputProvider(1, 150000, new IrisTargetMultiNeuronOutputConverter(), false, true);
+	TrainingInputProvider testInputProvider = new IrisInputProvider(1, 150, new IrisTargetMultiNeuronOutputConverter(), false, true);
 	MultipleNeuronsOutputError error = new MultipleNeuronsOutputError();
 
-	PCDAparapiTrainer t = TrainerFactory.pcdTrainer(rbm, trainInputProvider, testInputProvider, error, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.01f, 0f, 0f, 1);
+	AparapiCDTrainer t = TrainerFactory.cdTrainer(rbm, NNFactory.rbmSigmoidSigmoid(rbm), trainInputProvider, testInputProvider, error, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.01f, 0.5f, 0f, 2);
 	t.addEventListener(new LogTrainingListener());
+
+	Environment.getInstance().setExecutionStrategy(new CPUKernelExecution());
+
+	t.train();
+	t.test();
+
+	assertEquals(0, t.getOutputError().getTotalNetworkError(), 0.1);
+    }
+
+    /**
+     * Contrastive Divergence testing
+     */
+    @Test
+    public void testDBN() {
+	DBN dbn = NNFactory.dbn(new int[] {4, 8, 3}, false);
+	NNFactory.nnSigmoid(dbn, null);
+
+	TrainingInputProvider trainInputProvider = new IrisInputProvider(1, 1500, new IrisTargetMultiNeuronOutputConverter(), false, true);
+	TrainingInputProvider testInputProvider = new IrisInputProvider(1, 150, new IrisTargetMultiNeuronOutputConverter(), false, true);
+	MultipleNeuronsOutputError error = new MultipleNeuronsOutputError();
+
+	AparapiCDTrainer firstTrainer = TrainerFactory.cdTrainer(dbn.getFirstNeuralNetwork(), NNFactory.rbmSigmoidSigmoid(dbn.getFirstNeuralNetwork()), null, null, null, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.01f, 0.5f, 0f, 1);
+
+	AparapiCDTrainer lastTrainer = TrainerFactory.cdTrainer(dbn.getLastNeuralNetwork(), NNFactory.rbmSigmoidSigmoid(dbn.getLastNeuralNetwork()), null, null, null, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.01f, 0.5f, 0f, 1);
+
+	Map<NeuralNetwork, OneStepTrainer<?>> map = new HashMap<>();
+	map.put(dbn.getFirstNeuralNetwork(), firstTrainer);
+	map.put(dbn.getLastNeuralNetwork(), lastTrainer);
+
+	DBNTrainer t = TrainerFactory.dbnTrainer(dbn, map, trainInputProvider, testInputProvider, error);
+	t.addEventListener(new LogTrainingListener());
+
+	Environment.getInstance().setExecutionStrategy(new CPUKernelExecution());
+
 	t.train();
 	t.test();
 

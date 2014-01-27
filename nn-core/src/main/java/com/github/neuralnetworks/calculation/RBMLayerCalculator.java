@@ -7,7 +7,6 @@ import java.util.Set;
 
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
-import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.architecture.types.RBM;
 
 /**
@@ -18,8 +17,9 @@ public class RBMLayerCalculator extends LayerCalculatorImpl {
 
     private static final long serialVersionUID = -7524966192939615856L;
 
-    protected Set<Layer> calculatedLayers;
-    protected Map<Layer, Matrix> results;
+    private Set<Layer> calculatedLayers;
+    private Map<Layer, Matrix> results;
+    protected ConnectionCalculator lastGibbsSamplingStepCalculator;
 
     public RBMLayerCalculator() {
 	super();
@@ -27,26 +27,32 @@ public class RBMLayerCalculator extends LayerCalculatorImpl {
 	results = new HashMap<>();
     }
 
-    /* (non-Javadoc)
-     * @see com.github.neuralnetworks.calculation.LayerCalculatorImpl#calculate(java.util.Set, java.util.Map, com.github.neuralnetworks.architecture.Layer)
-     * takes into account the gibbs sampling - if the target "layer" is the input layer then the hidden layer is calculated first and then the visible
-     */
-    @Override
-    public void calculate(NeuralNetwork neuralNetwork, Layer layer, Set<Layer> calculatedLayers, Map<Layer, Matrix> results) {
-	this.results = results;
+    public RBMLayerCalculator(ConnectionCalculator lastGibbsSamplingStepCalculator) {
+	super();
+	this.lastGibbsSamplingStepCalculator = lastGibbsSamplingStepCalculator;
+	this.calculatedLayers = new HashSet<>();
+	this.results = new HashMap<>();
+    }
 
-	RBM rbm = (RBM) neuralNetwork;
-	Layer visibleLayer = rbm.getVisibleLayer();
-	Layer hiddenLayer = rbm.getHiddenLayer();
+    public void gibbsSampling(RBM rbm, Matrix posPhaseVisible, Matrix posPhaseHidden, Matrix negPhaseVisible, Matrix negPhaseHidden, int samplingCount, boolean resetNetwork) {
+	calculateHiddenLayer(rbm, posPhaseVisible, posPhaseHidden);
 
-	// gibbs sampling first
-	if ((layer == visibleLayer || layer == rbm.getOutputLayer()) && layer != hiddenLayer && calculatedLayers.contains(visibleLayer)) {
-	    super.calculate(neuralNetwork, hiddenLayer, calculatedLayers, results);
-	    calculatedLayers.clear();
-	    calculatedLayers.add(hiddenLayer);
-	    super.calculate(neuralNetwork, visibleLayer, calculatedLayers, results);
-	} else {
-	    super.calculate(neuralNetwork, layer, calculatedLayers, results);
+	if (resetNetwork) {
+	    System.arraycopy(posPhaseHidden.getElements(), 0, negPhaseHidden.getElements(), 0, negPhaseHidden.getElements().length);
+	}
+
+	// Gibbs sampling
+	for (int i = 1; i <= samplingCount; i++) {
+	    calculateVisibleLayer(rbm, negPhaseVisible, negPhaseHidden);
+
+	    if (i == samplingCount && lastGibbsSamplingStepCalculator != null) {
+		ConnectionCalculator current = getConnectionCalculator(rbm.getHiddenLayer());
+		addConnectionCalculator(rbm.getHiddenLayer(), lastGibbsSamplingStepCalculator);
+		calculateHiddenLayer(rbm, negPhaseVisible, negPhaseHidden);
+		addConnectionCalculator(rbm.getHiddenLayer(), current);
+	    } else {
+		calculateHiddenLayer(rbm, negPhaseVisible, negPhaseHidden);
+	    }
 	}
     }
 
@@ -74,5 +80,13 @@ public class RBMLayerCalculator extends LayerCalculatorImpl {
 	results.put(hiddenLayer, hiddenLayerResults);
 
 	super.calculate(rbm, hiddenLayer, calculatedLayers, results);
+    }
+
+    public ConnectionCalculator getLastGibbsSamplingStepCalculator() {
+        return lastGibbsSamplingStepCalculator;
+    }
+
+    public void setLastGibbsSamplingStepCalculator(ConnectionCalculator lastGibbsSamplingStepCalculator) {
+        this.lastGibbsSamplingStepCalculator = lastGibbsSamplingStepCalculator;
     }
 }

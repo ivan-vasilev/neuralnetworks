@@ -8,15 +8,12 @@ import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.architecture.types.RBM;
 import com.github.neuralnetworks.calculation.RBMLayerCalculator;
-import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSigmoid;
 import com.github.neuralnetworks.input.MultipleNeuronsOutputError;
 import com.github.neuralnetworks.training.TrainerFactory;
 import com.github.neuralnetworks.training.TrainingInputProvider;
 import com.github.neuralnetworks.training.events.LogTrainingListener;
 import com.github.neuralnetworks.training.random.MersenneTwisterRandomInitializer;
-import com.github.neuralnetworks.training.rbm.CDAparapiTrainer;
-import com.github.neuralnetworks.training.rbm.PCDAparapiTrainer;
-import com.github.neuralnetworks.util.Constants;
+import com.github.neuralnetworks.training.rbm.AparapiCDTrainer;
 import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.KernelExecutionStrategy.SeqKernelExecution;
 
@@ -25,7 +22,7 @@ public class RBMTest {
     @Test
     public void testRBMLayerCalculator1() {
 	RBM rbm = NNFactory.rbm(2, 2, false);
-	NNFactory.rbmSigmoidSigmoid(rbm);
+	rbm.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
 
 	Matrix cg1 = rbm.getMainConnections().getConnectionGraph();
 	cg1.set(0, 0, 0.1f);
@@ -46,7 +43,7 @@ public class RBMTest {
     @Test
     public void testRBMLayerCalculator2() {
 	RBM rbm = NNFactory.rbm(2, 2, false);
-	NNFactory.rbmSigmoidSigmoid(rbm);
+	rbm.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
 
 	Matrix cg1 = rbm.getMainConnections().getConnectionGraph();
 	cg1.set(0, 0, 0.1f);
@@ -68,7 +65,7 @@ public class RBMTest {
     @Test
     public void testRBMLayerCalculator3() {
 	RBM rbm = NNFactory.rbm(3, 2, true);
-	NNFactory.rbmSigmoidSigmoid(rbm);
+	rbm.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
 
 	Matrix cg1 = rbm.getMainConnections().getConnectionGraph();
 	cg1.set(0, 0, 0.2f);
@@ -94,7 +91,7 @@ public class RBMTest {
     @Test
     public void testRBMLayerCalculator4() {
 	RBM rbm = NNFactory.rbm(2, 3, true);
-	NNFactory.rbmSigmoidSigmoid(rbm);
+	rbm.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
 
 	Matrix cg1 = rbm.getMainConnections().getConnectionGraph();
 	cg1.set(0, 0, 0.2f);
@@ -138,9 +135,7 @@ public class RBMTest {
 	cgb2.set(0, 0, -0.4f);
 	cgb2.set(1, 0, 0.2f);
 
-	PCDAparapiTrainer t = TrainerFactory.pcdTrainer(rbm, new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, null, 1, 1), null, null, null, 1f, 0f, 0f, 1);
-	t.getProperties().setParameter(Constants.HIDDEN_CONNECTION_CALCULATOR, new AparapiSigmoid());
-	t.getProperties().setParameter(Constants.VISIBLE_CONNECTION_CALCULATOR, new AparapiSigmoid());
+	AparapiCDTrainer t = TrainerFactory.pcdTrainer(rbm, NNFactory.rbmSigmoidSigmoid(rbm), new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, null, 1, 1), null, null, null, 1f, 0f, 0f, 1);
 	t.train();
 
 	assertEquals(0.2 + 0.13203661, cg1.get(0, 0), 0.00001);
@@ -164,18 +159,17 @@ public class RBMTest {
     @Test
     public void testContrastiveDivergence2() {
 	RBM rbm = NNFactory.rbm(6, 2, false);
-	NNFactory.rbmSigmoidSigmoid(rbm);
+	rbm.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
 
 	TrainingInputProvider trainInputProvider = new SimpleInputProvider(new float[][] {{1, 1, 1, 0, 0, 0}, {1, 0, 1, 0, 0, 0}, {0, 1, 1, 1, 0, 0}, {0, 0, 0, 1, 1, 1}, {0, 0, 1, 1, 1, 0}, {0, 0, 0, 1, 0, 1} }, null, 1000, 1);
 	TrainingInputProvider testInputProvider =  new SimpleInputProvider(new float[][] {{1, 1, 1, 0, 0, 0}, {1, 0, 1, 0, 0, 0}, {0, 1, 1, 1, 0, 0}, {0, 0, 0, 1, 1, 1}, {0, 0, 1, 1, 1, 0}, {0, 0, 0, 1, 0, 1} }, new float[][] {{1, 0}, {1, 0}, {1, 0}, {0, 1}, {0, 1}, {0, 1} }, 6, 1);
 	MultipleNeuronsOutputError error = new MultipleNeuronsOutputError();
 
-	CDAparapiTrainer t = TrainerFactory.cdTrainer(rbm, trainInputProvider, testInputProvider, error, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.02f, 0.5f, 0f, 1);
+	AparapiCDTrainer t = TrainerFactory.cdTrainer(rbm, NNFactory.rbmSigmoidSigmoid(rbm), trainInputProvider, testInputProvider, error, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.02f, 0.5f, 0f, 1);
+	
 	t.addEventListener(new LogTrainingListener());
 
 	Environment.getInstance().setExecutionStrategy(new SeqKernelExecution());
-	t.getProperties().setParameter(Constants.VISIBLE_CONNECTION_CALCULATOR, new AparapiSigmoid());
-	t.getProperties().setParameter(Constants.HIDDEN_CONNECTION_CALCULATOR, new AparapiSigmoid());
 
 	t.train();
 	t.test();
@@ -189,18 +183,16 @@ public class RBMTest {
     @Test
     public void testPersistentContrastiveDivergence() {
 	RBM rbm = NNFactory.rbm(6, 2, false);
-	NNFactory.rbmSigmoidSigmoid(rbm);
+	rbm.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
 	
 	TrainingInputProvider trainInputProvider = new SimpleInputProvider(new float[][] {{1, 1, 1, 0, 0, 0}, {1, 0, 1, 0, 0, 0}, {0, 1, 1, 1, 0, 0}, {0, 0, 0, 1, 1, 1}, {0, 0, 1, 1, 1, 0}, {0, 0, 0, 1, 0, 1} }, null, 600, 1);
 	TrainingInputProvider testInputProvider =  new SimpleInputProvider(new float[][] {{1, 1, 1, 0, 0, 0}, {1, 0, 1, 0, 0, 0}, {0, 1, 1, 1, 0, 0}, {0, 0, 0, 1, 1, 1}, {0, 0, 1, 1, 1, 0}, {0, 0, 0, 1, 0, 1} }, new float[][] {{1, 0}, {1, 0}, {1, 0}, {0, 1}, {0, 1}, {0, 1} }, 6, 1);
 	MultipleNeuronsOutputError error = new MultipleNeuronsOutputError();
 	
-	PCDAparapiTrainer t = TrainerFactory.pcdTrainer(rbm, trainInputProvider, testInputProvider, error, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.02f, 0.5f, 0f, 1);
+	AparapiCDTrainer t = TrainerFactory.pcdTrainer(rbm, NNFactory.rbmSigmoidSigmoid(rbm), trainInputProvider, testInputProvider, error, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.02f, 0.5f, 0f, 1);
 	t.addEventListener(new LogTrainingListener());
 	
 	Environment.getInstance().setExecutionStrategy(new SeqKernelExecution());
-	t.getProperties().setParameter(Constants.VISIBLE_CONNECTION_CALCULATOR, new AparapiSigmoid());
-	t.getProperties().setParameter(Constants.HIDDEN_CONNECTION_CALCULATOR, new AparapiSigmoid());
 	
 	t.train();
 	t.test();

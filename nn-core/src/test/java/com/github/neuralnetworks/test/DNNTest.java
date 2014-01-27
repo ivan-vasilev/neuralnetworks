@@ -19,13 +19,11 @@ import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.architecture.types.RBM;
 import com.github.neuralnetworks.architecture.types.StackedAutoencoder;
 import com.github.neuralnetworks.calculation.LayerCalculatorImpl;
-import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSigmoid;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSumConnectionCalculator;
 import com.github.neuralnetworks.training.DNNLayerTrainer;
 import com.github.neuralnetworks.training.OneStepTrainer;
 import com.github.neuralnetworks.training.TrainerFactory;
-import com.github.neuralnetworks.training.rbm.PCDAparapiTrainer;
-import com.github.neuralnetworks.util.Constants;
+import com.github.neuralnetworks.training.rbm.AparapiCDTrainer;
 import com.github.neuralnetworks.util.Util;
 
 public class DNNTest {
@@ -158,15 +156,11 @@ public class DNNTest {
 
 	SimpleInputProvider inputProvider = new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, null, 1, 1);
 
-	PCDAparapiTrainer firstTrainer = TrainerFactory.pcdTrainer(firstRBM, null, null, null, null, 1f, 0f, 0f, 1);
-	firstTrainer.getProperties().setParameter(Constants.HIDDEN_CONNECTION_CALCULATOR, new AparapiSigmoid());
-	firstTrainer.getProperties().setParameter(Constants.VISIBLE_CONNECTION_CALCULATOR, new AparapiSigmoid());
+	AparapiCDTrainer firstTrainer = TrainerFactory.pcdTrainer(firstRBM, NNFactory.rbmSigmoidSigmoid(firstRBM), null, null, null, null, 1f, 0f, 0f, 1);
 
 	RBM secondRBM = dbn.getLastNeuralNetwork();
 
-	PCDAparapiTrainer secondTrainer = TrainerFactory.pcdTrainer(secondRBM, null, null, null, null, 1f, 0f, 0f, 1);
-	secondTrainer.getProperties().setParameter(Constants.HIDDEN_CONNECTION_CALCULATOR, new AparapiSigmoid());
-	secondTrainer.getProperties().setParameter(Constants.VISIBLE_CONNECTION_CALCULATOR, new AparapiSigmoid());
+	AparapiCDTrainer secondTrainer = TrainerFactory.pcdTrainer(secondRBM, NNFactory.rbmSigmoidSigmoid(secondRBM), null, null, null, null, 1f, 0f, 0f, 1);
 
 	Map<NeuralNetwork, OneStepTrainer<?>> layerTrainers = new HashMap<>();
 	layerTrainers.put(firstRBM, firstTrainer);
@@ -231,12 +225,10 @@ public class DNNTest {
 	
 	SimpleInputProvider inputProvider = new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, null, 1, 1);
 
-	PCDAparapiTrainer firstTrainer = TrainerFactory.pcdTrainer(firstRBM, null, null, null, null, 0f, 0f, 0f, 0);
+	AparapiCDTrainer firstTrainer = TrainerFactory.pcdTrainer(firstRBM, NNFactory.rbmSigmoidSigmoid(firstRBM), null, null, null, null, 0f, 0f, 0f, 0);
 
-	PCDAparapiTrainer secondTrainer = TrainerFactory.pcdTrainer(secondRBM, null, null, null, null, 1f, 0f, 0f, 1);
-	secondTrainer.getProperties().setParameter(Constants.HIDDEN_CONNECTION_CALCULATOR, new AparapiSigmoid());
-	secondTrainer.getProperties().setParameter(Constants.VISIBLE_CONNECTION_CALCULATOR, new AparapiSigmoid());
-	
+	AparapiCDTrainer secondTrainer = TrainerFactory.pcdTrainer(secondRBM, NNFactory.rbmSigmoidSigmoid(secondRBM), null, null, null, null, 1f, 0f, 0f, 1);
+
 	Map<NeuralNetwork, OneStepTrainer<?>> layerTrainers = new HashMap<>();
 	layerTrainers.put(firstRBM, firstTrainer);
 	layerTrainers.put(secondRBM, secondTrainer);

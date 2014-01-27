@@ -2,9 +2,6 @@ package com.github.neuralnetworks.training.rbm;
 
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.types.RBM;
-import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSigmoid;
-import com.github.neuralnetworks.calculation.neuronfunctions.AparapiStochasticBinary;
-import com.github.neuralnetworks.training.random.AparapiXORShiftInitializer;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.Properties;
@@ -13,7 +10,7 @@ import com.github.neuralnetworks.util.Properties;
  * Base class for Aparapi Contrastive Divergence
  * Supports learning rate, momentum and weight decay
  */
-public abstract class CDAparapiTrainerBase extends CDTrainerBase {
+public class AparapiCDTrainer extends CDTrainerBase {
 
     /**
      * weights update kernel for the connections between the visible and the hidden layer
@@ -30,9 +27,8 @@ public abstract class CDAparapiTrainerBase extends CDTrainerBase {
      */
     private CDBiasUpdatesKernel hiddenBiasUpdatesKernel;
 
-    public CDAparapiTrainerBase(Properties properties) {
+    public AparapiCDTrainer(Properties properties) {
 	super(properties);
-	init();
     }
 
     /* (non-Javadoc)
@@ -82,16 +78,6 @@ public abstract class CDAparapiTrainerBase extends CDTrainerBase {
 	    hiddenBiasUpdatesKernel.setLearningRate(getLearningRate());
 	    hiddenBiasUpdatesKernel.setMomentum(getMomentum());
 	    Environment.getInstance().getExecutionStrategy().execute(hiddenBiasUpdatesKernel, rbm.getHiddenBiasConnections().getConnectionGraph().getElements().length);
-	}
-    }
-
-    protected void init() {
-	if (!properties.containsKey(Constants.HIDDEN_CONNECTION_CALCULATOR)) {
-	    properties.setParameter(Constants.HIDDEN_CONNECTION_CALCULATOR, new AparapiStochasticBinary(new AparapiXORShiftInitializer()));
-	}
-
-	if (!properties.containsKey(Constants.VISIBLE_CONNECTION_CALCULATOR)) {
-	    properties.setParameter(Constants.VISIBLE_CONNECTION_CALCULATOR, new AparapiSigmoid());
 	}
     }
 

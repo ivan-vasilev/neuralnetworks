@@ -2,9 +2,7 @@ package com.github.neuralnetworks.training.rbm;
 
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.types.RBM;
-import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.calculation.RBMLayerCalculator;
-import com.github.neuralnetworks.events.TrainingEvent;
 import com.github.neuralnetworks.training.OneStepTrainer;
 import com.github.neuralnetworks.training.TrainingInputData;
 import com.github.neuralnetworks.util.Constants;
@@ -46,7 +44,7 @@ public abstract class CDTrainerBase extends OneStepTrainer<RBM> {
     }
 
     @Override
-    protected void learnInput(TrainingInputData data) {
+    protected void learnInput(TrainingInputData data, int batch) {
 	RBM nn = getNeuralNetwork();
 
 	posPhaseVisible = data.getInput();
@@ -57,26 +55,7 @@ public abstract class CDTrainerBase extends OneStepTrainer<RBM> {
 	    negPhaseHidden = new Matrix(nn.getHiddenLayer().getNeuronCount(), miniBatchSize);
 	}
 
-	triggerEvent(new SamplingStepEvent(this, -1));
-
-	RBMLayerCalculator calculator = (RBMLayerCalculator) getLayerCalculator();
-
-	// calculate hidden layer positive phase
-	calculator.addConnectionCalculator(nn.getHiddenLayer(), getHiddenConnectionCalculator(0));
-	calculator.calculateHiddenLayer(nn, posPhaseVisible, posPhaseHidden);
-
-	triggerEvent(new SamplingStepEvent(this, 0));
-
-	// Gibbs sampling
-	for (int i = 1; i <= getGibbsSamplingCount(); i++) {
-	    calculator.addConnectionCalculator(nn.getVisibleLayer(), getVisibleConnectionCalculator(i));
-	    calculator.calculateVisibleLayer(nn, negPhaseVisible, negPhaseHidden);
-
-	    calculator.addConnectionCalculator(nn.getHiddenLayer(), getHiddenConnectionCalculator(i));
-	    calculator.calculateHiddenLayer(nn, negPhaseVisible, negPhaseHidden);
-
-	    triggerEvent(new SamplingStepEvent(this, i));
-	}
+	getLayerCalculator().gibbsSampling(nn, posPhaseVisible, posPhaseHidden, negPhaseVisible, negPhaseHidden, getGibbsSamplingCount(), batch == 0 ? true : getResetRBM());
 
 	// update weights
 	updateWeights(posPhaseVisible, posPhaseHidden, negPhaseVisible, negPhaseHidden);
@@ -102,12 +81,20 @@ public abstract class CDTrainerBase extends OneStepTrainer<RBM> {
         return miniBatchSize;
     }
 
-    protected ConnectionCalculator getVisibleConnectionCalculator(int samplingStep) {
-	return properties.getParameter(Constants.VISIBLE_CONNECTION_CALCULATOR);
+    public RBMLayerCalculator getLayerCalculator() {
+	return properties.getParameter(Constants.LAYER_CALCULATOR);
     }
 
-    protected ConnectionCalculator getHiddenConnectionCalculator(int samplingStep) {
-	return properties.getParameter(Constants.HIDDEN_CONNECTION_CALCULATOR);
+    public void setLayerCalculator(RBMLayerCalculator layerCalculator) {
+	properties.setParameter(Constants.LAYER_CALCULATOR, layerCalculator);
+    }
+    
+    public Boolean getResetRBM() {
+	return properties.getParameter(Constants.RESET_RBM);
+    }
+    
+    public void setResetRBM(boolean resetRBM) {
+	properties.setParameter(Constants.RESET_RBM, resetRBM);
     }
 
     public int getGibbsSamplingCount() {
@@ -115,20 +102,4 @@ public abstract class CDTrainerBase extends OneStepTrainer<RBM> {
     }
 
     protected abstract void updateWeights(Matrix posPhaseVisible, Matrix posPhaseHidden, Matrix negPhaseVisible, Matrix negPhaseHidden);
-
-    public static class SamplingStepEvent extends TrainingEvent {
-
-	private static final long serialVersionUID = 1772155171480490374L;
-
-	private int samplingCount;
-
-	public SamplingStepEvent(CDTrainerBase source, int samplingCount) {
-	    super(source);
-	    this.samplingCount = samplingCount;
-	}
-
-	public int getSamplingCount() {
-	    return samplingCount;
-	}
-    }
 }

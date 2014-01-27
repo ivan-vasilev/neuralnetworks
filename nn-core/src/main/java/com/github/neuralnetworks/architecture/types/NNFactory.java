@@ -181,76 +181,83 @@ public class NNFactory {
 	return new RBM(new Layer(visibleCount), new Layer(hiddenCount), addBias, addBias);
     }
     
-    public static void rbmWeightedSumWeightedSum(RBM rbm) {
+    public static RBMLayerCalculator rbmWeightedSumWeightedSum(RBM rbm) {
 	RBMLayerCalculator lc = new RBMLayerCalculator();
-	rbm.setLayerCalculator(lc);
 	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiWeightedSumConnectionCalculator());
 	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiWeightedSumConnectionCalculator());
 	populateBiasLayers(lc, rbm);
+	return lc;
     }
 
-    public static void rbmSigmoidSigmoid(RBM rbm) {
+    public static RBMLayerCalculator rbmSigmoidSigmoid(RBM rbm) {
 	RBMLayerCalculator lc = new RBMLayerCalculator();
-	rbm.setLayerCalculator(lc);
 	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiSigmoid());
 	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiSigmoid());
 	populateBiasLayers(lc, rbm);
+	return lc;
     }
 
-    public static void rbmSoftReluSoftRelu(RBM rbm) {
+    public static RBMLayerCalculator rbmSoftReluSoftRelu(RBM rbm) {
 	RBMLayerCalculator lc = new RBMLayerCalculator();
-	rbm.setLayerCalculator(lc);
 	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiSoftReLU());
 	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiSoftReLU());
 	populateBiasLayers(lc, rbm);
+
+	return lc;
     }
     
-    public static void rbmReluRelu(RBM rbm) {
+    public static RBMLayerCalculator rbmReluRelu(RBM rbm) {
 	RBMLayerCalculator lc = new RBMLayerCalculator();
-	rbm.setLayerCalculator(lc);
 	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiReLU());
 	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiReLU());
 	populateBiasLayers(lc, rbm);
+
+	return lc;
     }
 
-    public static void rbmTanhTanh(RBM rbm) {
+    public static RBMLayerCalculator rbmTanhTanh(RBM rbm) {
 	RBMLayerCalculator lc = new RBMLayerCalculator();
-	rbm.setLayerCalculator(lc);
 	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiTanh());
 	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiTanh());
 	populateBiasLayers(lc, rbm);
+
+	return lc;
     }
 
-    public static void rbmSigmoidBinary(RBM rbm) {
+    public static RBMLayerCalculator rbmSigmoidBinary(RBM rbm) {
 	RBMLayerCalculator lc = new RBMLayerCalculator();
-	rbm.setLayerCalculator(lc);
 	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiSigmoid());
 	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiStochasticBinary(new AparapiXORShiftInitializer()));
 	populateBiasLayers(lc, rbm);
+
+	return lc;
     }
 
-    public static void rbmSoftReluBinary(RBM rbm) {
+    public static RBMLayerCalculator rbmSoftReluBinary(RBM rbm) {
 	RBMLayerCalculator lc = new RBMLayerCalculator();
-	rbm.setLayerCalculator(lc);
 	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiSoftReLU());
 	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiStochasticBinary(new AparapiXORShiftInitializer()));
 	populateBiasLayers(lc, rbm);
+
+	return lc;
     }
     
-    public static void rbmReluBinary(RBM rbm) {
+    public static RBMLayerCalculator rbmReluBinary(RBM rbm) {
 	RBMLayerCalculator lc = new RBMLayerCalculator();
-	rbm.setLayerCalculator(lc);
 	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiReLU());
 	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiStochasticBinary(new AparapiXORShiftInitializer()));
 	populateBiasLayers(lc, rbm);
+
+	return lc;
     }
 
-    public static void rbmTanhBinary(RBM rbm) {
+    public static RBMLayerCalculator rbmTanhBinary(RBM rbm) {
 	RBMLayerCalculator lc = new RBMLayerCalculator();
-	rbm.setLayerCalculator(lc);
 	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiTanh());
 	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiStochasticBinary(new AparapiXORShiftInitializer()));
 	populateBiasLayers(lc, rbm);
+
+	return lc;
     }
 
     public static DBN dbn(int[] layers, boolean addBias) {

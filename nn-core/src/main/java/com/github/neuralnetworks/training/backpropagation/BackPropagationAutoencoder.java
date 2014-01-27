@@ -26,12 +26,12 @@ public class BackPropagationAutoencoder extends BackPropagationTrainer<Autoencod
     }
 
     @Override
-    protected void learnInput(TrainingInputData data) {
+    protected void learnInput(TrainingInputData data, int batch) {
 	if (autoencoderTrainingInputData == null) {
 	    autoencoderTrainingInputData = new AutoencoderTrainingInputData();
 	}
 	autoencoderTrainingInputData.setBaseInput(data);
-	super.learnInput(autoencoderTrainingInputData);
+	super.learnInput(autoencoderTrainingInputData, batch);
     }
     
     public InputCorruptor getInputCorruptor() {

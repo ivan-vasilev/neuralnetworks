@@ -21,10 +21,9 @@ public class Constants {
     public static final String RANDOM_GENERATOR = "randomGenerator";
     public static final String ERROR_CALCULATOR = "errorCalculator";
     public static final String LAYER_CALCULATOR = "layerCalculator";
+    public static final String RESET_RBM = "resetRBM";
     public static final String BACKPROPAGATION = "backpropagation";
     public static final String OUTPUT_ERROR_DERIVATIVE = "outputErrorDerivative";
-    public static final String VISIBLE_CONNECTION_CALCULATOR = "visibleConnectionCalculator";
-    public static final String HIDDEN_CONNECTION_CALCULATOR = "hiddenConnectionCalculator";
     public static final String LAYER_TRAINERS = "layerTrainers";
     public static final String WEIGHT_DECAY = "weightDecayTrainers";
     public static final String CORRUPTION_LEVEL = "corruptionLevel";

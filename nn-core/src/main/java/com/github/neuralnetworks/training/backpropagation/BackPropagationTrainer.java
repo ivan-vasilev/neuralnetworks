@@ -7,7 +7,6 @@ import java.util.Set;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
-import com.github.neuralnetworks.calculation.LayerCalculator;
 import com.github.neuralnetworks.training.OneStepTrainer;
 import com.github.neuralnetworks.training.TrainingInputData;
 import com.github.neuralnetworks.util.Constants;
@@ -44,14 +43,13 @@ public class BackPropagationTrainer<N extends NeuralNetwork> extends OneStepTrai
      * After that the error is backpropagated (via BackPropagationLayerCalculator blc).
      */
     @Override
-    protected void learnInput(TrainingInputData data) {
+    protected void learnInput(TrainingInputData data, int batch) {
 	NeuralNetwork nn = getNeuralNetwork();
 	Set<Layer> calculatedLayers = new UniqueList<Layer>();
 
 	activations.put(nn.getInputLayer(), data.getInput());
 	calculatedLayers.add(nn.getInputLayer());
-	LayerCalculator lc = getLayerCalculator();
-	lc.calculate(nn, nn.getOutputLayer(), calculatedLayers, activations);
+	nn.getLayerCalculator().calculate(nn, nn.getOutputLayer(), calculatedLayers, activations);
 
 	OutputErrorDerivative d = getProperties().getParameter(Constants.OUTPUT_ERROR_DERIVATIVE);
 	Matrix outputErrorDerivative = d.getOutputErrorDerivative(activations.get(nn.getOutputLayer()), data.getTarget());
