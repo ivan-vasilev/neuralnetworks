@@ -19,19 +19,11 @@ public class RBMLayerCalculator extends LayerCalculatorImpl {
 
     private Set<Layer> calculatedLayers;
     private Map<Layer, Matrix> results;
-    protected ConnectionCalculator lastGibbsSamplingStepCalculator;
 
     public RBMLayerCalculator() {
 	super();
 	calculatedLayers = new HashSet<>();
 	results = new HashMap<>();
-    }
-
-    public RBMLayerCalculator(ConnectionCalculator lastGibbsSamplingStepCalculator) {
-	super();
-	this.lastGibbsSamplingStepCalculator = lastGibbsSamplingStepCalculator;
-	this.calculatedLayers = new HashSet<>();
-	this.results = new HashMap<>();
     }
 
     public void gibbsSampling(RBM rbm, Matrix posPhaseVisible, Matrix posPhaseHidden, Matrix negPhaseVisible, Matrix negPhaseHidden, int samplingCount, boolean resetNetwork) {
@@ -44,15 +36,7 @@ public class RBMLayerCalculator extends LayerCalculatorImpl {
 	// Gibbs sampling
 	for (int i = 1; i <= samplingCount; i++) {
 	    calculateVisibleLayer(rbm, negPhaseVisible, negPhaseHidden);
-
-	    if (i == samplingCount && lastGibbsSamplingStepCalculator != null) {
-		ConnectionCalculator current = getConnectionCalculator(rbm.getHiddenLayer());
-		addConnectionCalculator(rbm.getHiddenLayer(), lastGibbsSamplingStepCalculator);
-		calculateHiddenLayer(rbm, negPhaseVisible, negPhaseHidden);
-		addConnectionCalculator(rbm.getHiddenLayer(), current);
-	    } else {
-		calculateHiddenLayer(rbm, negPhaseVisible, negPhaseHidden);
-	    }
+	    calculateHiddenLayer(rbm, negPhaseVisible, negPhaseHidden);
 	}
     }
 
@@ -80,13 +64,5 @@ public class RBMLayerCalculator extends LayerCalculatorImpl {
 	results.put(hiddenLayer, hiddenLayerResults);
 
 	super.calculate(rbm, hiddenLayer, calculatedLayers, results);
-    }
-
-    public ConnectionCalculator getLastGibbsSamplingStepCalculator() {
-        return lastGibbsSamplingStepCalculator;
-    }
-
-    public void setLastGibbsSamplingStepCalculator(ConnectionCalculator lastGibbsSamplingStepCalculator) {
-        this.lastGibbsSamplingStepCalculator = lastGibbsSamplingStepCalculator;
     }
 }

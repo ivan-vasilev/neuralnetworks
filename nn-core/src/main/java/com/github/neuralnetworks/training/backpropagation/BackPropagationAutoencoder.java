@@ -1,12 +1,8 @@
 package com.github.neuralnetworks.training.backpropagation;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.types.Autoencoder;
 import com.github.neuralnetworks.training.TrainingInputData;
-import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
 
 /**
@@ -30,58 +26,35 @@ public class BackPropagationAutoencoder extends BackPropagationTrainer<Autoencod
 	if (autoencoderTrainingInputData == null) {
 	    autoencoderTrainingInputData = new AutoencoderTrainingInputData();
 	}
-	autoencoderTrainingInputData.setBaseInput(data);
+	autoencoderTrainingInputData.setInputOutput(data.getInput());
 	super.learnInput(autoencoderTrainingInputData, batch);
-    }
-    
-    public InputCorruptor getInputCorruptor() {
-	return properties.getParameter(Constants.CORRUPTOR);
-    }
-    
-    public void setInputCorruptor(InputCorruptor corruptor) {
-	properties.setParameter(Constants.CORRUPTOR, corruptor);
     }
 
     /**
      * Input and target are the same
      */
-    private class AutoencoderTrainingInputData implements TrainingInputData {
+    private static class AutoencoderTrainingInputData implements TrainingInputData {
 
-	private Matrix baseInput;
-	private Matrix baseTarget;
-	protected Map<Integer, float[]> randomDistributions = new HashMap<>();
-
-	public AutoencoderTrainingInputData() {
-	    super();
-	}
+	private Matrix input;
+	private Matrix target;
 
 	@Override
 	public Matrix getInput() {
-	    return baseInput;
+	    return input;
 	}
 
 	@Override
 	public Matrix getTarget() {
-	    return baseTarget;
+	    return target;
 	}
 
-	public void setBaseInput(TrainingInputData baseInput) {
-	    this.baseTarget = baseInput.getInput();
-	    if (getInputCorruptor() != null) {
-		float[] randomDistribution = randomDistributions.get(baseTarget.getElements().length);
-		if (randomDistribution == null) {
-		    randomDistribution = new float[baseTarget.getElements().length];
-		    randomDistributions.put(randomDistribution.length, randomDistribution);
-		}
-
-		if (this.baseInput == null || this.baseInput.getElements().length != baseTarget.getElements().length) {
-		    this.baseInput = new Matrix(baseTarget.getColumns(), baseTarget.getRows());
-		}
-
-		getInputCorruptor().corrupt(this.baseInput.getElements());
-	    } else {
-		this.baseInput = this.baseTarget;
+	public void setInputOutput(Matrix inputOutput) {
+	    this.input = inputOutput;
+	    if (target == null || target.getElements().length != input.getElements().length) {
+		target = new Matrix(input.getRows(), input.getColumns());
 	    }
+
+	    System.arraycopy(input.getElements(), 0, target.getElements(), 0, target.getElements().length);
 	}
     }
 }

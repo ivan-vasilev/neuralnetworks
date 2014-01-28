@@ -30,27 +30,33 @@ public class DNNTest {
 
     @Test
     public void testDBNConstruction() {
-	DBN dbn = NNFactory.dbn(new int[] { 4, 4, 4 }, false);
-	assertEquals(3, dbn.getLayers().size(), 0);
-	assertEquals(2, dbn.getNeuralNetworks().size(), 0);
+	DBN dbn = NNFactory.dbn(new int[] { 4, 4, 4, 4}, false);
+	assertEquals(4, dbn.getLayers().size(), 0);
+	assertEquals(3, dbn.getNeuralNetworks().size(), 0);
 	assertEquals(2, dbn.getFirstNeuralNetwork().getLayers().size(), 0);
+	assertEquals(2, dbn.getNeuralNetwork(1).getLayers().size(), 0);
 	assertEquals(2, dbn.getLastNeuralNetwork().getLayers().size(), 0);
 
-	dbn = NNFactory.dbn(new int[] { 4, 4, 4 }, true);
-	assertEquals(5, dbn.getLayers().size(), 0);
-	assertEquals(2, dbn.getNeuralNetworks().size(), 0);
+	dbn = NNFactory.dbn(new int[] { 4, 4, 4, 4 }, true);
+	assertEquals(7, dbn.getLayers().size(), 0);
+	assertEquals(3, dbn.getNeuralNetworks().size(), 0);
 	assertEquals(4, dbn.getFirstNeuralNetwork().getLayers().size(), 0);
+	assertEquals(4, dbn.getNeuralNetwork(0).getLayers().size(), 0);
 	assertEquals(4, dbn.getLastNeuralNetwork().getLayers().size(), 0);
 
 	assertEquals(true, dbn.getFirstNeuralNetwork().getHiddenBiasConnections() != null);
 	assertEquals(true, dbn.getFirstNeuralNetwork().getVisibleBiasConnections() != null);
+	assertEquals(true, dbn.getNeuralNetwork(1).getHiddenBiasConnections() != null);
+	assertEquals(true, dbn.getNeuralNetwork(1).getVisibleBiasConnections() != null);
 	assertEquals(true, dbn.getLastNeuralNetwork().getHiddenBiasConnections() != null);
 	assertEquals(true, dbn.getLastNeuralNetwork().getVisibleBiasConnections() != null);
 
 	assertEquals(false, dbn.getLayers().contains(dbn.getFirstNeuralNetwork().getVisibleBiasConnections().getInputLayer()));
+	assertEquals(false, dbn.getLayers().contains(dbn.getNeuralNetwork(1).getVisibleBiasConnections().getInputLayer()));
 	assertEquals(false, dbn.getLayers().contains(dbn.getLastNeuralNetwork().getVisibleBiasConnections().getInputLayer()));
 
-	assertEquals(true, dbn.getFirstNeuralNetwork().getHiddenLayer() == dbn.getLastNeuralNetwork().getVisibleLayer());
+	assertEquals(true, dbn.getFirstNeuralNetwork().getHiddenLayer() == dbn.getNeuralNetwork(1).getVisibleLayer());
+	assertEquals(true, dbn.getNeuralNetwork(1).getHiddenLayer() == dbn.getLastNeuralNetwork().getVisibleLayer());
 
 	assertEquals(true, dbn.getOutputLayer().equals(dbn.getLastNeuralNetwork().getHiddenLayer()));
     }
@@ -133,7 +139,7 @@ public class DNNTest {
     @Test
     public void testDNNLayerTrainer() {
 	DBN dbn = NNFactory.dbn(new int [] {3, 2, 2}, true);
-	NNFactory.nnSigmoid(dbn, null);
+	dbn.setLayerCalculator(NNFactory.nnSigmoid(dbn, null));
 
 	RBM firstRBM = dbn.getFirstNeuralNetwork();
 
@@ -187,7 +193,7 @@ public class DNNTest {
     @Test
     public void testDNNLayerTrainer2() {
 	DBN dbn = NNFactory.dbn(new int [] {3, 3, 2}, true);
-	NNFactory.nnSigmoid(dbn, null);
+	dbn.setLayerCalculator(NNFactory.nnSigmoid(dbn, null));
 
 	LayerCalculatorImpl lc = (LayerCalculatorImpl) dbn.getLayerCalculator();
 	RBM firstRBM = dbn.getFirstNeuralNetwork();
