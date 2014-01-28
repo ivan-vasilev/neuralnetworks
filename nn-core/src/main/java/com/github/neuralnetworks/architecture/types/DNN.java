@@ -63,6 +63,14 @@ public abstract class DNN<N extends NeuralNetwork> extends MultiLayerPerceptron 
 	return output;
     }
 
+    public N getNeuralNetwork(int index) {
+	if (neuralNetworks != null) {
+	    return neuralNetworks.get(index);
+	}
+	
+	return null;
+    }
+
     public N getFirstNeuralNetwork() {
 	if (neuralNetworks != null && neuralNetworks.size() > 0) {
 	    return neuralNetworks.get(0);

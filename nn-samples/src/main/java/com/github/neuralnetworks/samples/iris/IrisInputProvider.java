@@ -23,8 +23,9 @@ public class IrisInputProvider implements TrainingInputProvider {
     private Random random;
     private boolean useRandom;
     private boolean scale;
+    private boolean attachTargetToInput;
 
-    public IrisInputProvider(int batchSize, int totalInputSize, InputConverter inputConverter, boolean useRandom, boolean scale) {
+    public IrisInputProvider(int batchSize, int totalInputSize, InputConverter inputConverter, boolean useRandom, boolean scale, boolean attachTargetToInput) {
 	super();
 	this.batchSize = batchSize;
 	this.totalInputSize = totalInputSize;
@@ -33,8 +34,9 @@ public class IrisInputProvider implements TrainingInputProvider {
 	this.random = new Random();
 	this.useRandom = useRandom;
 	this.scale = scale;
+	this.attachTargetToInput = attachTargetToInput;
 	this.dataset = createDataset();
-	this.currentExample = new TrainingInputDataImpl(new Matrix(dataset.getRows() - 1, batchSize));
+	this.currentExample = new TrainingInputDataImpl(new Matrix(dataset.getRows() - 1 + (attachTargetToInput == true ? 1 : 0), batchSize));
 	reset();
     }
 
@@ -45,6 +47,10 @@ public class IrisInputProvider implements TrainingInputProvider {
 		int k = useRandom ? random.nextInt(150) : currentInputCount % 150;
 		for (int j = 0; j < dataset.getRows() - 1; j++) {
 		    currentExample.getInput().set(j, i, dataset.get(j, k));
+		}
+
+		if (attachTargetToInput) {
+		    currentExample.getInput().set(currentExample.getInput().getRows() - 1, i, dataset.get(dataset.getRows() - 1, k));
 		}
 
 		target[i] = (int) dataset.get(dataset.getRows() - 1, k);
