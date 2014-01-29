@@ -5,7 +5,7 @@ import com.github.neuralnetworks.architecture.Matrix;
 /**
  * Threshold binary activation function
  */
-public class ThresholdFunction implements ActivationFunction {
+public class ThresholdFunction implements MatrixFunction {
 
     private float threshold;
 

@@ -5,7 +5,7 @@ import com.github.neuralnetworks.architecture.Matrix;
 /**
  * Softmax activation function
  */
-public class SoftmaxFunction implements ActivationFunction {
+public class SoftmaxFunction implements MatrixFunction {
 
     @Override
     public void value(Matrix inputOutput) {

@@ -55,7 +55,7 @@ public abstract class CDTrainerBase extends OneStepTrainer<RBM> {
 	    negPhaseHidden = new Matrix(nn.getHiddenLayer().getNeuronCount(), miniBatchSize);
 	}
 
-	getLayerCalculator().gibbsSampling(nn, posPhaseVisible, posPhaseHidden, negPhaseVisible, negPhaseHidden, getGibbsSamplingCount(), batch == 0 ? true : getResetRBM());
+	getLayerCalculator().gibbsSampling(nn, posPhaseVisible, posPhaseHidden, negPhaseVisible, negPhaseHidden, getGibbsSamplingCount(), batch == 0 ? true : getResetRBM(), true);
 
 	// update weights
 	updateWeights(posPhaseVisible, posPhaseHidden, negPhaseVisible, negPhaseHidden);

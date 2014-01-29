@@ -14,6 +14,7 @@ import com.github.neuralnetworks.calculation.neuronfunctions.AparapiTanh;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSumConnectionCalculator;
 import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculatorFullyConnected;
 import com.github.neuralnetworks.calculation.neuronfunctions.ConstantConnectionCalculator;
+import com.github.neuralnetworks.calculation.neuronfunctions.SoftmaxFunction;
 
 /**
  * Factory class for neural networks
@@ -75,8 +76,14 @@ public class NNFactory {
 	for (Layer l : nn.getLayers()) {
 	    if (!(l instanceof BiasLayer)) {
 		if (l != nn.getInputLayer()) {
-		    if (outputCC != null && nn.getOutputLayer() == l) {
-			lc.addConnectionCalculator(l, outputCC);
+		    if (nn.getOutputLayer() == l) {
+			if (outputCC != null) {
+			    lc.addConnectionCalculator(l, outputCC);
+			} else {
+			    AparapiSoftReLU c = new AparapiSoftReLU();
+			    c.addActivationFunction(new SoftmaxFunction());
+			    lc.addConnectionCalculator(l, c);
+			}
 		    } else {
 			lc.addConnectionCalculator(l, new AparapiSoftReLU());
 		    }
@@ -94,8 +101,14 @@ public class NNFactory {
 	for (Layer l : nn.getLayers()) {
 	    if (!(l instanceof BiasLayer)) {
 		if (l != nn.getInputLayer()) {
-		    if (outputCC != null && nn.getOutputLayer() == l) {
-			lc.addConnectionCalculator(l, outputCC);
+		    if (nn.getOutputLayer() == l) {
+			if (outputCC != null) {
+			    lc.addConnectionCalculator(l, outputCC);
+			} else {
+			    AparapiReLU c = new AparapiReLU();
+			    c.addActivationFunction(new SoftmaxFunction());
+			    lc.addConnectionCalculator(l, c);
+			}
 		    } else {
 			lc.addConnectionCalculator(l, new AparapiReLU());
 		    }
@@ -201,8 +214,16 @@ public class NNFactory {
 
     public static RBMLayerCalculator rbmSoftReluSoftRelu(RBM rbm) {
 	RBMLayerCalculator lc = new RBMLayerCalculator();
-	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiSoftReLU());
-	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiSoftReLU());
+
+	AparapiSoftReLU c1 = new AparapiSoftReLU();
+	c1.addActivationFunction(new SoftmaxFunction());
+	lc.addConnectionCalculator(rbm.getVisibleLayer(), c1);
+
+
+	AparapiSoftReLU c2 = new AparapiSoftReLU();
+	c2.addActivationFunction(new SoftmaxFunction());
+	lc.addConnectionCalculator(rbm.getHiddenLayer(), c2);
+
 	populateBiasLayers(lc, rbm);
 
 	return lc;
@@ -210,8 +231,15 @@ public class NNFactory {
     
     public static RBMLayerCalculator rbmReluRelu(RBM rbm) {
 	RBMLayerCalculator lc = new RBMLayerCalculator();
-	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiReLU());
-	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiReLU());
+
+	AparapiReLU c1 = new AparapiReLU();
+	c1.addActivationFunction(new SoftmaxFunction());
+	lc.addConnectionCalculator(rbm.getVisibleLayer(), c1);
+
+	AparapiReLU c2 = new AparapiReLU();
+	c2.addActivationFunction(new SoftmaxFunction());
+	lc.addConnectionCalculator(rbm.getHiddenLayer(), c2);
+
 	populateBiasLayers(lc, rbm);
 
 	return lc;

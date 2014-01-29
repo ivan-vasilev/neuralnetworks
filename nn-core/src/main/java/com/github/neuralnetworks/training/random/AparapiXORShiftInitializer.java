@@ -51,7 +51,7 @@ public class AparapiXORShiftInitializer implements RandomInitializer {
 
 	@Override
 	public void run() {
-	    array[getGlobalId()] = start + random01() * range;
+	    array[getGlobalId()] = start + randomGaussian() * range;
 	}
     }
 }

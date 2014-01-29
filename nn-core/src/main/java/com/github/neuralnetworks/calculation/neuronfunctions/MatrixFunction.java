@@ -3,8 +3,8 @@ package com.github.neuralnetworks.calculation.neuronfunctions;
 import com.github.neuralnetworks.architecture.Matrix;
 
 /**
- * A transfer function for a layer of neurons
+ * Implementations provide transformations to the elements of the matrix
  */
-public interface ActivationFunction {
+public interface MatrixFunction {
     public void value(Matrix inputOutput);
 }

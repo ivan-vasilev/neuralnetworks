@@ -6,9 +6,12 @@ import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.architecture.types.DNN;
+import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.architecture.types.RBM;
 import com.github.neuralnetworks.calculation.OutputError;
 import com.github.neuralnetworks.calculation.RBMLayerCalculator;
+import com.github.neuralnetworks.calculation.neuronfunctions.BernoulliDistribution;
+import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculatorFullyConnected;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationAutoencoder;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationFullyConnected;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationLayerCalculatorImpl;
@@ -175,12 +178,20 @@ public class TrainerFactory {
 	return p;
     }
     
-    public static AparapiCDTrainer cdTrainer(RBM rbm, RBMLayerCalculator lc, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay, int gibbsSampling) {
-	return new AparapiCDTrainer(rbmProperties(rbm, lc, trainingSet, testingSet, error, rand, learningRate, momentum, weightDecay, gibbsSampling, true));
+    public static AparapiCDTrainer cdSoftReLUTrainer(RBM rbm, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay, int gibbsSampling, boolean isPersistentCD) {
+	RBMLayerCalculator lc = NNFactory.rbmSigmoidSigmoid(rbm);
+	ConnectionCalculatorFullyConnected cc = (ConnectionCalculatorFullyConnected) lc.getConnectionCalculator(rbm.getInputLayer());
+	cc.addPreTransferFunction(new BernoulliDistribution());
+	
+	return new AparapiCDTrainer(rbmProperties(rbm, lc, trainingSet, testingSet, error, rand, learningRate, momentum, weightDecay, gibbsSampling, isPersistentCD));
     }
 
-    public static AparapiCDTrainer pcdTrainer(RBM rbm, RBMLayerCalculator lc, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay, int gibbsSampling) {
-	return new AparapiCDTrainer(rbmProperties(rbm, lc, trainingSet, testingSet, error, rand, learningRate, momentum, weightDecay, gibbsSampling, false));
+    public static AparapiCDTrainer cdSigmoidTrainer(RBM rbm, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay, int gibbsSampling, boolean isPersistentCD) {
+	RBMLayerCalculator lc = NNFactory.rbmSigmoidSigmoid(rbm);
+	ConnectionCalculatorFullyConnected cc = (ConnectionCalculatorFullyConnected) lc.getConnectionCalculator(rbm.getInputLayer());
+	cc.addPreTransferFunction(new BernoulliDistribution());
+
+	return new AparapiCDTrainer(rbmProperties(rbm, lc, trainingSet, testingSet, error, rand, learningRate, momentum, weightDecay, gibbsSampling, isPersistentCD));
     }
 
     protected static Properties rbmProperties(RBM rbm, RBMLayerCalculator lc, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay, int gibbsSampling, boolean resetRBM) {

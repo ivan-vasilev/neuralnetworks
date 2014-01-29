@@ -19,15 +19,19 @@ public class RBMLayerCalculator extends LayerCalculatorImpl {
 
     private Set<Layer> calculatedLayers;
     private Map<Layer, Matrix> results;
+    private Map<Layer, Matrix> intermediateResults;
 
     public RBMLayerCalculator() {
 	super();
 	calculatedLayers = new HashSet<>();
 	results = new HashMap<>();
+	intermediateResults = new HashMap<>();
     }
 
-    public void gibbsSampling(RBM rbm, Matrix posPhaseVisible, Matrix posPhaseHidden, Matrix negPhaseVisible, Matrix negPhaseHidden, int samplingCount, boolean resetNetwork) {
-	calculateHiddenLayer(rbm, posPhaseVisible, posPhaseHidden);
+    public void gibbsSampling(RBM rbm, Matrix posPhaseVisible, Matrix posPhaseHidden, Matrix negPhaseVisible, Matrix negPhaseHidden, int samplingCount, boolean resetNetwork, boolean useIntermediateResults) {
+	Matrix hidden, visible;
+	visible = getLayerResult(rbm.getVisibleLayer(), posPhaseVisible, useIntermediateResults);
+	calculateHiddenLayer(rbm, visible, posPhaseHidden);
 
 	if (resetNetwork) {
 	    System.arraycopy(posPhaseHidden.getElements(), 0, negPhaseHidden.getElements(), 0, negPhaseHidden.getElements().length);
@@ -35,8 +39,11 @@ public class RBMLayerCalculator extends LayerCalculatorImpl {
 
 	// Gibbs sampling
 	for (int i = 1; i <= samplingCount; i++) {
-	    calculateVisibleLayer(rbm, negPhaseVisible, negPhaseHidden);
-	    calculateHiddenLayer(rbm, negPhaseVisible, negPhaseHidden);
+	    hidden = getLayerResult(rbm.getHiddenLayer(), negPhaseHidden, useIntermediateResults);
+	    calculateVisibleLayer(rbm, negPhaseVisible, hidden);
+
+	    visible = getLayerResult(rbm.getVisibleLayer(), negPhaseVisible, useIntermediateResults);
+	    calculateHiddenLayer(rbm, visible, negPhaseHidden);
 	}
     }
 
@@ -64,5 +71,19 @@ public class RBMLayerCalculator extends LayerCalculatorImpl {
 	results.put(hiddenLayer, hiddenLayerResults);
 
 	super.calculate(rbm, hiddenLayer, calculatedLayers, results);
+    }
+
+    private Matrix getLayerResult(Layer layer, Matrix realResult, boolean useIntermediateResults) {
+	Matrix result = realResult;
+	if (useIntermediateResults) {
+	    result = intermediateResults.get(layer);
+	    if (result == null) {
+		intermediateResults.put(layer, result = new Matrix(realResult));
+	    }
+
+	    System.arraycopy(realResult.getElements(), 0, result.getElements(), 0, result.getElements().length);
+	}
+
+	return result;
     }
 }

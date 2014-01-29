@@ -37,12 +37,12 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator 
     /**
      * Activation functions that are executed before the transfer function
      */
-    protected List<ActivationFunction> preTransferFunctions;
+    protected List<MatrixFunction> preTransferFunctions;
 
     /**
      * Activation functions that are called after the transfer function
      */
-    protected List<ActivationFunction> activationFunctions;
+    protected List<MatrixFunction> activationFunctions;
 
     
     public ConnectionCalculatorFullyConnected() {
@@ -67,9 +67,13 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator 
 	    }
 
 	    if (notBias.size() > 0) {
-		if (preTransferFunctions != null) {
-		    for (ActivationFunction f : preTransferFunctions) {
-			f.value(output);
+		if (preTransferFunctions != null && preTransferFunctions.size() > 0) {
+		    for (MatrixFunction f : preTransferFunctions) {
+			for (Entry<Connections, Matrix> e : connections.entrySet()) {
+			    if (!(e.getKey().getInputLayer() instanceof BiasLayer)) {
+				f.value(e.getValue());
+			    }
+			}
 		    }
 		}
 
@@ -90,7 +94,7 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator 
 		inputFunction.calculate(notBias, output, targetLayer);
 
 		if (activationFunctions != null) {
-		    for (ActivationFunction f : activationFunctions) {
+		    for (MatrixFunction f : activationFunctions) {
 			f.value(output);
 		    }
 		}
@@ -114,7 +118,7 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator 
 	return new AparapiWeightedSum(inputConnections, miniBatchSize, targetLayer);
     }
     
-    public void addPreTransferFunction(ActivationFunction function) {
+    public void addPreTransferFunction(MatrixFunction function) {
 	if (preTransferFunctions == null) {
 	    preTransferFunctions = new UniqueList<>();
 	}
@@ -122,13 +126,13 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator 
 	preTransferFunctions.add(function);
     }
     
-    public void removePreTransfer(ActivationFunction function) {
+    public void removePreTransfer(MatrixFunction function) {
 	if (preTransferFunctions != null) {
 	    preTransferFunctions.remove(function);
 	}
     }
 
-    public void addActivationFunction(ActivationFunction activationFunction) {
+    public void addActivationFunction(MatrixFunction activationFunction) {
 	if (activationFunctions == null) {
 	    activationFunctions = new UniqueList<>();
 	}
@@ -136,7 +140,7 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator 
 	activationFunctions.add(activationFunction);
     }
 
-    public void removeActivationFunction(ActivationFunction activationFunction) {
+    public void removeActivationFunction(MatrixFunction activationFunction) {
 	if (activationFunctions != null) {
 	    activationFunctions.remove(activationFunction);
 	}

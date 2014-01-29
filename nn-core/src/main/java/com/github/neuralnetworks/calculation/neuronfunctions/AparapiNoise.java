@@ -3,7 +3,7 @@ package com.github.neuralnetworks.calculation.neuronfunctions;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.training.random.XORShiftKernel;
 
-public class AparapiNoise extends XORShiftKernel implements ActivationFunction {
+public class AparapiNoise extends XORShiftKernel implements MatrixFunction {
 
     private final float corruptionLevel;
     private float[] inputOutput;
