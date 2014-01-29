@@ -135,7 +135,8 @@ public class RBMTest {
 	cgb2.set(0, 0, -0.4f);
 	cgb2.set(1, 0, 0.2f);
 
-	AparapiCDTrainer t = TrainerFactory.pcdTrainer(rbm, NNFactory.rbmSigmoidSigmoid(rbm), new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, null, 1, 1), null, null, null, 1f, 0f, 0f, 1);
+	AparapiCDTrainer t = TrainerFactory.cdSigmoidTrainer(rbm, new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, null, 1, 1), null, null, null, 1f, 0f, 0f, 1, true);
+	t.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
 	t.train();
 
 	assertEquals(0.2 + 0.13203661, cg1.get(0, 0), 0.00001);
@@ -165,9 +166,9 @@ public class RBMTest {
 	TrainingInputProvider testInputProvider =  new SimpleInputProvider(new float[][] {{1, 1, 1, 0, 0, 0}, {1, 0, 1, 0, 0, 0}, {0, 1, 1, 1, 0, 0}, {0, 0, 0, 1, 1, 1}, {0, 0, 1, 1, 1, 0}, {0, 0, 0, 1, 0, 1} }, new float[][] {{1, 0}, {1, 0}, {1, 0}, {0, 1}, {0, 1}, {0, 1} }, 6, 1);
 	MultipleNeuronsOutputError error = new MultipleNeuronsOutputError();
 
-	AparapiCDTrainer t = TrainerFactory.cdTrainer(rbm, NNFactory.rbmSigmoidSigmoid(rbm), trainInputProvider, testInputProvider, error, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.02f, 0.5f, 0f, 1);
+	AparapiCDTrainer t = TrainerFactory.cdSigmoidTrainer(rbm, trainInputProvider, testInputProvider, error, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.02f, 0.5f, 0f, 1, false);
 	
-	t.addEventListener(new LogTrainingListener());
+	t.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
 
 	Environment.getInstance().setExecutionStrategy(new SeqKernelExecution());
 
@@ -189,8 +190,8 @@ public class RBMTest {
 	TrainingInputProvider testInputProvider =  new SimpleInputProvider(new float[][] {{1, 1, 1, 0, 0, 0}, {1, 0, 1, 0, 0, 0}, {0, 1, 1, 1, 0, 0}, {0, 0, 0, 1, 1, 1}, {0, 0, 1, 1, 1, 0}, {0, 0, 0, 1, 0, 1} }, new float[][] {{1, 0}, {1, 0}, {1, 0}, {0, 1}, {0, 1}, {0, 1} }, 6, 1);
 	MultipleNeuronsOutputError error = new MultipleNeuronsOutputError();
 	
-	AparapiCDTrainer t = TrainerFactory.pcdTrainer(rbm, NNFactory.rbmSigmoidSigmoid(rbm), trainInputProvider, testInputProvider, error, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.02f, 0.5f, 0f, 1);
-	t.addEventListener(new LogTrainingListener());
+	AparapiCDTrainer t = TrainerFactory.cdSigmoidTrainer(rbm, trainInputProvider, testInputProvider, error, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.02f, 0.5f, 0f, 1, true);
+	t.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
 	
 	Environment.getInstance().setExecutionStrategy(new SeqKernelExecution());
 	

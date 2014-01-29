@@ -94,7 +94,6 @@ public class FFNNTest {
 	// with bias
 	map.put(bc, new Matrix(2, 2));
 	aws = new AparapiWeightedSumConnectionCalculator();
-	// Environment.getInstance().setExecutionMode(EXECUTION_MODE.JTP);
 	aws.calculate(map, o, ol);
 
 	assertEquals(14.1, o.get(0, 0), 0.01);
@@ -203,7 +202,7 @@ public class FFNNTest {
      */
     @Test
     public void testSigmoidBP() {
-	MultiLayerPerceptron mlp = NNFactory.mlpSigmoid(new int[] { 2, 2, 1 }, false);
+	MultiLayerPerceptron mlp = NNFactory.mlp(new int[] { 2, 2, 1 }, false);
 	FullyConnected c1 = (FullyConnected) mlp.getInputLayer().getConnections().iterator().next();
 	Matrix cg1 = c1.getConnectionGraph();
 	cg1.set(0, 0, 0.1f);
@@ -233,7 +232,7 @@ public class FFNNTest {
      */
     @Test
     public void testSigmoidBP2() {
-	MultiLayerPerceptron mlp = NNFactory.mlpSigmoid(new int[] { 3, 2, 1 }, true);
+	MultiLayerPerceptron mlp = NNFactory.mlp(new int[] { 3, 2, 1 }, true);
 	List<Connections> c = mlp.getConnections();
 	FullyConnected c1 = (FullyConnected) c.get(0);
 	Matrix cg1 = c1.getConnectionGraph();
@@ -260,7 +259,6 @@ public class FFNNTest {
 
 	@SuppressWarnings("unchecked")
 	BackPropagationTrainer<MultiLayerPerceptron> bpt = TrainerFactory.backPropagationSigmoid(mlp, new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, new float[][] { { 1 } }, 1, 1), new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, new float[][] { { 1 } }, 1, 1), null, null, 0.9f, 0f, 0f);
-	// Environment.getInstance().setExecutionMode(EXECUTION_MODE.JTP);
 	bpt.train();
 
 	assertEquals(0.192, cg1.get(0, 0), 0.001);
@@ -319,5 +317,14 @@ public class FFNNTest {
 	Matrix o = results.get(output);
 
 	assertEquals(1.32, o.get(0, 0), 0.000001);
+    }
+
+    @Test
+    public void testRemoveLayer() {
+	MultiLayerPerceptron mlp = NNFactory.mlp(new int[] {3, 4, 5}, true);
+	assertEquals(5, mlp.getLayers().size(), 0);
+	mlp.removeLayer(mlp.getOutputLayer());
+	assertEquals(3, mlp.getLayers().size(), 0);
+	assertEquals(4, mlp.getOutputLayer().getNeuronCount(), 0);
     }
 }

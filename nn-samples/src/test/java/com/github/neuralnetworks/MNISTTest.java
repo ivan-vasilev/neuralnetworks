@@ -38,7 +38,7 @@ public class MnistTest {
 	testInputProvider.addInputModifier(new ScalingInputModifier(255));
 	@SuppressWarnings("unchecked")
 	BackPropagationTrainer<MultiLayerPerceptron> bpt = TrainerFactory.backPropagationSigmoid(mlp, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.02f, 0.5f, 0f);
-	bpt.addEventListener(new LogTrainingListener(true));
+	bpt.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName(), true));
 
 	Environment.getInstance().setExecutionStrategy(new CPUKernelExecution());
 
@@ -55,9 +55,9 @@ public class MnistTest {
 	MnistInputProvider testInputProvider = new MnistInputProvider("t10k-images.idx3-ubyte", "t10k-labels.idx1-ubyte", 1000, new MnistTargetMultiNeuronOutputConverter());
 	testInputProvider.addInputModifier(new ScalingInputModifier(255));
 
-	AparapiCDTrainer t = TrainerFactory.cdTrainer(rbm, NNFactory.rbmSigmoidSigmoid(rbm), trainInputProvider, testInputProvider,  new MultipleNeuronsOutputError(), new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.01f, 0.5f, 0f, 1);
+	AparapiCDTrainer t = TrainerFactory.cdSigmoidTrainer(rbm, trainInputProvider, testInputProvider,  new MultipleNeuronsOutputError(), new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.01f, 0.5f, 0f, 1, false);
 
-	t.addEventListener(new LogTrainingListener(true));
+	t.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName(), true));
 	Environment.getInstance().setExecutionStrategy(new CPUKernelExecution());
 	t.train();
 	t.test();

@@ -162,11 +162,11 @@ public class DNNTest {
 
 	SimpleInputProvider inputProvider = new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, null, 1, 1);
 
-	AparapiCDTrainer firstTrainer = TrainerFactory.pcdTrainer(firstRBM, NNFactory.rbmSigmoidSigmoid(firstRBM), null, null, null, null, 1f, 0f, 0f, 1);
+	AparapiCDTrainer firstTrainer = TrainerFactory.cdSigmoidTrainer(firstRBM, null, null, null, null, 1f, 0f, 0f, 1, true);
 
 	RBM secondRBM = dbn.getLastNeuralNetwork();
 
-	AparapiCDTrainer secondTrainer = TrainerFactory.pcdTrainer(secondRBM, NNFactory.rbmSigmoidSigmoid(secondRBM), null, null, null, null, 1f, 0f, 0f, 1);
+	AparapiCDTrainer secondTrainer = TrainerFactory.cdSigmoidTrainer(secondRBM, null, null, null, null, 1f, 0f, 0f, 1, true);
 
 	Map<NeuralNetwork, OneStepTrainer<?>> layerTrainers = new HashMap<>();
 	layerTrainers.put(firstRBM, firstTrainer);
@@ -231,9 +231,9 @@ public class DNNTest {
 	
 	SimpleInputProvider inputProvider = new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, null, 1, 1);
 
-	AparapiCDTrainer firstTrainer = TrainerFactory.pcdTrainer(firstRBM, NNFactory.rbmSigmoidSigmoid(firstRBM), null, null, null, null, 0f, 0f, 0f, 0);
+	AparapiCDTrainer firstTrainer = TrainerFactory.cdSigmoidTrainer(firstRBM, null, null, null, null, 0f, 0f, 0f, 0, true);
 
-	AparapiCDTrainer secondTrainer = TrainerFactory.pcdTrainer(secondRBM, NNFactory.rbmSigmoidSigmoid(secondRBM), null, null, null, null, 1f, 0f, 0f, 1);
+	AparapiCDTrainer secondTrainer = TrainerFactory.cdSigmoidTrainer(secondRBM, null, null, null, null, 1f, 0f, 0f, 1, true);
 
 	Map<NeuralNetwork, OneStepTrainer<?>> layerTrainers = new HashMap<>();
 	layerTrainers.put(firstRBM, firstTrainer);

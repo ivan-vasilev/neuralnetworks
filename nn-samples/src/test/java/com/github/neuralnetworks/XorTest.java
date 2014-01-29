@@ -20,12 +20,12 @@ public class XorTest {
      */
     @Test
     public void testMLPSigmoidBP() {
-	MultiLayerPerceptron mlp = NNFactory.mlpSigmoid(new int[] { 2, 8, 1 }, true);
+	MultiLayerPerceptron mlp = NNFactory.mlp(new int[] { 2, 8, 1 }, true);
 	XorInputProvider trainingInput = new XorInputProvider(10000);
 	XorInputProvider testingInput = new XorInputProvider(4);
 	@SuppressWarnings("unchecked")
 	BackPropagationTrainer<MultiLayerPerceptron> bpt = TrainerFactory.backPropagationSigmoid(mlp, trainingInput, testingInput, new XorOutputError(), new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 1f, 0.5f, 0f);
-	bpt.addEventListener(new LogTrainingListener());
+	bpt.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
 	bpt.train();
 	bpt.test();
 	assertEquals(0, bpt.getOutputError().getTotalNetworkError(), 0.1);

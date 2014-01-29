@@ -54,12 +54,13 @@ public abstract class Trainer<N extends NeuralNetwork> {
     /**
      * The network is tested via the testing input provider and the training error is aggregated for each example.
      */
-    public float test() {
+    public void test() {
 	TrainingInputProvider ip = getTestingInputProvider();
-	OutputError e = getOutputError();
 	NeuralNetwork n = getNeuralNetwork();
 
-	if (ip != null && e != null && n != null && n.getLayerCalculator() != null) {
+	if (ip != null && n != null && n.getLayerCalculator() != null) {
+	    ip.reset();
+
 	    triggerEvent(new TestingStartedEvent(this));
 
 	    Set<Layer> calculatedLayers = new UniqueList<>();
@@ -71,17 +72,16 @@ public abstract class Trainer<N extends NeuralNetwork> {
 		calculatedLayers.add(n.getInputLayer());
 		results.put(n.getInputLayer(), input.getInput());
 		n.getLayerCalculator().calculate(n, n.getOutputLayer(), calculatedLayers, results);
-		e.addItem(results.get(n.getOutputLayer()), input.getTarget());
+
+		if (getOutputError() != null) {
+		    getOutputError().addItem(results.get(n.getOutputLayer()), input.getTarget());
+		}
 
 		triggerEvent(new MiniBatchFinishedEvent(this, input));
 	    }
 	    
 	    triggerEvent(new TestingFinishedEvent(this));
-
-	    return e.getTotalNetworkError();
 	}
-
-	return 0;
     }
 
     public Properties getProperties() {

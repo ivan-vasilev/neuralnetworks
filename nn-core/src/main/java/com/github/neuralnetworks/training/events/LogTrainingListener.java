@@ -10,6 +10,7 @@ import com.github.neuralnetworks.training.Trainer;
  */
 public class LogTrainingListener implements TrainingEventListener {
 
+    private String name;
     private long startTime;
     private long finishTime;
     private long miniBatchTotalTime;
@@ -17,13 +18,15 @@ public class LogTrainingListener implements TrainingEventListener {
     private int miniBatches;
     private boolean logMiniBatches = false;
 
-    public LogTrainingListener() {
+    public LogTrainingListener(String name) {
 	super();
+	this.name = name;
     }
 
-    public LogTrainingListener(boolean logMiniBatches) {
+    public LogTrainingListener(String name, boolean logMiniBatches) {
 	super();
 	this.logMiniBatches = logMiniBatches;
+	this.name = name;
     }
 
     @Override
@@ -33,10 +36,10 @@ public class LogTrainingListener implements TrainingEventListener {
 	    lastMiniBatchFinishTime = startTime = System.currentTimeMillis();
 
 	    if (event instanceof TrainingStartedEvent) {
-		System.out.println("TRAINING...");
+		System.out.println("TRAINING " + name + "...");
 	    } else if (event instanceof TestingStartedEvent) {
 		System.out.println();
-		System.out.println("TESTING...");
+		System.out.println("TESTING " + name + "...");
 	    }
 	} else if (event instanceof TrainingFinishedEvent || event instanceof TestingFinishedEvent) {
 	    finishTime = System.currentTimeMillis();
@@ -48,7 +51,7 @@ public class LogTrainingListener implements TrainingEventListener {
 	    if (event instanceof TestingFinishedEvent) {
 		Trainer<?> t = (Trainer<?>) event.getSource();
 		OutputError oe = t.getOutputError();
-		sb.append(oe.getTotalErrorSamples() + "/" + oe.getTotalInputSize() + " samples (" + oe.getTotalNetworkError() + ", " + (oe.getTotalNetworkError() * 100) + "%) error" + s);
+		sb.append(oe.getTotalErrorSamples() + "/" + oe.getTotalInputSize() + " samples (" + oe.getTotalNetworkError() + ", " + (oe.getTotalNetworkError() * 100) + "%) error" + s + s);
 	    }
 
 	    System.out.print(sb.toString());

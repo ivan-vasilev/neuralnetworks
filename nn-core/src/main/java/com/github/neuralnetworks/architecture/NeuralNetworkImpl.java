@@ -1,6 +1,7 @@
 package com.github.neuralnetworks.architecture;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -135,6 +136,35 @@ public class NeuralNetworkImpl implements NeuralNetwork {
 	}
 
 	return false;
+    }
+
+    /**
+     * Remove layer from the network
+     * @param layer
+     * @return whether the layer was removed successfully
+     */
+    public boolean removeLayer(Layer layer) {
+	boolean result = false;
+
+	if (layer != null) {
+	    if (layers != null) {
+		// remove layer and bias layers
+		Set<Layer> toRemove = new HashSet<>();
+		toRemove.add(layer);
+		for (Connections c : layer.getConnections(this)) {
+		    if (c.getInputLayer() instanceof BiasLayer) {
+			toRemove.add(c.getInputLayer());
+		    }
+		}
+
+		if (toRemove.size() > 0) {
+		    layers.removeAll(toRemove);
+		    result = true;
+		}
+	    }
+	}
+
+	return result;
     }
 
 

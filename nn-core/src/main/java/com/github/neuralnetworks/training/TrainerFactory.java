@@ -8,10 +8,12 @@ import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.architecture.types.DNN;
 import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.architecture.types.RBM;
+import com.github.neuralnetworks.calculation.LayerCalculatorImpl;
 import com.github.neuralnetworks.calculation.OutputError;
 import com.github.neuralnetworks.calculation.RBMLayerCalculator;
 import com.github.neuralnetworks.calculation.neuronfunctions.BernoulliDistribution;
 import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculatorFullyConnected;
+import com.github.neuralnetworks.calculation.neuronfunctions.SoftmaxFunction;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationAutoencoder;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationFullyConnected;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationLayerCalculatorImpl;
@@ -33,8 +35,10 @@ import com.github.neuralnetworks.util.Properties;
 public class TrainerFactory {
 
     @SuppressWarnings("rawtypes")
-    public static BackPropagationTrainer backPropagationSigmoid(NeuralNetwork nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay) {
+    public static BackPropagationTrainer backPropagationSigmoid(NeuralNetworkImpl nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay) {
 	BackPropagationTrainer t = new BackPropagationTrainer(backpropProperties(nn, trainingSet, testingSet, error, rand, learningRate, momentum, weightDecay));
+
+	nn.setLayerCalculator(NNFactory.nnSigmoid(nn, null));
 
 	BackPropagationLayerCalculatorImpl lc = new BackPropagationLayerCalculatorImpl();
 	t.getProperties().setParameter(Constants.BACKPROPAGATION, lc);
@@ -52,17 +56,22 @@ public class TrainerFactory {
     }
     
     @SuppressWarnings("rawtypes")
-    public static BackPropagationTrainer backPropagationSoftReLU(NeuralNetwork nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay) {
+    public static BackPropagationTrainer backPropagationSoftReLU(NeuralNetworkImpl nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay) {
 	BackPropagationTrainer t = new BackPropagationTrainer(backpropProperties(nn, trainingSet, testingSet, error, rand, learningRate, momentum, weightDecay));
 
-	BackPropagationLayerCalculatorImpl lc = new BackPropagationLayerCalculatorImpl();
-	t.getProperties().setParameter(Constants.BACKPROPAGATION, lc);
+	LayerCalculatorImpl lc = NNFactory.nnSoftRelu(nn, null);
+	ConnectionCalculatorFullyConnected cc = (ConnectionCalculatorFullyConnected) lc.getConnectionCalculator(nn.getOutputLayer());
+	cc.addActivationFunction(new SoftmaxFunction());
+	nn.setLayerCalculator(lc);
+
+	BackPropagationLayerCalculatorImpl blc = new BackPropagationLayerCalculatorImpl();
+	t.getProperties().setParameter(Constants.BACKPROPAGATION, blc);
 	for (Layer l : nn.getLayers()) {
 	    if (nn.getOutputLayer() != l) {
 		if (nn.getInputLayer() != l) {
-		    lc.addConnectionCalculator(l, new BackPropagationSoftReLU(t.getProperties()));
+		    blc.addConnectionCalculator(l, new BackPropagationSoftReLU(t.getProperties()));
 		} else {
-		    lc.addConnectionCalculator(l, new BackPropagationFullyConnected(t.getProperties()));
+		    blc.addConnectionCalculator(l, new BackPropagationFullyConnected(t.getProperties()));
 		}
 	    }
 	}
@@ -71,16 +80,21 @@ public class TrainerFactory {
     }
     
     @SuppressWarnings("rawtypes")
-    public static BackPropagationTrainer backPropagationReLU(NeuralNetwork nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay) {
+    public static BackPropagationTrainer backPropagationReLU(NeuralNetworkImpl nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay) {
 	BackPropagationTrainer t = new BackPropagationTrainer(backpropProperties(nn, trainingSet, testingSet, error, rand, learningRate, momentum, weightDecay));
-	
-	BackPropagationLayerCalculatorImpl lc = new BackPropagationLayerCalculatorImpl();
-	t.getProperties().setParameter(Constants.BACKPROPAGATION, lc);
+
+	LayerCalculatorImpl lc = NNFactory.nnRelu(nn, null);
+	ConnectionCalculatorFullyConnected cc = (ConnectionCalculatorFullyConnected) lc.getConnectionCalculator(nn.getOutputLayer());
+	cc.addActivationFunction(new SoftmaxFunction());
+	nn.setLayerCalculator(lc);
+
+	BackPropagationLayerCalculatorImpl blc = new BackPropagationLayerCalculatorImpl();
+	t.getProperties().setParameter(Constants.BACKPROPAGATION, blc);
 	for (Layer l : nn.getLayers()) {
 	    if (nn.getInputLayer() != l) {
-		lc.addConnectionCalculator(l, new BackPropagationReLU(t.getProperties()));
+		blc.addConnectionCalculator(l, new BackPropagationReLU(t.getProperties()));
 	    } else {
-		lc.addConnectionCalculator(l, new BackPropagationFullyConnected(t.getProperties()));
+		blc.addConnectionCalculator(l, new BackPropagationFullyConnected(t.getProperties()));
 	    }
 	}
 	
@@ -88,8 +102,9 @@ public class TrainerFactory {
     }
     
     @SuppressWarnings("rawtypes")
-    public static BackPropagationTrainer backPropagationTanh(NeuralNetwork nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay) {
+    public static BackPropagationTrainer backPropagationTanh(NeuralNetworkImpl nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay) {
 	BackPropagationTrainer t = new BackPropagationTrainer(backpropProperties(nn, trainingSet, testingSet, error, rand, learningRate, momentum, weightDecay));
+    	nn.setLayerCalculator(NNFactory.nnTanh(nn, null));
 
 	BackPropagationLayerCalculatorImpl lc = new BackPropagationLayerCalculatorImpl();
 	t.getProperties().setParameter(Constants.BACKPROPAGATION, lc);
@@ -106,8 +121,7 @@ public class TrainerFactory {
 
     public static BackPropagationAutoencoder backPropagationSigmoidAutoencoder(NeuralNetworkImpl nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay, float inputCorruptionRate) {
 	BackPropagationAutoencoder t = new BackPropagationAutoencoder(backpropProperties(nn, trainingSet, testingSet, error, rand, learningRate, momentum, weightDecay));
-	//ConnectionCalculatorFullyConnected cc = (ConnectionCalculatorFullyConnected) lc.getConnectionCalculator(nn.getInputLayer());
-	//nn.setLayerCalculator(NNFactory.nnSigmoid(nn, null));
+    	nn.setLayerCalculator(NNFactory.nnSigmoid(nn, null));
 
 	BackPropagationLayerCalculatorImpl lc = new BackPropagationLayerCalculatorImpl();
 	t.getProperties().setParameter(Constants.BACKPROPAGATION, lc);
@@ -123,11 +137,16 @@ public class TrainerFactory {
     public static BackPropagationAutoencoder backPropagationSoftReLUAutoencoder(NeuralNetworkImpl nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay, float inputCorruptionRate) {
 	BackPropagationAutoencoder t = new BackPropagationAutoencoder(backpropProperties(nn, trainingSet, testingSet, error, rand, learningRate, momentum, weightDecay));
 
-	BackPropagationLayerCalculatorImpl lc = new BackPropagationLayerCalculatorImpl();
-	t.getProperties().setParameter(Constants.BACKPROPAGATION, lc);
+	LayerCalculatorImpl lc = NNFactory.nnSoftRelu(nn, null);
+	ConnectionCalculatorFullyConnected cc = (ConnectionCalculatorFullyConnected) lc.getConnectionCalculator(nn.getOutputLayer());
+	cc.addActivationFunction(new SoftmaxFunction());
+	nn.setLayerCalculator(lc);
+
+	BackPropagationLayerCalculatorImpl blc = new BackPropagationLayerCalculatorImpl();
+	t.getProperties().setParameter(Constants.BACKPROPAGATION, blc);
 	for (Layer l : nn.getLayers()) {
 	    if (nn.getOutputLayer() != l) {
-		lc.addConnectionCalculator(l, new BackPropagationSoftReLU(t.getProperties()));
+		blc.addConnectionCalculator(l, new BackPropagationSoftReLU(t.getProperties()));
 	    }
 	}
 
@@ -136,12 +155,17 @@ public class TrainerFactory {
 
     public static BackPropagationAutoencoder backPropagationReLUAutoencoder(NeuralNetworkImpl nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay, float inputCorruptionRate) {
 	BackPropagationAutoencoder t = new BackPropagationAutoencoder(backpropProperties(nn, trainingSet, testingSet, error, rand, learningRate, momentum, weightDecay));
-	
-	BackPropagationLayerCalculatorImpl lc = new BackPropagationLayerCalculatorImpl();
-	t.getProperties().setParameter(Constants.BACKPROPAGATION, lc);
+
+	LayerCalculatorImpl lc = NNFactory.nnRelu(nn, null);
+	ConnectionCalculatorFullyConnected cc = (ConnectionCalculatorFullyConnected) lc.getConnectionCalculator(nn.getOutputLayer());
+	cc.addActivationFunction(new SoftmaxFunction());
+	nn.setLayerCalculator(lc);
+
+	BackPropagationLayerCalculatorImpl blc = new BackPropagationLayerCalculatorImpl();
+	t.getProperties().setParameter(Constants.BACKPROPAGATION, blc);
 	for (Layer l : nn.getLayers()) {
 	    if (nn.getOutputLayer() != l) {
-		lc.addConnectionCalculator(l, new BackPropagationReLU(t.getProperties()));
+		blc.addConnectionCalculator(l, new BackPropagationReLU(t.getProperties()));
 	    }
 	}
 	
@@ -150,6 +174,7 @@ public class TrainerFactory {
     
     public static BackPropagationAutoencoder backPropagationTanhAutoencoder(NeuralNetworkImpl nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay, float inputCorruptionRate) {
 	BackPropagationAutoencoder t = new BackPropagationAutoencoder(backpropProperties(nn, trainingSet, testingSet, error, rand, learningRate, momentum, weightDecay));
+    	nn.setLayerCalculator(NNFactory.nnTanh(nn, null));
 
 	BackPropagationLayerCalculatorImpl lc = new BackPropagationLayerCalculatorImpl();
 	t.getProperties().setParameter(Constants.BACKPROPAGATION, lc);

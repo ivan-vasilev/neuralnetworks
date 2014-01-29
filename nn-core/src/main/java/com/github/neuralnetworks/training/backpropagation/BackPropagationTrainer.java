@@ -16,8 +16,8 @@ import com.github.neuralnetworks.util.UniqueList;
 /**
  * Base backpropagation one step trainer
  * It has two additional parameters:
- * LayerCalculator for the feedforward phase
  * BackPropagationLayerCalculator for the backpropagation phase
+ * OutputErrorDerivative for calculating the derivative of the output error
  * This allows for various implementations of these calculators to be used (for example via GPU or other)
  */
 public class BackPropagationTrainer<N extends NeuralNetwork> extends OneStepTrainer<N> {
