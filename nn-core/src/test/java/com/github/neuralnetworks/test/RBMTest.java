@@ -160,7 +160,6 @@ public class RBMTest {
     @Test
     public void testContrastiveDivergence2() {
 	RBM rbm = NNFactory.rbm(6, 2, false);
-	rbm.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
 
 	TrainingInputProvider trainInputProvider = new SimpleInputProvider(new float[][] {{1, 1, 1, 0, 0, 0}, {1, 0, 1, 0, 0, 0}, {0, 1, 1, 1, 0, 0}, {0, 0, 0, 1, 1, 1}, {0, 0, 1, 1, 1, 0}, {0, 0, 0, 1, 0, 1} }, null, 1000, 1);
 	TrainingInputProvider testInputProvider =  new SimpleInputProvider(new float[][] {{1, 1, 1, 0, 0, 0}, {1, 0, 1, 0, 0, 0}, {0, 1, 1, 1, 0, 0}, {0, 0, 0, 1, 1, 1}, {0, 0, 1, 1, 1, 0}, {0, 0, 0, 1, 0, 1} }, new float[][] {{1, 0}, {1, 0}, {1, 0}, {0, 1}, {0, 1}, {0, 1} }, 6, 1);
@@ -184,13 +183,13 @@ public class RBMTest {
     @Test
     public void testPersistentContrastiveDivergence() {
 	RBM rbm = NNFactory.rbm(6, 2, false);
-	rbm.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
 	
 	TrainingInputProvider trainInputProvider = new SimpleInputProvider(new float[][] {{1, 1, 1, 0, 0, 0}, {1, 0, 1, 0, 0, 0}, {0, 1, 1, 1, 0, 0}, {0, 0, 0, 1, 1, 1}, {0, 0, 1, 1, 1, 0}, {0, 0, 0, 1, 0, 1} }, null, 600, 1);
 	TrainingInputProvider testInputProvider =  new SimpleInputProvider(new float[][] {{1, 1, 1, 0, 0, 0}, {1, 0, 1, 0, 0, 0}, {0, 1, 1, 1, 0, 0}, {0, 0, 0, 1, 1, 1}, {0, 0, 1, 1, 1, 0}, {0, 0, 0, 1, 0, 1} }, new float[][] {{1, 0}, {1, 0}, {1, 0}, {0, 1}, {0, 1}, {0, 1} }, 6, 1);
 	MultipleNeuronsOutputError error = new MultipleNeuronsOutputError();
 	
 	AparapiCDTrainer t = TrainerFactory.cdSigmoidTrainer(rbm, trainInputProvider, testInputProvider, error, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.02f, 0.5f, 0f, 1, true);
+	t.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
 	t.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
 	
 	Environment.getInstance().setExecutionStrategy(new SeqKernelExecution());

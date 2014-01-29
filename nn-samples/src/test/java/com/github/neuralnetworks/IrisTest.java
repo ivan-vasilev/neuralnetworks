@@ -81,8 +81,8 @@ public class IrisTest {
     @Ignore
     @Test
     public void testRBMCDSigmoidBP() {
+	// RBM with 4 visible and 3 hidden units
 	RBM rbm = NNFactory.rbm(4, 3, true);
-	rbm.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
 
 	TrainingInputProvider trainInputProvider = new IrisInputProvider(1, 150000, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
 	TrainingInputProvider testInputProvider = new IrisInputProvider(1, 150, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
@@ -100,13 +100,12 @@ public class IrisTest {
     }
 
     /**
-     * Contrastive Divergence testing
+     * DBN testing
      */
     @Ignore
     @Test
     public void testDBN() {
 	DBN dbn = NNFactory.dbn(new int[] {4, 8, 3}, true);
-	dbn.setLayerCalculator(NNFactory.nnSigmoid(dbn, null));
 
 	TrainingInputProvider trainInputProvider = new IrisInputProvider(1, 150000, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
 	TrainingInputProvider testInputProvider = new IrisInputProvider(1, 150, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
@@ -134,19 +133,28 @@ public class IrisTest {
 
     @Test
     public void testAE() {
+	// create autoencoder with visible layer with 4 neurons and hidden layer with 3 neurons
     	Autoencoder ae = NNFactory.autoencoder(4, 3, true);
-    	
+
+    	// training, testing and error
     	TrainingInputProvider trainInputProvider = new IrisInputProvider(1, 15000, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
     	TrainingInputProvider testInputProvider = new IrisInputProvider(1, 150, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
     	MultipleNeuronsOutputError error = new MultipleNeuronsOutputError();
-    	
+
+    	// backpropagation autoencoder training
     	BackPropagationAutoencoder bae = TrainerFactory.backPropagationSigmoidAutoencoder(ae, trainInputProvider, testInputProvider, error, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.25f, 0.5f, 0f, 0f);
+
+    	// log data to console
     	bae.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
 
+    	// execution mode
     	Environment.getInstance().setExecutionStrategy(new SeqKernelExecution());
 
     	bae.train();
-    	ae.removeLayer(ae.getOutputLayer()); // the output layer is needed only during the training phase...
+
+    	// the output layer is needed only during the training phase...
+    	ae.removeLayer(ae.getOutputLayer());
+
     	bae.test();
 
     	assertEquals(0, bae.getOutputError().getTotalNetworkError(), 0.1);
@@ -154,7 +162,7 @@ public class IrisTest {
 
     @Test
     public void testSAE() {
-	// create deep network
+	// create stacked autoencoder with input layer of size 4, hidden layer of the first AE with size 4 and hidden layer of the second AE with size 3
 	StackedAutoencoder sae = NNFactory.sae(new int[] { 4, 4, 3 }, true);
 	sae.setLayerCalculator(NNFactory.nnSigmoid(sae, null));
 

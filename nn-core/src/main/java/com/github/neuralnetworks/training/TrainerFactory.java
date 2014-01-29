@@ -202,8 +202,10 @@ public class TrainerFactory {
 
 	return p;
     }
-    
+
     public static AparapiCDTrainer cdSoftReLUTrainer(RBM rbm, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay, int gibbsSampling, boolean isPersistentCD) {
+	rbm.setLayerCalculator(NNFactory.rbmSoftReluSoftRelu(rbm));
+
 	RBMLayerCalculator lc = NNFactory.rbmSigmoidSigmoid(rbm);
 	ConnectionCalculatorFullyConnected cc = (ConnectionCalculatorFullyConnected) lc.getConnectionCalculator(rbm.getInputLayer());
 	cc.addPreTransferFunction(new BernoulliDistribution());
@@ -212,6 +214,8 @@ public class TrainerFactory {
     }
 
     public static AparapiCDTrainer cdSigmoidTrainer(RBM rbm, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay, int gibbsSampling, boolean isPersistentCD) {
+	rbm.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
+
 	RBMLayerCalculator lc = NNFactory.rbmSigmoidSigmoid(rbm);
 	ConnectionCalculatorFullyConnected cc = (ConnectionCalculatorFullyConnected) lc.getConnectionCalculator(rbm.getInputLayer());
 	cc.addPreTransferFunction(new BernoulliDistribution());
