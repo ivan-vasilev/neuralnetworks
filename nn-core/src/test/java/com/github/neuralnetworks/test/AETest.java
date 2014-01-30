@@ -30,8 +30,9 @@ public class AETest {
 	MultipleNeuronsOutputError error = new MultipleNeuronsOutputError();
 	
 	BackPropagationAutoencoder t = TrainerFactory.backPropagationSigmoidAutoencoder(ae, trainInputProvider, testInputProvider, error, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.1f, 0.5f, 0f, 0f);
-	t.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
-	
+
+	t.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName(), true, false));
+
 	Environment.getInstance().setExecutionStrategy(new SeqKernelExecution());
 
 	t.train();

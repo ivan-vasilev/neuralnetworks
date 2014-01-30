@@ -1,5 +1,6 @@
 package com.github.neuralnetworks.training.events;
 
+import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.calculation.OutputError;
 import com.github.neuralnetworks.events.TrainingEvent;
 import com.github.neuralnetworks.events.TrainingEventListener;
@@ -16,17 +17,29 @@ public class LogTrainingListener implements TrainingEventListener {
     private long miniBatchTotalTime;
     private long lastMiniBatchFinishTime;
     private int miniBatches;
-    private boolean logMiniBatches = false;
+
+    /**
+     * log minibatches time
+     */
+    private boolean logMiniBatches;
+
+    /**
+     * dispaly input/target/networkOutput for each testing example
+     */
+    private boolean logTestResults;
+
+    private boolean isTesting;
 
     public LogTrainingListener(String name) {
 	super();
 	this.name = name;
     }
 
-    public LogTrainingListener(String name, boolean logMiniBatches) {
+    public LogTrainingListener(String name, boolean logTestResults, boolean logMiniBatches) {
 	super();
-	this.logMiniBatches = logMiniBatches;
 	this.name = name;
+	this.logTestResults = logTestResults;
+	this.logMiniBatches = logMiniBatches;
     }
 
     @Override
@@ -36,8 +49,10 @@ public class LogTrainingListener implements TrainingEventListener {
 	    lastMiniBatchFinishTime = startTime = System.currentTimeMillis();
 
 	    if (event instanceof TrainingStartedEvent) {
+		isTesting = false;
 		System.out.println("TRAINING " + name + "...");
 	    } else if (event instanceof TestingStartedEvent) {
+		isTesting = true;
 		System.out.println();
 		System.out.println("TESTING " + name + "...");
 	    }
@@ -61,9 +76,47 @@ public class LogTrainingListener implements TrainingEventListener {
 	    miniBatchTotalTime += miniBatchTime;
 	    lastMiniBatchFinishTime = System.currentTimeMillis();
 
-	    if (logMiniBatches) {
-		System.out.println("MB " + miniBatches + " " + (miniBatchTime / 1000f) + " s");
+	    StringBuilder sb = new StringBuilder();
+	    String s = System.getProperty("line.separator");
+
+	    if (logMiniBatches || (isTesting && logTestResults)) {
+		sb.append("MB " + miniBatches + " " + (miniBatchTime / 1000f) + " s");
 	    }
+
+	    // log test results
+	    if (isTesting && logTestResults) {
+		MiniBatchFinishedEvent mbe = (MiniBatchFinishedEvent) event;
+		if (mbe.getResults() != null) {
+		    Matrix input = mbe.getData().getInput();
+		    Matrix target = mbe.getData().getTarget();
+		    Trainer<?> t = (Trainer<?>) mbe.getSource();
+		    Matrix networkOutput = mbe.getResults().get(t.getNeuralNetwork().getOutputLayer());
+
+		    for (int i = 0; i < input.getColumns(); i++) {
+			sb.append(s);
+			sb.append("Input:  ");
+			for (int j = 0; j < input.getRows(); j++) {
+			    sb.append(input.get(j, i)).append("  ");
+			}
+
+			sb.append(s);
+			sb.append("Output: ");
+			for (int j = 0; j < networkOutput.getRows(); j++) {
+			    sb.append(networkOutput.get(j, i)).append("  ");
+			}
+
+			sb.append(s);
+			sb.append("Target: ");
+			for (int j = 0; j < target.getRows(); j++) {
+			    sb.append(target.get(j, i)).append("  ");
+			}
+		    }
+
+		    sb.append(s).append(s);
+		}
+	    }
+
+	    System.out.print(sb.toString());
 	} else if (event instanceof TestingFinishedEvent) {
 	    miniBatches++;
 	}

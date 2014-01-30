@@ -33,7 +33,7 @@ public abstract class OneStepTrainer<N extends NeuralNetwork> extends Trainer<N>
 	TrainingInputData input = null;
 	while ((input = getTrainingInputProvider().getNextInput()) != null) {
 	    learnInput(input, batch++);
-	    triggerEvent(new MiniBatchFinishedEvent(this, input));
+	    triggerEvent(new MiniBatchFinishedEvent(this, input, null));
 	}
 
 	triggerEvent(new TrainingFinishedEvent(this));

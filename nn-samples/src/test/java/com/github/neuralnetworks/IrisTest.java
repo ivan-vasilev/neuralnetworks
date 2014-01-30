@@ -171,8 +171,8 @@ public class IrisTest {
 	Autoencoder lastNN = sae.getLastNeuralNetwork();
 
 	// trainers for each of the stacked networks
-    	BackPropagationAutoencoder firstTrainer = TrainerFactory.backPropagationSigmoidAutoencoder(firstNN, null, null, null, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.001f, 0.5f, 0f, 0f);
-    	BackPropagationAutoencoder secondTrainer = TrainerFactory.backPropagationSigmoidAutoencoder(lastNN, null, null, null, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.001f, 0.5f, 0f, 0f);
+	BackPropagationAutoencoder firstTrainer = TrainerFactory.backPropagationSigmoidAutoencoder(firstNN, null, null, null, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.001f, 0.5f, 0f, 0f);
+	BackPropagationAutoencoder secondTrainer = TrainerFactory.backPropagationSigmoidAutoencoder(lastNN, null, null, null, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.001f, 0.5f, 0f, 0f);
 
 	Map<NeuralNetwork, OneStepTrainer<?>> map = new HashMap<>();
 	map.put(firstNN, firstTrainer);

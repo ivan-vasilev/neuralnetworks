@@ -77,7 +77,7 @@ public abstract class Trainer<N extends NeuralNetwork> {
 		    getOutputError().addItem(results.get(n.getOutputLayer()), input.getTarget());
 		}
 
-		triggerEvent(new MiniBatchFinishedEvent(this, input));
+		triggerEvent(new MiniBatchFinishedEvent(this, input, results));
 	    }
 	    
 	    triggerEvent(new TestingFinishedEvent(this));
