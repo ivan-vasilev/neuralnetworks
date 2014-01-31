@@ -1,11 +1,17 @@
 package com.github.neuralnetworks.training.backpropagation;
 
+import com.github.neuralnetworks.architecture.Subsampling2DConnection;
+
 /**
  * Backpropagation for max pooling layers
  */
 public class BackpropagationMaxPooling2D extends AparapiBackpropagationSubsampling2D {
 
     private static final long serialVersionUID = -8888670594631428090L;
+
+    public BackpropagationMaxPooling2D(Subsampling2DConnection c, int miniBatchSize) {
+	super(c, miniBatchSize);
+    }
 
     @Override
     protected void pool(int inputStartIndex) {

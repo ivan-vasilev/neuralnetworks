@@ -31,7 +31,7 @@ public class BackPropagationConv2DTanh extends BackPropagationConnectionCalculat
 	}
 
 	if (con != null) {
-	    connectionCalculators.put(con, new AparapiBackpropConv2DTanh(con, miniBatchSize, targetLayer));
+	    connectionCalculators.put(con, new AparapiBackpropConv2DTanh(con, miniBatchSize));
 	}
     }
 
@@ -39,8 +39,8 @@ public class BackPropagationConv2DTanh extends BackPropagationConnectionCalculat
 
 	private static final long serialVersionUID = -3580345016542506932L;
 
-	public AparapiBackpropConv2DTanh(Conv2DConnection c, int miniBatchSize, Layer targetLayer) {
-	    super(c, miniBatchSize, targetLayer);
+	public AparapiBackpropConv2DTanh(Conv2DConnection c, int miniBatchSize) {
+	    super(c, miniBatchSize);
 	}
 
 	@Override

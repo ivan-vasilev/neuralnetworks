@@ -1,7 +1,6 @@
 package com.github.neuralnetworks.calculation.neuronfunctions;
 
 import com.github.neuralnetworks.architecture.Conv2DConnection;
-import com.github.neuralnetworks.architecture.Layer;
 
 /**
  * Base class for all feedforward convolutional functions
@@ -10,8 +9,8 @@ public class AparapiConv2DFF extends AparapiConv2D {
 
     private static final long serialVersionUID = 5048904661076337615L;
 
-    public AparapiConv2DFF(Conv2DConnection c, int miniBatchSize, Layer targetLayer) {
-	super(c, miniBatchSize, targetLayer);
+    public AparapiConv2DFF(Conv2DConnection c, int miniBatchSize) {
+	super(c, miniBatchSize);
     }
 
     @Override

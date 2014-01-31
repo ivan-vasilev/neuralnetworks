@@ -41,8 +41,8 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements Backp
      */
     protected Map<Layer, Matrix> activations;
 
-    public AparapiBackpropagationConv2D(Conv2DConnection c, int miniBatchSize, Layer targetLayer) {
-	super(c, miniBatchSize, targetLayer);
+    public AparapiBackpropagationConv2D(Conv2DConnection c, int miniBatchSize) {
+	super(c, miniBatchSize);
     }
 
     @Override

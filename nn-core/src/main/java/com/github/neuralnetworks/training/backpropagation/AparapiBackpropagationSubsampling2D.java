@@ -16,6 +16,10 @@ public class AparapiBackpropagationSubsampling2D extends AparapiSubsampling2D im
 
     private static final long serialVersionUID = -345286029645674230L;
 
+    public AparapiBackpropagationSubsampling2D(Subsampling2DConnection c, int miniBatchSize) {
+	super(c, miniBatchSize);
+    }
+
     /**
      * Activation of the output layer from the feedforward phase
      */

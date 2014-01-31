@@ -65,7 +65,7 @@ public class CNNTest {
 
 	Matrix o = new Matrix(4, 1);
 
-	AparapiConv2D conv = new AparapiConv2DFF(c, 1, c.getOutputLayer());
+	AparapiConv2D conv = new AparapiConv2DFF(c, 1);
 
 	conv.calculate(c, i1, o);
 
@@ -101,7 +101,7 @@ public class CNNTest {
 	
 	Matrix o = new Matrix(8, 1);
 	
-	AparapiConv2D conv = new AparapiConv2DFF(c, 1, c.getOutputLayer());
+	AparapiConv2D conv = new AparapiConv2DFF(c, 1);
 
 	conv.calculate(c, i1, o);
 	
@@ -124,7 +124,7 @@ public class CNNTest {
 	map.put(c, i1);
 
 	// max pooling
-	ConnectionCalculator calc = new AparapiMaxPooling2D();
+	ConnectionCalculator calc = new AparapiMaxPooling2D(c, 2);
 	Matrix o = new Matrix(8, 2);
 	calc.calculate(map, o, c.getOutputLayer());
 
@@ -147,7 +147,7 @@ public class CNNTest {
 	assertEquals(32, o.get(7, 1), 0);
 
 	// average pooling
-	calc = new AparapiAveragePooling2D();
+	calc = new AparapiAveragePooling2D(c, 2);
 	o = new Matrix(8, 2);
 	calc.calculate(map, o, c.getOutputLayer());
 
@@ -177,7 +177,7 @@ public class CNNTest {
 	TreeMap<Connections, Matrix> map = new TreeMap<Connections, Matrix>();
 	map.put(c, i1);
 
-	AparapiStochasticPooling2D calc = new AparapiStochasticPooling2D();
+	AparapiStochasticPooling2D calc = new AparapiStochasticPooling2D(c, 2);
 	Matrix o = new Matrix(1, 2);
 	calc.calculate(map, o, c.getOutputLayer());
 

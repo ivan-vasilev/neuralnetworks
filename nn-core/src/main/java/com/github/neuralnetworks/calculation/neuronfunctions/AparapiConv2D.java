@@ -5,7 +5,6 @@ import java.io.Serializable;
 import com.amd.aparapi.Kernel;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
 import com.github.neuralnetworks.architecture.ConvGridLayer;
-import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.util.Environment;
 
@@ -72,7 +71,7 @@ public abstract class AparapiConv2D extends Kernel implements Serializable {
      */
     protected Conv2DConnection current;
 
-    public AparapiConv2D(Conv2DConnection c, int miniBatchSize, Layer targetLayer) {
+    public AparapiConv2D(Conv2DConnection c, int miniBatchSize) {
 	super();
 
 	ConvGridLayer inputLayer = (ConvGridLayer) c.getInputLayer();

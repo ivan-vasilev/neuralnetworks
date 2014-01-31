@@ -24,52 +24,52 @@ public abstract class AparapiSubsampling2D extends Kernel implements ConnectionC
     /**
      * input feature map columns
      */
-    protected int inputFeatureMapColumns;
+    protected final int inputFeatureMapColumns;
 
     /**
      * Length of the input image (rows * cols)
      */
-    protected int inputFeatureMapLength;
+    protected final int inputFeatureMapLength;
     
     /**
      * output feature map columns
      */
-    protected int outputFeatureMapColumns;
+    protected final int outputFeatureMapColumns;
 
     /**
      * Length of the output image (rows * cols)
      */
-    protected int outputFeatureMapLength;
+    protected final int outputFeatureMapLength;
 
     /**
      * input samples count
      */
-    protected int miniBatchSize;
+    protected final int miniBatchSize;
 
     /**
      * subsampling region rows
      */
-    protected int subsamplingRows;
+    protected final int subsamplingRows;
     
     /**
      * subsampling region columns
      */
-    protected int subsamplingCols;
+    protected final int subsamplingCols;
 
     /**
      * Length of the subsampling region (subsampling rows *  subsampling cols)
      */
-    protected int regionLength;
+    protected final int regionLength;
 
     /**
      * offset from start when mapping input to output
      */
-    protected int ioRowsOffset;
+    protected final int ioRowsOffset;
 
     /**
      * offset from start when mapping input to output
      */
-    protected int ioColumnsOffset;
+    protected final int ioColumnsOffset;
 
     /**
      * input data
@@ -88,6 +88,28 @@ public abstract class AparapiSubsampling2D extends Kernel implements ConnectionC
     protected int[] featureMapOffsets;
 
     protected Subsampling2DConnection current;
+
+    public AparapiSubsampling2D(Subsampling2DConnection c, int miniBatchSize) {
+	this.miniBatchSize = miniBatchSize;
+	ConvGridLayer inputLayer = (ConvGridLayer) c.getInputLayer();
+	ConvGridLayer outputLayer = (ConvGridLayer) c.getOutputLayer();
+	this.inputFeatureMapColumns = inputLayer.getFeatureMapColumns();
+	this.inputFeatureMapLength = inputLayer.getFeatureMapLength();
+	this.outputFeatureMapColumns = outputLayer.getFeatureMapColumns();
+	this.outputFeatureMapLength = outputLayer.getFeatureMapLength();
+	this.subsamplingRows = c.getSubsamplingRegionRows();
+	this.subsamplingCols = c.getSubsamplingRegionCols();
+	this.regionLength = subsamplingRows * subsamplingCols;
+	this.ioRowsOffset = (inputLayer.getFeatureMapRows() % subsamplingRows) / 2;
+	this.ioColumnsOffset = (inputLayer.getFeatureMapColumns() % subsamplingCols) / 2;
+	this.featureMapOffsets = new int[regionLength];
+
+	for (int i = 0, j = 0; j < subsamplingRows; j++) {
+	    for (int k = 0; k < subsamplingCols; k++, i++) {
+		featureMapOffsets[i] = j * inputLayer.getFeatureMapColumns() + k;
+	    }
+	}
+    }
 
     @Override
     public void calculate(SortedMap<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
@@ -111,32 +133,8 @@ public abstract class AparapiSubsampling2D extends Kernel implements ConnectionC
      * @param output
      */
     protected void init(Subsampling2DConnection c, Matrix input, Matrix output) {
-	this.miniBatchSize = output.getColumns();
-
-	if (c != current) {
-	    current = c;
-
-	    ConvGridLayer inputLayer = (ConvGridLayer) c.getInputLayer();
-	    ConvGridLayer outputLayer = (ConvGridLayer) c.getOutputLayer();
-	    this.input = input.getElements();
-	    this.output = output.getElements();
-	    this.inputFeatureMapColumns = inputLayer.getFeatureMapColumns();
-	    this.inputFeatureMapLength = inputLayer.getFeatureMapLength();
-	    this.outputFeatureMapColumns = outputLayer.getFeatureMapColumns();
-	    this.outputFeatureMapLength = outputLayer.getFeatureMapLength();
-	    this.subsamplingRows = c.getSubsamplingRegionRows();
-	    this.subsamplingCols = c.getSubsamplingRegionCols();
-	    this.regionLength = subsamplingRows * subsamplingCols;
-	    this.ioRowsOffset = (input.getRows() % subsamplingRows) / 2;
-	    this.ioColumnsOffset = (input.getColumns() % subsamplingCols) / 2;
-	    this.featureMapOffsets = new int[regionLength];
-
-	    for (int i = 0, j = 0; j < subsamplingRows; j++) {
-		for (int k = 0; k < subsamplingCols; k++, i++) {
-		    featureMapOffsets[i] = j * inputLayer.getFeatureMapColumns() + k;
-		}
-	    }
-	}
+	this.input = input.getElements();
+	this.output = output.getElements();
     }
 
     /* (non-Javadoc)
@@ -150,7 +148,7 @@ public abstract class AparapiSubsampling2D extends Kernel implements ConnectionC
 	// get current offset
 	int fmOffset = id % outputFeatureMapLength;
 
-	pool((id / outputFeatureMapLength) * inputFeatureMapLength + (ioRowsOffset + (fmOffset / outputFeatureMapColumns) * subsamplingRows) * inputFeatureMapColumns + (fmOffset % outputFeatureMapColumns) * subsamplingCols);
+	pool((id / outputFeatureMapLength) * inputFeatureMapLength + (ioRowsOffset + (fmOffset / outputFeatureMapColumns) * subsamplingRows) * inputFeatureMapColumns + ioColumnsOffset + (fmOffset % outputFeatureMapColumns) * subsamplingCols);
     }
 
     /**

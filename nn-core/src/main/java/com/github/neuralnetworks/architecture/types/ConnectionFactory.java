@@ -50,23 +50,23 @@ public class ConnectionFactory {
 	return new Subsampling2DConnection(inputLayer, regionRows, regionCols);
     }
 
-    public static Subsampling2DConnection maxPoolingConnection(ConvGridLayer inputLayer, LayerCalculatorImpl lc, int regionRows, int regionCols) {
+    public static Subsampling2DConnection maxPoolingConnection(ConvGridLayer inputLayer, LayerCalculatorImpl lc, int regionRows, int regionCols, int miniBatchSize) {
 	Subsampling2DConnection c = subsamplingConnection(inputLayer, regionRows, regionCols);
-	lc.addConnectionCalculator(c.getOutputLayer(), new AparapiMaxPooling2D());
+	lc.addConnectionCalculator(c.getOutputLayer(), new AparapiMaxPooling2D(c, miniBatchSize));
 
 	return c;
     }
 
-    public static Subsampling2DConnection averagePoolingConnection(ConvGridLayer inputLayer, LayerCalculatorImpl lc, int regionRows, int regionCols) {
+    public static Subsampling2DConnection averagePoolingConnection(ConvGridLayer inputLayer, LayerCalculatorImpl lc, int regionRows, int regionCols, int miniBatchSize) {
 	Subsampling2DConnection c = subsamplingConnection(inputLayer, regionRows, regionCols);
-	lc.addConnectionCalculator(c.getOutputLayer(), new AparapiAveragePooling2D());
+	lc.addConnectionCalculator(c.getOutputLayer(), new AparapiAveragePooling2D(c, miniBatchSize));
 
 	return c;
     }
 
-    public static Subsampling2DConnection stochasticPoolingConnection(ConvGridLayer inputLayer, LayerCalculatorImpl lc, int regionRows, int regionCols) {
+    public static Subsampling2DConnection stochasticPoolingConnection(ConvGridLayer inputLayer, LayerCalculatorImpl lc, int regionRows, int regionCols, int miniBatchSize) {
 	Subsampling2DConnection c = subsamplingConnection(inputLayer, regionRows, regionCols);
-	lc.addConnectionCalculator(c.getOutputLayer(), new AparapiStochasticPooling2D());
+	lc.addConnectionCalculator(c.getOutputLayer(), new AparapiStochasticPooling2D(c, miniBatchSize));
 
 	return c;
     }
