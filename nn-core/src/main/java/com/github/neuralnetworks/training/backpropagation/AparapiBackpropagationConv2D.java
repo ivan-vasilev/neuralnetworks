@@ -71,6 +71,8 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements Backp
 	    } else {
 		super.calculate(c, output, connections.get(c));
 	    }
+
+	    updateWeights();
 	}
     }
 
@@ -107,6 +109,19 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements Backp
 		input[inputId] += activation * weights[j];
 		weightUpdates[j * miniBatch + p] += activation * ffActivation[inputId];
 	    }
+	}
+    }
+
+    /**
+     * Weight updates after the backpropagation
+     */
+    protected void updateWeights() {
+	float weightUpdate = 0;
+	for (int i = 0; i < weights.length; i++) {
+	    weightUpdate = learningRate * weightUpdates[i] + momentum * weightUpdatesMomentum[i] - weightDecay * weights[i];
+	    weights[i] += weightUpdate;
+	    weightUpdatesMomentum[i] = weightUpdates[i];
+	    weightUpdates[i] = weightUpdate;
 	}
     }
 
