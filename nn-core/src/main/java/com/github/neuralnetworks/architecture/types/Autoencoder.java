@@ -1,6 +1,5 @@
 package com.github.neuralnetworks.architecture.types;
 
-import com.github.neuralnetworks.architecture.BiasLayer;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.util.Util;
@@ -21,24 +20,24 @@ public class Autoencoder extends MultiLayerPerceptron {
 	addLayer(outputLayer, addBias);
     }
 
-    public BiasLayer getHiddenBiasLayer() {
+    public Layer getHiddenBiasLayer() {
 	Layer hiddenLayer = getHiddenLayer();
 	for (Connections c : hiddenLayer.getConnections()) {
 	    Layer l = Util.getOppositeLayer(c, hiddenLayer);
-	    if (l instanceof BiasLayer) {
-		return (BiasLayer) l;
+	    if (Util.isBias(l)) {
+		return l;
 	    }
 	}
 
 	return null;
     }
 
-    public BiasLayer getOutputBiasLayer() {
+    public Layer getOutputBiasLayer() {
 	Layer outputLayer = getOutputLayer();
 	for (Connections c : outputLayer.getConnections()) {
 	    Layer l = Util.getOppositeLayer(c, outputLayer);
-	    if (l instanceof BiasLayer) {
-		return (BiasLayer) l;
+	    if (Util.isBias(l)) {
+		return l;
 	    }
 	}
 

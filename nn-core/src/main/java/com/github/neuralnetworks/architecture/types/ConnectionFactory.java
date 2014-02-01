@@ -1,6 +1,5 @@
 package com.github.neuralnetworks.architecture.types;
 
-import com.github.neuralnetworks.architecture.BiasLayer;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
 import com.github.neuralnetworks.architecture.ConvGridLayer;
 import com.github.neuralnetworks.architecture.FullyConnected;
@@ -72,7 +71,7 @@ public class ConnectionFactory {
     }
 
     public static FullyConnected biasConnection(NeuralNetworkImpl nn, Layer targetLayer) {
-	Layer biasLayer = new BiasLayer();
+	Layer biasLayer = new Layer(1);
 	nn.addLayer(biasLayer);
 	return new FullyConnected(biasLayer, targetLayer);
     }

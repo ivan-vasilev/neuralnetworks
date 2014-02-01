@@ -3,7 +3,6 @@ package com.github.neuralnetworks.architecture.types;
 import java.util.Collection;
 import java.util.List;
 
-import com.github.neuralnetworks.architecture.BiasLayer;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
@@ -53,7 +52,7 @@ public abstract class DNN<N extends NeuralNetwork> extends MultiLayerPerceptron 
 	if (!getLayers().contains(output)) {
 	    for (Connections c : output.getConnections()) {
 		Layer opposite = Util.getOppositeLayer(c, output);
-		if (!(opposite instanceof BiasLayer) && getLayers().contains(opposite)) {
+		if (!Util.isBias(opposite) && getLayers().contains(opposite)) {
 		    output = opposite;
 		    break;
 		}

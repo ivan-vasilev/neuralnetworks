@@ -8,13 +8,13 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import com.github.neuralnetworks.architecture.BiasLayer;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
+import com.github.neuralnetworks.util.Util;
 
 /**
  * Connection calculator for the backpropagation phase of the algorithm
@@ -61,7 +61,7 @@ public abstract class BackPropagationConnectionCalculatorImpl implements Connect
 	    Matrix out = output;
 	    for (Entry<Connections, Matrix> e : connections.entrySet()) {
 		if (connectionCalculators.get(e.getKey()) == bc) {
-		    if (e.getKey().getInputLayer() instanceof BiasLayer && e.getKey().getInputLayer() != targetLayer) {
+		    if (Util.isBias(e.getKey().getInputLayer()) && e.getKey().getInputLayer() != targetLayer) {
 			chunkCalc.put(e.getKey(), output);
 			target = e.getKey().getInputLayer();
 			out = e.getValue();

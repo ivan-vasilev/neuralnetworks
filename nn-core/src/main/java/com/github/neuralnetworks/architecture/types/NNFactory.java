@@ -1,6 +1,5 @@
 package com.github.neuralnetworks.architecture.types;
 
-import com.github.neuralnetworks.architecture.BiasLayer;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
@@ -15,6 +14,7 @@ import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSumC
 import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculatorFullyConnected;
 import com.github.neuralnetworks.calculation.neuronfunctions.ConstantConnectionCalculator;
 import com.github.neuralnetworks.calculation.neuronfunctions.SoftmaxFunction;
+import com.github.neuralnetworks.util.Util;
 
 /**
  * Factory class for neural networks
@@ -38,7 +38,7 @@ public class NNFactory {
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	nn.setLayerCalculator(lc);
 	for (Layer l : nn.getLayers()) {
-	    if (!(l instanceof BiasLayer)) {
+	    if (!Util.isBias(l)) {
 		if (l != nn.getInputLayer()) {
 		    if (outputCC != null && nn.getOutputLayer() == l) {
 			lc.addConnectionCalculator(l, outputCC);
@@ -55,7 +55,7 @@ public class NNFactory {
     public static LayerCalculatorImpl nnSigmoid(NeuralNetworkImpl nn, ConnectionCalculator outputCC) {
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	for (Layer l : nn.getLayers()) {
-	    if (!(l instanceof BiasLayer)) {
+	    if (!Util.isBias(l)) {
 		if (l != nn.getInputLayer()) {
 		    if (outputCC != null && nn.getOutputLayer() == l) {
 			lc.addConnectionCalculator(l, outputCC);
@@ -74,7 +74,7 @@ public class NNFactory {
     public static LayerCalculatorImpl nnSoftRelu(NeuralNetworkImpl nn, ConnectionCalculator outputCC) {
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	for (Layer l : nn.getLayers()) {
-	    if (!(l instanceof BiasLayer)) {
+	    if (!Util.isBias(l)) {
 		if (l != nn.getInputLayer()) {
 		    if (nn.getOutputLayer() == l) {
 			if (outputCC != null) {
@@ -99,7 +99,7 @@ public class NNFactory {
     public static LayerCalculatorImpl nnRelu(NeuralNetworkImpl nn, ConnectionCalculator outputCC) {
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	for (Layer l : nn.getLayers()) {
-	    if (!(l instanceof BiasLayer)) {
+	    if (!Util.isBias(l)) {
 		if (l != nn.getInputLayer()) {
 		    if (nn.getOutputLayer() == l) {
 			if (outputCC != null) {
@@ -124,7 +124,7 @@ public class NNFactory {
     public static LayerCalculatorImpl nnTanh(NeuralNetworkImpl nn, ConnectionCalculator outputCC) {
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	for (Layer l : nn.getLayers()) {
-	    if (!(l instanceof BiasLayer)) {
+	    if (!Util.isBias(l)) {
 		if (l != nn.getInputLayer()) {
 		    if (outputCC != null && nn.getOutputLayer() == l) {
 			lc.addConnectionCalculator(l, outputCC);
@@ -330,7 +330,7 @@ public class NNFactory {
 
     public static void populateBiasLayers(LayerCalculatorImpl lc, NeuralNetwork nn) {
 	for (Layer l : nn.getLayers()) {
-	    if (l instanceof BiasLayer) {
+	    if (Util.isBias(l)) {
 		lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
 	    }
 	}

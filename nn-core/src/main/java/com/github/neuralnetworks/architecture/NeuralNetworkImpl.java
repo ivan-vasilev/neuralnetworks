@@ -7,6 +7,7 @@ import java.util.Set;
 
 import com.github.neuralnetworks.calculation.LayerCalculator;
 import com.github.neuralnetworks.util.UniqueList;
+import com.github.neuralnetworks.util.Util;
 
 /**
  * Base class for all types of neural networks.
@@ -51,11 +52,11 @@ public class NeuralNetworkImpl implements NeuralNetwork {
      */
     @Override
     public Layer getInputLayer() {
-	hasInboundConnections:
+	notInput:
 	for (Layer l : layers) {
 	    for (Connections c : l.getConnections(this)) {
-		if (l == c.getOutputLayer() && !(c.getInputLayer() instanceof BiasLayer) && !(c.getOutputLayer() instanceof BiasLayer)) {
-		    continue hasInboundConnections;
+		if (l == c.getOutputLayer() && !Util.isBias(c.getInputLayer())) {
+		    continue notInput;
 		}
 	    }
 
@@ -152,7 +153,7 @@ public class NeuralNetworkImpl implements NeuralNetwork {
 		Set<Layer> toRemove = new HashSet<>();
 		toRemove.add(layer);
 		for (Connections c : layer.getConnections(this)) {
-		    if (c.getInputLayer() instanceof BiasLayer) {
+		    if (Util.isBias(c.getInputLayer())) {
 			toRemove.add(c.getInputLayer());
 		    }
 		}

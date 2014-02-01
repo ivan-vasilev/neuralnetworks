@@ -3,13 +3,13 @@ package com.github.neuralnetworks.calculation.neuronfunctions;
 import java.util.Arrays;
 import java.util.SortedMap;
 
-import com.github.neuralnetworks.architecture.BiasLayer;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
 import com.github.neuralnetworks.architecture.ConvGridLayer;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
+import com.github.neuralnetworks.util.Util;
 
 /**
  * Default implementation of Connection calculator for convolutional/subsampling layers
@@ -29,7 +29,7 @@ public abstract class ConnectionCalculatorConv implements ConnectionCalculator {
 
 	for (Connections con : connections.keySet()) {
 	    if (con instanceof Conv2DConnection) {
-		if (c.getInputLayer() instanceof BiasLayer) {
+		if (!Util.isBias(c.getInputLayer())) {
 		    bias = (Conv2DConnection) con;
 		} else {
 		    c = (Conv2DConnection) con;

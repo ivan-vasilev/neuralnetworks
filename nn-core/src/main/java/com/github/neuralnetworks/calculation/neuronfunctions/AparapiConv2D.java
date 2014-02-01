@@ -38,6 +38,17 @@ public abstract class AparapiConv2D extends Kernel implements Serializable {
      * output columns * output rows
      */
     protected final int outputFeatureMapLength;
+    
+    /**
+     * weights for single feature map
+     */
+    protected final int featureMapWeights;
+
+    /**
+     * input offset for each feature map in respect to the start index
+     */
+    //@Local TODO
+    protected final int[] featureMapOffsets;
 
     /**
      * input
@@ -54,22 +65,6 @@ public abstract class AparapiConv2D extends Kernel implements Serializable {
      */
     //@Local TODO
     protected float[] weights;
-    
-    /**
-     * weights for single feature map
-     */
-    protected final int featureMapWeights;
-
-    /**
-     * input offset for each feature map in respect to the start index
-     */
-    //@Local TODO
-    protected final int[] featureMapOffsets;
-
-    /**
-     * current connection
-     */
-    protected Conv2DConnection current;
 
     public AparapiConv2D(Conv2DConnection c, int miniBatchSize) {
 	super();

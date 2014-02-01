@@ -4,7 +4,6 @@ import java.text.NumberFormat;
 import java.util.Collection;
 import java.util.Map.Entry;
 
-import com.github.neuralnetworks.architecture.BiasLayer;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
@@ -70,9 +69,17 @@ public class Util {
 	return connection.getInputLayer() != layer ? connection.getInputLayer() : connection.getOutputLayer();
     }
 
+    /**
+     * @param layer
+     * @return whether layer is in fact bias layer
+     */
+    public static boolean isBias(Layer layer) {
+	return layer.getNeuronCount() == 1 && layer.getConnections().size() == 1 && layer.getConnections().iterator().next().getInputLayer() == layer;
+    }
+
     public static boolean hasBias(Collection<Connections> connections) {
 	for (Connections c : connections) {
-	    if (c.getInputLayer() instanceof BiasLayer || c.getOutputLayer() instanceof BiasLayer) {
+	    if (Util.isBias(c.getInputLayer())) {
 		return true;
 	    }
 	}

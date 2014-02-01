@@ -3,7 +3,6 @@ package com.github.neuralnetworks.training.backpropagation;
 import java.util.Map;
 import java.util.SortedMap;
 
-import com.github.neuralnetworks.architecture.BiasLayer;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
 import com.github.neuralnetworks.architecture.Layer;
@@ -52,7 +51,7 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements Backp
 
 	for (Connections con : connections.keySet()) {
 	    if (con instanceof Conv2DConnection) {
-		if (c.getInputLayer() instanceof BiasLayer) {
+		if (Util.isBias(c.getInputLayer())) {
 		    bias = (Conv2DConnection) con;
 		} else {
 		    c = (Conv2DConnection) con;

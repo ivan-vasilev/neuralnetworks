@@ -3,11 +3,11 @@ package com.github.neuralnetworks.training.backpropagation;
 import java.util.Map;
 import java.util.SortedMap;
 
-import com.github.neuralnetworks.architecture.BiasLayer;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.util.Properties;
+import com.github.neuralnetworks.util.Util;
 
 /**
  * Convolutional Backpropagation connection calculator for sigmoid layers
@@ -24,7 +24,7 @@ public class BackPropagationConv2DSigmoid extends BackPropagationConnectionCalcu
     protected void addBackpropFunction(SortedMap<Connections, Integer> inputConnections, Map<Connections, BackpropagationConnectionCalculator> connectionCalculators, Layer targetLayer) {
 	Conv2DConnection con = null;
 	for (Connections c : inputConnections.keySet()) {
-	    if (c instanceof Conv2DConnection && !(c.getInputLayer() instanceof BiasLayer)) {
+	    if (c instanceof Conv2DConnection && !Util.isBias(c.getInputLayer())) {
 		con = (Conv2DConnection) c;
 		break;
 	    }

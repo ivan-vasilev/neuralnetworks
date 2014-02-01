@@ -5,11 +5,11 @@ import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import com.github.neuralnetworks.architecture.BiasLayer;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.util.Properties;
+import com.github.neuralnetworks.util.Util;
 
 /**
  * Backpropagation connection calculator for sigmoid layers
@@ -26,7 +26,7 @@ public class BackPropagationSigmoid extends BackPropagationConnectionCalculatorI
     protected void addBackpropFunction(SortedMap<Connections, Integer> inputConnections, Map<Connections, BackpropagationConnectionCalculator> connectionCalculators, Layer targetLayer) {
 	for (Entry<Connections, Integer> e : inputConnections.entrySet()) {
 	    SortedMap<GraphConnections, Integer> m = new TreeMap<>();
-	    if (e.getKey().getInputLayer() instanceof BiasLayer && targetLayer != e.getKey().getInputLayer()) {
+	    if (Util.isBias(e.getKey().getInputLayer()) && targetLayer != e.getKey().getInputLayer()) {
 		m.put((GraphConnections) e.getKey(), miniBatchSize);
 		connectionCalculators.put(e.getKey(), new AparapiBackpropSigmoid(m, miniBatchSize, e.getKey().getInputLayer()));
 	    } else {

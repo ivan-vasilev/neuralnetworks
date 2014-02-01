@@ -11,7 +11,6 @@ import java.util.TreeMap;
 
 import org.junit.Test;
 
-import com.github.neuralnetworks.architecture.BiasLayer;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.FullyConnected;
 import com.github.neuralnetworks.architecture.Layer;
@@ -40,7 +39,7 @@ public class FFNNTest {
 	Layer il2 = new Layer(3);
 	FullyConnected c1 = new FullyConnected(il1, ol);
 	FullyConnected c2 = new FullyConnected(il2, ol);
-	FullyConnected bc = new FullyConnected(new BiasLayer(), ol);
+	FullyConnected bc = new FullyConnected(new Layer(1), ol);
 
 	Matrix cg = c1.getConnectionGraph();
 	cg.set(0, 0, 1);
@@ -123,7 +122,7 @@ public class FFNNTest {
 	Layer il2 = new Layer(3);
 	FullyConnected c1 = new FullyConnected(ol, il1);
 	FullyConnected c2 = new FullyConnected(ol, il2);
-	FullyConnected bc = new FullyConnected(new BiasLayer(), ol);
+	FullyConnected bc = new FullyConnected(new Layer(1), ol);
 
 	Matrix cg = c1.getConnectionGraph();
 	cg.set(0, 0, 1);

@@ -7,13 +7,13 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import com.github.neuralnetworks.architecture.BiasLayer;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.util.UniqueList;
+import com.github.neuralnetworks.util.Util;
 
 /**
  * Default implementation of Connection calculator for fully connected layers
@@ -59,7 +59,7 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator 
 		Connections c = e.getKey();
 		Matrix input = e.getValue();
 		// bias layer scenarios
-		if (c.getInputLayer() instanceof BiasLayer) {
+		if (Util.isBias(c.getInputLayer())) {
 		    bias.add((GraphConnections) c);
 		} else {
 		    notBias.put(c, input);
@@ -70,7 +70,7 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator 
 		if (preTransferFunctions != null && preTransferFunctions.size() > 0) {
 		    for (MatrixFunction f : preTransferFunctions) {
 			for (Entry<Connections, Matrix> e : connections.entrySet()) {
-			    if (!(e.getKey().getInputLayer() instanceof BiasLayer)) {
+			    if (!Util.isBias(e.getKey().getInputLayer())) {
 				f.value(e.getValue());
 			    }
 			}

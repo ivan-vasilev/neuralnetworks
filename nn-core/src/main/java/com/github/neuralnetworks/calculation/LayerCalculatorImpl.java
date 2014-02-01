@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.github.neuralnetworks.architecture.BiasLayer;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
@@ -57,7 +56,7 @@ public class LayerCalculatorImpl extends LayerCalculatorBase implements LayerCal
     protected boolean orderConnections(NeuralNetwork neuralNetwork, Layer currentLayer, Set<Layer> calculatedLayers, Set<Layer> inProgressLayers, List<ConnectionCalculateCandidate> calculateCandidates) {
 	boolean result = false;
 
-	if (calculatedLayers.contains(currentLayer) || currentLayer instanceof BiasLayer) {
+	if (calculatedLayers.contains(currentLayer) || Util.isBias(currentLayer)) {
 	    result = true;
 	} else if (!inProgressLayers.contains(currentLayer)) {
 	    inProgressLayers.add(currentLayer);
@@ -69,7 +68,7 @@ public class LayerCalculatorImpl extends LayerCalculatorBase implements LayerCal
 		if (orderConnections(neuralNetwork, opposite, calculatedLayers, inProgressLayers, calculateCandidates)) {
 		    currentCandidates.add(new ConnectionCalculateCandidate(c, currentLayer));
 
-		    if (!(opposite instanceof BiasLayer)) {
+		    if (!Util.isBias(opposite)) {
 			hasNoBiasConnections = true;
 		    }
 		}
