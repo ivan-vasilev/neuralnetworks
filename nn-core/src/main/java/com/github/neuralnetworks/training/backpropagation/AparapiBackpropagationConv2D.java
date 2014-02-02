@@ -47,20 +47,11 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements Backp
     @Override
     public void calculate(SortedMap<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
 	Conv2DConnection c = null;
-	Conv2DConnection bias = null;
 
 	for (Connections con : connections.keySet()) {
 	    if (con instanceof Conv2DConnection) {
-		if (Util.isBias(c.getInputLayer())) {
-		    bias = (Conv2DConnection) con;
-		} else {
-		    c = (Conv2DConnection) con;
-		}
+		c = (Conv2DConnection) con;
 	    }
-	}
-
-	if (bias != null) {
-	    
 	}
 
 	if (c != null) {

@@ -1,16 +1,22 @@
 package com.github.neuralnetworks.architecture.types;
 
+import com.github.neuralnetworks.architecture.ConvGridLayer;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.calculation.LayerCalculatorImpl;
 import com.github.neuralnetworks.calculation.RBMLayerCalculator;
+import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2DReLU;
+import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2DSigmoid;
+import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2DSoftReLU;
+import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2DTanh;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiReLU;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSigmoid;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSoftReLU;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiTanh;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSumConnectionCalculator;
+import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculatorConv;
 import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculatorFullyConnected;
 import com.github.neuralnetworks.calculation.neuronfunctions.ConstantConnectionCalculator;
 import com.github.neuralnetworks.calculation.neuronfunctions.SoftmaxFunction;
@@ -42,6 +48,8 @@ public class NNFactory {
 		if (l != nn.getInputLayer()) {
 		    if (outputCC != null && nn.getOutputLayer() == l) {
 			lc.addConnectionCalculator(l, outputCC);
+		    } else if (l instanceof ConvGridLayer) {
+			lc.addConnectionCalculator(l, new ConnectionCalculatorConv());
 		    } else {
 			lc.addConnectionCalculator(l, new ConnectionCalculatorFullyConnected());
 		    }
@@ -59,6 +67,8 @@ public class NNFactory {
 		if (l != nn.getInputLayer()) {
 		    if (outputCC != null && nn.getOutputLayer() == l) {
 			lc.addConnectionCalculator(l, outputCC);
+		    } else if (l instanceof ConvGridLayer) {
+			lc.addConnectionCalculator(l, new AparapiConv2DSigmoid());
 		    } else {
 			lc.addConnectionCalculator(l, new AparapiSigmoid());
 		    }
@@ -84,6 +94,8 @@ public class NNFactory {
 			    c.addActivationFunction(new SoftmaxFunction());
 			    lc.addConnectionCalculator(l, c);
 			}
+		    } else if (l instanceof ConvGridLayer) {
+			lc.addConnectionCalculator(l, new AparapiConv2DSoftReLU());
 		    } else {
 			lc.addConnectionCalculator(l, new AparapiSoftReLU());
 		    }
@@ -109,6 +121,8 @@ public class NNFactory {
 			    c.addActivationFunction(new SoftmaxFunction());
 			    lc.addConnectionCalculator(l, c);
 			}
+		    } else if (l instanceof ConvGridLayer) {
+			lc.addConnectionCalculator(l, new AparapiConv2DReLU());
 		    } else {
 			lc.addConnectionCalculator(l, new AparapiReLU());
 		    }
@@ -128,6 +142,8 @@ public class NNFactory {
 		if (l != nn.getInputLayer()) {
 		    if (outputCC != null && nn.getOutputLayer() == l) {
 			lc.addConnectionCalculator(l, outputCC);
+		    } else if (l instanceof ConvGridLayer) {
+			lc.addConnectionCalculator(l, new AparapiConv2DTanh());
 		    } else {
 			lc.addConnectionCalculator(l, new AparapiTanh());
 		    }

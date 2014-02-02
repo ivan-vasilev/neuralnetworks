@@ -14,7 +14,7 @@ import com.github.neuralnetworks.util.Util;
 /**
  * Default implementation of Connection calculator for convolutional/subsampling layers
  */
-public abstract class ConnectionCalculatorConv implements ConnectionCalculator {
+public class ConnectionCalculatorConv implements ConnectionCalculator {
 
     private static final long serialVersionUID = -5405654469496055017L;
 
@@ -49,7 +49,9 @@ public abstract class ConnectionCalculatorConv implements ConnectionCalculator {
 	}
     }
 
-    protected abstract AparapiConv2D createInputFunction(Conv2DConnection c, int miniBatchSize, Layer targetLayer);
+    protected AparapiConv2D createInputFunction(Conv2DConnection c, int miniBatchSize, Layer targetLayer) {
+	return new AparapiConv2DFF(c, miniBatchSize);
+    }
 
     protected void calculateBias(Conv2DConnection bias, Matrix output) {
 	if (bias != null) {
