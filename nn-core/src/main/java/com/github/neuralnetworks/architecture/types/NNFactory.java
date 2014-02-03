@@ -1,10 +1,12 @@
 package com.github.neuralnetworks.architecture.types;
 
+import com.github.neuralnetworks.architecture.Conv2DConnection;
 import com.github.neuralnetworks.architecture.ConvGridLayer;
 import com.github.neuralnetworks.architecture.FullyConnected;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
+import com.github.neuralnetworks.architecture.Subsampling2DConnection;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.calculation.LayerCalculatorImpl;
 import com.github.neuralnetworks.calculation.RBMLayerCalculator;
@@ -31,8 +33,8 @@ public class NNFactory {
     /**
      * Create convolutional network
      * @param layers
-     * The first layer must have 2 parameters - width and height
-     * Convolutional connections must have 3 parameters - kernelColumns, kernelRows, filters
+     * The first layer must have 2 parameters - rows and columns
+     * Convolutional connections must have 3 parameters - kernelRows, kernelColumns, filters
      * Subsampling connections must have 2 parameters - subsamplingRegionRows, subsamplingRegionCols
      * Regular layers must have 1 parameter - neuron count
      * 
@@ -50,9 +52,43 @@ public class NNFactory {
 
 	NeuralNetworkImpl result = new NeuralNetworkImpl();
 
+	Layer prev = null;
+	result.addLayer(prev = new ConvGridLayer(layers[0][0], layers[0][1], 1));
+	for (int i = 1; i < layers.length; i++) {
+	    int[] l = layers[i];
+	    Layer newLayer = null;
+	    Layer biasLayer = null;
+	    if (l.length == 1) {
+		new FullyConnected(prev, newLayer = new Layer(l[0]));
+		if (addBias) {
+		    new FullyConnected(biasLayer = new Layer(1), newLayer);
+		}
+	    } else if (l.length == 3) {
+		newLayer = new Conv2DConnection((ConvGridLayer) prev, l[0], l[1], l[2]).getOutputLayer();
+		if (addBias) {
+		    new Conv2DConnection((ConvGridLayer) (biasLayer = new ConvGridLayer(1, 1, 1)), (ConvGridLayer) newLayer);
+		}
+	    } else if (l.length == 2) {
+		newLayer = new Subsampling2DConnection((ConvGridLayer) prev, l[0], l[1]).getOutputLayer();
+	    }
+
+	    result.addLayer(newLayer);
+	    if (biasLayer != null) {
+		result.addLayer(biasLayer);
+	    }
+
+	    prev = newLayer;
+	}
+
 	return result;
     }
 
+    /**
+     * Multi layer perceptron with fully connected layers
+     * @param layers - neuron count for each layer
+     * @param addBias
+     * @return
+     */
     public static NeuralNetworkImpl mlp(int[] layers, boolean addBias) {
 	if (layers.length <= 1) {
 	    throw new IllegalArgumentException("more than one layer is required");
