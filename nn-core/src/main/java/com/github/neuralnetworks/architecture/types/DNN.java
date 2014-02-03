@@ -6,13 +6,14 @@ import java.util.List;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
+import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.util.UniqueList;
 import com.github.neuralnetworks.util.Util;
 
 /**
  * Default implementation of the DeepNeuralNetwork interface
  */
-public abstract class DNN<N extends NeuralNetwork> extends MultiLayerPerceptron {
+public abstract class DNN<N extends NeuralNetwork> extends NeuralNetworkImpl {
 
     /**
      * List of networks in the network

@@ -1,6 +1,7 @@
 package com.github.neuralnetworks.architecture.types;
 
 import com.github.neuralnetworks.architecture.ConvGridLayer;
+import com.github.neuralnetworks.architecture.FullyConnected;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
@@ -27,19 +28,62 @@ import com.github.neuralnetworks.util.Util;
  */
 public class NNFactory {
 
-    public static MultiLayerPerceptron mlp(int[] layers, boolean addBias) {
+    /**
+     * Create convolutional network
+     * @param layers
+     * The first layer must have 2 parameters - width and height
+     * Convolutional connections must have 3 parameters - kernelColumns, kernelRows, filters
+     * Subsampling connections must have 2 parameters - subsamplingRegionRows, subsamplingRegionCols
+     * Regular layers must have 1 parameter - neuron count
+     * 
+     * @param addBias
+     * @return neural network
+     */
+    public static NeuralNetworkImpl convNN(int[][] layers, boolean addBias) {
 	if (layers.length <= 1) {
 	    throw new IllegalArgumentException("more than one layer is required");
 	}
 
-	MultiLayerPerceptron result = new MultiLayerPerceptron();
+	if (layers[0].length != 2) {
+	    throw new IllegalArgumentException("first layer must have width and height");
+	}
+
+	NeuralNetworkImpl result = new NeuralNetworkImpl();
+
+	return result;
+    }
+
+    public static NeuralNetworkImpl mlp(int[] layers, boolean addBias) {
+	if (layers.length <= 1) {
+	    throw new IllegalArgumentException("more than one layer is required");
+	}
+
+	NeuralNetworkImpl result = new NeuralNetworkImpl();
 	for (int i = 0; i < layers.length; i++) {
-	    result.addLayer(new Layer(layers[i]), addBias);
+	    addFullyConnectedLayer(result, new Layer(layers[i]), addBias);
 	}
 
 	return result;
     }
-    
+
+    /**
+     * Add fully connected layer to the output layer of the network
+     * @param nn
+     * @param layer
+     * @param addBias
+     */
+    public static void addFullyConnectedLayer(NeuralNetworkImpl nn, Layer layer, boolean addBias) {
+	if (nn.addLayer(layer) && nn.getOutputLayer() != layer) {
+	    new FullyConnected(nn.getOutputLayer(), layer);
+	}
+
+	if (addBias && nn.getInputLayer() != layer) {
+	    Layer biasLayer = new Layer(1);
+	    nn.addLayer(biasLayer);
+	    new FullyConnected(biasLayer, layer);
+	}
+    }
+
     public static void nnWeightedSum(NeuralNetworkImpl nn, ConnectionCalculator outputCC) {
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	nn.setLayerCalculator(lc);
@@ -49,7 +93,9 @@ public class NNFactory {
 		    if (outputCC != null && nn.getOutputLayer() == l) {
 			lc.addConnectionCalculator(l, outputCC);
 		    } else if (l instanceof ConvGridLayer) {
-			lc.addConnectionCalculator(l, new ConnectionCalculatorConv());
+			if (Util.isConvolutional(l)) {
+			    lc.addConnectionCalculator(l, new ConnectionCalculatorConv());
+			}
 		    } else {
 			lc.addConnectionCalculator(l, new ConnectionCalculatorFullyConnected());
 		    }
@@ -68,7 +114,9 @@ public class NNFactory {
 		    if (outputCC != null && nn.getOutputLayer() == l) {
 			lc.addConnectionCalculator(l, outputCC);
 		    } else if (l instanceof ConvGridLayer) {
-			lc.addConnectionCalculator(l, new AparapiConv2DSigmoid());
+			if (Util.isConvolutional(l)) {
+			    lc.addConnectionCalculator(l, new AparapiConv2DSigmoid());
+			}
 		    } else {
 			lc.addConnectionCalculator(l, new AparapiSigmoid());
 		    }
@@ -95,7 +143,9 @@ public class NNFactory {
 			    lc.addConnectionCalculator(l, c);
 			}
 		    } else if (l instanceof ConvGridLayer) {
-			lc.addConnectionCalculator(l, new AparapiConv2DSoftReLU());
+			if (Util.isConvolutional(l)) {
+			    lc.addConnectionCalculator(l, new AparapiConv2DSoftReLU());
+			}
 		    } else {
 			lc.addConnectionCalculator(l, new AparapiSoftReLU());
 		    }
@@ -107,7 +157,7 @@ public class NNFactory {
 
 	return lc;
     }
-    
+
     public static LayerCalculatorImpl nnRelu(NeuralNetworkImpl nn, ConnectionCalculator outputCC) {
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	for (Layer l : nn.getLayers()) {
@@ -122,7 +172,9 @@ public class NNFactory {
 			    lc.addConnectionCalculator(l, c);
 			}
 		    } else if (l instanceof ConvGridLayer) {
-			lc.addConnectionCalculator(l, new AparapiConv2DReLU());
+			if (Util.isConvolutional(l)) {
+			    lc.addConnectionCalculator(l, new AparapiConv2DReLU());
+			}
 		    } else {
 			lc.addConnectionCalculator(l, new AparapiReLU());
 		    }
@@ -134,7 +186,7 @@ public class NNFactory {
 
 	return lc;
     }
-    
+
     public static LayerCalculatorImpl nnTanh(NeuralNetworkImpl nn, ConnectionCalculator outputCC) {
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	for (Layer l : nn.getLayers()) {
@@ -143,7 +195,9 @@ public class NNFactory {
 		    if (outputCC != null && nn.getOutputLayer() == l) {
 			lc.addConnectionCalculator(l, outputCC);
 		    } else if (l instanceof ConvGridLayer) {
-			lc.addConnectionCalculator(l, new AparapiConv2DTanh());
+			if (Util.isConvolutional(l)) {
+			    lc.addConnectionCalculator(l, new AparapiConv2DTanh());
+			}
 		    } else {
 			lc.addConnectionCalculator(l, new AparapiTanh());
 		    }
@@ -156,26 +210,26 @@ public class NNFactory {
 	return lc;
     }
 
-    public static MultiLayerPerceptron mlpSigmoid(int[] layers, boolean addBias) {
-	MultiLayerPerceptron result = mlp(layers, addBias);
+    public static NeuralNetworkImpl mlpSigmoid(int[] layers, boolean addBias) {
+	NeuralNetworkImpl result = mlp(layers, addBias);
 	result.setLayerCalculator(nnSigmoid(result, null));
 	return result;
     }
 
-    public static MultiLayerPerceptron mlpSoftRelu(int[] layers, boolean addBias, ConnectionCalculator outputCC) {
-	MultiLayerPerceptron result = mlp(layers, addBias);
+    public static NeuralNetworkImpl mlpSoftRelu(int[] layers, boolean addBias, ConnectionCalculator outputCC) {
+	NeuralNetworkImpl result = mlp(layers, addBias);
 	result.setLayerCalculator(nnSoftRelu(result, outputCC));
 	return result;
     }
 
-    public static MultiLayerPerceptron mlpRelu(int[] layers, boolean addBias, ConnectionCalculator outputCC) {
-	MultiLayerPerceptron result = mlp(layers, addBias);
+    public static NeuralNetworkImpl mlpRelu(int[] layers, boolean addBias, ConnectionCalculator outputCC) {
+	NeuralNetworkImpl result = mlp(layers, addBias);
 	result.setLayerCalculator(nnRelu(result, outputCC));
 	return result;
     }
 
-    public static MultiLayerPerceptron mlpTanh(int[] layers, boolean addBias, ConnectionCalculator outputCC) {
-	MultiLayerPerceptron result = mlp(layers, addBias);
+    public static NeuralNetworkImpl mlpTanh(int[] layers, boolean addBias, ConnectionCalculator outputCC) {
+	NeuralNetworkImpl result = mlp(layers, addBias);
 	result.setLayerCalculator(nnTanh(result, outputCC));
 	return result;
     }

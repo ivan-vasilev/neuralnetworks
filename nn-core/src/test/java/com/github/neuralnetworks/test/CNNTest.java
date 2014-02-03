@@ -12,7 +12,6 @@ import com.github.neuralnetworks.architecture.ConvGridLayer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.architecture.Subsampling2DConnection;
-import com.github.neuralnetworks.architecture.types.ConnectionFactory;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiAveragePooling2D;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2D;
@@ -29,7 +28,7 @@ public class CNNTest {
     @Test
     public void testDimensions() {
 	// convolution dimensions
-	Conv2DConnection conv = ConnectionFactory.convConnection(new ConvGridLayer(4, 4, 3), 2, 2, 2);
+	Conv2DConnection conv = new Conv2DConnection(new ConvGridLayer(4, 4, 3), 2, 2, 2);
 
 	ConvGridLayer output = (ConvGridLayer) conv.getOutputLayer();
 
@@ -38,7 +37,7 @@ public class CNNTest {
 	assertEquals(2, output.getFilters(), 0);
 
 	// subsampling dimensions
-	Subsampling2DConnection sub = ConnectionFactory.subsamplingConnection(new ConvGridLayer(5, 5, 3), 2, 2);
+	Subsampling2DConnection sub = new Subsampling2DConnection(new ConvGridLayer(5, 5, 3), 2, 2);
 	
 	output = (ConvGridLayer) sub.getOutputLayer();
 
@@ -50,7 +49,7 @@ public class CNNTest {
     @Test
     public void testConvolutions() {
 	NeuralNetworkImpl nn = new NeuralNetworkImpl();
-	Conv2DConnection c = ConnectionFactory.convConnection(new ConvGridLayer(3, 3, 2), 2, 2, 1);
+	Conv2DConnection c = new Conv2DConnection(new ConvGridLayer(3, 3, 2), 2, 2, 1);
 	nn.addConnection(c);
 	c.getWeights()[0] = 1;
 	c.getWeights()[1] = 2;
@@ -79,7 +78,7 @@ public class CNNTest {
     
     @Test
     public void testConvolutions2() {
-	Conv2DConnection c = ConnectionFactory.convConnection(new ConvGridLayer(3, 3, 2), 2, 2, 2);
+	Conv2DConnection c = new Conv2DConnection(new ConvGridLayer(3, 3, 2), 2, 2, 2);
 	c.getWeights()[0] = 1;
 	c.getWeights()[1] = 2;
 	c.getWeights()[2] = 3;
@@ -118,7 +117,7 @@ public class CNNTest {
 
     @Test
     public void testPooling() {
-	Subsampling2DConnection c = ConnectionFactory.subsamplingConnection(new ConvGridLayer(4, 4, 2), 2, 2);
+	Subsampling2DConnection c = new Subsampling2DConnection(new ConvGridLayer(4, 4, 2), 2, 2);
 	Matrix i1 = new Matrix(new float[] {0.5f, 1, 1, 2, 1.5f, 3, 2, 4, 2.5f, 5, 3, 6, 3.5f, 7, 4f, 8, 4.5f, 9, 5f, 10, 5.5f, 11, 6f, 12, 6.5f, 13, 7f, 14, 8f, 16, 7.5f, 15, 8.5f, 17, 9f, 18, 9.5f, 19, 10f, 20, 10.5f, 21, 11f, 22, 11.5f, 23, 12f, 24, 12.5f, 25, 13f, 26, 13.5f, 27, 14f, 28, 14.5f, 29, 15f, 30, 16f, 32, 15.5f, 31}, 2);
 	TreeMap<Connections, Matrix> map = new TreeMap<Connections, Matrix>();
 	map.put(c, i1);
@@ -172,7 +171,7 @@ public class CNNTest {
 
     @Test
     public void testStochasticPooling() {
-	Subsampling2DConnection c = ConnectionFactory.subsamplingConnection(new ConvGridLayer(3, 3, 1), 3, 3);
+	Subsampling2DConnection c = new Subsampling2DConnection(new ConvGridLayer(3, 3, 1), 3, 3);
 	Matrix i1 = new Matrix(new float[] {1.6f, 1.6f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2.4f, 2.4f}, 2);
 	TreeMap<Connections, Matrix> map = new TreeMap<Connections, Matrix>();
 	map.put(c, i1);

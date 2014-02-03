@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import com.github.neuralnetworks.architecture.types.MultiLayerPerceptron;
+import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.samples.xor.XorInputProvider;
 import com.github.neuralnetworks.samples.xor.XorOutputError;
@@ -20,11 +20,11 @@ public class XorTest {
      */
     @Test
     public void testMLPSigmoidBP() {
-	MultiLayerPerceptron mlp = NNFactory.mlp(new int[] { 2, 8, 1 }, true);
+	NeuralNetworkImpl mlp = NNFactory.mlp(new int[] { 2, 8, 1 }, true);
 	XorInputProvider trainingInput = new XorInputProvider(10000);
 	XorInputProvider testingInput = new XorInputProvider(4);
 	@SuppressWarnings("unchecked")
-	BackPropagationTrainer<MultiLayerPerceptron> bpt = TrainerFactory.backPropagationSigmoid(mlp, trainingInput, testingInput, new XorOutputError(), new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 1f, 0.5f, 0f);
+	BackPropagationTrainer<NeuralNetworkImpl> bpt = TrainerFactory.backPropagationSigmoid(mlp, trainingInput, testingInput, new XorOutputError(), new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 1f, 0.5f, 0f);
 	bpt.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
 	bpt.train();
 	bpt.test();

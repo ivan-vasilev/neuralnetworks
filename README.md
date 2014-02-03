@@ -56,7 +56,6 @@ Most of the data is represented as one-dimensional array by default (for example
 - AparapiSoftReLU - softplus activation function.
 - AparapiTanh - tanh activation function.
 - SoftmaxFunction - softmax activation function.
-- AparapiStochasticBinary - stochastic binary activation function (for RBMs).
 
 ###Convolutional layer types
 

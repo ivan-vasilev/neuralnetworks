@@ -10,7 +10,7 @@ public class Conv2DConnection extends ConnectionsImpl {
      */
     protected float[] weights;
     
-    public Conv2DConnection(ConvGridLayer inputLayer, int kernelColumns, int kernelRows, int filters) {
+    public Conv2DConnection(ConvGridLayer inputLayer, int kernelRows, int kernelColumns, int filters) {
 	super(inputLayer, new ConvGridLayer());
 	setDimensions(kernelRows, kernelColumns, filters);
 	updateDimensions();

@@ -15,7 +15,7 @@ import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.FullyConnected;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
-import com.github.neuralnetworks.architecture.types.MultiLayerPerceptron;
+import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSumConnectionCalculator;
 import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculatorFullyConnected;
@@ -201,7 +201,7 @@ public class FFNNTest {
      */
     @Test
     public void testSigmoidBP() {
-	MultiLayerPerceptron mlp = NNFactory.mlp(new int[] { 2, 2, 1 }, false);
+	NeuralNetworkImpl mlp = NNFactory.mlp(new int[] { 2, 2, 1 }, false);
 	FullyConnected c1 = (FullyConnected) mlp.getInputLayer().getConnections().iterator().next();
 	Matrix cg1 = c1.getConnectionGraph();
 	cg1.set(0, 0, 0.1f);
@@ -215,7 +215,7 @@ public class FFNNTest {
 	cg2.set(0, 1, 0.9f);
 
 	@SuppressWarnings("unchecked")
-	BackPropagationTrainer<MultiLayerPerceptron> bpt = TrainerFactory.backPropagationSigmoid(mlp, new SimpleInputProvider(new float[][] { { 0.35f, 0.9f } }, new float[][] { { 0.5f } }, 1, 1), new SimpleInputProvider(new float[][] { { 0.35f, 0.9f } }, new float[][] { { 0.5f } }, 1, 1), null, null, 1f, 0f, 0f);
+	BackPropagationTrainer<NeuralNetworkImpl> bpt = TrainerFactory.backPropagationSigmoid(mlp, new SimpleInputProvider(new float[][] { { 0.35f, 0.9f } }, new float[][] { { 0.5f } }, 1, 1), new SimpleInputProvider(new float[][] { { 0.35f, 0.9f } }, new float[][] { { 0.5f } }, 1, 1), null, null, 1f, 0f, 0f);
 	bpt.train();
 
 	assertEquals(0.09916, cg1.get(0, 0), 0.01);
@@ -231,7 +231,7 @@ public class FFNNTest {
      */
     @Test
     public void testSigmoidBP2() {
-	MultiLayerPerceptron mlp = NNFactory.mlp(new int[] { 3, 2, 1 }, true);
+	NeuralNetworkImpl mlp = NNFactory.mlp(new int[] { 3, 2, 1 }, true);
 	List<Connections> c = mlp.getConnections();
 	FullyConnected c1 = (FullyConnected) c.get(0);
 	Matrix cg1 = c1.getConnectionGraph();
@@ -257,7 +257,7 @@ public class FFNNTest {
 	cgb2.set(0, 0, 0.1f);
 
 	@SuppressWarnings("unchecked")
-	BackPropagationTrainer<MultiLayerPerceptron> bpt = TrainerFactory.backPropagationSigmoid(mlp, new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, new float[][] { { 1 } }, 1, 1), new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, new float[][] { { 1 } }, 1, 1), null, null, 0.9f, 0f, 0f);
+	BackPropagationTrainer<NeuralNetworkImpl> bpt = TrainerFactory.backPropagationSigmoid(mlp, new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, new float[][] { { 1 } }, 1, 1), new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, new float[][] { { 1 } }, 1, 1), null, null, 0.9f, 0f, 0f);
 	bpt.train();
 
 	assertEquals(0.192, cg1.get(0, 0), 0.001);
@@ -278,7 +278,7 @@ public class FFNNTest {
 
     @Test
     public void testParallelNetworks() {
-	MultiLayerPerceptron mlp = new MultiLayerPerceptron();
+	NeuralNetworkImpl mlp = new NeuralNetworkImpl();
 	Layer input = new Layer(2);
 	mlp.addLayer(input);
 
@@ -320,7 +320,7 @@ public class FFNNTest {
 
     @Test
     public void testRemoveLayer() {
-	MultiLayerPerceptron mlp = NNFactory.mlp(new int[] {3, 4, 5}, true);
+	NeuralNetworkImpl mlp = NNFactory.mlp(new int[] {3, 4, 5}, true);
 	assertEquals(5, mlp.getLayers().size(), 0);
 	mlp.removeLayer(mlp.getOutputLayer());
 	assertEquals(3, mlp.getLayers().size(), 0);

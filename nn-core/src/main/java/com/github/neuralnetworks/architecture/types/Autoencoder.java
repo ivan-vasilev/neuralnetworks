@@ -2,12 +2,13 @@ package com.github.neuralnetworks.architecture.types;
 
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
+import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.util.Util;
 
 /**
  * Autoencoder
  */
-public class Autoencoder extends MultiLayerPerceptron {
+public class Autoencoder extends NeuralNetworkImpl {
 
     private Layer hiddenLayer;
 
@@ -16,8 +17,8 @@ public class Autoencoder extends MultiLayerPerceptron {
 
 	// layers are added
 	addLayer(inputLayer);
-	addLayer(hiddenLayer, addBias);
-	addLayer(outputLayer, addBias);
+	NNFactory.addFullyConnectedLayer(this, hiddenLayer, addBias);
+	NNFactory.addFullyConnectedLayer(this, outputLayer, addBias);
     }
 
     public Layer getHiddenBiasLayer() {

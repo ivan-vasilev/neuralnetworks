@@ -9,9 +9,9 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.github.neuralnetworks.architecture.NeuralNetwork;
+import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.architecture.types.Autoencoder;
 import com.github.neuralnetworks.architecture.types.DBN;
-import com.github.neuralnetworks.architecture.types.MultiLayerPerceptron;
 import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.architecture.types.RBM;
 import com.github.neuralnetworks.architecture.types.StackedAutoencoder;
@@ -45,7 +45,7 @@ public class IrisTest {
     @Test
     public void testMLPSigmoidBP() {
 	// create the network
-	MultiLayerPerceptron mlp = NNFactory.mlp(new int[] { 4, 2, 3 }, true);
+	NeuralNetworkImpl mlp = NNFactory.mlp(new int[] { 4, 2, 3 }, true);
 
 	// training and testing data providers
 	IrisInputProvider trainInputProvider = new IrisInputProvider(150, 1500000, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
@@ -53,7 +53,7 @@ public class IrisTest {
 
 	// trainer
 	@SuppressWarnings("unchecked")
-	BackPropagationTrainer<MultiLayerPerceptron> bpt = TrainerFactory.backPropagationSigmoid(mlp, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.01f, 0.5f, 0f);
+	BackPropagationTrainer<NeuralNetworkImpl> bpt = TrainerFactory.backPropagationSigmoid(mlp, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.01f, 0.5f, 0f);
 
 	// log data
 	bpt.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
@@ -196,7 +196,7 @@ public class IrisTest {
 
 	// fine tuning backpropagation
 	@SuppressWarnings("unchecked")
-	BackPropagationTrainer<MultiLayerPerceptron> bpt = TrainerFactory.backPropagationSigmoid(sae, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.01f, 0.5f, 0f);
+	BackPropagationTrainer<NeuralNetworkImpl> bpt = TrainerFactory.backPropagationSigmoid(sae, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.01f, 0.5f, 0f);
 
 	// log data
 	bpt.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
