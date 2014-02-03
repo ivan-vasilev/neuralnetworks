@@ -9,6 +9,7 @@ import org.junit.Test;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
 import com.github.neuralnetworks.architecture.ConvGridLayer;
+import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.architecture.Subsampling2DConnection;
@@ -187,7 +188,7 @@ public class CNNTest {
 
     @Test
     public void testCNNConstruction() {
-	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 32, 32 }, { 5, 5, 6 }, { 2, 2 }, { 6, 6, 16 }, { 2, 2 }, { 6, 6, 120 }, {84}, {10} }, true);
+	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 32, 32 }, { 5, 5, 6 }, { 2, 2 }, { 5, 5, 16 }, { 2, 2 }, { 5, 5, 120 }, {84}, {10} }, true);
 	assertEquals(13, nn.getLayers().size(), 0);
 
 	ConvGridLayer l = (ConvGridLayer) nn.getInputLayer().getConnections().get(0).getOutputLayer();
@@ -201,8 +202,24 @@ public class CNNTest {
 	assertEquals(6, l.getFilters(), 0);
 
 	l = (ConvGridLayer) l.getConnections().get(1).getOutputLayer();
-	assertEquals(9, l.getFeatureMapRows(), 0);
-	assertEquals(9, l.getFeatureMapColumns(), 0);
+	assertEquals(10, l.getFeatureMapRows(), 0);
+	assertEquals(10, l.getFeatureMapColumns(), 0);
 	assertEquals(16, l.getFilters(), 0);
+
+	l = (ConvGridLayer) l.getConnections().get(2).getOutputLayer();
+	assertEquals(5, l.getFeatureMapRows(), 0);
+	assertEquals(5, l.getFeatureMapColumns(), 0);
+	assertEquals(16, l.getFilters(), 0);
+
+	l = (ConvGridLayer) l.getConnections().get(1).getOutputLayer();
+	assertEquals(1, l.getFeatureMapRows(), 0);
+	assertEquals(1, l.getFeatureMapColumns(), 0);
+	assertEquals(120, l.getFilters(), 0);
+	
+	Layer layer = l.getConnections().get(2).getOutputLayer();
+	assertEquals(84, layer.getNeuronCount(), 0);
+	
+	layer = layer.getConnections().get(2).getOutputLayer();
+	assertEquals(10, layer.getNeuronCount(), 0);
     }
 }
