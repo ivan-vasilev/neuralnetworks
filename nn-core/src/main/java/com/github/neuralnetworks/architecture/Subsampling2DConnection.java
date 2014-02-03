@@ -32,4 +32,8 @@ public class Subsampling2DConnection extends ConnectionsImpl {
 	ConvGridLayer outputLayer = (ConvGridLayer) getOutputLayer();
 	return inputLayer.getFeatureMapColumns() / outputLayer.getFeatureMapColumns();
     }
+
+    public int getSubsamplingRegionLength() {
+	return getSubsamplingRegionRows() * getSubsamplingRegionCols();
+    }
 }

@@ -97,7 +97,7 @@ public abstract class AparapiSubsampling2D extends Kernel implements ConnectionC
 	this.outputFeatureMapLength = outputLayer.getFeatureMapLength();
 	this.subsamplingRows = c.getSubsamplingRegionRows();
 	this.subsamplingCols = c.getSubsamplingRegionCols();
-	this.regionLength = subsamplingRows * subsamplingCols;
+	this.regionLength = c.getSubsamplingRegionLength();
 	this.ioRowsOffset = (inputLayer.getFeatureMapRows() % subsamplingRows) / 2;
 	this.ioColumnsOffset = (inputLayer.getFeatureMapColumns() % subsamplingCols) / 2;
 	this.featureMapOffsets = new int[regionLength];
