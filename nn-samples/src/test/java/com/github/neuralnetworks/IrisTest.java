@@ -45,15 +45,14 @@ public class IrisTest {
     @Test
     public void testMLPSigmoidBP() {
 	// create the network
-	NeuralNetworkImpl mlp = NNFactory.mlp(new int[] { 4, 2, 3 }, true);
+	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 4, 2, 3 }, true);
 
 	// training and testing data providers
 	IrisInputProvider trainInputProvider = new IrisInputProvider(150, 1500000, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
 	IrisInputProvider testInputProvider = new IrisInputProvider(1, 150, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
 
 	// trainer
-	@SuppressWarnings("unchecked")
-	BackPropagationTrainer<NeuralNetworkImpl> bpt = TrainerFactory.backPropagationSigmoid(mlp, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.01f, 0.5f, 0f);
+	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(mlp, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.01f, 0.5f, 0f);
 
 	// log data
 	bpt.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
@@ -134,7 +133,7 @@ public class IrisTest {
     @Test
     public void testAE() {
 	// create autoencoder with visible layer with 4 neurons and hidden layer with 3 neurons
-    	Autoencoder ae = NNFactory.autoencoder(4, 3, true);
+    	Autoencoder ae = NNFactory.autoencoderSigmoid(4, 3, true);
 
     	// training, testing and error
     	TrainingInputProvider trainInputProvider = new IrisInputProvider(1, 15000, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
@@ -142,7 +141,7 @@ public class IrisTest {
     	MultipleNeuronsOutputError error = new MultipleNeuronsOutputError();
 
     	// backpropagation autoencoder training
-    	BackPropagationAutoencoder bae = TrainerFactory.backPropagationSigmoidAutoencoder(ae, trainInputProvider, testInputProvider, error, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.25f, 0.5f, 0f, 0f);
+    	BackPropagationAutoencoder bae = TrainerFactory.backPropagationAutoencoder(ae, trainInputProvider, testInputProvider, error, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.25f, 0.5f, 0f, 0f);
 
     	// log data to console
     	bae.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
@@ -157,22 +156,24 @@ public class IrisTest {
 
     	bae.test();
 
-    	assertEquals(0, bae.getOutputError().getTotalNetworkError(), 0.1);
+    	assertEquals(0, bae.getOutputError().getTotalNetworkError(), 0.4);
     }
 
     @Test
     public void testSAE() {
 	// create stacked autoencoder with input layer of size 4, hidden layer of the first AE with size 4 and hidden layer of the second AE with size 3
-	StackedAutoencoder sae = NNFactory.sae(new int[] { 4, 4, 3 }, true);
-	sae.setLayerCalculator(NNFactory.nnSigmoid(sae, null));
+	StackedAutoencoder sae = NNFactory.saeSigmoid(new int[] { 4, 4, 3 }, true);
 
 	// stacked networks
 	Autoencoder firstNN = sae.getFirstNeuralNetwork();
+	firstNN.setLayerCalculator(NNFactory.lcSigmoid(firstNN, null));
+
 	Autoencoder lastNN = sae.getLastNeuralNetwork();
+	lastNN.setLayerCalculator(NNFactory.lcSigmoid(lastNN, null));
 
 	// trainers for each of the stacked networks
-	BackPropagationAutoencoder firstTrainer = TrainerFactory.backPropagationSigmoidAutoencoder(firstNN, null, null, null, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.001f, 0.5f, 0f, 0f);
-	BackPropagationAutoencoder secondTrainer = TrainerFactory.backPropagationSigmoidAutoencoder(lastNN, null, null, null, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.001f, 0.5f, 0f, 0f);
+	BackPropagationAutoencoder firstTrainer = TrainerFactory.backPropagationAutoencoder(firstNN, null, null, null, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.001f, 0.5f, 0f, 0f);
+	BackPropagationAutoencoder secondTrainer = TrainerFactory.backPropagationAutoencoder(lastNN, null, null, null, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.001f, 0.5f, 0f, 0f);
 
 	Map<NeuralNetwork, OneStepTrainer<?>> map = new HashMap<>();
 	map.put(firstNN, firstTrainer);
@@ -192,11 +193,8 @@ public class IrisTest {
 	// layerwise pre-training
 	deepTrainer.train();
 
-	sae.setLayerCalculator(NNFactory.nnSigmoid(sae, null));
-
 	// fine tuning backpropagation
-	@SuppressWarnings("unchecked")
-	BackPropagationTrainer<NeuralNetworkImpl> bpt = TrainerFactory.backPropagationSigmoid(sae, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.01f, 0.5f, 0f);
+	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(sae, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.01f, 0.5f, 0f);
 
 	// log data
 	bpt.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));

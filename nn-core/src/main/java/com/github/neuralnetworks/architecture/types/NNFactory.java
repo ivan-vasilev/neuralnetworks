@@ -10,13 +10,16 @@ import com.github.neuralnetworks.architecture.Subsampling2DConnection;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.calculation.LayerCalculatorImpl;
 import com.github.neuralnetworks.calculation.RBMLayerCalculator;
+import com.github.neuralnetworks.calculation.neuronfunctions.AparapiAveragePooling2D;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2DReLU;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2DSigmoid;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2DSoftReLU;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2DTanh;
+import com.github.neuralnetworks.calculation.neuronfunctions.AparapiMaxPooling2D;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiReLU;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSigmoid;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSoftReLU;
+import com.github.neuralnetworks.calculation.neuronfunctions.AparapiStochasticPooling2D;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiTanh;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSumConnectionCalculator;
 import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculatorConv;
@@ -120,9 +123,8 @@ public class NNFactory {
 	}
     }
 
-    public static void nnWeightedSum(NeuralNetworkImpl nn, ConnectionCalculator outputCC) {
+    public static LayerCalculatorImpl lcWeightedSum(NeuralNetworkImpl nn, ConnectionCalculator outputCC) {
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
-	nn.setLayerCalculator(lc);
 	for (Layer l : nn.getLayers()) {
 	    if (!Util.isBias(l)) {
 		if (l != nn.getInputLayer()) {
@@ -140,9 +142,11 @@ public class NNFactory {
 		lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
 	    }
 	}
+
+	return lc;
     }
 
-    public static LayerCalculatorImpl nnSigmoid(NeuralNetworkImpl nn, ConnectionCalculator outputCC) {
+    public static LayerCalculatorImpl lcSigmoid(NeuralNetworkImpl nn, ConnectionCalculator outputCC) {
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	for (Layer l : nn.getLayers()) {
 	    if (!Util.isBias(l)) {
@@ -165,7 +169,7 @@ public class NNFactory {
 	return lc;
     }
 
-    public static LayerCalculatorImpl nnSoftRelu(NeuralNetworkImpl nn, ConnectionCalculator outputCC) {
+    public static LayerCalculatorImpl lcSoftRelu(NeuralNetworkImpl nn, ConnectionCalculator outputCC) {
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	for (Layer l : nn.getLayers()) {
 	    if (!Util.isBias(l)) {
@@ -194,7 +198,7 @@ public class NNFactory {
 	return lc;
     }
 
-    public static LayerCalculatorImpl nnRelu(NeuralNetworkImpl nn, ConnectionCalculator outputCC) {
+    public static LayerCalculatorImpl lcRelu(NeuralNetworkImpl nn, ConnectionCalculator outputCC) {
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	for (Layer l : nn.getLayers()) {
 	    if (!Util.isBias(l)) {
@@ -223,7 +227,7 @@ public class NNFactory {
 	return lc;
     }
 
-    public static LayerCalculatorImpl nnTanh(NeuralNetworkImpl nn, ConnectionCalculator outputCC) {
+    public static LayerCalculatorImpl lcTanh(NeuralNetworkImpl nn, ConnectionCalculator outputCC) {
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	for (Layer l : nn.getLayers()) {
 	    if (!Util.isBias(l)) {
@@ -246,27 +250,51 @@ public class NNFactory {
 	return lc;
     }
 
+    public static void lcMaxPooling(NeuralNetworkImpl nn, LayerCalculatorImpl lc) {
+	for (Layer l : nn.getLayers()) {
+	    if (Util.isSubsampling(l)) {
+		lc.addConnectionCalculator(l, new AparapiMaxPooling2D());
+	    }
+	}
+    }
+    
+    public static void lcAveragePooling(NeuralNetworkImpl nn, LayerCalculatorImpl lc) {
+	for (Layer l : nn.getLayers()) {
+	    if (Util.isSubsampling(l)) {
+		lc.addConnectionCalculator(l, new AparapiAveragePooling2D());
+	    }
+	}
+    }
+    
+    public static void lcStochasticPooling(NeuralNetworkImpl nn, LayerCalculatorImpl lc) {
+	for (Layer l : nn.getLayers()) {
+	    if (Util.isSubsampling(l)) {
+		lc.addConnectionCalculator(l, new AparapiStochasticPooling2D());
+	    }
+	}
+    }
+
     public static NeuralNetworkImpl mlpSigmoid(int[] layers, boolean addBias) {
 	NeuralNetworkImpl result = mlp(layers, addBias);
-	result.setLayerCalculator(nnSigmoid(result, null));
+	result.setLayerCalculator(lcSigmoid(result, null));
 	return result;
     }
 
     public static NeuralNetworkImpl mlpSoftRelu(int[] layers, boolean addBias, ConnectionCalculator outputCC) {
 	NeuralNetworkImpl result = mlp(layers, addBias);
-	result.setLayerCalculator(nnSoftRelu(result, outputCC));
+	result.setLayerCalculator(lcSoftRelu(result, outputCC));
 	return result;
     }
 
     public static NeuralNetworkImpl mlpRelu(int[] layers, boolean addBias, ConnectionCalculator outputCC) {
 	NeuralNetworkImpl result = mlp(layers, addBias);
-	result.setLayerCalculator(nnRelu(result, outputCC));
+	result.setLayerCalculator(lcRelu(result, outputCC));
 	return result;
     }
 
     public static NeuralNetworkImpl mlpTanh(int[] layers, boolean addBias, ConnectionCalculator outputCC) {
 	NeuralNetworkImpl result = mlp(layers, addBias);
-	result.setLayerCalculator(nnTanh(result, outputCC));
+	result.setLayerCalculator(lcTanh(result, outputCC));
 	return result;
     }
 
@@ -276,25 +304,25 @@ public class NNFactory {
 
     public static Autoencoder autoencoderSigmoid(int visibleCount, int hiddenCount, boolean addBias) {
 	Autoencoder ae = autoencoder(visibleCount, hiddenCount, addBias);
-	ae.setLayerCalculator(nnSigmoid(ae, null));
+	ae.setLayerCalculator(lcSigmoid(ae, null));
 	return ae;
     }
 
     public static Autoencoder autoencoderSoftReLU(int visibleCount, int hiddenCount, boolean addBias, ConnectionCalculator outputCC) {
 	Autoencoder ae = autoencoder(visibleCount, hiddenCount, addBias);
-	ae.setLayerCalculator(nnSoftRelu(ae, outputCC));
+	ae.setLayerCalculator(lcSoftRelu(ae, outputCC));
 	return ae;
     }
     
     public static Autoencoder autoencoderReLU(int visibleCount, int hiddenCount, boolean addBias, ConnectionCalculator outputCC) {
 	Autoencoder ae = autoencoder(visibleCount, hiddenCount, addBias);
-	ae.setLayerCalculator(nnRelu(ae, outputCC));
+	ae.setLayerCalculator(lcRelu(ae, outputCC));
 	return ae;
     }
 
     public static Autoencoder autoencoderTanh(int visibleCount, int hiddenCount, boolean addBias, ConnectionCalculator outputCC) {
 	Autoencoder ae = autoencoder(visibleCount, hiddenCount, addBias);
-	ae.setLayerCalculator(nnTanh(ae, outputCC));
+	ae.setLayerCalculator(lcTanh(ae, outputCC));
 	return ae;
     }
 
@@ -375,25 +403,25 @@ public class NNFactory {
 
     public static DBN dbnSigmoid(int[] layers, boolean addBias) {
 	DBN result = dbn(layers, addBias);
-	result.setLayerCalculator(nnSigmoid(result, null));
+	result.setLayerCalculator(lcSigmoid(result, null));
 	return result;
     }
     
     public static DBN dbnSoftReLU(int[] layers, boolean addBias) {
 	DBN result = dbn(layers, addBias);
-	result.setLayerCalculator(nnSoftRelu(result, null));
+	result.setLayerCalculator(lcSoftRelu(result, null));
 	return result;
     }
     
     public static DBN dbnReLU(int[] layers, boolean addBias) {
 	DBN result = dbn(layers, addBias);
-	result.setLayerCalculator(nnRelu(result, null));
+	result.setLayerCalculator(lcRelu(result, null));
 	return result;
     }
 
     public static DBN dbnTanh(int[] layers, boolean addBias) {
 	DBN result = dbn(layers, addBias);
-	result.setLayerCalculator(nnTanh(result, null));
+	result.setLayerCalculator(lcTanh(result, null));
 	return result;
     }
 
@@ -412,25 +440,25 @@ public class NNFactory {
 
     public static StackedAutoencoder saeSigmoid(int[] layers, boolean addBias) {
 	StackedAutoencoder sae = sae(layers, addBias);
-	sae.setLayerCalculator(nnSigmoid(sae, null));
+	sae.setLayerCalculator(lcSigmoid(sae, null));
 	return sae;
     }
 
     public static StackedAutoencoder saeSoftReLU(int[] layers, int hiddenCount, boolean addBias) {
 	StackedAutoencoder sae = sae(layers, addBias);
-	sae.setLayerCalculator(nnSoftRelu(sae, null));
+	sae.setLayerCalculator(lcSoftRelu(sae, null));
 	return sae;
     }
 
     public static StackedAutoencoder saeReLU(int[] layers, int hiddenCount, boolean addBias) {
 	StackedAutoencoder sae = sae(layers, addBias);
-	sae.setLayerCalculator(nnRelu(sae, null));
+	sae.setLayerCalculator(lcRelu(sae, null));
 	return sae;
     }
 
     public static StackedAutoencoder saeTanh(int[] layers, int hiddenCount, boolean addBias) {
 	StackedAutoencoder sae = sae(layers, addBias);
-	sae.setLayerCalculator(nnTanh(sae, null));
+	sae.setLayerCalculator(lcTanh(sae, null));
 	return sae;
     }
 

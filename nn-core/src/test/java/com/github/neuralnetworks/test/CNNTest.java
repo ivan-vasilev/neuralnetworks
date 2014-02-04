@@ -130,7 +130,7 @@ public class CNNTest {
 	TreeMap<Connections, Matrix> map = new TreeMap<Connections, Matrix>();
 	map.put(c, i1);
 
-	ConnectionCalculator calc = new AparapiMaxPooling2D(c, 2);
+	ConnectionCalculator calc = new AparapiMaxPooling2D();
 	Matrix o = new Matrix(8, 2);
 	calc.calculate(map, o, c.getOutputLayer());
 
@@ -160,7 +160,7 @@ public class CNNTest {
 	TreeMap<Connections, Matrix> map = new TreeMap<Connections, Matrix>();
 	map.put(c, i1);
 
-	AparapiAveragePooling2D calc = new AparapiAveragePooling2D(c, 2);
+	AparapiAveragePooling2D calc = new AparapiAveragePooling2D();
 	Matrix o = new Matrix(8, 2);
 	calc.calculate(map, o, c.getOutputLayer());
 
@@ -190,7 +190,7 @@ public class CNNTest {
 	TreeMap<Connections, Matrix> map = new TreeMap<Connections, Matrix>();
 	map.put(c, i1);
 
-	AparapiStochasticPooling2D calc = new AparapiStochasticPooling2D(c, 2);
+	AparapiStochasticPooling2D calc = new AparapiStochasticPooling2D();
 	Matrix o = new Matrix(1, 2);
 	calc.calculate(map, o, c.getOutputLayer());
 
@@ -204,7 +204,7 @@ public class CNNTest {
 	Matrix a1 = new Matrix(new float[] { 0.5f, 1, 1, 2, 1.5f, 3, 2, 4, 2.5f, 5, 3, 6, 3.5f, 7, 4f, 8, 4.5f, 9, 5f, 10, 5.5f, 11, 6f, 12, 6.5f, 13, 7f, 14, 8f, 16, 7.5f, 15, 8.5f, 17, 9f, 18, 9.5f, 19, 10f, 20, 10.5f, 21, 11f, 22, 11.5f, 23, 12f, 24, 12.5f, 25, 13f, 26, 13.5f, 27, 14f, 28, 14.5f, 29, 15f, 30, 16f, 32, 15.5f, 31 }, 2);
 
 	// max pooling
-	ConnectionCalculator calc = new AparapiMaxPooling2D(c, 2);
+	ConnectionCalculator calc = new AparapiMaxPooling2D();
 	TreeMap<Connections, Matrix> map = new TreeMap<Connections, Matrix>();
 	map.put(c, a1);
 	Matrix o = new Matrix(8, 2);
@@ -213,7 +213,7 @@ public class CNNTest {
 	Map<Layer, Matrix> activations = new HashMap<Layer, Matrix>();
 	activations.put(c.getInputLayer(), a1);
 
-	BackpropagationMaxPooling2D bp = new BackpropagationMaxPooling2D(c, 2);
+	BackpropagationMaxPooling2D bp = new BackpropagationMaxPooling2D();
 	bp.setActivations(activations);
 
 	Matrix bpo = new Matrix(32, 2);
@@ -237,7 +237,7 @@ public class CNNTest {
 	Matrix a1 = new Matrix(new float[] { 0.5f, 1, 1, 2, 1.5f, 3, 2, 4, 2.5f, 5, 3, 6, 3.5f, 7, 4f, 8, 4.5f, 9, 5f, 10, 5.5f, 11, 6f, 12, 6.5f, 13, 7f, 14, 8f, 16, 7.5f, 15, 8.5f, 17, 9f, 18, 9.5f, 19, 10f, 20, 10.5f, 21, 11f, 22, 11.5f, 23, 12f, 24, 12.5f, 25, 13f, 26, 13.5f, 27, 14f, 28, 14.5f, 29, 15f, 30, 16f, 32, 15.5f, 31 }, 2);
 
 	// max pooling
-	ConnectionCalculator calc = new AparapiAveragePooling2D(c, 2);
+	ConnectionCalculator calc = new AparapiAveragePooling2D();
 	TreeMap<Connections, Matrix> map = new TreeMap<Connections, Matrix>();
 	map.put(c, a1);
 	Matrix o = new Matrix(8, 2);
@@ -246,7 +246,7 @@ public class CNNTest {
 	Map<Layer, Matrix> activations = new HashMap<Layer, Matrix>();
 	activations.put(c.getInputLayer(), a1);
 
-	BackpropagationAveragePooling2D bp = new BackpropagationAveragePooling2D(c, 2);
+	BackpropagationAveragePooling2D bp = new BackpropagationAveragePooling2D();
 	bp.setActivations(activations);
 
 	Matrix bpo = new Matrix(32, 2);

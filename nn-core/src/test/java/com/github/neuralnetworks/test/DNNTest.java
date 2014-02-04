@@ -85,7 +85,7 @@ public class DNNTest {
     @Test
     public void testDBNCalculation() {
 	DBN dbn = NNFactory.dbn(new int [] {3, 2, 2}, true);
-	NNFactory.nnWeightedSum(dbn, null);
+	dbn.setLayerCalculator(NNFactory.lcWeightedSum(dbn, null));
 
 	RBM firstRBM = dbn.getFirstNeuralNetwork();
 	Util.fillArray(firstRBM.getMainConnections().getConnectionGraph().getElements(), 0.2f);
@@ -111,7 +111,7 @@ public class DNNTest {
     @Test
     public void testSAECalculation() {
 	StackedAutoencoder sae = NNFactory.sae(new int [] {3, 2, 2}, true);
-	NNFactory.nnWeightedSum(sae, null);
+	sae.setLayerCalculator(NNFactory.lcWeightedSum(sae, null));
 
 	Autoencoder firstAE = sae.getFirstNeuralNetwork();
 	Util.fillArray(((GraphConnections) firstAE.getConnection(firstAE.getInputLayer(), firstAE.getHiddenLayer())).getConnectionGraph().getElements(), 0.2f);
@@ -139,7 +139,7 @@ public class DNNTest {
     @Test
     public void testDNNLayerTrainer() {
 	DBN dbn = NNFactory.dbn(new int [] {3, 2, 2}, true);
-	dbn.setLayerCalculator(NNFactory.nnSigmoid(dbn, null));
+	dbn.setLayerCalculator(NNFactory.lcSigmoid(dbn, null));
 
 	RBM firstRBM = dbn.getFirstNeuralNetwork();
 
@@ -193,7 +193,7 @@ public class DNNTest {
     @Test
     public void testDNNLayerTrainer2() {
 	DBN dbn = NNFactory.dbn(new int [] {3, 3, 2}, true);
-	dbn.setLayerCalculator(NNFactory.nnSigmoid(dbn, null));
+	dbn.setLayerCalculator(NNFactory.lcSigmoid(dbn, null));
 
 	LayerCalculatorImpl lc = (LayerCalculatorImpl) dbn.getLayerCalculator();
 	RBM firstRBM = dbn.getFirstNeuralNetwork();

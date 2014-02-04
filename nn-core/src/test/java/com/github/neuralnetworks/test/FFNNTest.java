@@ -201,7 +201,8 @@ public class FFNNTest {
      */
     @Test
     public void testSigmoidBP() {
-	NeuralNetworkImpl mlp = NNFactory.mlp(new int[] { 2, 2, 1 }, false);
+	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 2, 2, 1 }, false);
+
 	FullyConnected c1 = (FullyConnected) mlp.getInputLayer().getConnections().iterator().next();
 	Matrix cg1 = c1.getConnectionGraph();
 	cg1.set(0, 0, 0.1f);
@@ -214,8 +215,7 @@ public class FFNNTest {
 	cg2.set(0, 0, 0.3f);
 	cg2.set(0, 1, 0.9f);
 
-	@SuppressWarnings("unchecked")
-	BackPropagationTrainer<NeuralNetworkImpl> bpt = TrainerFactory.backPropagationSigmoid(mlp, new SimpleInputProvider(new float[][] { { 0.35f, 0.9f } }, new float[][] { { 0.5f } }, 1, 1), new SimpleInputProvider(new float[][] { { 0.35f, 0.9f } }, new float[][] { { 0.5f } }, 1, 1), null, null, 1f, 0f, 0f);
+	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(mlp, new SimpleInputProvider(new float[][] { { 0.35f, 0.9f } }, new float[][] { { 0.5f } }, 1, 1), new SimpleInputProvider(new float[][] { { 0.35f, 0.9f } }, new float[][] { { 0.5f } }, 1, 1), null, null, 1f, 0f, 0f);
 	bpt.train();
 
 	assertEquals(0.09916, cg1.get(0, 0), 0.01);
@@ -231,7 +231,8 @@ public class FFNNTest {
      */
     @Test
     public void testSigmoidBP2() {
-	NeuralNetworkImpl mlp = NNFactory.mlp(new int[] { 3, 2, 1 }, true);
+	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 3, 2, 1 }, true);
+
 	List<Connections> c = mlp.getConnections();
 	FullyConnected c1 = (FullyConnected) c.get(0);
 	Matrix cg1 = c1.getConnectionGraph();
@@ -256,8 +257,7 @@ public class FFNNTest {
 	Matrix cgb2 = cb2.getConnectionGraph();
 	cgb2.set(0, 0, 0.1f);
 
-	@SuppressWarnings("unchecked")
-	BackPropagationTrainer<NeuralNetworkImpl> bpt = TrainerFactory.backPropagationSigmoid(mlp, new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, new float[][] { { 1 } }, 1, 1), new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, new float[][] { { 1 } }, 1, 1), null, null, 0.9f, 0f, 0f);
+	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(mlp, new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, new float[][] { { 1 } }, 1, 1), new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, new float[][] { { 1 } }, 1, 1), null, null, 0.9f, 0f, 0f);
 	bpt.train();
 
 	assertEquals(0.192, cg1.get(0, 0), 0.001);
@@ -300,7 +300,7 @@ public class FFNNTest {
 	Util.fillArray(fc4.getConnectionGraph().getElements(), 0.4f);
 	mlp.addConnection(fc4);
 
-	NNFactory.nnWeightedSum(mlp, null);
+	mlp.setLayerCalculator(NNFactory.lcWeightedSum(mlp, null));
 
 	Matrix i = new Matrix(new float [] {2, 2}, 1);
 	Set<Layer> calculated = new HashSet<>();
