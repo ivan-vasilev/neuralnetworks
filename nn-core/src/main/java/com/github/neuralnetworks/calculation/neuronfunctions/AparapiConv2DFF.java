@@ -23,9 +23,10 @@ public class AparapiConv2DFF extends AparapiConv2D {
 	float sum = 0;
 
 	for (int p = 0; p < miniBatch; p++) {
-	    sum = 0;
-	    for (int i = 0, j = weightsStartId; i < fmw; i++, j++) {
-		sum += input[(inputStartId + featureMapOffsets[i]) * miniBatch + p] * weights[j];
+	    sum = output[id * miniBatch + p];
+
+	    for (int i = 0; i < fmw; i++) {
+		sum += input[(inputStartId + featureMapOffsets[i]) * miniBatch + p] * weights[weightsStartId + i];
 	    }
 
 	    output[id * miniBatch + p] = activationFunction(sum);

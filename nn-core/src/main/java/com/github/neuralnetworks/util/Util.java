@@ -53,16 +53,22 @@ public class Util {
      */
     public static boolean isSubsampling(Layer layer) {
 	if (layer instanceof ConvGridLayer) {
+	    Conv2DConnection conv = null;
+	    Subsampling2DConnection ss = null;
 	    ConvGridLayer l = (ConvGridLayer) layer;
-	    if (l.getConnections().size() == 1) {
-		for (Connections c : l.getConnections()) {
-		    if (c instanceof Subsampling2DConnection && c.getOutputLayer() == l) {
-			return true;
-		    }
+	    for (Connections c : l.getConnections()) {
+		if (c instanceof Conv2DConnection) {
+		    conv = (Conv2DConnection) c;
+		} else if (c instanceof Subsampling2DConnection) {
+		    ss = (Subsampling2DConnection) c;
 		}
 	    }
-	}
 
+	    if (ss != null && (ss.getOutputLayer() == layer || conv == null)) {
+		return true;
+	    }
+	}
+	
 	return false;
     }
     
@@ -72,11 +78,19 @@ public class Util {
      */
     public static boolean isConvolutional(Layer layer) {
 	if (layer instanceof ConvGridLayer) {
+	    Conv2DConnection conv = null;
+	    Subsampling2DConnection ss = null;
 	    ConvGridLayer l = (ConvGridLayer) layer;
 	    for (Connections c : l.getConnections()) {
-		if (c instanceof Conv2DConnection && c.getOutputLayer() == l) {
-		    return true;
+		if (c instanceof Conv2DConnection) {
+		    conv = (Conv2DConnection) c;
+		} else if (c instanceof Subsampling2DConnection) {
+		    ss = (Subsampling2DConnection) c;
 		}
+	    }
+
+	    if (conv != null && (conv.getOutputLayer() == layer || ss == null)) {
+		return true;
 	    }
 	}
 	

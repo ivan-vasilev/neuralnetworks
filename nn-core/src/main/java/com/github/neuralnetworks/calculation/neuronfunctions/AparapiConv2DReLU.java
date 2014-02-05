@@ -1,7 +1,6 @@
 package com.github.neuralnetworks.calculation.neuronfunctions;
 
 import com.github.neuralnetworks.architecture.Conv2DConnection;
-import com.github.neuralnetworks.architecture.Layer;
 
 /**
  * Rectified linear unit convolutional calculator
@@ -11,7 +10,7 @@ public class AparapiConv2DReLU extends ConnectionCalculatorConv {
     private static final long serialVersionUID = -5265802399836825652L;
 
     @Override
-    protected AparapiConv2D createInputFunction(Conv2DConnection c, int miniBatchSize, Layer targetLayer) {
+    protected AparapiConv2D createInputFunction(Conv2DConnection c, int miniBatchSize) {
 	return new AparapiConv2DReLUFunction(c, miniBatchSize);
     }
 

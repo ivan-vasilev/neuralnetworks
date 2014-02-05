@@ -15,7 +15,6 @@ import com.github.neuralnetworks.calculation.LayerCalculatorImpl;
 import com.github.neuralnetworks.calculation.OutputError;
 import com.github.neuralnetworks.calculation.RBMLayerCalculator;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiAveragePooling2D;
-import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2D;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2DReLU;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2DSigmoid;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2DSoftReLU;
@@ -27,13 +26,14 @@ import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSoftReLU;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiStochasticPooling2D;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiTanh;
 import com.github.neuralnetworks.calculation.neuronfunctions.BernoulliDistribution;
+import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculatorConv;
 import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculatorFullyConnected;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationAutoencoder;
+import com.github.neuralnetworks.training.backpropagation.BackPropagationConv2D;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationConv2DReLU;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationConv2DSigmoid;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationConv2DSoftReLU;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationConv2DTanh;
-import com.github.neuralnetworks.training.backpropagation.BackPropagationFullyConnected;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationLayerCalculatorImpl;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationReLU;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationSigmoid;
@@ -83,13 +83,7 @@ public class TrainerFactory {
 
 	for (Layer l : nn.getLayers()) {
 	    if (l != nn.getOutputLayer()) {
-		ConnectionCalculator cc = null;
-		if (Util.isBias(l)) {
-		    cc = createCC(nn, Util.getOppositeLayer(l.getConnections().get(0), l), p);
-		} else {
-		    cc = createCC(nn, l, p);
-		}
-		
+		ConnectionCalculator cc = createCC(nn, l, p);
 		if (cc != null) {
 		    blc.addConnectionCalculator(l, cc);
 		}
@@ -103,12 +97,9 @@ public class TrainerFactory {
 	ConnectionCalculator result = null;
 
 	LayerCalculatorImpl lc = (LayerCalculatorImpl) nn.getLayerCalculator();
-	ConnectionCalculator cc = lc.getConnectionCalculator(l);
-	if (Util.isBias(l)) {
+	ConnectionCalculator cc = Util.isBias(l) ? lc.getConnectionCalculator(l.getConnections().get(0).getOutputLayer()) : lc.getConnectionCalculator(l);
 
-	} else if (l == nn.getInputLayer()) {
-	    result = new BackPropagationFullyConnected(p);
-	} else if (cc instanceof AparapiSigmoid) {
+	if (cc instanceof AparapiSigmoid) {
 	    result = new BackPropagationSigmoid(p);
 	} else if (cc instanceof AparapiTanh) {
 	    result = new BackPropagationTanh(p);
@@ -120,23 +111,27 @@ public class TrainerFactory {
 	    result = new BackpropagationMaxPooling2D();
 	} else if (cc instanceof AparapiAveragePooling2D) {
 	    result = new BackpropagationAveragePooling2D();
-	} else if (cc instanceof AparapiConv2D) {
+	} else if (cc instanceof ConnectionCalculatorConv) {
 	    boolean hasFullyConnected = false;
+	    boolean hasOutputConnection = false;
 	    for (Connections c : l.getConnections()) {
 		if (c instanceof FullyConnected && c.getInputLayer() == l) {
 		    hasFullyConnected = true;
-		    break;
+		}
+
+		if (Util.getOppositeLayer(c, l) == nn.getOutputLayer()) {
+		    hasOutputConnection = true;
 		}
 	    }
 
 	    if (cc instanceof AparapiConv2DSigmoid) {
-		result = hasFullyConnected ? new BackPropagationSigmoid(p) : new BackPropagationConv2DSigmoid(p);
+		result = hasFullyConnected ? new BackPropagationSigmoid(p) : hasOutputConnection ? new BackPropagationConv2D(p) : new BackPropagationConv2DSigmoid(p);
 	    } else if (cc instanceof AparapiConv2DTanh) {
-		result = hasFullyConnected ? new BackPropagationTanh(p) : new BackPropagationConv2DTanh(p);
+		result = hasFullyConnected ? new BackPropagationTanh(p) : hasOutputConnection ? new BackPropagationConv2D(p) : new BackPropagationConv2DTanh(p);
 	    } else if (cc instanceof AparapiConv2DSoftReLU) {
-		result = hasFullyConnected ? new BackPropagationSoftReLU(p) : new BackPropagationConv2DSoftReLU(p);
+		result = hasFullyConnected ? new BackPropagationSoftReLU(p) : hasOutputConnection ? new BackPropagationConv2D(p) : new BackPropagationConv2DSoftReLU(p);
 	    } else if (cc instanceof AparapiConv2DReLU) {
-		result = hasFullyConnected ? new BackPropagationReLU(p) : new BackPropagationConv2DReLU(p);
+		result = hasFullyConnected ? new BackPropagationReLU(p) : hasOutputConnection ? new BackPropagationConv2D(p) : new BackPropagationConv2DReLU(p);
 	    }
 	}
 

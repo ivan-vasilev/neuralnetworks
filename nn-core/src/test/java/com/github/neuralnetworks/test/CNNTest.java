@@ -22,6 +22,8 @@ import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2D;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2DFF;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiMaxPooling2D;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiStochasticPooling2D;
+import com.github.neuralnetworks.training.TrainerFactory;
+import com.github.neuralnetworks.training.backpropagation.BackPropagationTrainer;
 import com.github.neuralnetworks.training.backpropagation.BackpropagationAveragePooling2D;
 import com.github.neuralnetworks.training.backpropagation.BackpropagationMaxPooling2D;
 import com.github.neuralnetworks.util.Environment;
@@ -273,7 +275,7 @@ public class CNNTest {
 
     @Test
     public void testCNNConstruction() {
-	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 32, 32 }, { 5, 5, 6 }, { 2, 2 }, { 5, 5, 16 }, { 2, 2 }, { 5, 5, 120 }, {84}, {10} }, true);
+	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 32, 32, 1 }, { 5, 5, 6 }, { 2, 2 }, { 5, 5, 16 }, { 2, 2 }, { 5, 5, 120 }, {84}, {10} }, true);
 	assertEquals(13, nn.getLayers().size(), 0);
 
 	ConvGridLayer l = (ConvGridLayer) nn.getInputLayer().getConnections().get(0).getOutputLayer();
@@ -306,5 +308,32 @@ public class CNNTest {
 	
 	layer = layer.getConnections().get(2).getOutputLayer();
 	assertEquals(10, layer.getNeuronCount(), 0);
+    }
+
+    @Test
+    public void testCNNBackpropagation() {
+	Environment.getInstance().setExecutionStrategy(new SeqKernelExecution());
+
+	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 3, 3, 2 }, { 2, 2, 1 } }, true);
+	nn.setLayerCalculator(NNFactory.lcSigmoid(nn, null));
+
+	Conv2DConnection c = (Conv2DConnection) nn.getInputLayer().getConnections().get(0);
+	c.setWeights(new float [] {0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f});
+
+	Conv2DConnection b = (Conv2DConnection) nn.getOutputLayer().getConnections().get(1);
+	b.setWeights(new float [] {-3f, -3f, -4f, -4.5f});
+	
+	SimpleInputProvider ts = new SimpleInputProvider(new float[][] { { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1, 1.1f, 1.2f, 1.3f, 1.4f, 1.5f, 1.6f, 1.7f, 1.8f } }, new float[][] { { 1, 1, 1, 1 } }, 1, 1);
+	BackPropagationTrainer<?> t = TrainerFactory.backPropagation(nn, ts, null, null, null, 0.5f, 0f, 0f);
+	t.train();
+
+	assertEquals(0.14780167, c.getWeights()[0], 0.00001);
+	assertEquals(0.263249, c.getWeights()[1], 0.00001);
+	assertEquals(0.3941437, c.getWeights()[2], 0.00001);
+	assertEquals(0.50959104, c.getWeights()[3], 0.00001);
+	assertEquals(0.6868278, c.getWeights()[4], 0.00001);
+	assertEquals(0.8022752, c.getWeights()[5], 0.00001);
+	assertEquals(0.9331698, c.getWeights()[6], 0.00001);
+	assertEquals(1.0486171, c.getWeights()[7], 0.00001);
     }
 }

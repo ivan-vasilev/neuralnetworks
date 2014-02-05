@@ -36,8 +36,8 @@ public class NNFactory {
     /**
      * Create convolutional network
      * @param layers
-     * The first layer must have 2 parameters - rows and columns
-     * Convolutional connections must have 3 parameters - kernelRows, kernelColumns, filters
+     * The first layer must have 3 parameters - rows, columns and filter count (usually 1)
+     * Convolutional connections must have 3 parameters - kernelRows, kernelColumns, filters. The first layer must be convolutional.
      * Subsampling connections must have 2 parameters - subsamplingRegionRows, subsamplingRegionCols
      * Regular layers must have 1 parameter - neuron count
      * 
@@ -49,14 +49,14 @@ public class NNFactory {
 	    throw new IllegalArgumentException("more than one layer is required");
 	}
 
-	if (layers[0].length != 2) {
-	    throw new IllegalArgumentException("first layer must have width and height");
+	if (layers[0].length != 3) {
+	    throw new IllegalArgumentException("first layer must be convolutional");
 	}
 
 	NeuralNetworkImpl result = new NeuralNetworkImpl();
 
 	Layer prev = null;
-	result.addLayer(prev = new ConvGridLayer(layers[0][0], layers[0][1], 1));
+	result.addLayer(prev = new ConvGridLayer(layers[0][0], layers[0][1], layers[0][2]));
 	for (int i = 1; i < layers.length; i++) {
 	    int[] l = layers[i];
 	    Layer newLayer = null;
@@ -127,16 +127,14 @@ public class NNFactory {
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	for (Layer l : nn.getLayers()) {
 	    if (!Util.isBias(l)) {
-		if (l != nn.getInputLayer()) {
-		    if (outputCC != null && nn.getOutputLayer() == l) {
-			lc.addConnectionCalculator(l, outputCC);
-		    } else if (l instanceof ConvGridLayer) {
-			if (Util.isConvolutional(l)) {
-			    lc.addConnectionCalculator(l, new ConnectionCalculatorConv());
-			}
-		    } else {
-			lc.addConnectionCalculator(l, new ConnectionCalculatorFullyConnected());
+		if (outputCC != null && nn.getOutputLayer() == l) {
+		    lc.addConnectionCalculator(l, outputCC);
+		} else if (l instanceof ConvGridLayer) {
+		    if (Util.isConvolutional(l)) {
+			lc.addConnectionCalculator(l, new ConnectionCalculatorConv());
 		    }
+		} else {
+		    lc.addConnectionCalculator(l, new ConnectionCalculatorFullyConnected());
 		}
 	    } else {
 		lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
@@ -150,16 +148,14 @@ public class NNFactory {
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	for (Layer l : nn.getLayers()) {
 	    if (!Util.isBias(l)) {
-		if (l != nn.getInputLayer()) {
-		    if (outputCC != null && nn.getOutputLayer() == l) {
-			lc.addConnectionCalculator(l, outputCC);
-		    } else if (l instanceof ConvGridLayer) {
-			if (Util.isConvolutional(l)) {
-			    lc.addConnectionCalculator(l, new AparapiConv2DSigmoid());
-			}
-		    } else {
-			lc.addConnectionCalculator(l, new AparapiSigmoid());
+		if (outputCC != null && nn.getOutputLayer() == l) {
+		    lc.addConnectionCalculator(l, outputCC);
+		} else if (l instanceof ConvGridLayer) {
+		    if (Util.isConvolutional(l)) {
+			lc.addConnectionCalculator(l, new AparapiConv2DSigmoid());
 		    }
+		} else {
+		    lc.addConnectionCalculator(l, new AparapiSigmoid());
 		}
 	    } else {
 		lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
@@ -173,22 +169,20 @@ public class NNFactory {
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	for (Layer l : nn.getLayers()) {
 	    if (!Util.isBias(l)) {
-		if (l != nn.getInputLayer()) {
-		    if (nn.getOutputLayer() == l) {
-			if (outputCC != null) {
-			    lc.addConnectionCalculator(l, outputCC);
-			} else {
-			    AparapiSoftReLU c = new AparapiSoftReLU();
-			    c.addActivationFunction(new SoftmaxFunction());
-			    lc.addConnectionCalculator(l, c);
-			}
-		    } else if (l instanceof ConvGridLayer) {
-			if (Util.isConvolutional(l)) {
-			    lc.addConnectionCalculator(l, new AparapiConv2DSoftReLU());
-			}
+		if (nn.getOutputLayer() == l) {
+		    if (outputCC != null) {
+			lc.addConnectionCalculator(l, outputCC);
 		    } else {
-			lc.addConnectionCalculator(l, new AparapiSoftReLU());
+			AparapiSoftReLU c = new AparapiSoftReLU();
+			c.addActivationFunction(new SoftmaxFunction());
+			lc.addConnectionCalculator(l, c);
 		    }
+		} else if (l instanceof ConvGridLayer) {
+		    if (Util.isConvolutional(l)) {
+			lc.addConnectionCalculator(l, new AparapiConv2DSoftReLU());
+		    }
+		} else {
+		    lc.addConnectionCalculator(l, new AparapiSoftReLU());
 		}
 	    } else {
 		lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
@@ -202,22 +196,20 @@ public class NNFactory {
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	for (Layer l : nn.getLayers()) {
 	    if (!Util.isBias(l)) {
-		if (l != nn.getInputLayer()) {
-		    if (nn.getOutputLayer() == l) {
-			if (outputCC != null) {
-			    lc.addConnectionCalculator(l, outputCC);
-			} else {
-			    AparapiReLU c = new AparapiReLU();
-			    c.addActivationFunction(new SoftmaxFunction());
-			    lc.addConnectionCalculator(l, c);
-			}
-		    } else if (l instanceof ConvGridLayer) {
-			if (Util.isConvolutional(l)) {
-			    lc.addConnectionCalculator(l, new AparapiConv2DReLU());
-			}
+		if (nn.getOutputLayer() == l) {
+		    if (outputCC != null) {
+			lc.addConnectionCalculator(l, outputCC);
 		    } else {
-			lc.addConnectionCalculator(l, new AparapiReLU());
+			AparapiReLU c = new AparapiReLU();
+			c.addActivationFunction(new SoftmaxFunction());
+			lc.addConnectionCalculator(l, c);
 		    }
+		} else if (l instanceof ConvGridLayer) {
+		    if (Util.isConvolutional(l)) {
+			lc.addConnectionCalculator(l, new AparapiConv2DReLU());
+		    }
+		} else {
+		    lc.addConnectionCalculator(l, new AparapiReLU());
 		}
 	    } else {
 		lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
@@ -231,16 +223,14 @@ public class NNFactory {
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	for (Layer l : nn.getLayers()) {
 	    if (!Util.isBias(l)) {
-		if (l != nn.getInputLayer()) {
-		    if (outputCC != null && nn.getOutputLayer() == l) {
-			lc.addConnectionCalculator(l, outputCC);
-		    } else if (l instanceof ConvGridLayer) {
-			if (Util.isConvolutional(l)) {
-			    lc.addConnectionCalculator(l, new AparapiConv2DTanh());
-			}
-		    } else {
-			lc.addConnectionCalculator(l, new AparapiTanh());
+		if (outputCC != null && nn.getOutputLayer() == l) {
+		    lc.addConnectionCalculator(l, outputCC);
+		} else if (l instanceof ConvGridLayer) {
+		    if (Util.isConvolutional(l)) {
+			lc.addConnectionCalculator(l, new AparapiConv2DTanh());
 		    }
+		} else {
+		    lc.addConnectionCalculator(l, new AparapiTanh());
 		}
 	    } else {
 		lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
