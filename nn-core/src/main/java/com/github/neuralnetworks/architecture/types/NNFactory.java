@@ -69,7 +69,8 @@ public class NNFactory {
 	    } else if (l.length == 3) {
 		newLayer = new Conv2DConnection((ConvGridLayer) prev, l[0], l[1], l[2]).getOutputLayer();
 		if (addBias) {
-		    new Conv2DConnection((ConvGridLayer) (biasLayer = new ConvGridLayer(1, 1, 1)), (ConvGridLayer) newLayer);
+		    ConvGridLayer nl = (ConvGridLayer) newLayer;
+		    new Conv2DConnection((ConvGridLayer) (biasLayer = new ConvGridLayer(nl.getFeatureMapRows(), nl.getFeatureMapColumns(), 1, true)), (ConvGridLayer) newLayer);
 		}
 	    } else if (l.length == 2) {
 		newLayer = new Subsampling2DConnection((ConvGridLayer) prev, l[0], l[1]).getOutputLayer();

@@ -59,8 +59,9 @@ public class ConnectionCalculatorConv implements ConnectionCalculator {
 
     protected void calculateBias(Conv2DConnection bias, Matrix output) {
 	if (bias != null) {
+	    int fm = output.getElements().length / bias.getWeights().length;
 	    for (int i = 0; i < output.getElements().length; i++) {
-		output.getElements()[i] += bias.getWeights()[i / output.getColumns()];
+		output.getElements()[i] += bias.getWeights()[i / fm];
 	    }
 	}
     }

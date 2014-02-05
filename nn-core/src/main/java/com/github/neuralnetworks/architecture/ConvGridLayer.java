@@ -1,8 +1,8 @@
 package com.github.neuralnetworks.architecture;
 
-
 /**
- * Three dimensional layer to be used for convolutional and subsampling connections.
+ * Three dimensional layer to be used for convolutional and subsampling
+ * connections.
  */
 public class ConvGridLayer extends Layer {
 
@@ -11,6 +11,7 @@ public class ConvGridLayer extends Layer {
     private int featureMapColumns;
     private int featureMapRows;
     private int filters;
+    private boolean isBias;
 
     public ConvGridLayer() {
 	super(0);
@@ -21,6 +22,11 @@ public class ConvGridLayer extends Layer {
 	this.featureMapColumns = featureMapColumns;
 	this.featureMapRows = featureMapRows;
 	this.filters = filters;
+    }
+
+    public ConvGridLayer(int featureMapRows, int featureMapColumns, int filters, boolean isBias) {
+	this(featureMapRows, featureMapColumns, filters);
+	this.isBias = isBias;
     }
 
     public int getFeatureMapColumns() {
@@ -45,6 +51,14 @@ public class ConvGridLayer extends Layer {
 
     public int getFilters() {
 	return filters;
+    }
+
+    public boolean isBias() {
+	return isBias;
+    }
+
+    public void setBias(boolean isBias) {
+	this.isBias = isBias;
     }
 
     protected void updateNeuronCount() {

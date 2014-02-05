@@ -44,7 +44,13 @@ public class Util {
      * @return whether layer is in fact bias layer
      */
     public static boolean isBias(Layer layer) {
-	return layer.getNeuronCount() == 1 && layer.getConnections().size() == 1 && layer.getConnections().iterator().next().getInputLayer() == layer;
+	boolean isBias = false;
+	if (layer instanceof ConvGridLayer) {
+	    ConvGridLayer cl = (ConvGridLayer) layer;
+	    isBias = cl.isBias();
+	}
+
+	return isBias || layer.getNeuronCount() == 1 && layer.getConnections().size() == 1 && layer.getConnections().iterator().next().getInputLayer() == layer;
     }
 
     /**

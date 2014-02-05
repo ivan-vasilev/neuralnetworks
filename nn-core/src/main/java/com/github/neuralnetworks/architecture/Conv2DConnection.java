@@ -41,6 +41,12 @@ public class Conv2DConnection extends ConnectionsImpl {
 	this.weights = weights;
     }
 
+    public int getKernelRows() {
+        ConvGridLayer i = (ConvGridLayer) getInputLayer();
+	ConvGridLayer o = (ConvGridLayer) getOutputLayer();
+	return i.getFeatureMapRows() % o.getFeatureMapRows() + 1;
+    }
+
     public int getKernelColumns() {
         ConvGridLayer i = (ConvGridLayer) getInputLayer();
 	ConvGridLayer o = (ConvGridLayer) getOutputLayer();
@@ -51,11 +57,5 @@ public class Conv2DConnection extends ConnectionsImpl {
         ConvGridLayer i = (ConvGridLayer) getInputLayer();
 	ConvGridLayer o = (ConvGridLayer) getOutputLayer();
 	o.setDimensions(i.getFeatureMapRows() - kernelRows + 1, i.getFeatureMapColumns() - kernelColumns + 1, filters);
-    }
-
-    public int getKernelRows() {
-        ConvGridLayer i = (ConvGridLayer) getInputLayer();
-	ConvGridLayer o = (ConvGridLayer) getOutputLayer();
-	return i.getFeatureMapRows() % o.getFeatureMapRows() + 1;
     }
 }

@@ -321,19 +321,20 @@ public class CNNTest {
 	c.setWeights(new float [] {0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f});
 
 	Conv2DConnection b = (Conv2DConnection) nn.getOutputLayer().getConnections().get(1);
-	b.setWeights(new float [] {-3f, -3f, -4f, -4.5f});
+	b.setWeights(new float [] {-3f});
 	
 	SimpleInputProvider ts = new SimpleInputProvider(new float[][] { { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1, 1.1f, 1.2f, 1.3f, 1.4f, 1.5f, 1.6f, 1.7f, 1.8f } }, new float[][] { { 1, 1, 1, 1 } }, 1, 1);
 	BackPropagationTrainer<?> t = TrainerFactory.backPropagation(nn, ts, null, null, null, 0.5f, 0f, 0f);
 	t.train();
 
-	assertEquals(0.14780167, c.getWeights()[0], 0.00001);
-	assertEquals(0.263249, c.getWeights()[1], 0.00001);
-	assertEquals(0.3941437, c.getWeights()[2], 0.00001);
-	assertEquals(0.50959104, c.getWeights()[3], 0.00001);
-	assertEquals(0.6868278, c.getWeights()[4], 0.00001);
-	assertEquals(0.8022752, c.getWeights()[5], 0.00001);
-	assertEquals(0.9331698, c.getWeights()[6], 0.00001);
-	assertEquals(1.0486171, c.getWeights()[7], 0.00001);
+	assertEquals(0.11756, c.getWeights()[0], 0.00001);
+	assertEquals(0.22640, c.getWeights()[1], 0.00001);
+	assertEquals(0.34408, c.getWeights()[2], 0.00001);
+	assertEquals(0.45292, c.getWeights()[3], 0.00001);
+	assertEquals(0.59712, c.getWeights()[4], 0.00001);
+	assertEquals(0.70596, c.getWeights()[5], 0.00001);
+	assertEquals(0.82364, c.getWeights()[6], 0.00001);
+	assertEquals(0.93248, c.getWeights()[7], 0.00001);
+	assertEquals(-2.911599, b.getWeights()[0], 0.00001);
     }
 }
