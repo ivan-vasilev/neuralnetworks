@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.github.neuralnetworks.calculation.neuronfunctions.MatrixFunction;
-import com.github.neuralnetworks.input.InputModifier;
 
 public abstract class TrainingInputProviderImpl implements TrainingInputProvider {
 
@@ -33,7 +32,7 @@ public abstract class TrainingInputProviderImpl implements TrainingInputProvider
 	inputModifiers.add(modifier);
     }
 
-    public void removeModifier(InputModifier modifier) {
+    public void removeModifier(MatrixFunction modifier) {
 	if (inputModifiers != null) {
 	    inputModifiers.remove(modifier);
 	}
