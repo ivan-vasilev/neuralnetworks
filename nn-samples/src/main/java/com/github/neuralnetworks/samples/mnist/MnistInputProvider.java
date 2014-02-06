@@ -8,15 +8,14 @@ import java.util.Random;
 
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.input.InputConverter;
-import com.github.neuralnetworks.input.InputModifier;
 import com.github.neuralnetworks.training.TrainingInputData;
 import com.github.neuralnetworks.training.TrainingInputDataImpl;
-import com.github.neuralnetworks.training.TrainingInputProvider;
+import com.github.neuralnetworks.training.TrainingInputProviderImpl;
 
 /**
  * MNIST data set with random order
  */
-public class MnistInputProvider implements TrainingInputProvider {
+public class MnistInputProvider extends TrainingInputProviderImpl {
 
     private RandomAccessFile images;
     private RandomAccessFile labels;
@@ -29,11 +28,6 @@ public class MnistInputProvider implements TrainingInputProvider {
     private final InputConverter targetConverter;
     private Matrix tempImages;
     private byte[] current;
-
-    /**
-     * List of modifiers to apply on the input data after the conversion
-     */
-    private List<InputModifier> inputModifiers;
 
     public MnistInputProvider(String imagesFile, String labelsFile, int batchSize, InputConverter targetConverter) {
 	super();
@@ -60,7 +54,7 @@ public class MnistInputProvider implements TrainingInputProvider {
     }
 
     @Override
-    public TrainingInputData getNextInput() {
+    public TrainingInputData getNextUnmodifiedInput() {
 	TrainingInputData result = null;
 	if (elementsOrder.size() > 0) {
 	    int length = elementsOrder.size() > batchSize ? batchSize : elementsOrder.size();
@@ -70,11 +64,6 @@ public class MnistInputProvider implements TrainingInputProvider {
 	    }
 
 	    Matrix input = getImages(indexes);
-	    if (inputModifiers != null) {
-		for (InputModifier im : inputModifiers) {
-		    input = im.modify(input);
-		}
-	    }
 
 	    Matrix target = targetConverter.convert(getLabels(indexes));
 
@@ -95,20 +84,6 @@ public class MnistInputProvider implements TrainingInputProvider {
     @Override
     public int getInputSize() {
 	return inputSize;
-    }
-
-    public void addInputModifier(InputModifier modifier) {
-	if (inputModifiers == null) {
-	    inputModifiers = new ArrayList<>();
-	}
-
-	inputModifiers.add(modifier);
-    }
-
-    public void removeModifier(InputModifier modifier) {
-	if (inputModifiers != null) {
-	    inputModifiers.remove(modifier);
-	}
     }
 
     private Matrix getImages(int[] indexes) {
