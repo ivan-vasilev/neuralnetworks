@@ -34,12 +34,12 @@ public class FFNNTest {
     public void testWeightedSumFF() {
 	Matrix o = new Matrix(2, 2);
 
-	Layer il1 = new Layer(3);
-	Layer ol = new Layer(2);
-	Layer il2 = new Layer(3);
-	FullyConnected c1 = new FullyConnected(il1, ol);
-	FullyConnected c2 = new FullyConnected(il2, ol);
-	FullyConnected bc = new FullyConnected(new Layer(1), ol);
+	Layer il1 = new Layer();
+	Layer ol = new Layer();
+	Layer il2 = new Layer();
+	FullyConnected c1 = new FullyConnected(il1, ol, 3, 2);
+	FullyConnected c2 = new FullyConnected(il2, ol, 3, 2);
+	FullyConnected bc = new FullyConnected(new Layer(), ol, 1, 2);
 
 	Matrix cg = c1.getConnectionGraph();
 	cg.set(0, 0, 1);
@@ -117,12 +117,12 @@ public class FFNNTest {
     public void testWeightedSumBP() {
 	Matrix o = new Matrix(2, 2);
 
-	Layer il1 = new Layer(3);
-	Layer ol = new Layer(2);
-	Layer il2 = new Layer(3);
-	FullyConnected c1 = new FullyConnected(ol, il1);
-	FullyConnected c2 = new FullyConnected(ol, il2);
-	FullyConnected bc = new FullyConnected(new Layer(1), ol);
+	Layer il1 = new Layer();
+	Layer ol = new Layer();
+	Layer il2 = new Layer();
+	FullyConnected c1 = new FullyConnected(ol, il1, 2, 3);
+	FullyConnected c2 = new FullyConnected(ol, il2, 2, 3);
+	FullyConnected bc = new FullyConnected(new Layer(), ol, 1, 2);
 
 	Matrix cg = c1.getConnectionGraph();
 	cg.set(0, 0, 1);
@@ -279,24 +279,24 @@ public class FFNNTest {
     @Test
     public void testParallelNetworks() {
 	NeuralNetworkImpl mlp = new NeuralNetworkImpl();
-	Layer input = new Layer(2);
+	Layer input = new Layer();
 	mlp.addLayer(input);
 
-	Layer leaf1 = new Layer(3);
-	FullyConnected fc1 = new FullyConnected(input, leaf1);
+	Layer leaf1 = new Layer();
+	FullyConnected fc1 = new FullyConnected(input, leaf1, 2, 3);
 	Util.fillArray(fc1.getConnectionGraph().getElements(), 0.1f);
 	mlp.addConnection(fc1);
 
-	Layer leaf2 = new Layer(3);
-	FullyConnected fc2 = new FullyConnected(input, leaf2);
+	Layer leaf2 = new Layer();
+	FullyConnected fc2 = new FullyConnected(input, leaf2, 2, 3);
 	Util.fillArray(fc2.getConnectionGraph().getElements(), 0.2f);
 	mlp.addConnection(fc2);
 
-	Layer output = new Layer(1);
-	FullyConnected fc3 = new FullyConnected(leaf1, output);
+	Layer output = new Layer();
+	FullyConnected fc3 = new FullyConnected(leaf1, output, 3, 1);
 	Util.fillArray(fc3.getConnectionGraph().getElements(), 0.3f);
 	mlp.addConnection(fc3);
-	FullyConnected fc4 = new FullyConnected(leaf2, output);
+	FullyConnected fc4 = new FullyConnected(leaf2, output, 3, 1);
 	Util.fillArray(fc4.getConnectionGraph().getElements(), 0.4f);
 	mlp.addConnection(fc4);
 
@@ -322,8 +322,9 @@ public class FFNNTest {
     public void testRemoveLayer() {
 	NeuralNetworkImpl mlp = NNFactory.mlp(new int[] {3, 4, 5}, true);
 	assertEquals(5, mlp.getLayers().size(), 0);
+	Layer currentOutput = mlp.getOutputLayer();
 	mlp.removeLayer(mlp.getOutputLayer());
 	assertEquals(3, mlp.getLayers().size(), 0);
-	assertEquals(4, mlp.getOutputLayer().getNeuronCount(), 0);
+	assertEquals(true, currentOutput != mlp.getOutputLayer());
     }
 }

@@ -11,7 +11,6 @@ import com.github.neuralnetworks.calculation.RBMLayerCalculator;
 import com.github.neuralnetworks.input.MultipleNeuronsOutputError;
 import com.github.neuralnetworks.training.TrainerFactory;
 import com.github.neuralnetworks.training.TrainingInputProvider;
-import com.github.neuralnetworks.training.events.LogTrainingListener;
 import com.github.neuralnetworks.training.random.MersenneTwisterRandomInitializer;
 import com.github.neuralnetworks.training.rbm.AparapiCDTrainer;
 import com.github.neuralnetworks.util.Environment;
@@ -167,8 +166,6 @@ public class RBMTest {
 
 	AparapiCDTrainer t = TrainerFactory.cdSigmoidTrainer(rbm, trainInputProvider, testInputProvider, error, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.02f, 0.5f, 0f, 1, false);
 	
-	t.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
-
 	Environment.getInstance().setExecutionStrategy(new SeqKernelExecution());
 
 	t.train();
@@ -190,7 +187,6 @@ public class RBMTest {
 	
 	AparapiCDTrainer t = TrainerFactory.cdSigmoidTrainer(rbm, trainInputProvider, testInputProvider, error, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.02f, 0.5f, 0f, 1, true);
 	t.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
-	t.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
 	
 	Environment.getInstance().setExecutionStrategy(new SeqKernelExecution());
 	

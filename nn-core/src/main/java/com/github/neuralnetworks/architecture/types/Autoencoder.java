@@ -12,13 +12,17 @@ public class Autoencoder extends NeuralNetworkImpl {
 
     private Layer hiddenLayer;
 
-    public Autoencoder(Layer inputLayer, Layer hiddenLayer, Layer outputLayer, boolean addBias) {
+    public Autoencoder(int inputUnitCount, int hiddenUnitCount, boolean addBias) {
+	this(new Layer(), new Layer(), new Layer(), inputUnitCount, hiddenUnitCount, addBias);
+    }
+
+    public Autoencoder(Layer inputLayer, Layer hiddenLayer, Layer outputLayer, int inputUnitCount, int hiddenUnitCount, boolean addBias) {
 	this.hiddenLayer = hiddenLayer;
 
 	// layers are added
 	addLayer(inputLayer);
-	NNFactory.addFullyConnectedLayer(this, hiddenLayer, addBias);
-	NNFactory.addFullyConnectedLayer(this, outputLayer, addBias);
+	NNFactory.addFullyConnectedLayer(this, hiddenLayer, inputUnitCount, hiddenUnitCount, addBias);
+	NNFactory.addFullyConnectedLayer(this, outputLayer, hiddenUnitCount, inputUnitCount, addBias);
     }
 
     public Layer getHiddenBiasLayer() {

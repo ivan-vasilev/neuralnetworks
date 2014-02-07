@@ -16,11 +16,6 @@ public class Layer implements Serializable {
     private static final long serialVersionUID = 1035633207383317489L;
 
     /**
-     * Number of neurons in the layer
-     */
-    private int neuronCount;
-
-    /**
      * Set of links to other layers
      */
     private List<Connections> connections;
@@ -28,20 +23,6 @@ public class Layer implements Serializable {
     public Layer() {
 	super();
 	this.connections = new UniqueList<>();
-    }
-
-    public Layer(int neuronCount) {
-	super();
-	this.neuronCount = neuronCount;
-	this.connections = new UniqueList<>();
-    }
-
-    public int getNeuronCount() {
-	return neuronCount;
-    }
-
-    public void setNeuronCount(int neuronCount) {
-	this.neuronCount = neuronCount;
     }
 
     /**

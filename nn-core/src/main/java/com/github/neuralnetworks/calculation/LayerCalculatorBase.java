@@ -52,14 +52,23 @@ public class LayerCalculatorBase implements Serializable {
     protected Matrix getLayerResult(Map<Layer, Matrix> results, Layer layer) {
 	Matrix result = results.get(layer);
 	Integer columns = null;
+	int rows = 0;
 	for (Entry<Layer, Matrix> e : results.entrySet()) {
 	    if (columns == null || e.getValue().getColumns() < columns) {
 		columns = e.getValue().getColumns();
 	    }
 	}
 
-	if (result == null || result.getColumns() != columns) {
-	    result = new Matrix(layer.getNeuronCount(), columns);
+	for (Connections c : layer.getConnections()) {
+	    if (c.getInputLayer() == layer && c.getInputUnitCount() > rows) {
+		rows = c.getInputUnitCount();
+	    } else if (c.getOutputLayer() == layer && c.getOutputUnitCount() > rows) {
+		rows = c.getOutputUnitCount();
+	    }
+	}
+
+	if (result == null || result.getColumns() != columns || result.getRows() != rows) {
+	    result = new Matrix(rows, columns);
 	    results.put(layer, result);
 	} else {
 	    Util.fillArray(result.getElements(), 0);

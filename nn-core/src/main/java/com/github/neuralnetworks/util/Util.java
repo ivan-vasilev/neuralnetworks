@@ -5,6 +5,7 @@ import java.util.Collection;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
 import com.github.neuralnetworks.architecture.ConvGridLayer;
+import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Subsampling2DConnection;
 
@@ -44,13 +45,22 @@ public class Util {
      * @return whether layer is in fact bias layer
      */
     public static boolean isBias(Layer layer) {
-	boolean isBias = false;
+	boolean isConvBias = false;
 	if (layer instanceof ConvGridLayer) {
 	    ConvGridLayer cl = (ConvGridLayer) layer;
-	    isBias = cl.isBias();
+	    isConvBias = cl.isBias();
 	}
 
-	return isBias || layer.getNeuronCount() == 1 && layer.getConnections().size() == 1 && layer.getConnections().iterator().next().getInputLayer() == layer;
+	boolean isBias = false;
+	if (layer.getConnections().size() == 1) {
+	    Connections c = layer.getConnections().get(0);
+	    if (c.getInputLayer() == layer && c instanceof GraphConnections) {
+		GraphConnections cg = (GraphConnections) c;
+		isBias = cg.getConnectionGraph().getColumns() == 1;
+	    }
+	}
+
+	return isConvBias || isBias;
     }
 
     /**

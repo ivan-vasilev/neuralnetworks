@@ -11,6 +11,7 @@ import org.junit.Test;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
 import com.github.neuralnetworks.architecture.ConvGridLayer;
+import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
@@ -302,12 +303,12 @@ public class CNNTest {
 	assertEquals(1, l.getFeatureMapRows(), 0);
 	assertEquals(1, l.getFeatureMapColumns(), 0);
 	assertEquals(120, l.getFilters(), 0);
-	
-	Layer layer = l.getConnections().get(2).getOutputLayer();
-	assertEquals(84, layer.getNeuronCount(), 0);
-	
-	layer = layer.getConnections().get(2).getOutputLayer();
-	assertEquals(10, layer.getNeuronCount(), 0);
+
+	GraphConnections cg = (GraphConnections) l.getConnections().get(2);
+	assertEquals(84, cg.getConnectionGraph().getRows(), 0);
+
+	GraphConnections cg2 = (GraphConnections) cg.getOutputLayer().getConnections().get(2);
+	assertEquals(10, cg2.getConnectionGraph().getRows(), 0);
     }
 
     @Test

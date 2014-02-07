@@ -21,10 +21,10 @@ public class DBN extends DNN<RBM> {
      * @param addBias
      * @return this
      */
-    public DBN addLevel(Layer layer, boolean addBias) {
+    public DBN addLevel(Layer layer, int visibleUnitCount, int hiddenUnitCount, boolean addBias) {
 	Layer currentOutputLayer = getOutputLayer();
 	if (currentOutputLayer != null) {
-	    addNeuralNetwork(new RBM(currentOutputLayer, layer, addBias, addBias));
+	    addNeuralNetwork(new RBM(currentOutputLayer, layer, visibleUnitCount, hiddenUnitCount, addBias, addBias));
 	} else {
 	    addLayer(layer);
 	}

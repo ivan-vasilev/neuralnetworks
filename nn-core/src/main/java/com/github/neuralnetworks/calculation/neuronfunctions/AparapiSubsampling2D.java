@@ -115,12 +115,13 @@ public abstract class AparapiSubsampling2D extends Kernel implements ConnectionC
 	    Subsampling2DConnection c = (Subsampling2DConnection) connections.keySet().iterator().next();
 	    if (targetLayer == c.getOutputLayer()) {
 		init(c, connections.values().iterator().next(), output);
+		Environment.getInstance().getExecutionStrategy().execute(this, output.getRows());
 	    } else {
-		init(c, output, connections.values().iterator().next());
+		Matrix m = connections.values().iterator().next();
+		init(c, output, m);
+		Environment.getInstance().getExecutionStrategy().execute(this, m.getRows());
 	    }
 
-	    // the code is executed with as many kernels as the output layer neurons count
-	    Environment.getInstance().getExecutionStrategy().execute(this, c.getOutputLayer().getNeuronCount());
 	}
     }
 

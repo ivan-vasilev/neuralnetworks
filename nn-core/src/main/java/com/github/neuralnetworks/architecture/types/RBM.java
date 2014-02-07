@@ -27,27 +27,33 @@ public class RBM extends NeuralNetworkImpl {
      */
     private FullyConnected hiddenBiasConnections;
 
-    public RBM(Layer visibleLayer, Layer hiddenLayer, boolean addVisibleBias, boolean addHiddenBias) {
+
+    public RBM(int visibleUnitCount, int hiddenUnitCount, boolean addVisibleBias, boolean addHiddenBias) {
 	super();
-	init(visibleLayer, hiddenLayer, addVisibleBias, addHiddenBias);
+	init(new Layer(), new Layer(), visibleUnitCount, hiddenUnitCount, addVisibleBias, addHiddenBias);
     }
 
-    protected void init(Layer visibleLayer, Layer hiddenLayer, boolean addVisibleBias, boolean addHiddenBias) {
+    public RBM(Layer visibleLayer, Layer hiddenLayer, int visibleUnitCount, int hiddenUnitCount, boolean addVisibleBias, boolean addHiddenBias) {
+	super();
+	init(visibleLayer, hiddenLayer, visibleUnitCount, hiddenUnitCount, addVisibleBias, addHiddenBias);
+    }
+
+    protected void init(Layer visibleLayer, Layer hiddenLayer, int visibleUnitCount, int hiddenUnitCount, boolean addVisibleBias, boolean addHiddenBias) {
 	addLayer(visibleLayer);
 	addLayer(hiddenLayer);
 
-	mainConnections = new FullyConnected(visibleLayer, hiddenLayer);
+	mainConnections = new FullyConnected(visibleLayer, hiddenLayer, visibleUnitCount, hiddenUnitCount);
 
 	if (addVisibleBias) {
-	    Layer visibleBiasLayer = new Layer(1);
+	    Layer visibleBiasLayer = new Layer();
 	    addLayer(visibleBiasLayer);
-	    visibleBiasConnections = new FullyConnected(visibleBiasLayer, visibleLayer);
+	    visibleBiasConnections = new FullyConnected(visibleBiasLayer, visibleLayer, 1, visibleUnitCount);
 	}
 
 	if (addHiddenBias) {
-	    Layer hiddenBiasLayer = new Layer(1);
+	    Layer hiddenBiasLayer = new Layer();
 	    addLayer(hiddenBiasLayer);
-	    hiddenBiasConnections = new FullyConnected(hiddenBiasLayer, hiddenLayer);
+	    hiddenBiasConnections = new FullyConnected(hiddenBiasLayer, hiddenLayer, 1, hiddenUnitCount);
 	}
     }
 

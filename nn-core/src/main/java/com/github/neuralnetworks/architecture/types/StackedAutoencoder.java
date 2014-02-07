@@ -19,10 +19,10 @@ public class StackedAutoencoder extends DNN<Autoencoder> {
     /**
      * This method creates new Autoencoder with input layer - the hidden layer of the previous topmost autoencoder.
      */
-    public StackedAutoencoder addLevel(Layer layer, boolean addBias) {
+    public StackedAutoencoder addLevel(Layer layer, int inputUnitCount, int hiddenUnitCount, boolean addBias) {
 	Layer currentOutputLayer = getOutputLayer();
 	if (currentOutputLayer != null) {
-	    addNeuralNetwork(new Autoencoder(currentOutputLayer, layer, new Layer(currentOutputLayer.getNeuronCount()), addBias));
+	    addNeuralNetwork(new Autoencoder(currentOutputLayer, layer, new Layer(), inputUnitCount, hiddenUnitCount, addBias));
 	} else {
 	    addLayer(layer);
 	}

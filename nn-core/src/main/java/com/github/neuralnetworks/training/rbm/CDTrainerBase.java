@@ -34,11 +34,6 @@ public abstract class CDTrainerBase extends OneStepTrainer<RBM> {
      */
     private Matrix negPhaseHidden;
 
-    /**
-     * size of the mini batch
-     */
-    private int miniBatchSize;
-
     public CDTrainerBase(Properties properties) {
 	super(properties);
     }
@@ -48,11 +43,10 @@ public abstract class CDTrainerBase extends OneStepTrainer<RBM> {
 	RBM nn = getNeuralNetwork();
 
 	posPhaseVisible = data.getInput();
-	if (miniBatchSize != posPhaseVisible.getColumns()) {
-	    miniBatchSize = posPhaseVisible.getColumns();
-	    negPhaseVisible = new Matrix(nn.getVisibleLayer().getNeuronCount(), miniBatchSize);
-	    posPhaseHidden = new Matrix(nn.getHiddenLayer().getNeuronCount(), miniBatchSize);
-	    negPhaseHidden = new Matrix(nn.getHiddenLayer().getNeuronCount(), miniBatchSize);
+	if (negPhaseVisible == null || negPhaseVisible.getColumns() != posPhaseVisible.getColumns()) {
+	    negPhaseVisible = new Matrix(posPhaseVisible.getRows(), posPhaseVisible.getColumns());
+	    posPhaseHidden = new Matrix(nn.getMainConnections().getConnectionGraph().getRows(), posPhaseVisible.getColumns());
+	    negPhaseHidden = new Matrix(nn.getMainConnections().getConnectionGraph().getRows(), posPhaseVisible.getColumns());
 	}
 
 	getLayerCalculator().gibbsSampling(nn, posPhaseVisible, posPhaseHidden, negPhaseVisible, negPhaseHidden, getGibbsSamplingCount(), batch == 0 ? true : getResetRBM(), true);
@@ -75,10 +69,6 @@ public abstract class CDTrainerBase extends OneStepTrainer<RBM> {
 
     public Matrix getNegPhaseHidden() {
         return negPhaseHidden;
-    }
-
-    public int getMiniBatchSize() {
-        return miniBatchSize;
     }
 
     public RBMLayerCalculator getLayerCalculator() {

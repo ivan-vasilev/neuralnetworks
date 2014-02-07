@@ -56,16 +56,19 @@ public class NNFactory {
 	NeuralNetworkImpl result = new NeuralNetworkImpl();
 
 	Layer prev = null;
+	int prevUnitCount = layers[0][0] * layers[0][1] * layers[0][2];
 	result.addLayer(prev = new ConvGridLayer(layers[0][0], layers[0][1], layers[0][2]));
 	for (int i = 1; i < layers.length; i++) {
 	    int[] l = layers[i];
 	    Layer newLayer = null;
 	    Layer biasLayer = null;
 	    if (l.length == 1) {
-		new FullyConnected(prev, newLayer = new Layer(l[0]));
+		new FullyConnected(prev, newLayer = new Layer(), prevUnitCount, l[0]);
 		if (addBias) {
-		    new FullyConnected(biasLayer = new Layer(1), newLayer);
+		    new FullyConnected(biasLayer = new Layer(), newLayer, 1, l[0]);
 		}
+
+		prevUnitCount = l[0];
 	    } else if (l.length == 3) {
 		newLayer = new Conv2DConnection((ConvGridLayer) prev, l[0], l[1], l[2]).getOutputLayer();
 		if (addBias) {
@@ -99,8 +102,9 @@ public class NNFactory {
 	}
 
 	NeuralNetworkImpl result = new NeuralNetworkImpl();
-	for (int i = 0; i < layers.length; i++) {
-	    addFullyConnectedLayer(result, new Layer(layers[i]), addBias);
+	addFullyConnectedLayer(result, new Layer(), layers[0], layers[0], addBias);
+	for (int i = 1; i < layers.length; i++) {
+	    addFullyConnectedLayer(result, new Layer(), layers[i - 1], layers[i], addBias);
 	}
 
 	return result;
@@ -112,15 +116,15 @@ public class NNFactory {
      * @param layer
      * @param addBias
      */
-    public static void addFullyConnectedLayer(NeuralNetworkImpl nn, Layer layer, boolean addBias) {
+    public static void addFullyConnectedLayer(NeuralNetworkImpl nn, Layer layer, int inputUnitCount, int outputUnitCount, boolean addBias) {
 	if (nn.addLayer(layer) && nn.getOutputLayer() != layer) {
-	    new FullyConnected(nn.getOutputLayer(), layer);
+	    new FullyConnected(nn.getOutputLayer(), layer, inputUnitCount, outputUnitCount);
 	}
 
 	if (addBias && nn.getInputLayer() != layer) {
-	    Layer biasLayer = new Layer(1);
+	    Layer biasLayer = new Layer();
 	    nn.addLayer(biasLayer);
-	    new FullyConnected(biasLayer, layer);
+	    new FullyConnected(biasLayer, layer, 1, outputUnitCount);
 	}
     }
 
@@ -290,7 +294,7 @@ public class NNFactory {
     }
 
     public static Autoencoder autoencoder(int visibleCount, int hiddenCount, boolean addBias) {
-	return new Autoencoder(new Layer(visibleCount), new Layer(hiddenCount), new Layer(visibleCount), addBias);
+	return new Autoencoder(visibleCount, hiddenCount, addBias);
     }
 
     public static Autoencoder autoencoderSigmoid(int visibleCount, int hiddenCount, boolean addBias) {
@@ -318,7 +322,7 @@ public class NNFactory {
     }
 
     public static RBM rbm(int visibleCount, int hiddenCount, boolean addBias) {
-	return new RBM(new Layer(visibleCount), new Layer(hiddenCount), addBias, addBias);
+	return new RBM(visibleCount, hiddenCount, addBias, addBias);
     }
     
     public static RBMLayerCalculator rbmWeightedSumWeightedSum(RBM rbm) {
@@ -385,8 +389,9 @@ public class NNFactory {
 	}
 
 	DBN result = new DBN();
-	for (int i = 0; i < layers.length; i++) {
-	    result.addLevel(new Layer(layers[i]), addBias);
+	result.addLayer(new Layer());
+	for (int i = 1; i < layers.length; i++) {
+	    result.addLevel(new Layer(), layers[i - 1], layers[i], addBias);
 	}
 
 	return result;
@@ -421,9 +426,9 @@ public class NNFactory {
 	    throw new IllegalArgumentException("more than one layer is required");
 	}
 
-	StackedAutoencoder result = new StackedAutoencoder(new Layer(layers[0]));
+	StackedAutoencoder result = new StackedAutoencoder(new Layer());
 	for (int i = 1; i < layers.length; i++) {
-	    result.addLevel(new Layer(layers[i]), addBias);
+	    result.addLevel(new Layer(), layers[i - 1], layers[i], addBias);
 	}
 
 	return result;

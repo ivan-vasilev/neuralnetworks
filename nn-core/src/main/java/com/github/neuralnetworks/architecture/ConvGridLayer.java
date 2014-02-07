@@ -14,11 +14,11 @@ public class ConvGridLayer extends Layer {
     private boolean isBias;
 
     public ConvGridLayer() {
-	super(0);
+	super();
     }
 
     public ConvGridLayer(int featureMapRows, int featureMapColumns, int filters) {
-	super(featureMapRows * featureMapColumns * filters);
+	super();
 	this.featureMapColumns = featureMapColumns;
 	this.featureMapRows = featureMapRows;
 	this.filters = filters;
@@ -37,8 +37,6 @@ public class ConvGridLayer extends Layer {
 	this.featureMapRows = featureMaprows;
 	this.featureMapColumns = featureMapColumns;
 	this.filters = filters;
-
-	updateNeuronCount();
     }
 
     public int getFeatureMapRows() {
@@ -59,10 +57,6 @@ public class ConvGridLayer extends Layer {
 
     public void setBias(boolean isBias) {
 	this.isBias = isBias;
-    }
-
-    protected void updateNeuronCount() {
-	setNeuronCount(featureMapRows * featureMapColumns * filters);
     }
 
     protected Conv2DConnection getInputConvConnection() {

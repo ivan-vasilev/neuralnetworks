@@ -92,7 +92,7 @@ public abstract class AparapiConv2D extends Kernel implements Serializable {
     public void calculate(Conv2DConnection c, Matrix input, Matrix output) {
 	if (c != null) {
 	    init(c, input, output);
-	    Environment.getInstance().getExecutionStrategy().execute(this, c.getOutputLayer().getNeuronCount());
+	    Environment.getInstance().getExecutionStrategy().execute(this, output.getRows());
 	}
     }
 

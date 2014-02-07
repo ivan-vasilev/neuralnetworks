@@ -58,4 +58,16 @@ public class Conv2DConnection extends ConnectionsImpl {
 	ConvGridLayer o = (ConvGridLayer) getOutputLayer();
 	o.setDimensions(i.getFeatureMapRows() - kernelRows + 1, i.getFeatureMapColumns() - kernelColumns + 1, filters);
     }
+
+    @Override
+    public int getInputUnitCount() {
+        ConvGridLayer i = (ConvGridLayer) getInputLayer();
+	return i.getFeatureMapRows() * i.getFeatureMapColumns() * i.getFilters();
+    }
+
+    @Override
+    public int getOutputUnitCount() {
+        ConvGridLayer o = (ConvGridLayer) getOutputLayer();
+	return o.getFeatureMapRows() * o.getFeatureMapColumns() * o.getFilters();
+    }
 }
