@@ -1,8 +1,6 @@
 package com.github.neuralnetworks.calculation;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import com.github.neuralnetworks.architecture.Layer;
@@ -18,20 +16,19 @@ public class RBMLayerCalculator extends LayerCalculatorImpl {
     private static final long serialVersionUID = -7524966192939615856L;
 
     private Set<Layer> calculatedLayers;
-    private Map<Layer, Matrix> results;
-    private Map<Layer, Matrix> intermediateResults;
+    private ValuesProvider results;
+    private ValuesProvider intermediateResults;
 
     public RBMLayerCalculator() {
 	super();
 	calculatedLayers = new HashSet<>();
-	results = new HashMap<>();
-	intermediateResults = new HashMap<>();
+	results = new ValuesProvider();
+	intermediateResults = new ValuesProvider();
     }
 
     public void gibbsSampling(RBM rbm, Matrix posPhaseVisible, Matrix posPhaseHidden, Matrix negPhaseVisible, Matrix negPhaseHidden, int samplingCount, boolean resetNetwork, boolean useIntermediateResults) {
 	Matrix hidden, visible;
-	visible = getLayerResult(rbm.getVisibleLayer(), posPhaseVisible, useIntermediateResults);
-	calculateHiddenLayer(rbm, visible, posPhaseHidden);
+	calculateHiddenLayer(rbm, posPhaseVisible, posPhaseHidden);
 
 	if (resetNetwork) {
 	    System.arraycopy(posPhaseHidden.getElements(), 0, negPhaseHidden.getElements(), 0, negPhaseHidden.getElements().length);
@@ -54,8 +51,8 @@ public class RBMLayerCalculator extends LayerCalculatorImpl {
 	calculatedLayers.clear();
 	calculatedLayers.add(hiddenLayer);
 
-	results.put(visibleLayer, visibleLayerResults);
-	results.put(hiddenLayer, hiddenLayerResults);
+	results.addValues(visibleLayer, visibleLayerResults);
+	results.addValues(hiddenLayer, hiddenLayerResults);
 
 	super.calculate(rbm, visibleLayer, calculatedLayers, results);
     }
@@ -67,8 +64,8 @@ public class RBMLayerCalculator extends LayerCalculatorImpl {
 	calculatedLayers.clear();
 	calculatedLayers.add(visibleLayer);
 
-	results.put(visibleLayer, visibleLayerResults);
-	results.put(hiddenLayer, hiddenLayerResults);
+	results.addValues(visibleLayer, visibleLayerResults);
+	results.addValues(hiddenLayer, hiddenLayerResults);
 
 	super.calculate(rbm, hiddenLayer, calculatedLayers, results);
     }
@@ -76,9 +73,10 @@ public class RBMLayerCalculator extends LayerCalculatorImpl {
     private Matrix getLayerResult(Layer layer, Matrix realResult, boolean useIntermediateResults) {
 	Matrix result = realResult;
 	if (useIntermediateResults) {
-	    result = intermediateResults.get(layer);
+	    intermediateResults.setColumns(realResult.getColumns());
+	    result = intermediateResults.getValues(layer, realResult.getRows());
 	    if (result == null) {
-		intermediateResults.put(layer, result = new Matrix(realResult));
+		intermediateResults.addValues(layer, result = new Matrix(realResult));
 	    }
 
 	    System.arraycopy(realResult.getElements(), 0, result.getElements(), 0, result.getElements().length);

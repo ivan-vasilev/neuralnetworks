@@ -2,12 +2,10 @@ package com.github.neuralnetworks.test;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 import org.junit.Test;
 
@@ -17,12 +15,14 @@ import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.architecture.types.NNFactory;
+import com.github.neuralnetworks.calculation.ValuesProvider;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSumConnectionCalculator;
 import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculatorFullyConnected;
 import com.github.neuralnetworks.training.TrainerFactory;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationTrainer;
 import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.KernelExecutionStrategy.JTPKernelExecution;
+import com.github.neuralnetworks.util.KernelExecutionStrategy.SeqKernelExecution;
 import com.github.neuralnetworks.util.Util;
 
 /**
@@ -32,6 +32,7 @@ public class FFNNTest {
 
     @Test
     public void testWeightedSumFF() {
+	Environment.getInstance().setExecutionStrategy(new SeqKernelExecution());
 	Matrix o = new Matrix(2, 2);
 
 	Layer il1 = new Layer();
@@ -79,9 +80,14 @@ public class FFNNTest {
 
 	ConnectionCalculatorFullyConnected aws = new AparapiWeightedSumConnectionCalculator();
 
-	TreeMap<Connections, Matrix> map = new TreeMap<Connections, Matrix>();
-	map.put(c1, i1);
-	aws.calculate(map, o, ol);
+	List<Connections> connections = new ArrayList<>();
+	connections.add(c1);
+
+	ValuesProvider vp = new ValuesProvider();
+	vp.addValues(c1.getInputLayer(), i1);
+	vp.addValues(ol, o);
+
+	aws.calculate(connections, vp, ol);
 
 	// most simple case
 	assertEquals(14, o.get(0, 0), 0);
@@ -91,9 +97,16 @@ public class FFNNTest {
 	Util.fillArray(o.getElements(), 0);
 
 	// with bias
-	map.put(bc, new Matrix(2, 2));
+	connections = new ArrayList<>();
+	connections.add(c1);
+	connections.add(bc);
+
+	vp = new ValuesProvider();
+	vp.addValues(c1.getInputLayer(), i1);
+	vp.addValues(ol, o);
+
 	aws = new AparapiWeightedSumConnectionCalculator();
-	aws.calculate(map, o, ol);
+	aws.calculate(connections, vp, ol);
 
 	assertEquals(14.1, o.get(0, 0), 0.01);
 	assertEquals(32.1, o.get(0, 1), 0.01);
@@ -102,9 +115,18 @@ public class FFNNTest {
 	Util.fillArray(o.getElements(), 0);
 
 	// combined layers
-	map.put(c2, i2);
+	connections = new ArrayList<>();
+	connections.add(c1);
+	connections.add(c2);
+	connections.add(bc);
+
+	vp = new ValuesProvider();
+	vp.addValues(c1.getInputLayer(), i1);
+	vp.addValues(c2.getInputLayer(), i2);
+	vp.addValues(ol, o);
+
 	aws = new AparapiWeightedSumConnectionCalculator();
-	aws.calculate(map, o, ol);
+	aws.calculate(connections, vp, ol);
 
 	assertEquals(28.1, o.get(0, 0), 0.01);
 	assertEquals(64.1, o.get(0, 1), 0.01);
@@ -162,9 +184,14 @@ public class FFNNTest {
 
 	ConnectionCalculatorFullyConnected aws = new AparapiWeightedSumConnectionCalculator();
 
-	TreeMap<Connections, Matrix> map = new TreeMap<Connections, Matrix>();
-	map.put(c1, i1);
-	aws.calculate(map, o, ol);
+	List<Connections> connections = new ArrayList<>();
+	connections.add(c1);
+
+	ValuesProvider vp = new ValuesProvider();
+	vp.addValues(c1.getOutputLayer(), i1);
+	vp.addValues(ol, o);
+
+	aws.calculate(connections, vp, ol);
 
 	// most simple case
 	assertEquals(14, o.get(0, 0), 0);
@@ -174,9 +201,16 @@ public class FFNNTest {
 	Util.fillArray(o.getElements(), 0);
 
 	// with bias
-	map.put(bc, new Matrix(2, 2));
+	connections = new ArrayList<>();
+	connections.add(c1);
+	connections.add(bc);
+
+	vp = new ValuesProvider();
+	vp.addValues(c1.getOutputLayer(), i1);
+	vp.addValues(ol, o);
+
 	aws = new AparapiWeightedSumConnectionCalculator();
-	aws.calculate(map, o, ol);
+	aws.calculate(connections, vp, ol);
 
 	assertEquals(14.1, o.get(0, 0), 0.01);
 	assertEquals(32.1, o.get(0, 1), 0.01);
@@ -185,9 +219,18 @@ public class FFNNTest {
 	Util.fillArray(o.getElements(), 0);
 
 	// combined layers
-	map.put(c2, i2);
+	connections = new ArrayList<>();
+	connections.add(c1);
+	connections.add(c2);
+	connections.add(bc);
+
+	vp = new ValuesProvider();
+	vp.addValues(c1.getOutputLayer(), i1);
+	vp.addValues(c2.getOutputLayer(), i2);
+	vp.addValues(ol, o);
+
 	aws = new AparapiWeightedSumConnectionCalculator();
-	aws.calculate(map, o, ol);
+	aws.calculate(connections, vp, ol);
 
 	assertEquals(28.1, o.get(0, 0), 0.01);
 	assertEquals(64.1, o.get(0, 1), 0.01);
@@ -306,16 +349,14 @@ public class FFNNTest {
 	Set<Layer> calculated = new HashSet<>();
 	calculated.add(mlp.getInputLayer());
 
-	Map<Layer, Matrix> results = new HashMap<>();
-	results.put(input, i);
+	ValuesProvider results = new ValuesProvider();
+	results.addValues(input, i);
 
 	Environment.getInstance().setExecutionStrategy(new JTPKernelExecution());
 
 	mlp.getLayerCalculator().calculate(mlp, output, calculated, results);
 
-	Matrix o = results.get(output);
-
-	assertEquals(1.32, o.get(0, 0), 0.000001);
+	assertEquals(1.32, results.getValues(output).get(0, 0), 0.000001);
     }
 
     @Test

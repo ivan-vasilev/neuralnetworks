@@ -1,10 +1,9 @@
 package com.github.neuralnetworks.events;
 
 import java.util.EventObject;
-import java.util.Map;
 
 import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.architecture.Matrix;
+import com.github.neuralnetworks.calculation.ValuesProvider;
 
 /**
  * Triggered when a propagation step is finished
@@ -13,14 +12,14 @@ public class PropagationEvent extends EventObject {
 
     private static final long serialVersionUID = 1L;
 
-    private Map<Layer, Matrix> results;
+    private ValuesProvider results;
 
-    public PropagationEvent(Layer layer, Map<Layer, Matrix> results) {
+    public PropagationEvent(Layer layer, ValuesProvider results) {
 	super(layer);
 	this.results = results;
     }
 
-    public Map<Layer, Matrix> getResults() {
+    public ValuesProvider getResults() {
 	return results;
     }
 }

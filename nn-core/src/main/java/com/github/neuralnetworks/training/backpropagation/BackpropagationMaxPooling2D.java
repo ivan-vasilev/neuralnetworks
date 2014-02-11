@@ -1,12 +1,11 @@
 package com.github.neuralnetworks.training.backpropagation;
 
-import java.util.Map;
-import java.util.SortedMap;
+import java.util.List;
 
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.Subsampling2DConnection;
+import com.github.neuralnetworks.calculation.ValuesProvider;
 
 /**
  * Backpropagation for max pooling layers
@@ -16,16 +15,16 @@ public class BackpropagationMaxPooling2D implements BackpropagationConnectionCal
     private static final long serialVersionUID = 8165829315701496713L;
 
     private BackpropagationConnectionCalculator cc;
-    protected Map<Layer, Matrix> activations;
+    protected ValuesProvider activations;
 
     @Override
-    public void calculate(SortedMap<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
+    public void calculate(List<Connections> connections, ValuesProvider valuesProvider, Layer targetLayer) {
 	if (cc == null) {
-	    cc = new BackpropagationMaxPooling2DCC((Subsampling2DConnection) connections.keySet().iterator().next(), output.getColumns());
+	    cc = new BackpropagationMaxPooling2DCC((Subsampling2DConnection) connections.get(0), valuesProvider.getColumns());
 	    cc.setActivations(activations);
 	}
 
-	cc.calculate(connections, output, targetLayer);
+	cc.calculate(connections, valuesProvider, targetLayer);
     }
 
     @Override
@@ -59,12 +58,12 @@ public class BackpropagationMaxPooling2D implements BackpropagationConnectionCal
     }
 
     @Override
-    public Map<Layer, Matrix> getActivations() {
+    public ValuesProvider getActivations() {
 	return cc != null ? cc.getActivations() : activations;
     }
 
     @Override
-    public void setActivations(Map<Layer, Matrix> activations) {
+    public void setActivations(ValuesProvider activations) {
 	this.activations = activations;
 	if (cc != null) {
 	    cc.setActivations(activations);

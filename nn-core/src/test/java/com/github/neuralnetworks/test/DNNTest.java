@@ -19,6 +19,7 @@ import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.architecture.types.RBM;
 import com.github.neuralnetworks.architecture.types.StackedAutoencoder;
 import com.github.neuralnetworks.calculation.LayerCalculatorImpl;
+import com.github.neuralnetworks.calculation.ValuesProvider;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSumConnectionCalculator;
 import com.github.neuralnetworks.training.DNNLayerTrainer;
 import com.github.neuralnetworks.training.OneStepTrainer;
@@ -100,12 +101,13 @@ public class DNNTest {
 	Set<Layer> calculatedLayers = new HashSet<>();
 	calculatedLayers.add(dbn.getInputLayer());
 
-	Map<Layer, Matrix> results = new HashMap<>();
-	results.put(dbn.getInputLayer(), new Matrix(new float[] {1, 0, 1}, 1));
+	ValuesProvider results = new ValuesProvider();
+
+	results.addValues(dbn.getInputLayer(), new Matrix(new float[] {1, 0, 1}, 1));
 	dbn.getLayerCalculator().calculate(dbn, dbn.getOutputLayer(), calculatedLayers, results);
 
-	assertEquals(1.06, results.get(dbn.getOutputLayer()).get(0, 0), 0.00001);
-	assertEquals(1.06, results.get(dbn.getOutputLayer()).get(1, 0), 0.00001);
+	assertEquals(1.06, results.getValues(dbn.getOutputLayer()).get(0, 0), 0.00001);
+	assertEquals(1.06, results.getValues(dbn.getOutputLayer()).get(1, 0), 0.00001);
     }
 
     @Test
@@ -128,12 +130,12 @@ public class DNNTest {
 	Set<Layer> calculatedLayers = new HashSet<>();
 	calculatedLayers.add(sae.getInputLayer());
 
-	Map<Layer, Matrix> results = new HashMap<>();
-	results.put(sae.getInputLayer(), new Matrix(new float[] {1, 0, 1}, 1));
+	ValuesProvider results = new ValuesProvider();
+	results.addValues(sae.getInputLayer(), new Matrix(new float[] {1, 0, 1}, 1));
 	sae.getLayerCalculator().calculate(sae, sae.getOutputLayer(), calculatedLayers, results);
 
-	assertEquals(1.06, results.get(sae.getOutputLayer()).get(0, 0), 0.00001);
-	assertEquals(1.06, results.get(sae.getOutputLayer()).get(1, 0), 0.00001);
+	assertEquals(1.06, results.getValues(sae.getOutputLayer()).get(0, 0), 0.00001);
+	assertEquals(1.06, results.getValues(sae.getOutputLayer()).get(1, 0), 0.00001);
     }
 
     @Test
@@ -163,10 +165,12 @@ public class DNNTest {
 	SimpleInputProvider inputProvider = new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, null, 1, 1);
 
 	AparapiCDTrainer firstTrainer = TrainerFactory.cdSigmoidTrainer(firstRBM, null, null, null, null, 1f, 0f, 0f, 1, true);
+	firstTrainer.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(firstRBM));
 
 	RBM secondRBM = dbn.getLastNeuralNetwork();
 
 	AparapiCDTrainer secondTrainer = TrainerFactory.cdSigmoidTrainer(secondRBM, null, null, null, null, 1f, 0f, 0f, 1, true);
+	secondTrainer.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(secondRBM));
 
 	Map<NeuralNetwork, OneStepTrainer<?>> layerTrainers = new HashMap<>();
 	layerTrainers.put(firstRBM, firstTrainer);
@@ -232,8 +236,10 @@ public class DNNTest {
 	SimpleInputProvider inputProvider = new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, null, 1, 1);
 
 	AparapiCDTrainer firstTrainer = TrainerFactory.cdSigmoidTrainer(firstRBM, null, null, null, null, 0f, 0f, 0f, 0, true);
+	firstTrainer.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(firstRBM));
 
 	AparapiCDTrainer secondTrainer = TrainerFactory.cdSigmoidTrainer(secondRBM, null, null, null, null, 1f, 0f, 0f, 1, true);
+	secondTrainer.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(secondRBM));
 
 	Map<NeuralNetwork, OneStepTrainer<?>> layerTrainers = new HashMap<>();
 	layerTrainers.put(firstRBM, firstTrainer);

@@ -155,7 +155,6 @@ public class TrainerFactory {
 	p.setParameter(Constants.LEARNING_RATE, learningRate);
 	p.setParameter(Constants.MOMENTUM, momentum);
 	p.setParameter(Constants.WEIGHT_DECAY, weightDecay);
-	p.setParameter(Constants.LAYER_CALCULATOR, nn.getLayerCalculator());
 	p.setParameter(Constants.OUTPUT_ERROR_DERIVATIVE, new MSEDerivative());
 	p.setParameter(Constants.OUTPUT_ERROR, error);
 	p.setParameter(Constants.RANDOM_INITIALIZER, rand);
@@ -188,7 +187,6 @@ public class TrainerFactory {
 	p.setParameter(Constants.NEURAL_NETWORK, rbm);
 	p.setParameter(Constants.TRAINING_INPUT_PROVIDER, trainingSet);
 	p.setParameter(Constants.TESTING_INPUT_PROVIDER, testingSet);
-	p.setParameter(Constants.LAYER_CALCULATOR, new RBMLayerCalculator());
 	p.setParameter(Constants.LEARNING_RATE, learningRate);
 	p.setParameter(Constants.MOMENTUM, momentum);
 	p.setParameter(Constants.WEIGHT_DECAY, weightDecay);
@@ -214,7 +212,6 @@ public class TrainerFactory {
 	p.setParameter(Constants.NEURAL_NETWORK, dnn);
 	p.setParameter(Constants.TRAINING_INPUT_PROVIDER, trainingSet);
 	p.setParameter(Constants.TESTING_INPUT_PROVIDER, testingSet);
-	p.setParameter(Constants.LAYER_CALCULATOR, new RBMLayerCalculator());
 	p.setParameter(Constants.OUTPUT_ERROR, error);
 	p.setParameter(Constants.LAYER_TRAINERS, layerTrainers);
 

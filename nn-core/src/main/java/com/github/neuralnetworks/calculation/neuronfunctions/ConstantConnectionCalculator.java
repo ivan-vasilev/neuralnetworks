@@ -1,11 +1,11 @@
 package com.github.neuralnetworks.calculation.neuronfunctions;
 
-import java.util.SortedMap;
+import java.util.List;
 
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
+import com.github.neuralnetworks.calculation.ValuesProvider;
 import com.github.neuralnetworks.util.Util;
 
 /**
@@ -28,8 +28,8 @@ public class ConstantConnectionCalculator implements ConnectionCalculator {
     }
 
     @Override
-    public void calculate(SortedMap<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
-	Util.fillArray(output.getElements(), value);
+    public void calculate(List<Connections> connections, ValuesProvider valuesProvider, Layer targetLayer) {
+	Util.fillArray(valuesProvider.getValues(targetLayer, connections).getElements(), value);
     }
 
     public float getValue() {

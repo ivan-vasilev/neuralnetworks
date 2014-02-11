@@ -2,9 +2,8 @@ package com.github.neuralnetworks.test;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -12,12 +11,12 @@ import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
 import com.github.neuralnetworks.architecture.ConvGridLayer;
 import com.github.neuralnetworks.architecture.GraphConnections;
-import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.architecture.Subsampling2DConnection;
 import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
+import com.github.neuralnetworks.calculation.ValuesProvider;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiAveragePooling2D;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2D;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2DFF;
@@ -130,12 +129,17 @@ public class CNNTest {
     public void testMaxPooling() {
 	Subsampling2DConnection c = new Subsampling2DConnection(new ConvGridLayer(4, 4, 2), 2, 2);
 	Matrix i1 = new Matrix(new float[] { 0.5f, 1, 1, 2, 1.5f, 3, 2, 4, 2.5f, 5, 3, 6, 3.5f, 7, 4f, 8, 4.5f, 9, 5f, 10, 5.5f, 11, 6f, 12, 6.5f, 13, 7f, 14, 8f, 16, 7.5f, 15, 8.5f, 17, 9f, 18, 9.5f, 19, 10f, 20, 10.5f, 21, 11f, 22, 11.5f, 23, 12f, 24, 12.5f, 25, 13f, 26, 13.5f, 27, 14f, 28, 14.5f, 29, 15f, 30, 16f, 32, 15.5f, 31 }, 2);
-	TreeMap<Connections, Matrix> map = new TreeMap<Connections, Matrix>();
-	map.put(c, i1);
+	List<Connections> connections = new ArrayList<Connections>();
+	connections.add(c);
 
 	ConnectionCalculator calc = new AparapiMaxPooling2D();
 	Matrix o = new Matrix(8, 2);
-	calc.calculate(map, o, c.getOutputLayer());
+
+	ValuesProvider vp = new ValuesProvider();
+	vp.addValues(c.getInputLayer(), i1);
+	vp.addValues(c.getOutputLayer(), o);
+
+	calc.calculate(connections, vp, c.getOutputLayer());
 
 	assertEquals(3, o.get(0, 0), 0);
 	assertEquals(4, o.get(1, 0), 0);
@@ -160,12 +164,17 @@ public class CNNTest {
     public void testAveragePooling() {
 	Subsampling2DConnection c = new Subsampling2DConnection(new ConvGridLayer(4, 4, 2), 2, 2);
 	Matrix i1 = new Matrix(new float[] { 0.5f, 1, 1, 2, 1.5f, 3, 2, 4, 2.5f, 5, 3, 6, 3.5f, 7, 4f, 8, 4.5f, 9, 5f, 10, 5.5f, 11, 6f, 12, 6.5f, 13, 7f, 14, 8f, 16, 7.5f, 15, 8.5f, 17, 9f, 18, 9.5f, 19, 10f, 20, 10.5f, 21, 11f, 22, 11.5f, 23, 12f, 24, 12.5f, 25, 13f, 26, 13.5f, 27, 14f, 28, 14.5f, 29, 15f, 30, 16f, 32, 15.5f, 31 }, 2);
-	TreeMap<Connections, Matrix> map = new TreeMap<Connections, Matrix>();
-	map.put(c, i1);
+	List<Connections> connections = new ArrayList<Connections>();
+	connections.add(c);
 
 	AparapiAveragePooling2D calc = new AparapiAveragePooling2D();
 	Matrix o = new Matrix(8, 2);
-	calc.calculate(map, o, c.getOutputLayer());
+
+	ValuesProvider vp = new ValuesProvider();
+	vp.addValues(c.getInputLayer(), i1);
+	vp.addValues(c.getOutputLayer(), o);
+
+	calc.calculate(connections, vp, c.getOutputLayer());
 
 	assertEquals(1.75, o.get(0, 0), 0);
 	assertEquals(2.75, o.get(1, 0), 0);
@@ -190,12 +199,17 @@ public class CNNTest {
     public void testStochasticPooling() {
 	Subsampling2DConnection c = new Subsampling2DConnection(new ConvGridLayer(3, 3, 1), 3, 3);
 	Matrix i1 = new Matrix(new float[] { 1.6f, 1.6f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2.4f, 2.4f }, 2);
-	TreeMap<Connections, Matrix> map = new TreeMap<Connections, Matrix>();
-	map.put(c, i1);
+	List<Connections> connections = new ArrayList<Connections>();
+	connections.add(c);
+
+	Matrix o = new Matrix(1, 2);
+
+	ValuesProvider vp = new ValuesProvider();
+	vp.addValues(c.getInputLayer(), i1);
+	vp.addValues(c.getOutputLayer(), o);
 
 	AparapiStochasticPooling2D calc = new AparapiStochasticPooling2D();
-	Matrix o = new Matrix(1, 2);
-	calc.calculate(map, o, c.getOutputLayer());
+	calc.calculate(connections, vp, c.getOutputLayer());
 
 	assertEquals(2.08, o.get(0, 0), 0.01);
 	assertEquals(2.08, o.get(0, 1), 0.01);
@@ -205,23 +219,31 @@ public class CNNTest {
     public void testMaxPoolingBackpropagation() {
 	Subsampling2DConnection c = new Subsampling2DConnection(new ConvGridLayer(4, 4, 2), 2, 2);
 	Matrix a1 = new Matrix(new float[] { 0.5f, 1, 1, 2, 1.5f, 3, 2, 4, 2.5f, 5, 3, 6, 3.5f, 7, 4f, 8, 4.5f, 9, 5f, 10, 5.5f, 11, 6f, 12, 6.5f, 13, 7f, 14, 8f, 16, 7.5f, 15, 8.5f, 17, 9f, 18, 9.5f, 19, 10f, 20, 10.5f, 21, 11f, 22, 11.5f, 23, 12f, 24, 12.5f, 25, 13f, 26, 13.5f, 27, 14f, 28, 14.5f, 29, 15f, 30, 16f, 32, 15.5f, 31 }, 2);
+	Matrix o = new Matrix(8, 2);
+
+	List<Connections> connections = new ArrayList<Connections>();
+	connections.add(c);
 
 	// max pooling
-	ConnectionCalculator calc = new AparapiMaxPooling2D();
-	TreeMap<Connections, Matrix> map = new TreeMap<Connections, Matrix>();
-	map.put(c, a1);
-	Matrix o = new Matrix(8, 2);
-	calc.calculate(map, o, c.getOutputLayer());
+	ValuesProvider vp = new ValuesProvider();
+	vp.addValues(c.getInputLayer(), a1);
+	vp.addValues(c.getOutputLayer(), o);
 
-	Map<Layer, Matrix> activations = new HashMap<Layer, Matrix>();
-	activations.put(c.getInputLayer(), a1);
+	ConnectionCalculator calc = new AparapiMaxPooling2D();
+	calc.calculate(connections, vp, c.getOutputLayer());
+
+	ValuesProvider activations = new ValuesProvider();
+	activations.addValues(c.getInputLayer(), a1);
+
+	Matrix bpo = new Matrix(32, 2);
+
+	vp = new ValuesProvider();
+	vp.addValues(c.getOutputLayer(), o);
+	vp.addValues(c.getInputLayer(), bpo);
 
 	BackpropagationMaxPooling2D bp = new BackpropagationMaxPooling2D();
 	bp.setActivations(activations);
-
-	Matrix bpo = new Matrix(32, 2);
-	map.put(c, o);
-	bp.calculate(map, bpo, c.getInputLayer());
+	bp.calculate(connections, vp, c.getInputLayer());
 
 	assertEquals(true, bpo.get(5, 0) == a1.get(5, 0));
 	assertEquals(true, bpo.get(7, 0) == a1.get(7, 0));
@@ -241,20 +263,29 @@ public class CNNTest {
 
 	// max pooling
 	ConnectionCalculator calc = new AparapiAveragePooling2D();
-	TreeMap<Connections, Matrix> map = new TreeMap<Connections, Matrix>();
-	map.put(c, a1);
-	Matrix o = new Matrix(8, 2);
-	calc.calculate(map, o, c.getOutputLayer());
 
-	Map<Layer, Matrix> activations = new HashMap<Layer, Matrix>();
-	activations.put(c.getInputLayer(), a1);
+	List<Connections> connections = new ArrayList<Connections>();
+	connections.add(c);
+
+	ValuesProvider vp = new ValuesProvider();
+	vp.addValues(c.getInputLayer(), a1);
+	Matrix o = new Matrix(8, 2);
+	vp.addValues(c.getOutputLayer(), o);
+
+	calc.calculate(connections, vp, c.getOutputLayer());
+
+	ValuesProvider activations = new ValuesProvider();
+	activations.addValues(c.getInputLayer(), a1);
 
 	BackpropagationAveragePooling2D bp = new BackpropagationAveragePooling2D();
 	bp.setActivations(activations);
 
+	vp = new ValuesProvider();
+	vp.addValues(c.getOutputLayer(), o);
 	Matrix bpo = new Matrix(32, 2);
-	map.put(c, o);
-	bp.calculate(map, bpo, c.getInputLayer());
+	vp.addValues(c.getInputLayer(), bpo);
+
+	bp.calculate(connections, vp, c.getInputLayer());
 
 	assertEquals(true, bpo.get(0, 0) == o.get(0, 0) / c.getSubsamplingRegionLength());
 	assertEquals(true, bpo.get(1, 0) == o.get(0, 0) / c.getSubsamplingRegionLength());

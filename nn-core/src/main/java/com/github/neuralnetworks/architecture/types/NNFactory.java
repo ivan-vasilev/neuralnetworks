@@ -116,16 +116,19 @@ public class NNFactory {
      * @param layer
      * @param addBias
      */
-    public static void addFullyConnectedLayer(NeuralNetworkImpl nn, Layer layer, int inputUnitCount, int outputUnitCount, boolean addBias) {
+    public static FullyConnected addFullyConnectedLayer(NeuralNetworkImpl nn, Layer layer, int inputUnitCount, int outputUnitCount, boolean addBias) {
+	FullyConnected result = null;
 	if (nn.addLayer(layer) && nn.getOutputLayer() != layer) {
-	    new FullyConnected(nn.getOutputLayer(), layer, inputUnitCount, outputUnitCount);
+	    result = new FullyConnected(nn.getOutputLayer(), layer, inputUnitCount, outputUnitCount);
 	}
 
 	if (addBias && nn.getInputLayer() != layer) {
 	    Layer biasLayer = new Layer();
 	    nn.addLayer(biasLayer);
-	    new FullyConnected(biasLayer, layer, 1, outputUnitCount);
+	    return new FullyConnected(biasLayer, layer, 1, outputUnitCount);
 	}
+
+	return result;
     }
 
     public static LayerCalculatorImpl lcWeightedSum(NeuralNetworkImpl nn, ConnectionCalculator outputCC) {

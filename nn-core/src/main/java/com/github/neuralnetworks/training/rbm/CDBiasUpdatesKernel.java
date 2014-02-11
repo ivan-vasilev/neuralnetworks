@@ -30,10 +30,10 @@ public class CDBiasUpdatesKernel extends Kernel {
     private float momentum;
     private final int miniBatchSize;
 
-    public CDBiasUpdatesKernel(float[] hiddenBiasWeights, int miniBatchSize) {
+    public CDBiasUpdatesKernel(float[] biasWeights, int miniBatchSize) {
 	super();
-	this.biasWeights = hiddenBiasWeights;
-	this.biasUpdates = new float[hiddenBiasWeights.length];
+	this.biasWeights = biasWeights;
+	this.biasUpdates = new float[biasWeights.length];
 	this.miniBatchSize = miniBatchSize;
     }
 

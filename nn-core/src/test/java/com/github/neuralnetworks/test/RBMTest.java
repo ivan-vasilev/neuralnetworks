@@ -136,7 +136,17 @@ public class RBMTest {
 
 	AparapiCDTrainer t = TrainerFactory.cdSigmoidTrainer(rbm, new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, null, 1, 1), null, null, null, 1f, 0f, 0f, 1, true);
 	t.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
+
+	Environment.getInstance().setExecutionStrategy(new SeqKernelExecution());
+
 	t.train();
+
+	assertEquals(0.52276707, cgb1.get(0, 0), 0.00001);
+	assertEquals(- 0.54617375, cgb1.get(1, 0), 0.00001);
+	assertEquals(0.51522285, cgb1.get(2, 0), 0.00001);
+	
+	assertEquals(-0.4 - 0.08680013, cgb2.get(0, 0), 0.00001);
+	assertEquals(0.2 - 0.02693379, cgb2.get(1, 0), 0.00001);
 
 	assertEquals(0.2 + 0.13203661, cg1.get(0, 0), 0.00001);
 	assertEquals(0.4 - 0.22863509,  cg1.get(0, 1), 0.00001);
@@ -144,13 +154,6 @@ public class RBMTest {
 	assertEquals(-0.3 + 0.26158813, cg1.get(1, 0), 0.00001);
 	assertEquals(0.1 - 0.3014404,  cg1.get(1, 1), 0.00001);
 	assertEquals(0.2 + 0.25742438, cg1.get(1, 2), 0.00001);
-
-	assertEquals(0.52276707, cgb1.get(0, 0), 0.00001);
-	assertEquals(- 0.54617375, cgb1.get(1, 0), 0.00001);
-	assertEquals(0.51522285, cgb1.get(2, 0), 0.00001);
-
-	assertEquals(-0.4 - 0.08680013, cgb2.get(0, 0), 0.00001);
-	assertEquals(0.2 - 0.02693379, cgb2.get(1, 0), 0.00001);
     }
 
     /**
@@ -165,8 +168,7 @@ public class RBMTest {
 	MultipleNeuronsOutputError error = new MultipleNeuronsOutputError();
 
 	AparapiCDTrainer t = TrainerFactory.cdSigmoidTrainer(rbm, trainInputProvider, testInputProvider, error, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.02f, 0.5f, 0f, 1, false);
-	
-	Environment.getInstance().setExecutionStrategy(new SeqKernelExecution());
+	t.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
 
 	t.train();
 	t.test();

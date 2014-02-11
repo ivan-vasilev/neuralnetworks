@@ -1,12 +1,12 @@
 package com.github.neuralnetworks.calculation.neuronfunctions;
 
-import java.util.SortedMap;
+import java.util.List;
 
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.Subsampling2DConnection;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
+import com.github.neuralnetworks.calculation.ValuesProvider;
 
 /**
  * Max pooling
@@ -18,12 +18,12 @@ public class AparapiMaxPooling2D implements ConnectionCalculator {
     private ConnectionCalculator cc;
 
     @Override
-    public void calculate(SortedMap<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
+    public void calculate(List<Connections> connections, ValuesProvider valuesProvider, Layer targetLayer) {
 	if (cc == null) {
-	    cc = new AparapiMaxPooling2DCC((Subsampling2DConnection) connections.keySet().iterator().next(), output.getColumns());
+	    cc = new AparapiMaxPooling2DCC((Subsampling2DConnection) connections.get(0), valuesProvider.getColumns());
 	}
 
-	cc.calculate(connections, output, targetLayer);
+	cc.calculate(connections, valuesProvider, targetLayer);
     }
 
     public static class AparapiMaxPooling2DCC extends AparapiSubsampling2D {

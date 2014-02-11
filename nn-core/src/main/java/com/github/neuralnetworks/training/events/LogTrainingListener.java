@@ -90,7 +90,7 @@ public class LogTrainingListener implements TrainingEventListener {
 		    Matrix input = mbe.getData().getInput();
 		    Matrix target = mbe.getData().getTarget();
 		    Trainer<?> t = (Trainer<?>) mbe.getSource();
-		    Matrix networkOutput = mbe.getResults().get(t.getNeuralNetwork().getOutputLayer());
+		    Matrix networkOutput = mbe.getResults().getValues(t.getNeuralNetwork().getOutputLayer());
 
 		    for (int i = 0; i < input.getColumns(); i++) {
 			sb.append(s);

@@ -1,13 +1,14 @@
 package com.github.neuralnetworks.training.backpropagation;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.architecture.Matrix;
+import com.github.neuralnetworks.calculation.ValuesProvider;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSum;
 import com.github.neuralnetworks.util.Util;
 
@@ -40,21 +41,22 @@ public class AparapiBackpropagationFullyConnected extends AparapiWeightedSum imp
     /**
      * activations from the feedforward phase
      */
-    protected Map<Layer, Matrix> activations;
+    protected ValuesProvider activations;
 
     public AparapiBackpropagationFullyConnected(SortedMap<GraphConnections, Integer> inputConnections, int miniBatchSize, Layer targetLayer) {
 	super(inputConnections, miniBatchSize, targetLayer);
     }
 
     @Override
-    public void calculate(SortedMap<Connections, Matrix> inputConnections, Matrix outputMatrix, Layer targetLayer) {
-	super.calculate(inputConnections, outputMatrix, targetLayer);
+    public void calculate(List<Connections> inputConnections, ValuesProvider valuesProvider, Layer targetLayer) {
+	super.calculate(inputConnections, valuesProvider, targetLayer);
 
-	if (inputConnections.size() > 2 || (inputConnections.size() > 1 && !Util.hasBias(inputConnections.keySet()))) {
+	if (inputConnections.size() > 2 || (inputConnections.size() > 1 && !Util.hasBias(inputConnections))) {
 	    int i = 0;
-	    for (java.util.Map.Entry<Connections, Matrix> e : inputConnections.entrySet()) {
-		System.arraycopy(input, inputStartPositions[i], e.getValue().getElements(), 0, e.getValue().getElements().length);
-		float[] cg = ((GraphConnections) e.getKey()).getConnectionGraph().getElements();
+	    for (Connections c : inputConnections) {
+		float[] a = valuesProvider.getValues(Util.getOppositeLayer(c, targetLayer), c).getElements();
+		System.arraycopy(input, inputStartPositions[i], a, 0, a.length);
+		float[] cg = ((GraphConnections) c).getConnectionGraph().getElements();
 		System.arraycopy(weights, weightStartPositions[i], cg, 0, cg.length);
 		i++;
 	    }
@@ -62,16 +64,15 @@ public class AparapiBackpropagationFullyConnected extends AparapiWeightedSum imp
     }
 
     @Override
-    protected void init(SortedMap<GraphConnections, Matrix> input, Matrix outputMatrix, Layer targetLayer) {
-	super.init(input, outputMatrix, targetLayer);
-
+    protected void init(List<Connections> inputConnections, ValuesProvider valuesProvider, Layer targetLayer) {
+	super.init(inputConnections, valuesProvider, targetLayer);
 	weightUpdates = storedWeightUpdates.get(targetLayer);
 	if (weightUpdates == null) {
 	    weightUpdates = new float[weights.length];
 	    storedWeightUpdates.put(targetLayer, weightUpdates);
 	}
 
-	ffActivation = activations.get(targetLayer).getElements();
+	ffActivation = activations.getValues(targetLayer, inputConnections).getElements();
     }
 
     @Override
@@ -144,12 +145,12 @@ public class AparapiBackpropagationFullyConnected extends AparapiWeightedSum imp
     }
 
     @Override
-    public Map<Layer, Matrix> getActivations() {
+    public ValuesProvider getActivations() {
 	return activations;
     }
 
     @Override
-    public void setActivations(Map<Layer, Matrix> activations) {
+    public void setActivations(ValuesProvider activations) {
 	this.activations = activations;
     }
 }

@@ -1,17 +1,18 @@
 package com.github.neuralnetworks.training.backpropagation;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
+import com.github.neuralnetworks.calculation.ValuesProvider;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
 import com.github.neuralnetworks.util.Util;
@@ -27,7 +28,7 @@ public abstract class BackPropagationConnectionCalculatorImpl implements Connect
     private Properties properties;
     protected Map<Connections, BackpropagationConnectionCalculator> connectionCalculators;
     protected Set<BackpropagationConnectionCalculator> calculators;
-    protected Map<Layer, Matrix> activations;
+    protected ValuesProvider activations;
     protected Layer currentLayer;
     protected int miniBatchSize;
 
@@ -38,35 +39,31 @@ public abstract class BackPropagationConnectionCalculatorImpl implements Connect
     }
 
     @Override
-    public void calculate(SortedMap<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
+    public void calculate(List<Connections> connections, ValuesProvider valuesProvider, Layer targetLayer) {
 	SortedMap<Connections, Integer> chunk = new TreeMap<>();
-	for (Entry<Connections, Matrix> e : connections.entrySet()) {
-	    if (!connectionCalculators.containsKey(e.getKey()) || targetLayer != currentLayer || miniBatchSize != output.getColumns()) {
-		chunk.put(e.getKey(), e.getValue().getElements().length);
+	for (Connections c : connections) {
+	    if (!connectionCalculators.containsKey(c) || targetLayer != currentLayer || miniBatchSize != valuesProvider.getColumns()) {
+		chunk.put(c, valuesProvider.getColumns() * valuesProvider.getUnitCount(Util.getOppositeLayer(c, targetLayer), c));
 	    }
 	}
 
 	if (chunk.size() > 0) {
-	    miniBatchSize = output.getColumns();
+	    miniBatchSize = valuesProvider.getColumns();
 	    currentLayer = targetLayer;
 	    addBackpropFunction(chunk, connectionCalculators, targetLayer);
 	    calculators.addAll(connectionCalculators.values());
 	}
 
-	SortedMap<Connections, Matrix> chunkCalc = new TreeMap<>();
+	List<Connections> chunkCalc = new ArrayList<>();
 	for (BackpropagationConnectionCalculator bc : calculators) {
 	    chunkCalc.clear();
 
 	    Layer target = targetLayer;
-	    Matrix out = output;
-	    for (Entry<Connections, Matrix> e : connections.entrySet()) {
-		if (connectionCalculators.get(e.getKey()) == bc) {
-		    if (Util.isBias(e.getKey().getInputLayer()) && e.getKey().getInputLayer() != targetLayer) {
-			chunkCalc.put(e.getKey(), output);
-			target = e.getKey().getInputLayer();
-			out = e.getValue();
-		    } else {
-			chunkCalc.put(e.getKey(), e.getValue());
+	    for (Connections c : connections) {
+		if (connectionCalculators.get(c) == bc) {
+		    chunkCalc.add(c);
+		    if (Util.isBias(c.getInputLayer()) && c.getInputLayer() != targetLayer) {
+			target = c.getInputLayer();
 		    }
 		}
 	    }
@@ -76,7 +73,7 @@ public abstract class BackPropagationConnectionCalculatorImpl implements Connect
 		bc.setMomentum(getMomentum());
 		bc.setWeightDecay(getWeightDecay());
 		bc.setActivations(getActivations());
-		bc.calculate(chunkCalc, out, target);
+		bc.calculate(chunkCalc, valuesProvider, target);
 	    }
 	}
     }
@@ -99,11 +96,11 @@ public abstract class BackPropagationConnectionCalculatorImpl implements Connect
 	return properties.getParameter(Constants.WEIGHT_DECAY);
     }
 
-    public Map<Layer, Matrix> getActivations() {
+    public ValuesProvider getActivations() {
 	return activations;
     }
     
-    public void setActivations(Map<Layer, Matrix> activations) {
+    public void setActivations(ValuesProvider activations) {
 	this.activations = activations;
     }
 }

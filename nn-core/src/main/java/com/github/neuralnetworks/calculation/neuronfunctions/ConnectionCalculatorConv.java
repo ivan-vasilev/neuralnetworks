@@ -1,12 +1,12 @@
 package com.github.neuralnetworks.calculation.neuronfunctions;
 
-import java.util.SortedMap;
+import java.util.List;
 
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
 import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
+import com.github.neuralnetworks.calculation.ValuesProvider;
 import com.github.neuralnetworks.util.Util;
 
 /**
@@ -22,11 +22,11 @@ public class ConnectionCalculatorConv implements ConnectionCalculator {
     protected int miniBatchSize;
 
     @Override
-    public void calculate(SortedMap<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
+    public void calculate(List<Connections> connections, ValuesProvider valuesProvider, Layer targetLayer) {
 	Conv2DConnection c = null;
 	Conv2DConnection bias = null;
 
-	for (Connections con : connections.keySet()) {
+	for (Connections con : connections) {
 	    if (con instanceof Conv2DConnection) {
 		if (Util.isBias(con.getInputLayer())) {
 		    bias = (Conv2DConnection) con;
@@ -38,17 +38,17 @@ public class ConnectionCalculatorConv implements ConnectionCalculator {
 
 	if (c != null) {
 	    // currently works only as a feedforward (including bp)
-	    if (inputFunction == null || miniBatchSize != output.getColumns()) {
-		miniBatchSize = output.getColumns();
+	    if (inputFunction == null || miniBatchSize != valuesProvider.getColumns()) {
+		miniBatchSize = valuesProvider.getColumns();
 		inputFunction = createInputFunction(c, miniBatchSize);
 	    }
 
+	    calculateBias(bias, valuesProvider);
+
 	    if (targetLayer == c.getOutputLayer()) {
-		calculateBias(bias, output);
-		inputFunction.calculate(c, connections.get(c), output);
+		inputFunction.calculate(c, valuesProvider.getValues(Util.getOppositeLayer(c, targetLayer), c), valuesProvider.getValues(targetLayer, c));
 	    } else {
-		calculateBias(bias, connections.get(c));
-		inputFunction.calculate(c, output, connections.get(c));
+		inputFunction.calculate(c, valuesProvider.getValues(targetLayer, c), valuesProvider.getValues(Util.getOppositeLayer(c, targetLayer), c));
 	    }
 	}
     }
@@ -57,11 +57,17 @@ public class ConnectionCalculatorConv implements ConnectionCalculator {
 	return new AparapiConv2DFF(c, miniBatchSize);
     }
 
-    protected void calculateBias(Conv2DConnection bias, Matrix output) {
+    protected void calculateBias(Conv2DConnection bias, ValuesProvider vp) {
 	if (bias != null) {
-	    int fm = output.getElements().length / bias.getWeights().length;
-	    for (int i = 0; i < output.getElements().length; i++) {
-		output.getElements()[i] += bias.getWeights()[i / fm];
+	    float[] biasValue = vp.getValues(bias.getInputLayer(), bias).getElements();
+	    if (biasValue[0] == 0) {
+		Util.fillArray(biasValue, 1);
+	    }
+
+	    float[] a = vp.getValues(bias.getOutputLayer(), bias).getElements();
+	    int fm = a.length / bias.getWeights().length;
+	    for (int i = 0; i < a.length; i++) {
+		a[i] += bias.getWeights()[i / fm];
 	    }
 	}
     }

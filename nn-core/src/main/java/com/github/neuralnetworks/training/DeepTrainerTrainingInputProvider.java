@@ -1,14 +1,12 @@
 package com.github.neuralnetworks.training;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.architecture.types.DNN;
+import com.github.neuralnetworks.calculation.ValuesProvider;
 
 /**
  * Training Input Provider for deep network trainers
@@ -19,7 +17,7 @@ public class DeepTrainerTrainingInputProvider implements TrainingInputProvider {
     private DNN<?> dnn;
     private NeuralNetwork currentNN;
     private Set<Layer> calculatedLayers;
-    private Map<Layer, Matrix> layerResults;
+    private ValuesProvider layerResults;
 
     public DeepTrainerTrainingInputProvider(TrainingInputProvider inputProvider, DNN<?> dnn, NeuralNetwork currentNN) {
 	super();
@@ -27,7 +25,7 @@ public class DeepTrainerTrainingInputProvider implements TrainingInputProvider {
 	this.dnn = dnn;
 	this.currentNN = currentNN;
 	this.calculatedLayers = new HashSet<>();
-	this.layerResults = new HashMap<>();
+	this.layerResults = new ValuesProvider();
     }
 
     @Override
@@ -35,11 +33,11 @@ public class DeepTrainerTrainingInputProvider implements TrainingInputProvider {
 	TrainingInputData input = inputProvider.getNextInput();
 
 	if (input != null && dnn.getFirstNeuralNetwork() != currentNN) {
-	    layerResults.put(dnn.getInputLayer(), input.getInput());
+	    layerResults.addValues(dnn.getInputLayer(), input.getInput());
 	    calculatedLayers.clear();
 	    calculatedLayers.add(dnn.getInputLayer());
 	    dnn.getLayerCalculator().calculate(dnn, currentNN.getInputLayer(), calculatedLayers, layerResults);
-	    input = new TrainingInputDataImpl(layerResults.get(currentNN.getInputLayer()), input.getTarget());
+	    input = new TrainingInputDataImpl(layerResults.getValues(currentNN.getInputLayer()), input.getTarget());
 	}
 
 	return input;

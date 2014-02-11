@@ -1,6 +1,6 @@
 package com.github.neuralnetworks.calculation.neuronfunctions;
 
-import java.util.SortedMap;
+import java.util.List;
 
 import com.amd.aparapi.Kernel;
 import com.github.neuralnetworks.architecture.Connections;
@@ -9,7 +9,9 @@ import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.Subsampling2DConnection;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
+import com.github.neuralnetworks.calculation.ValuesProvider;
 import com.github.neuralnetworks.util.Environment;
+import com.github.neuralnetworks.util.Util;
 
 /**
  * Base Aparapi connection calculator for subsampling layers.
@@ -110,16 +112,15 @@ public abstract class AparapiSubsampling2D extends Kernel implements ConnectionC
     }
 
     @Override
-    public void calculate(SortedMap<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
+    public void calculate(List<Connections> connections, ValuesProvider valuesProvider, Layer targetLayer) {
 	if (connections.size() > 0) {
-	    Subsampling2DConnection c = (Subsampling2DConnection) connections.keySet().iterator().next();
+	    Subsampling2DConnection c = (Subsampling2DConnection) connections.get(0);
 	    if (targetLayer == c.getOutputLayer()) {
-		init(c, connections.values().iterator().next(), output);
-		Environment.getInstance().getExecutionStrategy().execute(this, output.getRows());
+		init(c, valuesProvider.getValues(Util.getOppositeLayer(c, targetLayer), c), valuesProvider.getValues(targetLayer, c));
+		Environment.getInstance().getExecutionStrategy().execute(this, valuesProvider.getUnitCount(targetLayer, c));
 	    } else {
-		Matrix m = connections.values().iterator().next();
-		init(c, output, m);
-		Environment.getInstance().getExecutionStrategy().execute(this, m.getRows());
+		init(c, valuesProvider.getValues(targetLayer, c), valuesProvider.getValues(Util.getOppositeLayer(c, targetLayer), c));
+		Environment.getInstance().getExecutionStrategy().execute(this, valuesProvider.getUnitCount(Util.getOppositeLayer(c, targetLayer), c));
 	    }
 
 	}

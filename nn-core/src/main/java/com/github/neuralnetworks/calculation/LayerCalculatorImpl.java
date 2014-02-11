@@ -3,12 +3,10 @@ package com.github.neuralnetworks.calculation;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.util.UniqueList;
 import com.github.neuralnetworks.util.Util;
@@ -23,7 +21,7 @@ public class LayerCalculatorImpl extends LayerCalculatorBase implements LayerCal
     private static final long serialVersionUID = 1L;
 
     @Override
-    public void calculate(NeuralNetwork neuralNetwork, Layer layer, Set<Layer> calculatedLayers, Map<Layer, Matrix> results) {
+    public void calculate(NeuralNetwork neuralNetwork, Layer layer, Set<Layer> calculatedLayers, ValuesProvider results) {
 	List<ConnectionCalculateCandidate> ccc = new ArrayList<ConnectionCalculateCandidate>();
 	orderConnections(neuralNetwork, layer, calculatedLayers, new UniqueList<Layer>(), ccc);
 	calculate(results, ccc);

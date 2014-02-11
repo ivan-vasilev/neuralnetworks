@@ -1,17 +1,15 @@
 package com.github.neuralnetworks.training;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.calculation.OutputError;
+import com.github.neuralnetworks.calculation.ValuesProvider;
 import com.github.neuralnetworks.events.TrainingEvent;
 import com.github.neuralnetworks.events.TrainingEventListener;
 import com.github.neuralnetworks.training.events.MiniBatchFinishedEvent;
@@ -64,17 +62,17 @@ public abstract class Trainer<N extends NeuralNetwork> {
 	    triggerEvent(new TestingStartedEvent(this));
 
 	    Set<Layer> calculatedLayers = new UniqueList<>();
-	    Map<Layer, Matrix> results = new HashMap<>();
+	    ValuesProvider results = new ValuesProvider();
 	    TrainingInputData input = null;
 	    
 	    while ((input = ip.getNextInput()) != null) {
 		calculatedLayers.clear();
 		calculatedLayers.add(n.getInputLayer());
-		results.put(n.getInputLayer(), input.getInput());
+		results.addValues(n.getInputLayer(), input.getInput());
 		n.getLayerCalculator().calculate(n, n.getOutputLayer(), calculatedLayers, results);
 
 		if (getOutputError() != null) {
-		    getOutputError().addItem(results.get(n.getOutputLayer()), input.getTarget());
+		    getOutputError().addItem(results.getValues(n.getOutputLayer()), input.getTarget());
 		}
 
 		triggerEvent(new MiniBatchFinishedEvent(this, input, results));

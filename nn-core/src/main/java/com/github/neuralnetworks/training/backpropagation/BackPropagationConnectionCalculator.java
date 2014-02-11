@@ -1,10 +1,7 @@
 package com.github.neuralnetworks.training.backpropagation;
 
-import java.util.Map;
-
-import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
+import com.github.neuralnetworks.calculation.ValuesProvider;
 
 public interface BackpropagationConnectionCalculator extends ConnectionCalculator {
 
@@ -20,7 +17,7 @@ public interface BackpropagationConnectionCalculator extends ConnectionCalculato
 
     public void setWeightDecay(float weightDecay);
 
-    public Map<Layer, Matrix> getActivations();
+    public ValuesProvider getActivations();
 
-    public void setActivations(Map<Layer, Matrix> activations);
+    public void setActivations(ValuesProvider activations);
 }

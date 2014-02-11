@@ -1,12 +1,12 @@
 package com.github.neuralnetworks.training.backpropagation;
 
-import java.util.Map;
-import java.util.SortedMap;
+import java.util.List;
 
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
+import com.github.neuralnetworks.calculation.ValuesProvider;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2D;
 import com.github.neuralnetworks.util.Util;
 
@@ -38,17 +38,17 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements Backp
     /**
      * activations from the feedforward phase
      */
-    protected Map<Layer, Matrix> activations;
+    protected ValuesProvider activations;
 
     public AparapiBackpropagationConv2D(Conv2DConnection c, int miniBatchSize) {
 	super(c, miniBatchSize);
     }
 
     @Override
-    public void calculate(SortedMap<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
+    public void calculate(List<Connections> connections, ValuesProvider valuesProvider, Layer targetLayer) {
 	Conv2DConnection c = null;
 
-	for (Connections con : connections.keySet()) {
+	for (Connections con : connections) {
 	    if (con instanceof Conv2DConnection) {
 		c = (Conv2DConnection) con;
 	    }
@@ -57,9 +57,9 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements Backp
 	if (c != null) {
 	    // currently works only as a feedforward (including bp)
 	    if (targetLayer == c.getOutputLayer()) {
-		super.calculate(c, connections.get(c), output);
+		super.calculate(c, valuesProvider.getValues(Util.getOppositeLayer(c, targetLayer), c), valuesProvider.getValues(targetLayer, c));
 	    } else {
-		super.calculate(c, output, connections.get(c));
+		super.calculate(c, valuesProvider.getValues(targetLayer, c), valuesProvider.getValues(Util.getOppositeLayer(c, targetLayer), c));
 	    }
 
 	    updateWeights();
@@ -78,7 +78,7 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements Backp
 	    Util.fillArray(weightUpdates, 0);
 	}
 
-	ffActivation = activations.get(c.getInputLayer()).getElements();
+	ffActivation = activations.getValues(c.getInputLayer(), c).getElements();
     }
 
     @Override
@@ -156,12 +156,12 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements Backp
     }
 
     @Override
-    public Map<Layer, Matrix> getActivations() {
+    public ValuesProvider getActivations() {
         return activations;
     }
 
     @Override
-    public void setActivations(Map<Layer, Matrix> activations) {
+    public void setActivations(ValuesProvider activations) {
         this.activations = activations;
     }
 }

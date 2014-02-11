@@ -1,12 +1,8 @@
 package com.github.neuralnetworks.training.backpropagation;
 
-import java.util.Map;
-import java.util.SortedMap;
-
-import com.github.neuralnetworks.architecture.Connections;
-import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.Subsampling2DConnection;
+import com.github.neuralnetworks.calculation.ValuesProvider;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSubsampling2D;
 
 /**
@@ -28,27 +24,22 @@ public class AparapiBackpropagationSubsampling2D extends AparapiSubsampling2D im
     /**
      * activations from the feedforward phase
      */
-    protected Map<Layer, Matrix> activations;
-
-    @Override
-    public void calculate(SortedMap<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
-	super.calculate(connections, output, targetLayer);
-    }
+    protected ValuesProvider activations;
 
     @Override
     protected void init(Subsampling2DConnection c, Matrix input, Matrix output) {
 	super.init(c, input, output);
 
-	ffActivation = activations.get(c.getInputLayer()).getElements();
+	ffActivation = activations.getValues(c.getInputLayer(), c).getElements();
     }
 
     @Override
-    public Map<Layer, Matrix> getActivations() {
+    public ValuesProvider getActivations() {
         return activations;
     }
 
     @Override
-    public void setActivations(Map<Layer, Matrix> activations) {
+    public void setActivations(ValuesProvider activations) {
         this.activations = activations;
     }
 

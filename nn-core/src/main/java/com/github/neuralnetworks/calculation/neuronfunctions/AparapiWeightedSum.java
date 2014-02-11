@@ -1,6 +1,7 @@
 package com.github.neuralnetworks.calculation.neuronfunctions;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 
@@ -10,7 +11,9 @@ import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
+import com.github.neuralnetworks.calculation.ValuesProvider;
 import com.github.neuralnetworks.util.Environment;
+import com.github.neuralnetworks.util.Util;
 
 /**
  * Base Aparapi connection calculator for weighted sum functions (matrix
@@ -160,12 +163,11 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
 	}
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public void calculate(SortedMap<Connections, Matrix> input, Matrix outputMatrix, Layer targetLayer) {
-	if (input.size() > 0) {
-	    init((SortedMap<GraphConnections, Matrix>) ((SortedMap<?, ?>) input), outputMatrix, targetLayer);
-	    Environment.getInstance().getExecutionStrategy().execute(this, outputMatrix.getRows());
+    public void calculate(List<Connections> connections, ValuesProvider valuesProvider, Layer targetLayer) {
+	if (connections.size() > 0) {
+	    init(connections, valuesProvider, targetLayer);
+	    Environment.getInstance().getExecutionStrategy().execute(this, valuesProvider.getUnitCount(targetLayer, connections));
 	}
     }
 
@@ -173,16 +175,15 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
      * Combines all the inputConnections and initializes all the arrays based on
      * the connections
      */
-    protected void init(SortedMap<GraphConnections, Matrix> inputConnections, Matrix outputMatrix, Layer targetLayer) {
-	this.output = outputMatrix.getElements();
+    protected void init(List<Connections> inputConnections, ValuesProvider valuesProvider, Layer targetLayer) {
+	this.output = valuesProvider.getValues(targetLayer, inputConnections).getElements();
 
 	if (inputConnections.size() == 1) {
-	    java.util.Map.Entry<GraphConnections, Matrix> e = inputConnections.entrySet().iterator().next();
-	    this.input = e.getValue().getElements();
+	    this.input = valuesProvider.getValues(Util.getOppositeLayer(inputConnections.get(0), targetLayer), inputConnections).getElements();
 	} else {
 	    int totalInputSize = 0;
-	    for (java.util.Map.Entry<GraphConnections, Matrix> e : inputConnections.entrySet()) {
-		totalInputSize += e.getValue().getElements().length;
+	    for (Connections c : inputConnections) {
+		totalInputSize += valuesProvider.getValues(Util.getOppositeLayer(c, targetLayer), c).getElements().length;
 	    }
 
 	    this.input = storedInputs.get(totalInputSize);
@@ -192,9 +193,10 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
 	    }
 
 	    int offset = 0;
-	    for (java.util.Map.Entry<GraphConnections, Matrix> e : inputConnections.entrySet()) {
-		System.arraycopy(e.getValue().getElements(), 0, input, offset, e.getValue().getElements().length);
-		offset += e.getValue().getElements().length;
+	    for (Connections c: inputConnections) {
+		float[] a = valuesProvider.getValues(Util.getOppositeLayer(c, targetLayer), c).getElements();
+		System.arraycopy(a, 0, input, offset, a.length);
+		offset += a.length;
 	    }
 	}
     };

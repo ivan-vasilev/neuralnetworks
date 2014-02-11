@@ -4,16 +4,15 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.calculation.LayerCalculatorBase;
+import com.github.neuralnetworks.calculation.ValuesProvider;
 import com.github.neuralnetworks.util.Util;
 
 /**
@@ -23,14 +22,14 @@ public class BackPropagationLayerCalculatorImpl extends LayerCalculatorBase impl
 
     private static final long serialVersionUID = 1L;
 
-    private Map<Layer, Matrix> activations;
+    private ValuesProvider activations;
 
     public BackPropagationLayerCalculatorImpl() {
 	super();
     }
 
     @Override
-    public void backpropagate(NeuralNetwork nn, Set<Layer> calculatedLayers, Map<Layer, Matrix> activations, Map<Layer, Matrix> results) {
+    public void backpropagate(NeuralNetwork nn, Set<Layer> calculatedLayers, ValuesProvider activations, ValuesProvider results) {
 	this.activations = activations;
 
 	Layer currentLayer = nn.getOutputLayer();
@@ -42,11 +41,6 @@ public class BackPropagationLayerCalculatorImpl extends LayerCalculatorBase impl
 
 	while (layersQueue.size() > 0) {
 	    Layer l = layersQueue.poll();
-	    if (Util.isBias(l) && !activations.containsKey(l)) {
-		Matrix m = getLayerResult(activations, l);
-		Util.fillArray(m.getElements(), 1);
-		activations.put(l, m);
-	    }
 
 	    for (Connections c : l.getConnections(nn)) {
 		Layer opposite = Util.getOppositeLayer(c, l);
