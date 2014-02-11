@@ -34,6 +34,7 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator 
 
     protected ConnectionCalculator inputFunction;
     protected Layer currentLayer;
+    protected int miniBatchSize;
 
     /**
      * Activation functions that are executed before the transfer function
@@ -78,7 +79,8 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator 
 		calculateBias(bias, valuesProvider);
 
 		// new input function is required
-		if (inputFunction == null || targetLayer != currentLayer) {
+		if (inputFunction == null || targetLayer != currentLayer || miniBatchSize != valuesProvider.getColumns()) {
+		    miniBatchSize = valuesProvider.getColumns();
 		    currentLayer = targetLayer;
 		    SortedMap<GraphConnections, Integer> map = new TreeMap<>();
 		    for (Connections c : notBias) {

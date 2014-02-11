@@ -127,6 +127,7 @@ public class ValuesProvider implements Serializable {
 	    set.remove(old);
 	}
 
+	setColumns(m.getColumns());
 	set.add(m);
     }
 
