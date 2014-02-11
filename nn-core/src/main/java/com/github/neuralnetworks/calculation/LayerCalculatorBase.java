@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
+import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.events.PropagationEvent;
 import com.github.neuralnetworks.events.PropagationEventListener;
 import com.github.neuralnetworks.util.Util;
@@ -22,7 +23,7 @@ public class LayerCalculatorBase implements Serializable {
     protected List<PropagationEventListener> listeners;
     protected Map<Layer, ConnectionCalculator> calculators;
 
-    protected void calculate(ValuesProvider valuesProvider, List<ConnectionCalculateCandidate> connections) {
+    protected void calculate(ValuesProvider valuesProvider, List<ConnectionCalculateCandidate> connections, NeuralNetwork nn) {
 	if (connections.size() > 0) {
 	    List<Connections> chunk = new ArrayList<>();
 
@@ -39,7 +40,7 @@ public class LayerCalculatorBase implements Serializable {
 
 		    chunk.clear();
 
-		    triggerEvent(new PropagationEvent(c.target, valuesProvider));
+		    triggerEvent(new PropagationEvent(c.target, chunk, nn, valuesProvider));
 		}
 	    }
 	}
@@ -85,6 +86,14 @@ public class LayerCalculatorBase implements Serializable {
 	if (listeners != null) {
 	    for (PropagationEventListener l : listeners) {
 		l.handleEvent(event);
+	    }
+	}
+
+	if (calculators != null) {
+	    for (ConnectionCalculator cc : calculators.values()) {
+		if (cc instanceof PropagationEventListener) {
+		    ((PropagationEventListener) cc).handleEvent(event);
+		}
 	    }
 	}
     }

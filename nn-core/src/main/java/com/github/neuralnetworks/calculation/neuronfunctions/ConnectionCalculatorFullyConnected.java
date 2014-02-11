@@ -10,6 +10,8 @@ import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.calculation.ValuesProvider;
+import com.github.neuralnetworks.events.PropagationEvent;
+import com.github.neuralnetworks.events.PropagationEventListener;
 import com.github.neuralnetworks.util.UniqueList;
 import com.github.neuralnetworks.util.Util;
 
@@ -28,7 +30,7 @@ import com.github.neuralnetworks.util.Util;
  * classify MNIST images, each column of the input matrix will represent single
  * MNIST image.
  */
-public class ConnectionCalculatorFullyConnected implements ConnectionCalculator {
+public class ConnectionCalculatorFullyConnected implements ConnectionCalculator, PropagationEventListener {
 
     private static final long serialVersionUID = -5405654469496055017L;
 
@@ -112,6 +114,25 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator 
 	    for (int i = 0; i < out.length; i++) {
 		GraphConnections gc = (GraphConnections) bias;
 		out[i] += gc.getConnectionGraph().getElements()[i / valuesProvider.getColumns()];
+	    }
+	}
+    }
+
+    @Override
+    public void handleEvent(PropagationEvent event) {
+	if (preTransferFunctions != null) {
+	    for (MatrixFunction f : preTransferFunctions) {
+		if (f instanceof PropagationEventListener) {
+		    ((PropagationEventListener) f).handleEvent(event);
+		}
+	    }
+	}
+
+	if (activationFunctions != null) {
+	    for (MatrixFunction f : activationFunctions) {
+		if (f instanceof PropagationEventListener) {
+		    ((PropagationEventListener) f).handleEvent(event);
+		}
 	    }
 	}
     }

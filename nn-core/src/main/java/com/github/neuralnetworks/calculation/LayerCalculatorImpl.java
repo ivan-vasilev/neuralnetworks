@@ -24,7 +24,7 @@ public class LayerCalculatorImpl extends LayerCalculatorBase implements LayerCal
     public void calculate(NeuralNetwork neuralNetwork, Layer layer, Set<Layer> calculatedLayers, ValuesProvider results) {
 	List<ConnectionCalculateCandidate> ccc = new ArrayList<ConnectionCalculateCandidate>();
 	orderConnections(neuralNetwork, layer, calculatedLayers, new UniqueList<Layer>(), ccc);
-	calculate(results, ccc);
+	calculate(results, ccc, neuralNetwork);
     }
 
     /**

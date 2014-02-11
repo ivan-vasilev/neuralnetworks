@@ -52,7 +52,7 @@ public class BackPropagationLayerCalculatorImpl extends LayerCalculatorBase impl
 	    }
 	}
 
-	calculate(results, connections);
+	calculate(results, connections, nn);
     }
 
     @Override
