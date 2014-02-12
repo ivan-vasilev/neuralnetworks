@@ -11,6 +11,7 @@ import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
 import com.github.neuralnetworks.architecture.ConvGridLayer;
 import com.github.neuralnetworks.architecture.GraphConnections;
+import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.architecture.Subsampling2DConnection;
@@ -54,6 +55,76 @@ public class CNNTest {
 	assertEquals(2, output.getFeatureMapColumns(), 0);
 	assertEquals(2, output.getFeatureMapRows(), 0);
 	assertEquals(3, output.getFilters(), 0);
+    }
+
+    @Test
+    public void testCNNConstruction() {
+	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 32, 32, 1 }, { 5, 5, 6 }, { 2, 2 }, { 5, 5, 16 }, { 2, 2 }, { 5, 5, 120 }, {84}, {10} }, true);
+	assertEquals(13, nn.getLayers().size(), 0);
+
+	ConvGridLayer l = (ConvGridLayer) nn.getInputLayer().getConnections().get(0).getOutputLayer();
+	assertEquals(28, l.getFeatureMapRows(), 0);
+	assertEquals(28, l.getFeatureMapColumns(), 0);
+	assertEquals(6, l.getFilters(), 0);
+
+	l = (ConvGridLayer) l.getConnections().get(2).getOutputLayer();
+	assertEquals(14, l.getFeatureMapRows(), 0);
+	assertEquals(14, l.getFeatureMapColumns(), 0);
+	assertEquals(6, l.getFilters(), 0);
+
+	l = (ConvGridLayer) l.getConnections().get(1).getOutputLayer();
+	assertEquals(10, l.getFeatureMapRows(), 0);
+	assertEquals(10, l.getFeatureMapColumns(), 0);
+	assertEquals(16, l.getFilters(), 0);
+
+	l = (ConvGridLayer) l.getConnections().get(2).getOutputLayer();
+	assertEquals(5, l.getFeatureMapRows(), 0);
+	assertEquals(5, l.getFeatureMapColumns(), 0);
+	assertEquals(16, l.getFilters(), 0);
+
+	l = (ConvGridLayer) l.getConnections().get(1).getOutputLayer();
+	assertEquals(1, l.getFeatureMapRows(), 0);
+	assertEquals(1, l.getFeatureMapColumns(), 0);
+	assertEquals(120, l.getFilters(), 0);
+
+	GraphConnections cg = (GraphConnections) l.getConnections().get(2);
+	assertEquals(84, cg.getConnectionGraph().getRows(), 0);
+
+	GraphConnections cg2 = (GraphConnections) cg.getOutputLayer().getConnections().get(2);
+	assertEquals(10, cg2.getConnectionGraph().getRows(), 0);
+    }
+
+    @Test
+    public void testCNNConstruction2() {
+	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 28, 28, 1 }, { 5, 5, 20 }, { 2, 2 }, { 5, 5, 50 }, { 2, 2 }, {500}, {10} }, true);
+	assertEquals(11, nn.getLayers().size(), 0);
+
+	ConvGridLayer l = (ConvGridLayer) nn.getInputLayer().getConnections().get(0).getOutputLayer();
+	assertEquals(24, l.getFeatureMapRows(), 0);
+	assertEquals(24, l.getFeatureMapColumns(), 0);
+	assertEquals(20, l.getFilters(), 0);
+
+	l = (ConvGridLayer) l.getConnections().get(2).getOutputLayer();
+	assertEquals(12, l.getFeatureMapRows(), 0);
+	assertEquals(12, l.getFeatureMapColumns(), 0);
+	assertEquals(20, l.getFilters(), 0);
+
+	l = (ConvGridLayer) l.getConnections().get(1).getOutputLayer();
+	assertEquals(8, l.getFeatureMapRows(), 0);
+	assertEquals(8, l.getFeatureMapColumns(), 0);
+	assertEquals(50, l.getFilters(), 0);
+
+	l = (ConvGridLayer) l.getConnections().get(2).getOutputLayer();
+	assertEquals(4, l.getFeatureMapRows(), 0);
+	assertEquals(4, l.getFeatureMapColumns(), 0);
+	assertEquals(50, l.getFilters(), 0);
+	assertEquals(50 * 4 * 4, l.getConnections().get(0).getOutputUnitCount(), 0);
+
+	Layer layer = l.getConnections().get(1).getOutputLayer();
+	assertEquals(500, layer.getConnections().get(0).getOutputUnitCount(), 0);
+
+	layer = layer.getConnections().get(2).getOutputLayer();
+	assertEquals(10, layer.getConnections().get(0).getOutputUnitCount(), 0);
     }
 
     @Test
@@ -303,43 +374,6 @@ public class CNNTest {
 	assertEquals(true, bpo.get(11, 1) == o.get(3, 1) / c.getSubsamplingRegionLength());
 	assertEquals(true, bpo.get(14, 1) == o.get(3, 1) / c.getSubsamplingRegionLength());
 	assertEquals(true, bpo.get(15, 1) == o.get(3, 1) / c.getSubsamplingRegionLength());
-    }
-
-    @Test
-    public void testCNNConstruction() {
-	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 32, 32, 1 }, { 5, 5, 6 }, { 2, 2 }, { 5, 5, 16 }, { 2, 2 }, { 5, 5, 120 }, {84}, {10} }, true);
-	assertEquals(13, nn.getLayers().size(), 0);
-
-	ConvGridLayer l = (ConvGridLayer) nn.getInputLayer().getConnections().get(0).getOutputLayer();
-	assertEquals(28, l.getFeatureMapRows(), 0);
-	assertEquals(28, l.getFeatureMapColumns(), 0);
-	assertEquals(6, l.getFilters(), 0);
-
-	l = (ConvGridLayer) l.getConnections().get(2).getOutputLayer();
-	assertEquals(14, l.getFeatureMapRows(), 0);
-	assertEquals(14, l.getFeatureMapColumns(), 0);
-	assertEquals(6, l.getFilters(), 0);
-
-	l = (ConvGridLayer) l.getConnections().get(1).getOutputLayer();
-	assertEquals(10, l.getFeatureMapRows(), 0);
-	assertEquals(10, l.getFeatureMapColumns(), 0);
-	assertEquals(16, l.getFilters(), 0);
-
-	l = (ConvGridLayer) l.getConnections().get(2).getOutputLayer();
-	assertEquals(5, l.getFeatureMapRows(), 0);
-	assertEquals(5, l.getFeatureMapColumns(), 0);
-	assertEquals(16, l.getFilters(), 0);
-
-	l = (ConvGridLayer) l.getConnections().get(1).getOutputLayer();
-	assertEquals(1, l.getFeatureMapRows(), 0);
-	assertEquals(1, l.getFeatureMapColumns(), 0);
-	assertEquals(120, l.getFilters(), 0);
-
-	GraphConnections cg = (GraphConnections) l.getConnections().get(2);
-	assertEquals(84, cg.getConnectionGraph().getRows(), 0);
-
-	GraphConnections cg2 = (GraphConnections) cg.getOutputLayer().getConnections().get(2);
-	assertEquals(10, cg2.getConnectionGraph().getRows(), 0);
     }
 
     @Test
