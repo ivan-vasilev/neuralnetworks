@@ -32,6 +32,7 @@ import com.github.neuralnetworks.training.random.MersenneTwisterRandomInitialize
 import com.github.neuralnetworks.training.rbm.AparapiCDTrainer;
 import com.github.neuralnetworks.training.rbm.DBNTrainer;
 import com.github.neuralnetworks.util.Environment;
+import com.github.neuralnetworks.util.KernelExecutionStrategy.CPUKernelExecution;
 import com.github.neuralnetworks.util.KernelExecutionStrategy.SeqKernelExecution;
 
 /**
@@ -101,18 +102,19 @@ public class IrisTest {
     /**
      * DBN testing
      */
-    @Ignore
     @Test
+    @Ignore
     public void testDBN() {
-	DBN dbn = NNFactory.dbn(new int[] {4, 8, 3}, true);
+	DBN dbn = NNFactory.dbn(new int[] {4, 16, 3}, true);
+	dbn.setLayerCalculator(NNFactory.lcSigmoid(dbn, null));
 
-	TrainingInputProvider trainInputProvider = new IrisInputProvider(1, 150000, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
+	TrainingInputProvider trainInputProvider = new IrisInputProvider(1, 15000, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
 	TrainingInputProvider testInputProvider = new IrisInputProvider(1, 150, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
 	MultipleNeuronsOutputError error = new MultipleNeuronsOutputError();
 
-	AparapiCDTrainer firstTrainer = TrainerFactory.cdSigmoidTrainer(dbn.getFirstNeuralNetwork(), null, null, null, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.001f, 0.5f, 0f, 1, true);
+	AparapiCDTrainer firstTrainer = TrainerFactory.cdSigmoidTrainer(dbn.getFirstNeuralNetwork(), null, null, null, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.01f, 0.5f, 0f, 1, true);
 	//AparapiCDTrainer secondTrainer = TrainerFactory.cdSigmoidTrainer(dbn.getNeuralNetwork(1), null, null, null, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.01f, 0.5f, 0f, 1, true);
-	AparapiCDTrainer lastTrainer = TrainerFactory.cdSigmoidTrainer(dbn.getLastNeuralNetwork(), null, null, null, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.001f, 0.5f, 0f, 1, true);
+	AparapiCDTrainer lastTrainer = TrainerFactory.cdSigmoidTrainer(dbn.getLastNeuralNetwork(), null, null, null, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.01f, 0.5f, 0f, 1, true);
 
 	Map<NeuralNetwork, OneStepTrainer<?>> map = new HashMap<>();
 	map.put(dbn.getFirstNeuralNetwork(), firstTrainer);
@@ -122,7 +124,7 @@ public class IrisTest {
 	DBNTrainer t = TrainerFactory.dbnTrainer(dbn, map, trainInputProvider, testInputProvider, error);
 	t.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
 
-	Environment.getInstance().setExecutionStrategy(new SeqKernelExecution());
+	Environment.getInstance().setExecutionStrategy(new CPUKernelExecution());
 
 	t.train();
 	t.test();

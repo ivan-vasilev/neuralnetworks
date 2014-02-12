@@ -9,6 +9,7 @@ import java.util.Map;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
+import com.github.neuralnetworks.calculation.LayerOrderStrategy.ConnectionCandidate;
 import com.github.neuralnetworks.events.PropagationEvent;
 import com.github.neuralnetworks.events.PropagationEventListener;
 import com.github.neuralnetworks.util.Util;
@@ -23,12 +24,12 @@ public class LayerCalculatorBase implements Serializable {
     protected List<PropagationEventListener> listeners;
     protected Map<Layer, ConnectionCalculator> calculators;
 
-    protected void calculate(ValuesProvider valuesProvider, List<ConnectionCalculateCandidate> connections, NeuralNetwork nn) {
+    protected void calculate(ValuesProvider valuesProvider, List<ConnectionCandidate> connections, NeuralNetwork nn) {
 	if (connections.size() > 0) {
 	    List<Connections> chunk = new ArrayList<>();
 
 	    for (int i = 0; i < connections.size(); i++) {
-		ConnectionCalculateCandidate c = connections.get(i);
+		ConnectionCandidate c = connections.get(i);
 		chunk.add(c.connection);
 
 		if (i == connections.size() - 1 || connections.get(i + 1).target != c.target) {
@@ -95,18 +96,6 @@ public class LayerCalculatorBase implements Serializable {
 		    ((PropagationEventListener) cc).handleEvent(event);
 		}
 	    }
-	}
-    }
-
-    public static class ConnectionCalculateCandidate {
-
-	public Connections connection;
-	public Layer target;
-
-	public ConnectionCalculateCandidate(Connections connection, Layer target) {
-	    super();
-	    this.connection = connection;
-	    this.target = target;
 	}
     }
 }
