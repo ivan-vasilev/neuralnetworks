@@ -11,7 +11,7 @@ import com.github.neuralnetworks.calculation.LayerOrderStrategy.ConnectionCandid
 import com.github.neuralnetworks.util.Util;
 
 /**
- * Random Initializer for neural networks
+ * Random Initializer for neural networks weights - all the connections between neurons are traversed and initialized
  */
 public class NNRandomInitializer implements Serializable {
 
