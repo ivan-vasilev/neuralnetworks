@@ -3,7 +3,9 @@ package com.github.neuralnetworks.test;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Test;
 
@@ -17,6 +19,7 @@ import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.architecture.Subsampling2DConnection;
 import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
+import com.github.neuralnetworks.calculation.LayerCalculatorImpl;
 import com.github.neuralnetworks.calculation.ValuesProvider;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiAveragePooling2D;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2D;
@@ -194,6 +197,45 @@ public class CNNTest {
 	assertEquals(224, o.get(0, 6), 0);
 	assertEquals(244, o.get(0, 7), 0);
 	Util.fillArray(o.getElements(), 0);
+    }
+
+    @Test
+    public void testSimpleCNN() {
+	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] {{3, 3, 2}, {2, 2, 2}, {2, 2}}, false);
+	nn.setLayerCalculator(NNFactory.lcWeightedSum(nn, null));
+	NNFactory.lcMaxPooling(nn, (LayerCalculatorImpl) nn.getLayerCalculator());
+
+	Conv2DConnection c = (Conv2DConnection) nn.getInputLayer().getConnections().get(0);
+	c.getWeights()[0] = 1;
+	c.getWeights()[1] = 2;
+	c.getWeights()[2] = 3;
+	c.getWeights()[3] = 4;
+	c.getWeights()[4] = 1;
+	c.getWeights()[5] = 2;
+	c.getWeights()[6] = 3;
+	c.getWeights()[7] = 4;
+	c.getWeights()[8] = 1;
+	c.getWeights()[9] = 2;
+	c.getWeights()[10] = 3;
+	c.getWeights()[11] = 4;
+	c.getWeights()[12] = 1;
+	c.getWeights()[13] = 2;
+	c.getWeights()[14] = 3;
+	c.getWeights()[15] = 4;
+
+	Matrix i1 = new Matrix(new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 }, 1);
+
+	ValuesProvider vp = new ValuesProvider();
+	vp.addValues(nn.getInputLayer(), i1);
+
+	Set<Layer> calculatedLayers = new HashSet<>();
+	calculatedLayers.add(nn.getInputLayer());
+	nn.getLayerCalculator().calculate(nn, nn.getOutputLayer(), calculatedLayers, vp);
+
+	Matrix o = vp.getValues(nn.getOutputLayer());
+
+	assertEquals(244, o.get(0, 0), 0);
+	assertEquals(244, o.get(1, 0), 0);
     }
 
     @Test
