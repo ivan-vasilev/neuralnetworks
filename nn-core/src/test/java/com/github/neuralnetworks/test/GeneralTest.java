@@ -11,6 +11,7 @@ import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.calculation.ValuesProvider;
+import com.github.neuralnetworks.calculation.neuronfunctions.SoftmaxFunction;
 import com.github.neuralnetworks.training.random.MersenneTwisterRandomInitializer;
 import com.github.neuralnetworks.training.random.NNRandomInitializer;
 import com.github.neuralnetworks.util.Util;
@@ -85,5 +86,26 @@ public class GeneralTest {
 		}
 	    }
 	}
+    }
+
+    @Test
+    public void testSoftMax() {
+	SoftmaxFunction sf = new SoftmaxFunction();
+	Matrix m = new Matrix(3, 2);
+	m.set(0, 0, 1);
+	m.set(1, 0, 2);
+	m.set(2, 0, 3);
+	m.set(0, 1, 4);
+	m.set(1, 1, 5);
+	m.set(2, 1, 6);
+
+	sf.value(m);
+
+	assertEquals(1 / 6f, m.get(0, 0), 0);
+	assertEquals(2 / 6f, m.get(1, 0), 0);
+	assertEquals(3 / 6f, m.get(2, 0), 0);
+	assertEquals(4 / 15f, m.get(0, 1), 0);
+	assertEquals(5 / 15f, m.get(1, 1), 0);
+	assertEquals(6 / 15f, m.get(2, 1), 0);
     }
 }
