@@ -1,14 +1,19 @@
 package com.github.neuralnetworks.test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.calculation.ValuesProvider;
+import com.github.neuralnetworks.training.random.MersenneTwisterRandomInitializer;
+import com.github.neuralnetworks.training.random.NNRandomInitializer;
+import com.github.neuralnetworks.util.Util;
 
 public class GeneralTest {
 
@@ -42,5 +47,26 @@ public class GeneralTest {
 	assertTrue(hm2 == vp.getValues(h, nn.getConnection(h, o)));
 	assertTrue(om == vp.getValues(o, 1));
 	assertTrue(om == vp.getValues(o));
+    }
+
+    @Test
+    public void testRandomInitializer() {
+	NeuralNetworkImpl nn = NNFactory.mlp(new int[] {3, 2}, true);
+	NNRandomInitializer rand = new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.1f, 0.1f), 0.5f);
+	rand.initialize(nn);
+
+	for (Layer l : nn.getLayers()) {
+	    if (Util.isBias(l)) {
+		GraphConnections gc = (GraphConnections) l.getConnections().get(0);
+		for (float v : gc.getConnectionGraph().getElements()) {
+		    assertEquals(0.5, v, 0f);
+		}
+	    } else {
+		GraphConnections gc = (GraphConnections) l.getConnections().get(0);
+		for (float v : gc.getConnectionGraph().getElements()) {
+		    assertTrue(v >= -0.1f && v <= 0.1f && v != 0);
+		}
+	    }
+	}
     }
 }
