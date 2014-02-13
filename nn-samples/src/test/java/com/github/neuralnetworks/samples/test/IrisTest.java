@@ -8,6 +8,7 @@ import java.util.Map;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.amd.aparapi.Kernel.EXECUTION_MODE;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.architecture.types.Autoencoder;
@@ -33,8 +34,6 @@ import com.github.neuralnetworks.training.random.NNRandomInitializer;
 import com.github.neuralnetworks.training.rbm.AparapiCDTrainer;
 import com.github.neuralnetworks.training.rbm.DBNTrainer;
 import com.github.neuralnetworks.util.Environment;
-import com.github.neuralnetworks.util.KernelExecutionStrategy.CPUKernelExecution;
-import com.github.neuralnetworks.util.KernelExecutionStrategy.SeqKernelExecution;
 
 /**
  * Iris test
@@ -60,7 +59,7 @@ public class IrisTest {
 	bpt.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
 
 	// execution mode
-	Environment.getInstance().setExecutionStrategy(new SeqKernelExecution());
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 
 	// train
 	bpt.train();
@@ -92,7 +91,7 @@ public class IrisTest {
 	AparapiCDTrainer t = TrainerFactory.cdSigmoidTrainer(rbm, trainInputProvider, testInputProvider, error, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.01f, 0.5f, 0f, 1, true);
 	t.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
 
-	Environment.getInstance().setExecutionStrategy(new SeqKernelExecution());
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 
 	t.train();
 	t.test();
@@ -125,7 +124,7 @@ public class IrisTest {
 	DBNTrainer t = TrainerFactory.dbnTrainer(dbn, map, trainInputProvider, testInputProvider, error);
 	t.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
 
-	Environment.getInstance().setExecutionStrategy(new CPUKernelExecution());
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.CPU);
 
 	t.train();
 	t.test();
@@ -150,7 +149,7 @@ public class IrisTest {
     	bae.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
 
     	// execution mode
-    	Environment.getInstance().setExecutionStrategy(new SeqKernelExecution());
+    	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 
     	bae.train();
 
@@ -191,7 +190,7 @@ public class IrisTest {
 	DNNLayerTrainer deepTrainer = TrainerFactory.dnnLayerTrainer(sae, map, trainInputProvider, testInputProvider, error);
 
 	// execution mode
-	Environment.getInstance().setExecutionStrategy(new SeqKernelExecution());
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 
 	// layerwise pre-training
 	deepTrainer.train();

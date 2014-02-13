@@ -21,13 +21,23 @@ public class XorTest {
      */
     @Test
     public void testMLPSigmoidBP() {
+	// create multi layer perceptron with one hidden layer and bias
 	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 2, 8, 1 }, true);
+
+	// create training and testing input providers
 	XorInputProvider trainingInput = new XorInputProvider(10000);
 	XorInputProvider testingInput = new XorInputProvider(4);
 
+	// create backpropagation trainer for the network
 	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(mlp, trainingInput, testingInput, new XorOutputError(), new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 1f, 0.5f, 0f);
+
+	// add logging
 	bpt.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
+
+	// train
 	bpt.train();
+
+	// test
 	bpt.test();
 
 	assertEquals(0, bpt.getOutputError().getTotalNetworkError(), 0.1);

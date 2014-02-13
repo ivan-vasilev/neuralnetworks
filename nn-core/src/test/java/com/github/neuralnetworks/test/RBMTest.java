@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import com.amd.aparapi.Kernel.EXECUTION_MODE;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.architecture.types.RBM;
@@ -15,7 +16,6 @@ import com.github.neuralnetworks.training.random.MersenneTwisterRandomInitialize
 import com.github.neuralnetworks.training.random.NNRandomInitializer;
 import com.github.neuralnetworks.training.rbm.AparapiCDTrainer;
 import com.github.neuralnetworks.util.Environment;
-import com.github.neuralnetworks.util.KernelExecutionStrategy.SeqKernelExecution;
 
 public class RBMTest {
 
@@ -138,7 +138,7 @@ public class RBMTest {
 	AparapiCDTrainer t = TrainerFactory.cdSigmoidTrainer(rbm, new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, null, 1, 1), null, null, null, 1f, 0f, 0f, 1, true);
 	t.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
 
-	Environment.getInstance().setExecutionStrategy(new SeqKernelExecution());
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 
 	t.train();
 
@@ -191,7 +191,7 @@ public class RBMTest {
 	AparapiCDTrainer t = TrainerFactory.cdSigmoidTrainer(rbm, trainInputProvider, testInputProvider, error, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.02f, 0.5f, 0f, 1, true);
 	t.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
 	
-	Environment.getInstance().setExecutionStrategy(new SeqKernelExecution());
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 	
 	t.train();
 	t.test();

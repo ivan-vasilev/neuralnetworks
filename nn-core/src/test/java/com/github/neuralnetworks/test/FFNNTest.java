@@ -9,6 +9,7 @@ import java.util.Set;
 
 import org.junit.Test;
 
+import com.amd.aparapi.Kernel.EXECUTION_MODE;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.FullyConnected;
 import com.github.neuralnetworks.architecture.Layer;
@@ -21,8 +22,6 @@ import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculato
 import com.github.neuralnetworks.training.TrainerFactory;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationTrainer;
 import com.github.neuralnetworks.util.Environment;
-import com.github.neuralnetworks.util.KernelExecutionStrategy.JTPKernelExecution;
-import com.github.neuralnetworks.util.KernelExecutionStrategy.SeqKernelExecution;
 import com.github.neuralnetworks.util.Util;
 
 /**
@@ -32,7 +31,7 @@ public class FFNNTest {
 
     @Test
     public void testWeightedSumFF() {
-	Environment.getInstance().setExecutionStrategy(new SeqKernelExecution());
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 	Matrix o = new Matrix(2, 2);
 
 	Layer il1 = new Layer();
@@ -352,7 +351,7 @@ public class FFNNTest {
 	ValuesProvider results = new ValuesProvider();
 	results.addValues(input, i);
 
-	Environment.getInstance().setExecutionStrategy(new JTPKernelExecution());
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 
 	mlp.getLayerCalculator().calculate(mlp, output, calculated, results);
 

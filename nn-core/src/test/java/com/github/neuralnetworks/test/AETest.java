@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.amd.aparapi.Kernel.EXECUTION_MODE;
 import com.github.neuralnetworks.architecture.types.Autoencoder;
 import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.input.MultipleNeuronsOutputError;
@@ -15,7 +16,6 @@ import com.github.neuralnetworks.training.events.LogTrainingListener;
 import com.github.neuralnetworks.training.random.MersenneTwisterRandomInitializer;
 import com.github.neuralnetworks.training.random.NNRandomInitializer;
 import com.github.neuralnetworks.util.Environment;
-import com.github.neuralnetworks.util.KernelExecutionStrategy.SeqKernelExecution;
 
 public class AETest {
     
@@ -34,7 +34,7 @@ public class AETest {
 
 	t.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName(), true, false));
 
-	Environment.getInstance().setExecutionStrategy(new SeqKernelExecution());
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 
 	t.train();
 	ae.removeLayer(ae.getOutputLayer());
@@ -59,7 +59,7 @@ public class AETest {
 	
 	t.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName(), true, false));
 	
-	Environment.getInstance().setExecutionStrategy(new SeqKernelExecution());
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 	
 	t.train();
 	ae.removeLayer(ae.getOutputLayer());

@@ -1,6 +1,10 @@
 package com.github.neuralnetworks.util;
 
+import com.amd.aparapi.Kernel.EXECUTION_MODE;
+import com.github.neuralnetworks.util.KernelExecutionStrategy.CPUKernelExecution;
 import com.github.neuralnetworks.util.KernelExecutionStrategy.DefaultKernelExecution;
+import com.github.neuralnetworks.util.KernelExecutionStrategy.JTPKernelExecution;
+import com.github.neuralnetworks.util.KernelExecutionStrategy.SeqKernelExecution;
 
 /**
  * Singleton for environment variables (can be used for debugging)
@@ -25,11 +29,23 @@ public class Environment {
     }
 
     public KernelExecutionStrategy getExecutionStrategy() {
-        return executionStrategy;
+	return executionStrategy;
     }
 
-    public void setExecutionStrategy(KernelExecutionStrategy executionStrategy) {
-        this.executionStrategy = executionStrategy;
+    public void setExecutionMode(EXECUTION_MODE executionMode) {
+	switch (executionMode) {
+	case CPU:
+	    this.executionStrategy = new CPUKernelExecution();
+	    break;
+	case SEQ:
+	    this.executionStrategy = new SeqKernelExecution();
+	    break;
+	case JTP:
+	    this.executionStrategy = new JTPKernelExecution();
+	    break;
+	default:
+	    this.executionStrategy = new DefaultKernelExecution();
+	}
     }
 
     public static Environment getInstance() {
@@ -37,10 +53,10 @@ public class Environment {
     }
 
     public boolean isDebug() {
-        return debug;
+	return debug;
     }
 
     public void setDebug(boolean debug) {
-        this.debug = debug;
+	this.debug = debug;
     }
 }

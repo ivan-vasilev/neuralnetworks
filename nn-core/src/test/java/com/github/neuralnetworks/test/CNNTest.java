@@ -9,6 +9,7 @@ import java.util.Set;
 
 import org.junit.Test;
 
+import com.amd.aparapi.Kernel.EXECUTION_MODE;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
 import com.github.neuralnetworks.architecture.ConvGridLayer;
@@ -31,7 +32,6 @@ import com.github.neuralnetworks.training.backpropagation.BackPropagationTrainer
 import com.github.neuralnetworks.training.backpropagation.BackpropagationAveragePooling2D;
 import com.github.neuralnetworks.training.backpropagation.BackpropagationMaxPooling2D;
 import com.github.neuralnetworks.util.Environment;
-import com.github.neuralnetworks.util.KernelExecutionStrategy.SeqKernelExecution;
 import com.github.neuralnetworks.util.Util;
 
 /**
@@ -370,7 +370,7 @@ public class CNNTest {
 
     @Test
     public void testAveragePoolingBackpropagation() {
-	Environment.getInstance().setExecutionStrategy(new SeqKernelExecution());
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 	Subsampling2DConnection c = new Subsampling2DConnection(new ConvGridLayer(4, 4, 2), 2, 2);
 	Matrix a1 = new Matrix(new float[] { 0.5f, 1, 1, 2, 1.5f, 3, 2, 4, 2.5f, 5, 3, 6, 3.5f, 7, 4f, 8, 4.5f, 9, 5f, 10, 5.5f, 11, 6f, 12, 6.5f, 13, 7f, 14, 8f, 16, 7.5f, 15, 8.5f, 17, 9f, 18, 9.5f, 19, 10f, 20, 10.5f, 21, 11f, 22, 11.5f, 23, 12f, 24, 12.5f, 25, 13f, 26, 13.5f, 27, 14f, 28, 14.5f, 29, 15f, 30, 16f, 32, 15.5f, 31 }, 2);
 
@@ -420,7 +420,7 @@ public class CNNTest {
 
     @Test
     public void testCNNBackpropagation() {
-	Environment.getInstance().setExecutionStrategy(new SeqKernelExecution());
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 
 	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 3, 3, 2 }, { 2, 2, 1 } }, true);
 	nn.setLayerCalculator(NNFactory.lcSigmoid(nn, null));

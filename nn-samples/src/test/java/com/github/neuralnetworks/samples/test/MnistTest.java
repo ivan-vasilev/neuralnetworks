@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.amd.aparapi.Kernel.EXECUTION_MODE;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.architecture.types.RBM;
@@ -19,7 +20,6 @@ import com.github.neuralnetworks.training.random.MersenneTwisterRandomInitialize
 import com.github.neuralnetworks.training.random.NNRandomInitializer;
 import com.github.neuralnetworks.training.rbm.AparapiCDTrainer;
 import com.github.neuralnetworks.util.Environment;
-import com.github.neuralnetworks.util.KernelExecutionStrategy.CPUKernelExecution;
 
 /**
  * MNIST test
@@ -43,7 +43,7 @@ public class MnistTest {
 
 	bpt.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName(), false, true));
 
-	Environment.getInstance().setExecutionStrategy(new CPUKernelExecution());
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.CPU);
 
 	bpt.train();
 	bpt.test();
@@ -61,7 +61,7 @@ public class MnistTest {
 	AparapiCDTrainer t = TrainerFactory.cdSigmoidTrainer(rbm, trainInputProvider, testInputProvider,  new MultipleNeuronsOutputError(), new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.01f, 0.5f, 0f, 1, false);
 
 	t.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName(), false, true));
-	Environment.getInstance().setExecutionStrategy(new CPUKernelExecution());
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.CPU);
 	t.train();
 	t.test();
 
