@@ -22,7 +22,7 @@ public class LayerCalculatorBase implements Serializable {
     private static final long serialVersionUID = 1L;
 
     protected List<PropagationEventListener> listeners;
-    protected Map<Layer, ConnectionCalculator> calculators;
+    protected Map<Layer, ConnectionCalculator> calculators = new HashMap<>();
 
     protected void calculate(ValuesProvider valuesProvider, List<ConnectionCandidate> connections, NeuralNetwork nn) {
 	if (connections.size() > 0) {
@@ -48,25 +48,15 @@ public class LayerCalculatorBase implements Serializable {
     }
 
     public void addConnectionCalculator(Layer layer, ConnectionCalculator calculator) {
-	if (calculators == null) {
-	    calculators = new HashMap<>();
-	}
-
 	calculators.put(layer, calculator);
     }
 
     public ConnectionCalculator getConnectionCalculator(Layer layer) {
-	if (calculators != null) {
-	    return calculators.get(layer);
-	}
-
-	return null;
+	return calculators.get(layer);
     }
 
     public void removeConnectionCalculator(Layer layer) {
-	if (calculators != null) {
-	    calculators.remove(layer);
-	}
+	calculators.remove(layer);
     }
 
     public void addEventListener(PropagationEventListener listener) {

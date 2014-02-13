@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import com.github.neuralnetworks.architecture.Connections;
-import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.calculation.OutputError;
@@ -15,7 +13,7 @@ import com.github.neuralnetworks.events.TrainingEventListener;
 import com.github.neuralnetworks.training.events.MiniBatchFinishedEvent;
 import com.github.neuralnetworks.training.events.TestingFinishedEvent;
 import com.github.neuralnetworks.training.events.TestingStartedEvent;
-import com.github.neuralnetworks.training.random.RandomInitializer;
+import com.github.neuralnetworks.training.random.NNRandomInitializer;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
 import com.github.neuralnetworks.util.UniqueList;
@@ -122,11 +120,11 @@ public abstract class Trainer<N extends NeuralNetwork> {
 	properties.setParameter(Constants.OUTPUT_ERROR, outputError);
     }
     
-    public RandomInitializer getRandomInitializer() {
+    public NNRandomInitializer getRandomInitializer() {
 	return properties.getParameter(Constants.RANDOM_INITIALIZER);
     }
     
-    public void setRandomInitializer(RandomInitializer randomInitializer) {
+    public void setRandomInitializer(NNRandomInitializer randomInitializer) {
 	properties.setParameter(Constants.RANDOM_INITIALIZER, randomInitializer);
     }
 
@@ -155,20 +153,5 @@ public abstract class Trainer<N extends NeuralNetwork> {
 
     protected boolean stopTraining(int index) {
 	return index >= getTestingInputProvider().getInputSize();
-    }
-
-    /**
-     * Random initialization of weights
-     */
-    protected void initializeWithRandom() {
-	if (getRandomInitializer() != null) {
-	    N nn = getNeuralNetwork();
-	    RandomInitializer r = getRandomInitializer();
-	    for (Connections c : nn.getConnections()) {
-		if (c instanceof GraphConnections) {
-		    r.initialize(((GraphConnections) c).getConnectionGraph().getElements());
-		}
-	    }
-	}
     }
 }

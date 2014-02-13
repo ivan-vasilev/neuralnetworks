@@ -43,7 +43,7 @@ import com.github.neuralnetworks.training.backpropagation.BackPropagationTrainer
 import com.github.neuralnetworks.training.backpropagation.BackpropagationAveragePooling2D;
 import com.github.neuralnetworks.training.backpropagation.BackpropagationMaxPooling2D;
 import com.github.neuralnetworks.training.backpropagation.MSEDerivative;
-import com.github.neuralnetworks.training.random.RandomInitializer;
+import com.github.neuralnetworks.training.random.NNRandomInitializer;
 import com.github.neuralnetworks.training.rbm.AparapiCDTrainer;
 import com.github.neuralnetworks.training.rbm.DBNTrainer;
 import com.github.neuralnetworks.util.Constants;
@@ -69,7 +69,7 @@ public class TrainerFactory {
      * @param weightDecay
      * @return
      */
-    public static BackPropagationTrainer<?> backPropagation(NeuralNetworkImpl nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay) {
+    public static BackPropagationTrainer<?> backPropagation(NeuralNetworkImpl nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, NNRandomInitializer rand, float learningRate, float momentum, float weightDecay) {
 	BackPropagationTrainer<?> t = new BackPropagationTrainer<NeuralNetwork>(backpropProperties(nn, trainingSet, testingSet, error, rand, learningRate, momentum, weightDecay));
 
 	BackPropagationLayerCalculatorImpl bplc = bplc(nn, t.getProperties());
@@ -138,7 +138,7 @@ public class TrainerFactory {
 	return result;
     }
 
-    public static BackPropagationAutoencoder backPropagationAutoencoder(NeuralNetworkImpl nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay, float inputCorruptionRate) {
+    public static BackPropagationAutoencoder backPropagationAutoencoder(NeuralNetworkImpl nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, NNRandomInitializer rand, float learningRate, float momentum, float weightDecay, float inputCorruptionRate) {
 	BackPropagationAutoencoder t = new BackPropagationAutoencoder(backpropProperties(nn, trainingSet, testingSet, error, rand, learningRate, momentum, weightDecay));
 
 	BackPropagationLayerCalculatorImpl bplc = bplc(nn, t.getProperties());
@@ -147,7 +147,7 @@ public class TrainerFactory {
 	return t;
     }
 
-    protected static Properties backpropProperties(NeuralNetwork nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay) {
+    protected static Properties backpropProperties(NeuralNetwork nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, NNRandomInitializer rand, float learningRate, float momentum, float weightDecay) {
 	Properties p = new Properties();
 	p.setParameter(Constants.NEURAL_NETWORK, nn);
 	p.setParameter(Constants.TRAINING_INPUT_PROVIDER, trainingSet);
@@ -162,7 +162,7 @@ public class TrainerFactory {
 	return p;
     }
 
-    public static AparapiCDTrainer cdSoftReLUTrainer(RBM rbm, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay, int gibbsSampling, boolean isPersistentCD) {
+    public static AparapiCDTrainer cdSoftReLUTrainer(RBM rbm, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, NNRandomInitializer rand, float learningRate, float momentum, float weightDecay, int gibbsSampling, boolean isPersistentCD) {
 	rbm.setLayerCalculator(NNFactory.rbmSoftReluSoftRelu(rbm));
 
 	RBMLayerCalculator lc = NNFactory.rbmSigmoidSigmoid(rbm);
@@ -172,7 +172,7 @@ public class TrainerFactory {
 	return new AparapiCDTrainer(rbmProperties(rbm, lc, trainingSet, testingSet, error, rand, learningRate, momentum, weightDecay, gibbsSampling, isPersistentCD));
     }
 
-    public static AparapiCDTrainer cdSigmoidTrainer(RBM rbm, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay, int gibbsSampling, boolean isPersistentCD) {
+    public static AparapiCDTrainer cdSigmoidTrainer(RBM rbm, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, NNRandomInitializer rand, float learningRate, float momentum, float weightDecay, int gibbsSampling, boolean isPersistentCD) {
 	rbm.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
 
 	RBMLayerCalculator lc = NNFactory.rbmSigmoidSigmoid(rbm);
@@ -182,7 +182,7 @@ public class TrainerFactory {
 	return new AparapiCDTrainer(rbmProperties(rbm, lc, trainingSet, testingSet, error, rand, learningRate, momentum, weightDecay, gibbsSampling, isPersistentCD));
     }
 
-    protected static Properties rbmProperties(RBM rbm, RBMLayerCalculator lc, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, RandomInitializer rand, float learningRate, float momentum, float weightDecay, int gibbsSampling, boolean resetRBM) {
+    protected static Properties rbmProperties(RBM rbm, RBMLayerCalculator lc, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, NNRandomInitializer rand, float learningRate, float momentum, float weightDecay, int gibbsSampling, boolean resetRBM) {
 	Properties p = new Properties();
 	p.setParameter(Constants.NEURAL_NETWORK, rbm);
 	p.setParameter(Constants.TRAINING_INPUT_PROVIDER, trainingSet);

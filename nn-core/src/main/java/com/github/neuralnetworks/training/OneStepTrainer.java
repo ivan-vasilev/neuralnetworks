@@ -25,7 +25,9 @@ public abstract class OneStepTrainer<N extends NeuralNetwork> extends Trainer<N>
     public void train() {
 	triggerEvent(new TrainingStartedEvent(this));
 
-	initializeWithRandom();
+	if (getRandomInitializer() != null) {
+	    getRandomInitializer().initialize(getNeuralNetwork());;
+	}
 
 	getTrainingInputProvider().reset();
 

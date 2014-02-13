@@ -12,6 +12,7 @@ import com.github.neuralnetworks.input.MultipleNeuronsOutputError;
 import com.github.neuralnetworks.training.TrainerFactory;
 import com.github.neuralnetworks.training.TrainingInputProvider;
 import com.github.neuralnetworks.training.random.MersenneTwisterRandomInitializer;
+import com.github.neuralnetworks.training.random.NNRandomInitializer;
 import com.github.neuralnetworks.training.rbm.AparapiCDTrainer;
 import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.KernelExecutionStrategy.SeqKernelExecution;
@@ -167,7 +168,7 @@ public class RBMTest {
 	TrainingInputProvider testInputProvider =  new SimpleInputProvider(new float[][] {{1, 1, 1, 0, 0, 0}, {1, 0, 1, 0, 0, 0}, {0, 1, 1, 1, 0, 0}, {0, 0, 0, 1, 1, 1}, {0, 0, 1, 1, 1, 0}, {0, 0, 0, 1, 0, 1} }, new float[][] {{1, 0}, {1, 0}, {1, 0}, {0, 1}, {0, 1}, {0, 1} }, 6, 1);
 	MultipleNeuronsOutputError error = new MultipleNeuronsOutputError();
 
-	AparapiCDTrainer t = TrainerFactory.cdSigmoidTrainer(rbm, trainInputProvider, testInputProvider, error, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.02f, 0.5f, 0f, 1, false);
+	AparapiCDTrainer t = TrainerFactory.cdSigmoidTrainer(rbm, trainInputProvider, testInputProvider, error, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.02f, 0.5f, 0f, 1, false);
 	t.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
 
 	t.train();
@@ -187,7 +188,7 @@ public class RBMTest {
 	TrainingInputProvider testInputProvider =  new SimpleInputProvider(new float[][] {{1, 1, 1, 0, 0, 0}, {1, 0, 1, 0, 0, 0}, {0, 1, 1, 1, 0, 0}, {0, 0, 0, 1, 1, 1}, {0, 0, 1, 1, 1, 0}, {0, 0, 0, 1, 0, 1} }, new float[][] {{1, 0}, {1, 0}, {1, 0}, {0, 1}, {0, 1}, {0, 1} }, 6, 1);
 	MultipleNeuronsOutputError error = new MultipleNeuronsOutputError();
 	
-	AparapiCDTrainer t = TrainerFactory.cdSigmoidTrainer(rbm, trainInputProvider, testInputProvider, error, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.02f, 0.5f, 0f, 1, true);
+	AparapiCDTrainer t = TrainerFactory.cdSigmoidTrainer(rbm, trainInputProvider, testInputProvider, error, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.02f, 0.5f, 0f, 1, true);
 	t.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
 	
 	Environment.getInstance().setExecutionStrategy(new SeqKernelExecution());
