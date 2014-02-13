@@ -4,7 +4,8 @@ Deep Neural Networks with GPU support
 This is a Java implementation of some of the algorithms for training deep neural networks. GPU support is provided via the OpenCL and Aparapi.
 The architecture is designed with modularity, extensibility and pluggability in mind.
 Supported networks are Multi Layer Perceptron, Autoencoders, Restricted Boltzmann Machines, Convolutional (and subsampling) networks, Stacked Autoencoders, Deep Belief Nets.
-To build this project you need gradle (http://www.gradle.org/) or maven (http://maven.apache.org/, to be deprecated).
+To build this project you need gradle (http://www.gradle.org/) or maven (http://maven.apache.org/, to be deprecated). 
+The latest jar file (with bundled dependencies and sources) is located under /build/libs/neuralnetworks-snapshot.jar.
 
 There are two projects:
 - nn-core - the full implementation is here.

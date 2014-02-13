@@ -20,6 +20,13 @@ public class NNRandomInitializer implements Serializable {
     protected RandomInitializer randomInitializer;
 
     /**
+     * Random initializer for bias weights. If null, the default
+     * randomInitializer will be used. if biasDefaultValue != null
+     * biasDefaultValue has preference
+     */
+    protected RandomInitializer biasRandomInitializer;
+
+    /**
      * If this is != null all bias weights are initialized with this value
      */
     protected Float biasDefaultValue;
@@ -33,6 +40,12 @@ public class NNRandomInitializer implements Serializable {
 	this.randomInitializer = randomInitializer;
     }
 
+    public NNRandomInitializer(RandomInitializer randomInitializer, RandomInitializer biasRandomInitializer) {
+	super();
+	this.randomInitializer = randomInitializer;
+	this.biasRandomInitializer = biasRandomInitializer;
+    }
+
     public NNRandomInitializer(RandomInitializer randomInitializer, Float biasDefaultValue) {
 	super();
 	this.randomInitializer = randomInitializer;
@@ -44,19 +57,30 @@ public class NNRandomInitializer implements Serializable {
 	for (ConnectionCandidate cc : ccs) {
 	    if (cc.connection instanceof GraphConnections) {
 		GraphConnections fc = (GraphConnections) cc.connection;
-		if (biasDefaultValue != null && Util.isBias(fc.getInputLayer())) {
-		    Util.fillArray(fc.getConnectionGraph().getElements(), biasDefaultValue);
+		if (Util.isBias(fc.getInputLayer())) {
+		    if (biasDefaultValue != null) {
+			Util.fillArray(fc.getConnectionGraph().getElements(), biasDefaultValue);
+		    } else if (biasRandomInitializer != null) {
+			biasRandomInitializer.initialize(fc.getConnectionGraph().getElements());
+		    } else {
+			randomInitializer.initialize(fc.getConnectionGraph().getElements());
+		    }
 		} else {
 		    randomInitializer.initialize(fc.getConnectionGraph().getElements());
 		}
 	    } else if (cc.connection instanceof Conv2DConnection) {
 		Conv2DConnection c = (Conv2DConnection) cc.connection;
-		if (biasDefaultValue != null && Util.isBias(c.getInputLayer())) {
-		    Util.fillArray(c.getWeights(), biasDefaultValue);
+		if (Util.isBias(c.getInputLayer())) {
+		    if (biasDefaultValue != null) {
+			Util.fillArray(c.getWeights(), biasDefaultValue);
+		    } else if (biasRandomInitializer != null) {
+			biasRandomInitializer.initialize(c.getWeights());
+		    } else {
+			randomInitializer.initialize(c.getWeights());
+		    }
 		} else {
 		    randomInitializer.initialize(c.getWeights());
 		}
-		
 	    }
 	}
     }
@@ -67,6 +91,14 @@ public class NNRandomInitializer implements Serializable {
 
     public void setRandomInitializer(RandomInitializer randomInitializer) {
 	this.randomInitializer = randomInitializer;
+    }
+
+    public RandomInitializer getBiasRandomInitializer() {
+	return biasRandomInitializer;
+    }
+
+    public void setBiasRandomInitializer(RandomInitializer biasRandomInitializer) {
+	this.biasRandomInitializer = biasRandomInitializer;
     }
 
     public Float getBiasDefaultValue() {
