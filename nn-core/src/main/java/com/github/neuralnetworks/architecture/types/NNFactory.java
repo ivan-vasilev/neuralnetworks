@@ -248,27 +248,42 @@ public class NNFactory {
 	return lc;
     }
 
-    public static void lcMaxPooling(NeuralNetworkImpl nn, LayerCalculatorImpl lc) {
-	for (Layer l : nn.getLayers()) {
-	    if (Util.isSubsampling(l)) {
-		lc.addConnectionCalculator(l, new AparapiMaxPooling2D());
+    public static void lcMaxPooling(NeuralNetworkImpl nn) {
+	if (nn.getLayerCalculator() instanceof LayerCalculatorImpl) {
+	    LayerCalculatorImpl lc = (LayerCalculatorImpl) nn.getLayerCalculator();
+	    for (Layer l : nn.getLayers()) {
+		if (Util.isSubsampling(l)) {
+		    lc.addConnectionCalculator(l, new AparapiMaxPooling2D());
+		}
 	    }
+	} else {
+	    throw new IllegalArgumentException("LayerCalculator type not supported");
 	}
     }
     
-    public static void lcAveragePooling(NeuralNetworkImpl nn, LayerCalculatorImpl lc) {
-	for (Layer l : nn.getLayers()) {
-	    if (Util.isSubsampling(l)) {
-		lc.addConnectionCalculator(l, new AparapiAveragePooling2D());
+    public static void lcAveragePooling(NeuralNetworkImpl nn) {
+	if (nn.getLayerCalculator() instanceof LayerCalculatorImpl) {
+	    LayerCalculatorImpl lc = (LayerCalculatorImpl) nn.getLayerCalculator();
+	    for (Layer l : nn.getLayers()) {
+		if (Util.isSubsampling(l)) {
+		    lc.addConnectionCalculator(l, new AparapiAveragePooling2D());
+		}
 	    }
+	} else {
+	    throw new IllegalArgumentException("LayerCalculator type not supported");
 	}
     }
     
-    public static void lcStochasticPooling(NeuralNetworkImpl nn, LayerCalculatorImpl lc) {
-	for (Layer l : nn.getLayers()) {
-	    if (Util.isSubsampling(l)) {
-		lc.addConnectionCalculator(l, new AparapiStochasticPooling2D());
+    public static void lcStochasticPooling(NeuralNetworkImpl nn) {
+	if (nn.getLayerCalculator() instanceof LayerCalculatorImpl) {
+	    LayerCalculatorImpl lc = (LayerCalculatorImpl) nn.getLayerCalculator();
+	    for (Layer l : nn.getLayers()) {
+		if (Util.isSubsampling(l)) {
+		    lc.addConnectionCalculator(l, new AparapiStochasticPooling2D());
+		}
 	    }
+	} else {
+	    throw new IllegalArgumentException("LayerCalculator type not supported");
 	}
     }
 

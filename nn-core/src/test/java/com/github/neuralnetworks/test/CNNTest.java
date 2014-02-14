@@ -1,6 +1,7 @@
 package com.github.neuralnetworks.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -27,10 +28,16 @@ import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2D;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2DFF;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiMaxPooling2D;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiStochasticPooling2D;
+import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculatorConv;
+import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculatorFullyConnected;
 import com.github.neuralnetworks.training.TrainerFactory;
+import com.github.neuralnetworks.training.backpropagation.BackPropagationConv2DSigmoid;
+import com.github.neuralnetworks.training.backpropagation.BackPropagationLayerCalculatorImpl;
+import com.github.neuralnetworks.training.backpropagation.BackPropagationSigmoid;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationTrainer;
 import com.github.neuralnetworks.training.backpropagation.BackpropagationAveragePooling2D;
 import com.github.neuralnetworks.training.backpropagation.BackpropagationMaxPooling2D;
+import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.Util;
 
@@ -131,6 +138,69 @@ public class CNNTest {
     }
 
     @Test
+    public void testCNNLayerCalculatorConstruction() {
+	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 28, 28, 1 }, { 5, 5, 20 }, { 2, 2 }, { 5, 5, 50 }, { 2, 2 }, {500}, {10} }, true);
+	nn.setLayerCalculator(NNFactory.lcSigmoid(nn, null));
+	NNFactory.lcMaxPooling(nn);
+
+	// feedforwad cc
+	LayerCalculatorImpl lc = (LayerCalculatorImpl) nn.getLayerCalculator();
+
+	Layer l = nn.getInputLayer();
+
+	assertTrue(lc.getConnectionCalculator(l) instanceof ConnectionCalculatorConv);
+
+	l = l.getConnections().get(0).getOutputLayer();
+	assertTrue(lc.getConnectionCalculator(l) instanceof ConnectionCalculatorConv);
+
+	l = l.getConnections().get(2).getOutputLayer();
+	assertTrue(lc.getConnectionCalculator(l) instanceof AparapiMaxPooling2D);
+
+	l = l.getConnections().get(1).getOutputLayer();
+	assertTrue(lc.getConnectionCalculator(l) instanceof ConnectionCalculatorConv);
+
+	l = l.getConnections().get(2).getOutputLayer();
+	assertTrue(lc.getConnectionCalculator(l) instanceof AparapiMaxPooling2D);
+
+	l = l.getConnections().get(1).getOutputLayer();
+	assertTrue(lc.getConnectionCalculator(l) instanceof ConnectionCalculatorFullyConnected);
+
+	l = l.getConnections().get(2).getOutputLayer();
+	assertTrue(lc.getConnectionCalculator(l) instanceof ConnectionCalculatorFullyConnected);
+
+	// backpropagation cc
+	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(nn, null, null, null, null, 0.01f, 0.5f, 0f);
+	BackPropagationLayerCalculatorImpl bplc = (BackPropagationLayerCalculatorImpl) bpt.getProperties().get(Constants.BACKPROPAGATION);
+
+	l = nn.getInputLayer();
+	assertTrue(bplc.getConnectionCalculator(l) instanceof BackPropagationConv2DSigmoid);
+
+	l = l.getConnections().get(0).getOutputLayer();
+	assertTrue(bplc.getConnectionCalculator(l) instanceof BackPropagationConv2DSigmoid);
+
+	// bias
+	assertTrue(bplc.getConnectionCalculator(l.getConnections().get(1).getInputLayer()) instanceof BackPropagationConv2DSigmoid);
+
+	l = l.getConnections().get(2).getOutputLayer();
+	assertTrue(bplc.getConnectionCalculator(l) instanceof BackpropagationMaxPooling2D);
+
+	l = l.getConnections().get(1).getOutputLayer();
+	assertTrue(bplc.getConnectionCalculator(l) instanceof BackPropagationConv2DSigmoid);
+	assertTrue(bplc.getConnectionCalculator(l.getConnections().get(1).getInputLayer()) instanceof BackPropagationConv2DSigmoid);
+
+	l = l.getConnections().get(2).getOutputLayer();
+	assertTrue(bplc.getConnectionCalculator(l) instanceof BackpropagationMaxPooling2D);
+
+	l = l.getConnections().get(1).getOutputLayer();
+	assertTrue(bplc.getConnectionCalculator(l.getConnections().get(1).getInputLayer()) instanceof BackPropagationSigmoid);
+	assertTrue(bplc.getConnectionCalculator(l) instanceof BackPropagationSigmoid);
+
+	l = l.getConnections().get(2).getOutputLayer();
+	assertTrue(bplc.getConnectionCalculator(l.getConnections().get(1).getInputLayer()) instanceof BackPropagationSigmoid);
+	assertTrue(bplc.getConnectionCalculator(l) == null);
+    }
+
+    @Test
     public void testConvolutions() {
 	NeuralNetworkImpl nn = new NeuralNetworkImpl();
 	Conv2DConnection c = new Conv2DConnection(new ConvGridLayer(3, 3, 2), 2, 2, 1);
@@ -203,7 +273,7 @@ public class CNNTest {
     public void testSimpleCNN() {
 	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] {{3, 3, 2}, {2, 2, 2}, {2, 2}}, false);
 	nn.setLayerCalculator(NNFactory.lcWeightedSum(nn, null));
-	NNFactory.lcMaxPooling(nn, (LayerCalculatorImpl) nn.getLayerCalculator());
+	NNFactory.lcMaxPooling(nn);
 
 	Conv2DConnection c = (Conv2DConnection) nn.getInputLayer().getConnections().get(0);
 	c.getWeights()[0] = 1;

@@ -36,19 +36,10 @@ public class BackPropagationLayerCalculatorImpl extends LayerCalculatorBase impl
     @Override
     public ConnectionCalculator getConnectionCalculator(Layer layer) {
 	ConnectionCalculator cc = super.getConnectionCalculator(layer);
-	if (cc != null) {
+	if (cc instanceof BackPropagationConnectionCalculatorImpl) {
 	    ((BackPropagationConnectionCalculatorImpl) cc).setActivations(activations);
 	}
 
 	return cc;
-    }
-
-    @Override
-    public void addConnectionCalculator(Layer layer, ConnectionCalculator calculator) {
-	if (!(calculator instanceof BackPropagationConnectionCalculatorImpl)) {
-	    throw new IllegalArgumentException("Only BackPropagationConnectionCalculator is allowed");
-	}
-
-	super.addConnectionCalculator(layer, calculator);
     }
 }
