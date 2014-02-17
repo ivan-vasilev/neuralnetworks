@@ -50,6 +50,7 @@ public class MnistTest {
 	assertEquals(0, bpt.getOutputError().getTotalNetworkError(), 0.1);
     }
 
+    @Ignore
     @Test
     public void testRBM() {
 	RBM rbm = NNFactory.rbm(784, 10, false);
@@ -66,5 +67,26 @@ public class MnistTest {
 	t.test();
 
 	assertEquals(0, t.getOutputError().getTotalNetworkError(), 0.1);
+    }
+
+    @Test
+    public void testLeNet() {
+	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 28, 28, 1 }, { 5, 5, 20 }, { 2, 2 }, { 5, 5, 50 }, { 2, 2 }, {500}, {10} }, true);
+	nn.setLayerCalculator(NNFactory.lcSigmoid(nn, null));
+	NNFactory.lcMaxPooling(nn);
+
+	MnistInputProvider trainInputProvider = new MnistInputProvider("train-images.idx3-ubyte", "train-labels.idx1-ubyte", 1, new MnistTargetMultiNeuronOutputConverter());
+	trainInputProvider.addInputModifier(new ScalingInputFunction(255));
+	MnistInputProvider testInputProvider = new MnistInputProvider("t10k-images.idx3-ubyte", "t10k-labels.idx1-ubyte", 1000, new MnistTargetMultiNeuronOutputConverter());
+	testInputProvider.addInputModifier(new ScalingInputFunction(255));
+
+	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(nn, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.5f), 0.01f, 0.5f, 0f);
+
+	bpt.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName(), false, true));
+
+	bpt.train();
+	bpt.test();
+
+	assertEquals(0, bpt.getOutputError().getTotalNetworkError(), 0.1);
     }
 }

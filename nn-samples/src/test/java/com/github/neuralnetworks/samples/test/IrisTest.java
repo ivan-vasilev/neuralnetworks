@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.amd.aparapi.Kernel.EXECUTION_MODE;
@@ -40,9 +39,6 @@ import com.github.neuralnetworks.util.Environment;
  */
 public class IrisTest {
 
-    /**
-     * Simple iris backpropagation test
-     */
     @Test
     public void testMLPSigmoidBP() {
 	// create the network
@@ -78,58 +74,78 @@ public class IrisTest {
     /**
      * Contrastive Divergence testing
      */
-    @Ignore
     @Test
     public void testRBMCDSigmoidBP() {
 	// RBM with 4 visible and 3 hidden units
 	RBM rbm = NNFactory.rbm(4, 3, true);
 
+	// training and testing input providers
 	TrainingInputProvider trainInputProvider = new IrisInputProvider(1, 150000, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
 	TrainingInputProvider testInputProvider = new IrisInputProvider(1, 150, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
 	MultipleNeuronsOutputError error = new MultipleNeuronsOutputError();
 
+	// trainers
 	AparapiCDTrainer t = TrainerFactory.cdSigmoidTrainer(rbm, trainInputProvider, testInputProvider, error, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.01f, 0.5f, 0f, 1, true);
+
+	// log data
 	t.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
 
+	// execution mode
 	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 
+	// training
 	t.train();
+
+	// training
 	t.test();
 
-	assertEquals(0, t.getOutputError().getTotalNetworkError(), 0.1);
+	// 2 of the iris classes are linearly not separable - an error of 1/3 illustrates that
+	assertEquals(0, t.getOutputError().getTotalNetworkError(), 1/3f);
     }
 
     /**
      * DBN testing
      */
     @Test
-    @Ignore
     public void testDBN() {
-	DBN dbn = NNFactory.dbn(new int[] {4, 16, 3}, true);
+	// deep belief network with two rbms - 4-16 and 16-3 with biases
+	DBN dbn = NNFactory.dbn(new int[] {4, 4, 3}, true);
+	assertEquals(2, dbn.getNeuralNetworks().size(), 0);
+
 	dbn.setLayerCalculator(NNFactory.lcSigmoid(dbn, null));
 
-	TrainingInputProvider trainInputProvider = new IrisInputProvider(1, 15000, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
+	TrainingInputProvider trainInputProvider = new IrisInputProvider(150, 150000, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
 	TrainingInputProvider testInputProvider = new IrisInputProvider(1, 150, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
-	MultipleNeuronsOutputError error = new MultipleNeuronsOutputError();
 
+	// rbm trainers for each layer
 	AparapiCDTrainer firstTrainer = TrainerFactory.cdSigmoidTrainer(dbn.getFirstNeuralNetwork(), null, null, null, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.01f, 0.5f, 0f, 1, true);
-	//AparapiCDTrainer secondTrainer = TrainerFactory.cdSigmoidTrainer(dbn.getNeuralNetwork(1), null, null, null, new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.01f, 0.5f, 0f, 1, true);
 	AparapiCDTrainer lastTrainer = TrainerFactory.cdSigmoidTrainer(dbn.getLastNeuralNetwork(), null, null, null, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.01f, 0.5f, 0f, 1, true);
 
 	Map<NeuralNetwork, OneStepTrainer<?>> map = new HashMap<>();
 	map.put(dbn.getFirstNeuralNetwork(), firstTrainer);
-	//map.put(dbn.getNeuralNetwork(1), secondTrainer);
 	map.put(dbn.getLastNeuralNetwork(), lastTrainer);
 
-	DBNTrainer t = TrainerFactory.dbnTrainer(dbn, map, trainInputProvider, testInputProvider, error);
-	t.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
+	// deep trainer
+	DBNTrainer deepTrainer = TrainerFactory.dbnTrainer(dbn, map, trainInputProvider, null, null);
 
-	Environment.getInstance().setExecutionMode(EXECUTION_MODE.CPU);
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 
-	t.train();
-	t.test();
+	// layer pre-training
+	deepTrainer.train();
 
-	assertEquals(0, t.getOutputError().getTotalNetworkError(), 0.1);
+	// fine tuning backpropagation
+	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(dbn, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.01f, 0.5f, 0f);
+
+	// log data
+	bpt.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
+
+	// training
+	bpt.train();
+
+	// testing
+	bpt.test();
+
+	assertEquals(0, bpt.getOutputError().getTotalNetworkError(), 0.1);
     }
 
     @Test
@@ -158,7 +174,8 @@ public class IrisTest {
 
     	bae.test();
 
-    	assertEquals(0, bae.getOutputError().getTotalNetworkError(), 0.4);
+    	// 2 of the iris classes are linearly not separable - an error of 1/3 illustrates that
+    	assertEquals(0, bae.getOutputError().getTotalNetworkError(), 1/3f);
     }
 
     @Test

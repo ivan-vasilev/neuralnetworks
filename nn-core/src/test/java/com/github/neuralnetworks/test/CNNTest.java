@@ -189,7 +189,7 @@ public class CNNTest {
 	assertTrue(bplc.getConnectionCalculator(l.getConnections().get(1).getInputLayer()) instanceof BackPropagationConv2DSigmoid);
 
 	l = l.getConnections().get(2).getOutputLayer();
-	assertTrue(bplc.getConnectionCalculator(l) instanceof BackpropagationMaxPooling2D);
+	assertTrue(bplc.getConnectionCalculator(l) instanceof BackPropagationSigmoid);
 
 	l = l.getConnections().get(1).getOutputLayer();
 	assertTrue(bplc.getConnectionCalculator(l.getConnections().get(1).getInputLayer()) instanceof BackPropagationSigmoid);
