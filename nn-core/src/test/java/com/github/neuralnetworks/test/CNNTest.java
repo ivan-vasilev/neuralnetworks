@@ -31,6 +31,7 @@ import com.github.neuralnetworks.calculation.neuronfunctions.AparapiStochasticPo
 import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculatorConv;
 import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculatorFullyConnected;
 import com.github.neuralnetworks.training.TrainerFactory;
+import com.github.neuralnetworks.training.backpropagation.BackPropagationConv2D;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationConv2DSigmoid;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationLayerCalculatorImpl;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationSigmoid;
@@ -176,17 +177,15 @@ public class CNNTest {
 	assertTrue(bplc.getConnectionCalculator(l) instanceof BackPropagationConv2DSigmoid);
 
 	l = l.getConnections().get(0).getOutputLayer();
-	assertTrue(bplc.getConnectionCalculator(l) instanceof BackPropagationConv2DSigmoid);
-
-	// bias
-	assertTrue(bplc.getConnectionCalculator(l.getConnections().get(1).getInputLayer()) instanceof BackPropagationConv2DSigmoid);
+	assertTrue(bplc.getConnectionCalculator(l) instanceof BackpropagationMaxPooling2D);
+	assertTrue(bplc.getConnectionCalculator(l.getConnections().get(1).getInputLayer()) instanceof BackPropagationConv2D); 	// bias
 
 	l = l.getConnections().get(2).getOutputLayer();
-	assertTrue(bplc.getConnectionCalculator(l) instanceof BackpropagationMaxPooling2D);
+	assertTrue(bplc.getConnectionCalculator(l) instanceof BackPropagationConv2DSigmoid);
 
 	l = l.getConnections().get(1).getOutputLayer();
-	assertTrue(bplc.getConnectionCalculator(l) instanceof BackPropagationConv2DSigmoid);
-	assertTrue(bplc.getConnectionCalculator(l.getConnections().get(1).getInputLayer()) instanceof BackPropagationConv2DSigmoid);
+	assertTrue(bplc.getConnectionCalculator(l) instanceof BackpropagationMaxPooling2D);
+	assertTrue(bplc.getConnectionCalculator(l.getConnections().get(1).getInputLayer()) instanceof BackPropagationConv2D);
 
 	l = l.getConnections().get(2).getOutputLayer();
 	assertTrue(bplc.getConnectionCalculator(l) instanceof BackPropagationSigmoid);

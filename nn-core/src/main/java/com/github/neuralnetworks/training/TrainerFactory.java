@@ -1,8 +1,13 @@
 package com.github.neuralnetworks.training;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.github.neuralnetworks.architecture.Connections;
+import com.github.neuralnetworks.architecture.ConvGridLayer;
 import com.github.neuralnetworks.architecture.FullyConnected;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
@@ -10,8 +15,10 @@ import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.architecture.types.DNN;
 import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.architecture.types.RBM;
+import com.github.neuralnetworks.calculation.BreadthFirstOrderStrategy;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.calculation.LayerCalculatorImpl;
+import com.github.neuralnetworks.calculation.LayerOrderStrategy.ConnectionCandidate;
 import com.github.neuralnetworks.calculation.OutputError;
 import com.github.neuralnetworks.calculation.RBMLayerCalculator;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiAveragePooling2D;
@@ -56,8 +63,7 @@ import com.github.neuralnetworks.util.Util;
 public class TrainerFactory {
 
     /**
-     * Backpropagation trainer
-     * Depends on the LayerCalculator of the network
+     * Backpropagation trainer Depends on the LayerCalculator of the network
      * 
      * @param nn
      * @param trainingSet
@@ -80,12 +86,79 @@ public class TrainerFactory {
 
     private static BackPropagationLayerCalculatorImpl bplc(NeuralNetworkImpl nn, Properties p) {
 	BackPropagationLayerCalculatorImpl blc = new BackPropagationLayerCalculatorImpl();
+	LayerCalculatorImpl lc = (LayerCalculatorImpl) nn.getLayerCalculator();
 
-	for (Layer l : nn.getLayers()) {
-	    if (l != nn.getOutputLayer()) {
-		ConnectionCalculator cc = createCC(nn, l, p);
-		if (cc != null) {
-		    blc.addConnectionCalculator(l, cc);
+	List<ConnectionCandidate> connections = new BreadthFirstOrderStrategy(nn, nn.getOutputLayer()).order();
+
+	if (connections.size() > 0) {
+	    Layer current = null;
+	    List<Connections> chunk = new ArrayList<>();
+	    Set<Layer> convCalculatedLayers = new HashSet<>(); // tracks
+							       // convolutional
+							       // layers
+							       // (because their
+							       // calculations
+							       // are
+							       // interlinked)
+	    convCalculatedLayers.add(nn.getOutputLayer());
+
+	    for (int i = 0; i < connections.size(); i++) {
+		ConnectionCandidate c = connections.get(i);
+		chunk.add(c.connection);
+
+		if (i == connections.size() - 1 || connections.get(i + 1).target != c.target) {
+		    current = c.target;
+
+		    ConnectionCalculator result = null;
+		    ConnectionCalculator ffcc = null;
+		    if (Util.isBias(current)) {
+			ffcc = lc.getConnectionCalculator(current.getConnections().get(0).getOutputLayer());
+		    } else if (current instanceof ConvGridLayer) {
+			if (chunk.size() != 1) {
+			    throw new IllegalArgumentException("Convolutional layer with more than one connection");
+			}
+
+			ffcc = lc.getConnectionCalculator(Util.getOppositeLayer(chunk.iterator().next(), current));
+		    } else {
+			ffcc = lc.getConnectionCalculator(current);
+		    }
+
+		    if (ffcc instanceof AparapiSigmoid) {
+			result = new BackPropagationSigmoid(p);
+		    } else if (ffcc instanceof AparapiTanh) {
+			result = new BackPropagationTanh(p);
+		    } else if (ffcc instanceof AparapiSoftReLU) {
+			result = new BackPropagationSoftReLU(p);
+		    } else if (ffcc instanceof AparapiReLU) {
+			result = new BackPropagationReLU(p);
+		    } else if (ffcc instanceof AparapiMaxPooling2D || ffcc instanceof AparapiStochasticPooling2D) {
+			result = new BackpropagationMaxPooling2D();
+		    } else if (ffcc instanceof AparapiAveragePooling2D) {
+			result = new BackpropagationAveragePooling2D();
+		    } else if (ffcc instanceof ConnectionCalculatorConv) {
+			Layer opposite = Util.getOppositeLayer(chunk.iterator().next(), current);
+			if (!convCalculatedLayers.contains(opposite)) {
+			    convCalculatedLayers.add(opposite);
+
+			    if (ffcc instanceof AparapiConv2DSigmoid) {
+				result = new BackPropagationConv2DSigmoid(p);
+			    } else if (ffcc instanceof AparapiConv2DTanh) {
+				result = new BackPropagationConv2DTanh(p);
+			    } else if (ffcc instanceof AparapiConv2DSoftReLU) {
+				result = new BackPropagationConv2DSoftReLU(p);
+			    } else if (ffcc instanceof AparapiConv2DReLU) {
+				result = new BackPropagationConv2DReLU(p);
+			    }
+			} else {
+			    result = new BackPropagationConv2D(p);
+			}
+		    }
+
+		    if (result != null) {
+			blc.addConnectionCalculator(current, result);
+		    }
+
+		    chunk.clear();
 		}
 	    }
 	}
@@ -93,11 +166,11 @@ public class TrainerFactory {
 	return blc;
     }
 
-    private static ConnectionCalculator createCC(NeuralNetwork nn, Layer l, Properties p) {
+    private static ConnectionCalculator createCC(NeuralNetwork nn, Layer current, Layer prev, Properties p) {
 	ConnectionCalculator result = null;
 
 	LayerCalculatorImpl lc = (LayerCalculatorImpl) nn.getLayerCalculator();
-	ConnectionCalculator cc = Util.isBias(l) ? lc.getConnectionCalculator(l.getConnections().get(0).getOutputLayer()) : lc.getConnectionCalculator(l);
+	ConnectionCalculator cc = Util.isBias(current) ? lc.getConnectionCalculator(current.getConnections().get(0).getOutputLayer()) : lc.getConnectionCalculator(current);
 
 	if (cc instanceof AparapiSigmoid) {
 	    result = new BackPropagationSigmoid(p);
@@ -114,12 +187,12 @@ public class TrainerFactory {
 	} else if (cc instanceof ConnectionCalculatorConv) {
 	    boolean hasFullyConnected = false;
 	    boolean hasOutputConnection = false;
-	    for (Connections c : l.getConnections()) {
-		if (c instanceof FullyConnected && c.getInputLayer() == l) {
+	    for (Connections c : current.getConnections()) {
+		if (c instanceof FullyConnected && c.getInputLayer() == current) {
 		    hasFullyConnected = true;
 		}
 
-		if (Util.getOppositeLayer(c, l) == nn.getOutputLayer()) {
+		if (Util.getOppositeLayer(c, current) == nn.getOutputLayer()) {
 		    hasOutputConnection = true;
 		}
 	    }
@@ -168,7 +241,7 @@ public class TrainerFactory {
 	RBMLayerCalculator lc = NNFactory.rbmSigmoidSigmoid(rbm);
 	ConnectionCalculatorFullyConnected cc = (ConnectionCalculatorFullyConnected) lc.getConnectionCalculator(rbm.getInputLayer());
 	cc.addPreTransferFunction(new BernoulliDistribution());
-	
+
 	return new AparapiCDTrainer(rbmProperties(rbm, lc, trainingSet, testingSet, error, rand, learningRate, momentum, weightDecay, gibbsSampling, isPersistentCD));
     }
 
