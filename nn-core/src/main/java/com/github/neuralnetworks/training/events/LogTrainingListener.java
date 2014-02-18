@@ -14,6 +14,7 @@ public class LogTrainingListener implements TrainingEventListener {
     private String name;
     private long startTime;
     private long finishTime;
+    private long miniBatchTime;
     private long miniBatchTotalTime;
     private long lastMiniBatchFinishTime;
     private int miniBatches;
@@ -72,15 +73,16 @@ public class LogTrainingListener implements TrainingEventListener {
 	    System.out.print(sb.toString());
 	} else if (event instanceof MiniBatchFinishedEvent) {
 	    miniBatches++;
-	    long miniBatchTime = System.currentTimeMillis() - lastMiniBatchFinishTime;
-	    miniBatchTotalTime += miniBatchTime;
+	    miniBatchTime += System.currentTimeMillis() - lastMiniBatchFinishTime;
+	    miniBatchTotalTime += System.currentTimeMillis() - lastMiniBatchFinishTime;
 	    lastMiniBatchFinishTime = System.currentTimeMillis();
 
 	    StringBuilder sb = new StringBuilder();
 	    String s = System.getProperty("line.separator");
 
-	    if (logMiniBatches || (isTesting && logTestResults)) {
-		sb.append("MB " + miniBatches + " " + (miniBatchTime / 1000f) + " s" + s);
+	    if (miniBatchTime / 5000 > 0 && (logMiniBatches || (isTesting && logTestResults))) {
+		sb.append(miniBatches + " minibatches in " + (miniBatchTotalTime / 1000f) + " s" + s);
+		miniBatchTime = 0;
 	    }
 
 	    // log test results

@@ -15,13 +15,13 @@ public interface KernelExecutionStrategy {
 
 	@Override
 	public void execute(Kernel kernel, int range) {
-	    if (range <= Runtime.getRuntime().availableProcessors() * 5) {
+	    if (range <= Runtime.getRuntime().availableProcessors() * 200) {
 		kernel.setExecutionMode(EXECUTION_MODE.CPU);
+		kernel.execute(range);
 	    } else {
 		kernel.setExecutionMode(EXECUTION_MODE.GPU);
+		kernel.execute(range);
 	    }
-
-	    kernel.execute(range);
 	}
     }
 
@@ -35,7 +35,7 @@ public interface KernelExecutionStrategy {
     }
 
     public static class GPUKernelExecution implements KernelExecutionStrategy {
-	
+
 	@Override
 	public void execute(Kernel kernel, int range) {
 	    kernel.setExecutionMode(EXECUTION_MODE.GPU);

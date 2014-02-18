@@ -31,7 +31,8 @@ public class FFNNTest {
 
     @Test
     public void testWeightedSumFF() {
-	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.GPU);
+
 	Matrix o = new Matrix(2, 2);
 
 	Layer il1 = new Layer();
@@ -136,6 +137,8 @@ public class FFNNTest {
 
     @Test
     public void testWeightedSumBP() {
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.GPU);
+
 	Matrix o = new Matrix(2, 2);
 
 	Layer il1 = new Layer();
