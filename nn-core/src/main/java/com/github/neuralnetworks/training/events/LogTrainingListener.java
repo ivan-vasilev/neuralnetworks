@@ -80,7 +80,7 @@ public class LogTrainingListener implements TrainingEventListener {
 	    String s = System.getProperty("line.separator");
 
 	    if (logMiniBatches || (isTesting && logTestResults)) {
-		sb.append("MB " + miniBatches + " " + (miniBatchTime / 1000f) + " s");
+		sb.append("MB " + miniBatches + " " + (miniBatchTime / 1000f) + " s" + s);
 	    }
 
 	    // log test results

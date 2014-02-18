@@ -11,7 +11,6 @@ import java.util.TreeMap;
 
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.calculation.ValuesProvider;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
@@ -21,7 +20,7 @@ import com.github.neuralnetworks.util.Util;
  * Connection calculator for the backpropagation phase of the algorithm
  * The difference with the regular ConnectionCalculatorImpl is that forwardBackprop's and backwardBackprop's properties (learing rate, momentum, weight decay) are updated before each propagation
  */
-public abstract class BackPropagationConnectionCalculatorImpl implements ConnectionCalculator {
+public abstract class BackPropagationConnectionCalculatorImpl implements BackpropagationConnectionCalculator {
 
     private static final long serialVersionUID = -8854054073444883314L;
 
@@ -80,26 +79,46 @@ public abstract class BackPropagationConnectionCalculatorImpl implements Connect
 
     protected abstract void addBackpropFunction(SortedMap<Connections, Integer> inputConnections, Map<Connections, BackpropagationConnectionCalculator> connectionCalculators, Layer targetLayer);
 
-    public float getLearningRate() {
-	return properties.getParameter(Constants.LEARNING_RATE);
-    }
-
     public int getMiniBatchSize() {
 	return miniBatchSize;
     }
 
+    @Override
+    public float getLearningRate() {
+	return properties.getParameter(Constants.LEARNING_RATE);
+    }
+
+    @Override
+    public void setLearningRate(float learningRate) {
+	properties.setParameter(Constants.LEARNING_RATE, learningRate);
+    }
+
+    @Override
     public float getMomentum() {
 	return properties.getParameter(Constants.MOMENTUM);
     }
 
+    @Override
+    public void setMomentum(float momentum) {
+	properties.setParameter(Constants.MOMENTUM, momentum);
+    }
+
+    @Override
     public float getWeightDecay() {
 	return properties.getParameter(Constants.WEIGHT_DECAY);
     }
 
+    @Override
+    public void setWeightDecay(float weightDecay) {
+	properties.setParameter(Constants.WEIGHT_DECAY, weightDecay);
+    }
+
+    @Override
     public ValuesProvider getActivations() {
 	return activations;
     }
-    
+
+    @Override
     public void setActivations(ValuesProvider activations) {
 	this.activations = activations;
     }
