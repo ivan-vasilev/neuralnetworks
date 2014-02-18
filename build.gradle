@@ -18,6 +18,10 @@ subprojects {
   }  
 }
 
+task wrapper(type: Wrapper) {
+  gradleVersion = '1.11'
+}
+
 task uberJar(type: Jar) {
   subprojects.each { subproject ->
     from { subproject.configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
