@@ -61,18 +61,21 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
      * It is an array, because of the combined connections
      */
     //@Local TODO
+    @Constant
     protected final int[] weightsDimension;
 
     /**
      * For optimization reasons
      */
     //@Local TODO
+    @Constant
     protected final int[] weightsInitialStep;
 
     /**
      * For optimization reasons
      */
     //@Local TODO
+    @Constant
     protected final int[] weightsStep;
 
     /**
@@ -82,6 +85,7 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
      * combined connections
      */
     //@Local TODO
+    @Constant
     protected final int[] inputStartPositions;
 
     /**
@@ -91,6 +95,7 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
      * combined connections
      */
     //@Local TODO
+    @Constant
     protected final int[] weightStartPositions;
 
     /**

@@ -48,6 +48,7 @@ public abstract class AparapiConv2D extends Kernel implements Serializable {
      * input offset for each feature map in respect to the start index
      */
     //@Local TODO
+    @Constant
     protected final int[] featureMapOffsets;
 
     /**

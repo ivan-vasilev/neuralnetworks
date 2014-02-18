@@ -74,7 +74,9 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements Backp
 
 	Util.fillArray(weightUpdates, 0);
 
-	ffActivation = activations.getValues(c.getInputLayer(), c).getElements();
+	if (ffActivation != activations.getValues(c.getInputLayer(), c).getElements()) {
+	    ffActivation = activations.getValues(c.getInputLayer(), c).getElements();
+	}
     }
 
     @Override

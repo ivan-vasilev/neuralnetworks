@@ -64,7 +64,9 @@ public class AparapiBackpropagationFullyConnected extends AparapiWeightedSum imp
     @Override
     protected void init(List<Connections> inputConnections, ValuesProvider valuesProvider, Layer targetLayer) {
 	super.init(inputConnections, valuesProvider, targetLayer);
-	ffActivation = activations.getValues(targetLayer, inputConnections).getElements();
+	if (ffActivation != activations.getValues(targetLayer, inputConnections).getElements()) {
+	    ffActivation = activations.getValues(targetLayer, inputConnections).getElements();
+	}
     }
 
     @Override
