@@ -1,8 +1,6 @@
 package com.github.neuralnetworks.training.backpropagation;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.SortedMap;
 
 import com.github.neuralnetworks.architecture.Connections;
@@ -28,23 +26,23 @@ public class AparapiBackpropagationFullyConnected extends AparapiWeightedSum imp
     /**
      * Weight updates array
      */
-    protected float[] weightUpdates;
+    protected final float[] weightUpdates;
 
-    /**
-     * Stored weight updates for reuse
-     */
-    protected Map<Layer, float[]> storedWeightUpdates = new HashMap<>();
     protected float learningRate;
-    protected float momentum;
-    protected float weightDecay;
+    protected final float momentum;
+    protected final float weightDecay;
 
     /**
      * activations from the feedforward phase
      */
     protected ValuesProvider activations;
 
-    public AparapiBackpropagationFullyConnected(SortedMap<GraphConnections, Integer> inputConnections, int miniBatchSize, Layer targetLayer) {
+    public AparapiBackpropagationFullyConnected(SortedMap<GraphConnections, Integer> inputConnections, int miniBatchSize, float learningRate, float momentum, float weightDecay, Layer targetLayer) {
 	super(inputConnections, miniBatchSize, targetLayer);
+	this.learningRate = momentum;
+	this.momentum = momentum;
+	this.weightDecay = weightDecay;
+	this.weightUpdates = new float[weights.length];
     }
 
     @Override
@@ -55,9 +53,9 @@ public class AparapiBackpropagationFullyConnected extends AparapiWeightedSum imp
 	    int i = 0;
 	    for (Connections c : inputConnections) {
 		float[] a = valuesProvider.getValues(Util.getOppositeLayer(c, targetLayer), c).getElements();
-		System.arraycopy(input, inputStartPositions[i], a, 0, a.length);
+		System.arraycopy(a, inputStartPositions[i], input, 0, a.length);
 		float[] cg = ((GraphConnections) c).getConnectionGraph().getElements();
-		System.arraycopy(weights, weightStartPositions[i], cg, 0, cg.length);
+		System.arraycopy(cg, weightStartPositions[i], weights, 0, cg.length);
 		i++;
 	    }
 	}
@@ -66,27 +64,17 @@ public class AparapiBackpropagationFullyConnected extends AparapiWeightedSum imp
     @Override
     protected void init(List<Connections> inputConnections, ValuesProvider valuesProvider, Layer targetLayer) {
 	super.init(inputConnections, valuesProvider, targetLayer);
-	weightUpdates = storedWeightUpdates.get(targetLayer);
-	if (weightUpdates == null) {
-	    weightUpdates = new float[weights.length];
-	    storedWeightUpdates.put(targetLayer, weightUpdates);
-	}
-
 	ffActivation = activations.getValues(targetLayer, inputConnections).getElements();
     }
 
     @Override
     protected void after() {
-	int s = series;
-	int miniBatch = miniBatchSize;
-	int row = getGlobalId() * miniBatch;
+	final int row = getGlobalId() * miniBatchSize;
 	float lr = learningRate;
-	float wd = weightDecay;
-	float mm = momentum;
 	float weightUpdate = 0;
 	int inputStartPosition = 0, initialWeightIndex = 0, weightStep = 0, dim = 0, weightIndex = 0;
 
-	for (int i = 0; i < s; i++) {
+	for (int i = 0; i < series; i++) {
 	    inputStartPosition = inputStartPositions[i];
 	    initialWeightIndex = weightStartPositions[i] + weightsInitialStep[i] * getGlobalId();
 	    weightStep = weightsStep[i];
@@ -94,12 +82,12 @@ public class AparapiBackpropagationFullyConnected extends AparapiWeightedSum imp
 
 	    for (int j = 0; j < dim; j++) {
 		weightUpdate = 0;
-		for (int column = 0; column < miniBatch; column++) {
-		    weightUpdate += input[inputStartPosition + j * miniBatch + column] * ffActivation[row + column];
+		for (int column = 0; column < miniBatchSize; column++) {
+		    weightUpdate += input[inputStartPosition + j * miniBatchSize + column] * ffActivation[row + column];
 		}
 
 		weightIndex = initialWeightIndex + j * weightStep;
-		weightUpdate = lr * weightUpdate + mm * weightUpdates[weightIndex] - wd * abs(weights[weightIndex]);
+		weightUpdate = lr * weightUpdate + momentum * weightUpdates[weightIndex] - weightDecay * abs(weights[weightIndex]);
 		weights[weightIndex] += weightUpdate;
 		weightUpdates[weightIndex] = weightUpdate;
 	    }
@@ -131,7 +119,6 @@ public class AparapiBackpropagationFullyConnected extends AparapiWeightedSum imp
 
     @Override
     public void setMomentum(float momentum) {
-	this.momentum = momentum;
     }
 
     @Override
@@ -141,7 +128,6 @@ public class AparapiBackpropagationFullyConnected extends AparapiWeightedSum imp
 
     @Override
     public void setWeightDecay(float weightDecay) {
-	this.weightDecay = weightDecay;
     }
 
     @Override

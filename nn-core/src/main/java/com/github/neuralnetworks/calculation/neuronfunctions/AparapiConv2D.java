@@ -64,7 +64,7 @@ public abstract class AparapiConv2D extends Kernel implements Serializable {
      * combined feature weights of all feature maps
      */
     //@Local TODO
-    protected float[] weights;
+    protected final float[] weights;
 
     public AparapiConv2D(Conv2DConnection c, int miniBatchSize) {
 	super();

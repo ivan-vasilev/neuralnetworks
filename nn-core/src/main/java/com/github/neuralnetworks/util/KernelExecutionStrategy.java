@@ -34,6 +34,15 @@ public interface KernelExecutionStrategy {
 	}
     }
 
+    public static class GPUKernelExecution implements KernelExecutionStrategy {
+	
+	@Override
+	public void execute(Kernel kernel, int range) {
+	    kernel.setExecutionMode(EXECUTION_MODE.GPU);
+	    kernel.execute(range);
+	}
+    }
+
     public static class SeqKernelExecution implements KernelExecutionStrategy {
 
 	@Override

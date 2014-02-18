@@ -25,8 +25,8 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements Backp
     /**
      * weight updates and momentum
      */
-    protected float[] weightUpdates;
-    protected float[] weightUpdatesMomentum;
+    protected final float[] weightUpdates;
+    protected final float[] weightUpdatesMomentum;
 
     /**
      * BP parameters
@@ -42,6 +42,8 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements Backp
 
     public AparapiBackpropagationConv2D(Conv2DConnection c, int miniBatchSize) {
 	super(c, miniBatchSize);
+	this.weightUpdates = new float[c.getWeights().length];
+	this.weightUpdatesMomentum = new float[c.getWeights().length];
     }
 
     @Override
@@ -70,13 +72,7 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements Backp
     protected void init(Conv2DConnection c, Matrix input, Matrix output) {
 	super.init(c, input, output);
 
-	int weightUpdatesLength = c.getWeights().length * output.getColumns();
-	if (weightUpdates == null || weightUpdates.length != weightUpdatesLength) {
-	    weightUpdates = new float[weightUpdatesLength];
-	    weightUpdatesMomentum = new float[weightUpdatesLength];
-	} else {
-	    Util.fillArray(weightUpdates, 0);
-	}
+	Util.fillArray(weightUpdates, 0);
 
 	ffActivation = activations.getValues(c.getInputLayer(), c).getElements();
     }
@@ -85,17 +81,15 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements Backp
     protected void conv(int weightsStartId, int inputStartId) {
 	int id = getGlobalId();
 
-	int miniBatch = miniBatchSize;
-	int fmw = featureMapWeights;
 	float activationDerivative = 0;
 	int inputId = 0;
 
-	for (int p = 0; p < miniBatch; p++) {
-	    activationDerivative = activationFunctionDerivative(output[id * miniBatch + p]);
-	    output[id * miniBatch + p] = activationDerivative;
+	for (int p = 0; p < miniBatchSize; p++) {
+	    activationDerivative = activationFunctionDerivative(output[id * miniBatchSize + p]);
+	    output[id * miniBatchSize + p] = activationDerivative;
 
-	    for (int i = 0; i < fmw; i++) {
-		inputId = (inputStartId + featureMapOffsets[i]) * miniBatch + p;
+	    for (int i = 0; i < featureMapWeights; i++) {
+		inputId = (inputStartId + featureMapOffsets[i]) * miniBatchSize + p;
 		weightUpdates[weightsStartId + i] += activationDerivative * ffActivation[inputId];
 		input[inputId] += activationDerivative * weights[weightsStartId + i];
 	    }
@@ -108,7 +102,7 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements Backp
     protected void updateWeights() {
 	float weightUpdate = 0;
 	for (int i = 0; i < weights.length; i++) {
-	    weightUpdate = learningRate * weightUpdates[i] + momentum * weightUpdatesMomentum[i] - weightDecay * weights[i];
+	    weightUpdate = learningRate * weightUpdates[i] + momentum * weightUpdatesMomentum[i] - weightDecay * Math.abs(weights[i]);
 	    weights[i] += weightUpdate;
 	    weightUpdatesMomentum[i] = weightUpdates[i];
 	    weightUpdates[i] = weightUpdate;
@@ -152,7 +146,7 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements Backp
 
     @Override
     public void setWeightDecay(float weightDecay) {
-        this.weightDecay = weightDecay;
+	this.weightDecay = weightDecay;
     }
 
     @Override

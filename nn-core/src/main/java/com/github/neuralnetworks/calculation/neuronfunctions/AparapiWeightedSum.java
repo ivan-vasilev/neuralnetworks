@@ -1,8 +1,6 @@
 package com.github.neuralnetworks.calculation.neuronfunctions;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.SortedMap;
 
 import com.amd.aparapi.Kernel;
@@ -94,11 +92,6 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
      */
     //@Local TODO
     protected final int[] weightStartPositions;
-
-    /**
-     * helper map to reuse existing arrays for outputs
-     */
-    protected Map<Integer, float[]> storedWeights = new HashMap<>();
 
     /**
      * Will determine whether initialization is needed

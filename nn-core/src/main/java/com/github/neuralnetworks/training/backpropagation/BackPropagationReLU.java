@@ -28,10 +28,10 @@ public class BackPropagationReLU extends BackPropagationConnectionCalculatorImpl
 	    SortedMap<GraphConnections, Integer> m = new TreeMap<>();
 	    if (Util.isBias(e.getKey().getInputLayer()) && targetLayer != e.getKey().getInputLayer()) {
 		m.put((GraphConnections) e.getKey(), miniBatchSize);
-		connectionCalculators.put(e.getKey(), new AparapiBackpropReLU(m, miniBatchSize, e.getKey().getInputLayer()));
+		connectionCalculators.put(e.getKey(), new AparapiBackpropReLU(m, miniBatchSize, getLearningRate(), getMomentum(), getWeightDecay(), e.getKey().getInputLayer()));
 	    } else {
 		m.put((GraphConnections) e.getKey(), e.getValue());
-		connectionCalculators.put(e.getKey(), new AparapiBackpropReLU(m, miniBatchSize, targetLayer));
+		connectionCalculators.put(e.getKey(), new AparapiBackpropReLU(m, miniBatchSize, getLearningRate(), getMomentum(), getWeightDecay(), targetLayer));
 	    }
 	}
     }
@@ -40,8 +40,8 @@ public class BackPropagationReLU extends BackPropagationConnectionCalculatorImpl
 
 	private static final long serialVersionUID = -3580345016542506932L;
 
-	public AparapiBackpropReLU(SortedMap<GraphConnections, Integer> inputConnections, int miniBatchSize, Layer targetLayer) {
-	    super(inputConnections, miniBatchSize, targetLayer);
+	public AparapiBackpropReLU(SortedMap<GraphConnections, Integer> inputConnections, int miniBatchSize, float learningRate, float momentum, float weightDecay, Layer targetLayer) {
+	    super(inputConnections, miniBatchSize, learningRate, momentum, weightDecay, targetLayer);
 	}
 	
 	@Override
