@@ -62,7 +62,11 @@ public abstract class Trainer<N extends NeuralNetwork> {
 	    Set<Layer> calculatedLayers = new UniqueList<>();
 	    ValuesProvider results = new ValuesProvider();
 	    TrainingInputData input = null;
-	    
+
+	    if (getOutputError() != null) {
+		getOutputError().reset();
+	    }
+
 	    while ((input = ip.getNextInput()) != null) {
 		calculatedLayers.clear();
 		calculatedLayers.add(n.getInputLayer());
@@ -73,7 +77,7 @@ public abstract class Trainer<N extends NeuralNetwork> {
 		    getOutputError().addItem(results.getValues(n.getOutputLayer()), input.getTarget());
 		}
 
-		triggerEvent(new MiniBatchFinishedEvent(this, input, results));
+		triggerEvent(new MiniBatchFinishedEvent(this, input, results, null));
 	    }
 	    
 	    triggerEvent(new TestingFinishedEvent(this));

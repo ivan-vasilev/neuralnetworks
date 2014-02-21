@@ -17,8 +17,7 @@ public class MultipleNeuronsOutputError implements OutputError {
 
     public MultipleNeuronsOutputError() {
 	super();
-	this.tuples = new ArrayList<>();
-	this.dim = -1;
+	reset();
     }
 
     @Override
@@ -117,6 +116,14 @@ public class MultipleNeuronsOutputError implements OutputError {
 	}
 
 	return result;
+    }
+
+    @Override
+    public void reset() {
+	this.tuples = new ArrayList<>();
+	this.dim = -1;
+	this.nullCount = 0;
+	this.outputToTarget = null;
     }
 
     private static class OutputTargetTuple {

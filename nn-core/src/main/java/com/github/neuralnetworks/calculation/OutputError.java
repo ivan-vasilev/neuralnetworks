@@ -10,4 +10,5 @@ public interface OutputError {
     public float getTotalNetworkError();
     public int getTotalErrorSamples();
     public int getTotalInputSize();
+    public void reset();
 }

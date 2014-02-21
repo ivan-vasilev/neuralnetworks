@@ -13,6 +13,8 @@ import com.github.neuralnetworks.util.Properties;
  */
 public abstract class OneStepTrainer<N extends NeuralNetwork> extends Trainer<N> {
 
+    private boolean stopTraining;
+
     public OneStepTrainer() {
 	super();
     }
@@ -25,6 +27,8 @@ public abstract class OneStepTrainer<N extends NeuralNetwork> extends Trainer<N>
     public void train() {
 	triggerEvent(new TrainingStartedEvent(this));
 
+	stopTraining = false;
+
 	if (getRandomInitializer() != null) {
 	    getRandomInitializer().initialize(getNeuralNetwork());;
 	}
@@ -33,12 +37,16 @@ public abstract class OneStepTrainer<N extends NeuralNetwork> extends Trainer<N>
 
 	int batch = 0;
 	TrainingInputData input = null;
-	while ((input = getTrainingInputProvider().getNextInput()) != null) {
+	while ((input = getTrainingInputProvider().getNextInput()) != null && !stopTraining) {
 	    learnInput(input, batch++);
-	    triggerEvent(new MiniBatchFinishedEvent(this, input, null));
+	    triggerEvent(new MiniBatchFinishedEvent(this, input, null, batch));
 	}
 
 	triggerEvent(new TrainingFinishedEvent(this));
+    }
+
+    public void stopTraining() {
+	stopTraining = true;
     }
 
     /**

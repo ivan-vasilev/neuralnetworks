@@ -19,6 +19,8 @@ public class MnistInputProvider extends TrainingInputProviderImpl {
 
     private RandomAccessFile images;
     private RandomAccessFile labels;
+    private int epochs;
+    private int currentEpoch;
     private int rows;
     private int cols;
     private int inputSize;
@@ -29,9 +31,10 @@ public class MnistInputProvider extends TrainingInputProviderImpl {
     private Matrix tempImages;
     private byte[] current;
 
-    public MnistInputProvider(String imagesFile, String labelsFile, int batchSize, InputConverter targetConverter) {
+    public MnistInputProvider(String imagesFile, String labelsFile, int batchSize, int epochs, InputConverter targetConverter) {
 	super();
 
+	this.epochs = epochs;
 	this.batchSize = batchSize;
 	this.targetConverter = targetConverter;
 
@@ -47,7 +50,6 @@ public class MnistInputProvider extends TrainingInputProviderImpl {
 	    current = new byte[rows * cols];
 
 	    random = new Random();
-	    reset();
 	} catch (IOException e) {
 	    e.printStackTrace();
 	}
@@ -56,6 +58,12 @@ public class MnistInputProvider extends TrainingInputProviderImpl {
     @Override
     public TrainingInputData getNextUnmodifiedInput() {
 	TrainingInputData result = null;
+
+	if (elementsOrder.size() == 0 && currentEpoch < epochs) {
+	    resetOrder();
+	    currentEpoch++;
+	}
+
 	if (elementsOrder.size() > 0) {
 	    int length = elementsOrder.size() > batchSize ? batchSize : elementsOrder.size();
 	    int[] indexes = new int[length];
@@ -75,6 +83,11 @@ public class MnistInputProvider extends TrainingInputProviderImpl {
 
     @Override
     public void reset() {
+	currentEpoch = 1;
+	resetOrder();
+    }
+
+    public void resetOrder() {
 	elementsOrder = new ArrayList<Integer>(inputSize);
 	for (int i = 0; i < inputSize; i++) {
 	    elementsOrder.add(i);
@@ -83,7 +96,7 @@ public class MnistInputProvider extends TrainingInputProviderImpl {
 
     @Override
     public int getInputSize() {
-	return inputSize;
+	return inputSize * epochs;
     }
 
     private Matrix getImages(int[] indexes) {

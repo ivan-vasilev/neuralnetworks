@@ -29,4 +29,10 @@ public class XorOutputError implements OutputError {
     public int getTotalInputSize() {
 	return size;
     }
+
+    @Override
+    public void reset() {
+	networkError = 0;
+	size = 0;
+    }
 }

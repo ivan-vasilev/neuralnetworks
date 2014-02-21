@@ -15,7 +15,7 @@ public interface KernelExecutionStrategy {
 
 	@Override
 	public void execute(Kernel kernel, int range) {
-	    if (range <= Runtime.getRuntime().availableProcessors() * 200) {
+	    if (range <= Runtime.getRuntime().availableProcessors() * 600) {
 		kernel.setExecutionMode(EXECUTION_MODE.CPU);
 		kernel.execute(range);
 	    } else {

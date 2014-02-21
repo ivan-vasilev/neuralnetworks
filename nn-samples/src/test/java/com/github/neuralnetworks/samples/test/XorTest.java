@@ -10,6 +10,7 @@ import com.github.neuralnetworks.samples.xor.XorInputProvider;
 import com.github.neuralnetworks.samples.xor.XorOutputError;
 import com.github.neuralnetworks.training.TrainerFactory;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationTrainer;
+import com.github.neuralnetworks.training.events.EarlyStoppingListener;
 import com.github.neuralnetworks.training.events.LogTrainingListener;
 import com.github.neuralnetworks.training.random.MersenneTwisterRandomInitializer;
 import com.github.neuralnetworks.training.random.NNRandomInitializer;
@@ -33,6 +34,9 @@ public class XorTest {
 
 	// add logging
 	bpt.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
+
+	// early stopping
+	bpt.addEventListener(new EarlyStoppingListener(testingInput, 1000, 0.1f));
 
 	// train
 	bpt.train();

@@ -12,13 +12,15 @@ public class MiniBatchFinishedEvent extends TrainingEvent {
 
     private static final long serialVersionUID = -5239379347414855784L;
 
+    private Integer batchCount;
     private TrainingInputData data;
     private ValuesProvider results;
 
-    public MiniBatchFinishedEvent(Trainer<?> source, TrainingInputData data, ValuesProvider results) {
+    public MiniBatchFinishedEvent(Trainer<?> source, TrainingInputData data, ValuesProvider results, Integer batchCount) {
 	super(source);
 	this.data = data;
 	this.results = results;
+	this.batchCount = batchCount;
     }
 
     public TrainingInputData getData() {
@@ -27,5 +29,9 @@ public class MiniBatchFinishedEvent extends TrainingEvent {
 
     public ValuesProvider getResults() {
         return results;
+    }
+
+    public Integer getBatchCount() {
+        return batchCount;
     }
 }

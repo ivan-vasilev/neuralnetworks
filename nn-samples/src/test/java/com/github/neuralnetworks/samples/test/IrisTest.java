@@ -16,6 +16,7 @@ import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.architecture.types.RBM;
 import com.github.neuralnetworks.architecture.types.StackedAutoencoder;
 import com.github.neuralnetworks.calculation.LayerCalculatorImpl;
+import com.github.neuralnetworks.calculation.OutputError;
 import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculatorFullyConnected;
 import com.github.neuralnetworks.calculation.neuronfunctions.SoftmaxFunction;
 import com.github.neuralnetworks.input.MultipleNeuronsOutputError;
@@ -27,6 +28,7 @@ import com.github.neuralnetworks.training.TrainerFactory;
 import com.github.neuralnetworks.training.TrainingInputProvider;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationAutoencoder;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationTrainer;
+import com.github.neuralnetworks.training.events.EarlyStoppingListener;
 import com.github.neuralnetworks.training.events.LogTrainingListener;
 import com.github.neuralnetworks.training.random.MersenneTwisterRandomInitializer;
 import com.github.neuralnetworks.training.random.NNRandomInitializer;
@@ -45,14 +47,18 @@ public class IrisTest {
 	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 4, 2, 3 }, true);
 
 	// training and testing data providers
-	IrisInputProvider trainInputProvider = new IrisInputProvider(150, 1500000, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
+	IrisInputProvider trainInputProvider = new IrisInputProvider(150, 15000000, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
 	IrisInputProvider testInputProvider = new IrisInputProvider(1, 150, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
+	OutputError outputError = new MultipleNeuronsOutputError();
 
 	// trainer
-	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(mlp, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0f), 0.01f, 0.5f, 0f);
+	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(mlp, trainInputProvider, testInputProvider, outputError, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0f), 0.01f, 0.5f, 0f);
 
 	// log data
 	bpt.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
+
+	// early stopping
+	bpt.addEventListener(new EarlyStoppingListener(testInputProvider, 15000, 0.1f));
 
 	// execution mode
 	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);

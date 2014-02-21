@@ -51,9 +51,7 @@ Therefore before each GPU calculation all the data is converted to one-dim array
 Most of the data is represented as one-dimensional array by default (for example Matrix).
 
 ###How to run Aparapi
-Running Aparapi requires two things:
-- depending on your environment you might need to download aparapi.jar from https://code.google.com/p/aparapi/downloads/list and replace it with the one in */nn-core/lib/aparapi.jar*. The default aparapi.jar file included is for windows 64 bit environment.
-- add the path to aparapi.jar to the system PATH variable.
+Depending on your environment you might need to download the relevant aparapi .dll or .so file (located in the root of each archive) from https://code.google.com/p/aparapi/downloads/list and add it's location to the system PATH variable.
 
 ###Neuron types based on weighted sum
 
