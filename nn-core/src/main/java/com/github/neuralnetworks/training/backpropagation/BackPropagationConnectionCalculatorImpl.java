@@ -70,7 +70,7 @@ public abstract class BackPropagationConnectionCalculatorImpl implements Backpro
 	    if (chunkCalc.size() > 0) {
 		bc.setLearningRate(getLearningRate());
 		bc.setMomentum(getMomentum());
-		bc.setWeightDecay(getWeightDecay());
+		bc.setL1weightDecay(getL1weightDecay());
 		bc.setActivations(getActivations());
 		bc.calculate(chunkCalc, valuesProvider, target);
 	    }
@@ -104,13 +104,23 @@ public abstract class BackPropagationConnectionCalculatorImpl implements Backpro
     }
 
     @Override
-    public float getWeightDecay() {
-	return properties.getParameter(Constants.WEIGHT_DECAY);
+    public float getL1weightDecay() {
+	return properties.getParameter(Constants.L1_WEIGHT_DECAY);
     }
 
     @Override
-    public void setWeightDecay(float weightDecay) {
-	properties.setParameter(Constants.WEIGHT_DECAY, weightDecay);
+    public void setL1weightDecay(float weightDecay) {
+	properties.setParameter(Constants.L1_WEIGHT_DECAY, weightDecay);
+    }
+    
+    @Override
+    public float getL2weightDecay() {
+	return properties.getParameter(Constants.L2_WEIGHT_DECAY);
+    }
+    
+    @Override
+    public void setL2weightDecay(float weightDecay) {
+	properties.setParameter(Constants.L2_WEIGHT_DECAY, weightDecay);
     }
 
     @Override

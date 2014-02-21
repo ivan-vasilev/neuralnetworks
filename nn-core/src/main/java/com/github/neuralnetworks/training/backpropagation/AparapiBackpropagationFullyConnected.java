@@ -30,18 +30,20 @@ public class AparapiBackpropagationFullyConnected extends AparapiWeightedSum imp
 
     protected float learningRate;
     protected final float momentum;
-    protected final float weightDecay;
+    protected final float l1weightDecay;
+    protected final float l2weightDecay;
 
     /**
      * activations from the feedforward phase
      */
     protected ValuesProvider activations;
 
-    public AparapiBackpropagationFullyConnected(SortedMap<GraphConnections, Integer> inputConnections, int miniBatchSize, float learningRate, float momentum, float weightDecay, Layer targetLayer) {
+    public AparapiBackpropagationFullyConnected(SortedMap<GraphConnections, Integer> inputConnections, int miniBatchSize, float learningRate, float momentum, float l1weightDecay, float l2weightDecay, Layer targetLayer) {
 	super(inputConnections, miniBatchSize, targetLayer);
 	this.learningRate = momentum;
 	this.momentum = momentum;
-	this.weightDecay = weightDecay;
+	this.l1weightDecay = l1weightDecay;
+	this.l2weightDecay = l2weightDecay;
 	this.weightUpdates = new float[weights.length];
     }
 
@@ -73,7 +75,7 @@ public class AparapiBackpropagationFullyConnected extends AparapiWeightedSum imp
     protected void after() {
 	final int row = getGlobalId() * miniBatchSize;
 	float lr = learningRate;
-	float weightUpdate = 0;
+	float weight = 0, weightUpdate = 0;
 	int inputStartPosition = 0, initialWeightIndex = 0, weightStep = 0, dim = 0, weightIndex = 0;
 
 	for (int i = 0; i < series; i++) {
@@ -89,7 +91,8 @@ public class AparapiBackpropagationFullyConnected extends AparapiWeightedSum imp
 		}
 
 		weightIndex = initialWeightIndex + j * weightStep;
-		weightUpdate = lr * weightUpdate + momentum * weightUpdates[weightIndex] - weightDecay * abs(weights[weightIndex]);
+		weight = weights[weightIndex];
+		weightUpdate = lr * weightUpdate + momentum * weightUpdates[weightIndex] - l1weightDecay * abs(weight) - l2weightDecay * weight * weight / 2;
 		weights[weightIndex] += weightUpdate;
 		weightUpdates[weightIndex] = weightUpdate;
 	    }
@@ -124,12 +127,21 @@ public class AparapiBackpropagationFullyConnected extends AparapiWeightedSum imp
     }
 
     @Override
-    public float getWeightDecay() {
-	return weightDecay;
+    public float getL1weightDecay() {
+	return l1weightDecay;
     }
 
     @Override
-    public void setWeightDecay(float weightDecay) {
+    public void setL1weightDecay(float weightDecay) {
+    }
+
+    @Override
+    public float getL2weightDecay() {
+	return l2weightDecay;
+    }
+
+    @Override
+    public void setL2weightDecay(float l2weightDecay) {
     }
 
     @Override

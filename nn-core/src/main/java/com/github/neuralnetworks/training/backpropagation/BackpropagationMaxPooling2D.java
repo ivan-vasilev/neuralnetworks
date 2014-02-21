@@ -48,15 +48,24 @@ public class BackpropagationMaxPooling2D implements BackpropagationConnectionCal
     }
 
     @Override
-    public float getWeightDecay() {
-	return cc.getWeightDecay();
+    public float getL1weightDecay() {
+	return cc.getL1weightDecay();
     }
 
     @Override
-    public void setWeightDecay(float weightDecay) {
-	cc.setWeightDecay(weightDecay);
+    public void setL1weightDecay(float weightDecay) {
+	cc.setL1weightDecay(weightDecay);
     }
 
+    @Override
+    public float getL2weightDecay() {
+	return cc.getL2weightDecay();
+    }
+
+    @Override
+    public void setL2weightDecay(float l2weightDecay) {
+	cc.setL2weightDecay(l2weightDecay);
+    }
     @Override
     public ValuesProvider getActivations() {
 	return cc != null ? cc.getActivations() : activations;

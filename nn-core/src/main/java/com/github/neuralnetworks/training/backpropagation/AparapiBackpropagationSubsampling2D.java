@@ -66,13 +66,24 @@ public class AparapiBackpropagationSubsampling2D extends AparapiSubsampling2D im
     }
 
     @Override
-    public float getWeightDecay() {
+    public float getL1weightDecay() {
 	// UNUSED
 	return 0;
     }
 
     @Override
-    public void setWeightDecay(float weightDecay) {
+    public void setL1weightDecay(float weightDecay) {
+	// UNUSED
+    }
+
+    @Override
+    public float getL2weightDecay() {
+	// UNUSED
+	return 0;
+    }
+
+    @Override
+    public void setL2weightDecay(float l2weightDecay) {
 	// UNUSED
     }
 }

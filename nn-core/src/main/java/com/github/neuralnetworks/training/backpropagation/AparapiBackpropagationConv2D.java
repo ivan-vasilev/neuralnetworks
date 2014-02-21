@@ -33,7 +33,8 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements Backp
      */
     protected float learningRate;
     protected float momentum;
-    protected float weightDecay;
+    protected float l1weightDecay;
+    protected float l2weightDecay;
 
     /**
      * activations from the feedforward phase
@@ -104,7 +105,7 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements Backp
     protected void updateWeights() {
 	float weightUpdate = 0;
 	for (int i = 0; i < weights.length; i++) {
-	    weightUpdate = learningRate * weightUpdates[i] + momentum * weightUpdatesMomentum[i] - weightDecay * Math.abs(weights[i]);
+	    weightUpdate = learningRate * weightUpdates[i] + momentum * weightUpdatesMomentum[i] - l1weightDecay * Math.abs(weights[i]) - l2weightDecay * weights[i] * weights[i] / 2;
 	    weights[i] += weightUpdate;
 	    weightUpdatesMomentum[i] = weightUpdates[i];
 	    weightUpdates[i] = weightUpdate;
@@ -142,13 +143,23 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements Backp
     }
 
     @Override
-    public float getWeightDecay() {
-        return weightDecay;
+    public float getL1weightDecay() {
+        return l1weightDecay;
     }
 
     @Override
-    public void setWeightDecay(float weightDecay) {
-	this.weightDecay = weightDecay;
+    public void setL1weightDecay(float weightDecay) {
+	this.l1weightDecay = weightDecay;
+    }
+    
+    @Override
+    public float getL2weightDecay() {
+	return l2weightDecay;
+    }
+    
+    @Override
+    public void setL2weightDecay(float weightDecay) {
+	this.l2weightDecay = weightDecay;
     }
 
     @Override

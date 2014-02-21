@@ -25,7 +25,8 @@ public class Constants {
     public static final String BACKPROPAGATION = "backpropagation";
     public static final String OUTPUT_ERROR_DERIVATIVE = "outputErrorDerivative";
     public static final String LAYER_TRAINERS = "layerTrainers";
-    public static final String WEIGHT_DECAY = "weightDecayTrainers";
+    public static final String L1_WEIGHT_DECAY = "l1weightDecayTrainers";
+    public static final String L2_WEIGHT_DECAY = "l2weightDecayTrainers";
     public static final String CORRUPTION_LEVEL = "corruptionLevel";
     public static final String CORRUPTOR = "corruptionInitializer";
     public static final String INACTIVE_CORRUPTED_VALUE = "inactiveCorruptedValue";

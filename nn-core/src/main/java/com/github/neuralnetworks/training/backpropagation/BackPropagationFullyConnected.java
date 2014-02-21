@@ -28,10 +28,10 @@ public class BackPropagationFullyConnected extends BackPropagationConnectionCalc
 	    SortedMap<GraphConnections, Integer> m = new TreeMap<>();
 	    if (Util.isBias(e.getKey().getInputLayer()) && targetLayer != e.getKey().getInputLayer()) {
 		m.put((GraphConnections) e.getKey(), miniBatchSize);
-		connectionCalculators.put(e.getKey(), new AparapiBackpropagationFullyConnected(m, miniBatchSize, getLearningRate(), getMomentum(), getWeightDecay(), e.getKey().getInputLayer()));
+		connectionCalculators.put(e.getKey(), new AparapiBackpropagationFullyConnected(m, miniBatchSize, getLearningRate(), getMomentum(), getL1weightDecay(), getL2weightDecay(), e.getKey().getInputLayer()));
 	    } else {
 		m.put((GraphConnections) e.getKey(), e.getValue());
-		connectionCalculators.put(e.getKey(), new AparapiBackpropagationFullyConnected(m, miniBatchSize, getLearningRate(), getMomentum(), getWeightDecay(), targetLayer));
+		connectionCalculators.put(e.getKey(), new AparapiBackpropagationFullyConnected(m, miniBatchSize, getLearningRate(), getMomentum(), getL1weightDecay(), getL2weightDecay(), targetLayer));
 	    }
 	}
     }

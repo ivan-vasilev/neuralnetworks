@@ -90,6 +90,6 @@ public class AparapiCDTrainer extends CDTrainerBase {
     }
 
     protected float getWeightDecay() {
-	return (float) (properties.getParameter(Constants.WEIGHT_DECAY) != null ? properties.getParameter(Constants.WEIGHT_DECAY) : 0f);
+	return (float) (properties.getParameter(Constants.L1_WEIGHT_DECAY) != null ? properties.getParameter(Constants.L1_WEIGHT_DECAY) : 0f);
     }
 }
