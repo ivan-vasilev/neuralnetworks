@@ -7,27 +7,20 @@ import com.amd.aparapi.Kernel;
  */
 public class CDWeightUpdatesKernel extends Kernel {
 
-    private float[] posPhaseHidden;
-    private float[] posPhaseVisible;
-    private float[] negPhaseHidden;
-    private float[] negPhaseVisible;
-    private float[] weights;
-    private float[] weightUpdates;
+    private final float[] posPhaseHidden;
+    private final float[] posPhaseVisible;
+    private final float[] negPhaseHidden;
+    private final float[] negPhaseVisible;
+    private final float[] weights;
+    private final float[] weightUpdates;
     private final int weightColumns;
     private final int miniBatchSize;
     private float learningRate;
-    private float momentum;
-    private float weightDecay;
+    private final float momentum;
+    private final float l1weightDecay;
+    private final float l2weightDecay;
 
-    public CDWeightUpdatesKernel(float[] weights, int weightColumns, int miniBatchSize) {
-	super();
-	this.weights = weights;
-	this.weightUpdates = new float[weights.length];
-	this.weightColumns = weightColumns;
-	this.miniBatchSize = miniBatchSize;
-    }
-
-    public CDWeightUpdatesKernel(float[] posPhaseVisible, float[] posPhaseHidden, float[] negPhaseVisible, float[] negPhaseHidden, float[] weights, int weightColumns, float learningRate, float momentum, float weightDecay, int miniBatchSize) {
+    public CDWeightUpdatesKernel(float[] posPhaseVisible, float[] posPhaseHidden, float[] negPhaseVisible, float[] negPhaseHidden, float[] weights, int weightColumns, float learningRate, float momentum, float l1weightDecay, float l2weightDecay, int miniBatchSize) {
 	super();
 	this.posPhaseVisible = posPhaseVisible;
 	this.posPhaseHidden = posPhaseHidden;
@@ -38,7 +31,8 @@ public class CDWeightUpdatesKernel extends Kernel {
 	this.weightColumns = weightColumns;
 	this.learningRate = learningRate;
 	this.momentum = momentum;
-	this.weightDecay = weightDecay;
+	this.l1weightDecay = l1weightDecay;
+	this.l2weightDecay = l2weightDecay;
 	this.miniBatchSize = miniBatchSize;
     }
 
@@ -49,11 +43,10 @@ public class CDWeightUpdatesKernel extends Kernel {
 	int wc = weightColumns;
 	int hiddenId = id * mbs;
 	float lr = learningRate;
-	float wd = weightDecay;
 	float mm = momentum;
 
 	int visibleId = 0, weightId = 0;
-	float weightUpdate = 0;
+	float weightUpdate = 0, weight = 0;
 
 	for (int i = 0; i < wc; i++) {
 	    visibleId = i * mbs;
@@ -64,7 +57,8 @@ public class CDWeightUpdatesKernel extends Kernel {
 	    }
 
 	    weightId = id * wc + i;
-	    weightUpdate = lr * (weightUpdate /*/ mbs*/ - wd * weights[weightId]) + mm * weightUpdates[weightId];
+	    weight = weights[weightId];
+	    weightUpdate = lr * (weightUpdate /*/ mbs*/ - l1weightDecay * abs(weight) - l2weightDecay * weight * weight / 2) + mm * weightUpdates[weightId];
 	    weights[weightId] += weightUpdate;
 	    weightUpdates[weightId] = weightUpdate;
 	}
@@ -74,43 +68,20 @@ public class CDWeightUpdatesKernel extends Kernel {
         return posPhaseHidden;
     }
 
-    public void setPosPhaseHidden(float[] posPhaseHidden) {
-        this.posPhaseHidden = posPhaseHidden;
-    }
-
     public float[] getPosPhaseVisible() {
         return posPhaseVisible;
-    }
-
-    public void setPosPhaseVisible(float[] posPhaseVisible) {
-        this.posPhaseVisible = posPhaseVisible;
     }
 
     public float[] getNegPhaseHidden() {
         return negPhaseHidden;
     }
 
-    public void setNegPhaseHidden(float[] negPhaseHidden) {
-        this.negPhaseHidden = negPhaseHidden;
-    }
-
     public float[] getNegPhaseVisible() {
         return negPhaseVisible;
     }
 
-    public void setNegPhaseVisible(float[] negPhaseVisible) {
-        this.negPhaseVisible = negPhaseVisible;
-    }
-
     public float[] getWeights() {
         return weights;
-    }
-
-    public void setWeights(float[] weights) {
-        this.weights = weights;
-        if (this.weightUpdates == null || this.weightUpdates.length != weights.length) {
-            this.weightUpdates = new float[weights.length];
-        }
     }
 
     public int getWeightColumns() {
@@ -129,16 +100,12 @@ public class CDWeightUpdatesKernel extends Kernel {
         return momentum;
     }
 
-    public void setMomentum(float momentum) {
-        this.momentum = momentum;
+    public float getl1WeightDecay() {
+        return l1weightDecay;
     }
-
-    public float getWeightDecay() {
-        return weightDecay;
-    }
-
-    public void setWeightDecay(float weightDecay) {
-        this.weightDecay = weightDecay;
+    
+    public float getl2WeightDecay() {
+	return l1weightDecay;
     }
 
     public int getMiniBatchSize() {
