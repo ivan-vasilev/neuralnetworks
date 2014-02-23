@@ -19,8 +19,8 @@ Each NeuralNetwork (default NeuralNetworkImpl) is defined by a list of Layers (L
 
 ###Connections between layers
 - FullyConnected - fully connected layers of neurons. The weights are matrices (of the type Matrix).
-- Conv2DConnection - convolutional connection between two ConvGridLayers. Contains a list of filters for each feature map.
-- Subsampling2DConnection - subsampling connection between two ConvGridLayers. Contains subsampling region dimensions.
+- Conv2DConnection - convolutional connection between two layers. Contains a list of filters for each feature map.
+- Subsampling2DConnection - subsampling connection between two layers. Contains subsampling region dimensions.
 
 ###Neural Networks
 - MultiLayerPerceptron - Multilayer Perceptron.
