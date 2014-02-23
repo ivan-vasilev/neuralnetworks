@@ -1,6 +1,7 @@
 package com.github.neuralnetworks.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -16,6 +17,9 @@ import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.architecture.types.NNFactory;
+import com.github.neuralnetworks.calculation.BreadthFirstOrderStrategy;
+import com.github.neuralnetworks.calculation.LayerOrderStrategy.ConnectionCandidate;
+import com.github.neuralnetworks.calculation.TargetLayerOrderStrategy;
 import com.github.neuralnetworks.calculation.ValuesProvider;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSumConnectionCalculator;
 import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculatorFullyConnected;
@@ -369,5 +373,67 @@ public class FFNNTest {
 	mlp.removeLayer(mlp.getOutputLayer());
 	assertEquals(3, mlp.getLayers().size(), 0);
 	assertEquals(true, currentOutput != mlp.getOutputLayer());
+    }
+
+    @Test
+    public void testLayerOrderStrategy() {
+	// MLP
+	NeuralNetworkImpl mlp = NNFactory.mlp(new int[] {3, 4, 5}, true);
+	
+	Set<Layer> calculated = new HashSet<Layer>();
+	calculated.add(mlp.getInputLayer());
+	List<ConnectionCandidate> ccc = new TargetLayerOrderStrategy(mlp, mlp.getOutputLayer(), calculated).order();
+	assertEquals(4, ccc.size(), 0);
+	Layer l = mlp.getInputLayer();
+	assertTrue(ccc.get(0).connection == l.getConnections().get(0));
+	l = l.getConnections().get(0).getOutputLayer();
+	assertTrue(ccc.get(1).connection == l.getConnections().get(1));
+	assertTrue(ccc.get(2).connection == l.getConnections().get(2));
+	l = l.getConnections().get(2).getOutputLayer();
+	assertTrue(ccc.get(3).connection == l.getConnections().get(1));
+
+	ccc = new BreadthFirstOrderStrategy(mlp, mlp.getOutputLayer()).order();
+	assertEquals(4, ccc.size(), 0);
+	l = mlp.getOutputLayer();
+	assertTrue(ccc.get(0).connection == l.getConnections().get(0));
+	assertTrue(ccc.get(1).connection == l.getConnections().get(1));
+
+	l = l.getConnections().get(0).getInputLayer();
+	assertTrue(ccc.get(2).connection == l.getConnections().get(0));
+	assertTrue(ccc.get(3).connection == l.getConnections().get(1));
+
+	// Simple MLP
+	mlp = NNFactory.mlp(new int[] {3, 4}, true);
+
+	calculated = new HashSet<Layer>();
+	calculated.add(mlp.getInputLayer());
+	ccc = new TargetLayerOrderStrategy(mlp, mlp.getOutputLayer(), calculated).order();
+	assertEquals(2, ccc.size(), 0);
+	l = mlp.getOutputLayer();
+	assertTrue(ccc.get(0).connection == l.getConnections().get(0));
+	assertTrue(ccc.get(1).connection == l.getConnections().get(1));
+
+	ccc = new BreadthFirstOrderStrategy(mlp, mlp.getOutputLayer()).order();
+	assertEquals(2, ccc.size(), 0);
+	l = mlp.getOutputLayer();
+	assertTrue(ccc.get(0).connection == l.getConnections().get(0));
+	assertTrue(ccc.get(1).connection == l.getConnections().get(1));
+
+	// CNN
+	NeuralNetworkImpl cnn = NNFactory.convNN(new int[][] { { 3, 3, 2 }, { 2, 2, 1 } }, true);
+
+	calculated = new HashSet<Layer>();
+	calculated.add(cnn.getInputLayer());
+	ccc = new TargetLayerOrderStrategy(cnn, cnn.getOutputLayer(), calculated).order();
+	l = cnn.getOutputLayer();
+	assertEquals(2, ccc.size(), 0);
+	assertTrue(ccc.get(0).connection == l.getConnections().get(0));
+	assertTrue(ccc.get(1).connection == l.getConnections().get(1));
+
+	ccc = new BreadthFirstOrderStrategy(cnn, cnn.getOutputLayer()).order();
+	l = cnn.getOutputLayer();
+	assertEquals(2, ccc.size(), 0);
+	assertTrue(ccc.get(0).connection == l.getConnections().get(0));
+	assertTrue(ccc.get(1).connection == l.getConnections().get(1));
     }
 }

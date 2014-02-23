@@ -9,15 +9,25 @@ public class Conv2DConnection extends ConnectionsImpl {
      * The list of filters to be used in the connection
      */
     protected float[] weights;
-    
-    public Conv2DConnection(ConvGridLayer inputLayer, int kernelRows, int kernelColumns, int filters) {
-	super(inputLayer, new ConvGridLayer());
-	setDimensions(kernelRows, kernelColumns, filters);
-	updateDimensions();
+    protected int inputFeatureMapColumns;
+    protected int inputFeatureMapRows;
+    protected int inputFilters;
+    protected int outputFeatureMapColumns;
+    protected int outputFeatureMapRows;
+    protected int outputFilters;
+
+    public Conv2DConnection(Layer inputLayer, Layer outputLayer, int inputFeatureMapColumns, int inputFeatureMapRows, int inputFilters, int kernelRows, int kernelColumns, int outputFilters) {
+	super(inputLayer, outputLayer);
+	this.inputFeatureMapColumns = inputFeatureMapColumns;
+	this.inputFeatureMapRows = inputFeatureMapRows;
+	this.inputFilters = inputFilters;
+	this.outputFilters = outputFilters;
+	setOutputDimensions(kernelRows, kernelColumns);
     }
 
-    public Conv2DConnection(ConvGridLayer inputLayer, ConvGridLayer outputLayer) {
-	super(inputLayer, outputLayer);
+    public void setOutputDimensions(int kernelRows, int kernelColumns) {
+	outputFeatureMapRows = inputFeatureMapRows - kernelRows + 1;
+	outputFeatureMapColumns = inputFeatureMapColumns - kernelColumns + 1;
 	updateDimensions();
     }
 
@@ -25,9 +35,7 @@ public class Conv2DConnection extends ConnectionsImpl {
      * When some dimension changes in the output layer the weights array changes it's size
      */
     public void updateDimensions() {
-	ConvGridLayer i = (ConvGridLayer) getInputLayer();
-	ConvGridLayer o = (ConvGridLayer) getOutputLayer();
-	int totalWeights = getKernelColumns() * getKernelRows() * o.getFilters() * i.getFilters();
+	int totalWeights = getKernelColumns() * getKernelRows() * outputFilters * inputFilters;
 	if (weights == null || weights.length != totalWeights) {
 	    weights = new float[totalWeights];
 	}
@@ -42,32 +50,76 @@ public class Conv2DConnection extends ConnectionsImpl {
     }
 
     public int getKernelRows() {
-        ConvGridLayer i = (ConvGridLayer) getInputLayer();
-	ConvGridLayer o = (ConvGridLayer) getOutputLayer();
-	return i.getFeatureMapRows() % o.getFeatureMapRows() + 1;
+	return inputFeatureMapRows % outputFeatureMapRows + 1;
     }
 
     public int getKernelColumns() {
-        ConvGridLayer i = (ConvGridLayer) getInputLayer();
-	ConvGridLayer o = (ConvGridLayer) getOutputLayer();
-	return i.getFeatureMapColumns() % o.getFeatureMapColumns() + 1;
-    }
-
-    public void setDimensions(int kernelRows, int kernelColumns, int filters) {
-        ConvGridLayer i = (ConvGridLayer) getInputLayer();
-	ConvGridLayer o = (ConvGridLayer) getOutputLayer();
-	o.setDimensions(i.getFeatureMapRows() - kernelRows + 1, i.getFeatureMapColumns() - kernelColumns + 1, filters);
+	return inputFeatureMapColumns % outputFeatureMapColumns + 1;
     }
 
     @Override
     public int getInputUnitCount() {
-        ConvGridLayer i = (ConvGridLayer) getInputLayer();
-	return i.getFeatureMapRows() * i.getFeatureMapColumns() * i.getFilters();
+	return inputFeatureMapRows * inputFeatureMapColumns * inputFilters;
     }
 
     @Override
     public int getOutputUnitCount() {
-        ConvGridLayer o = (ConvGridLayer) getOutputLayer();
-	return o.getFeatureMapRows() * o.getFeatureMapColumns() * o.getFilters();
+	return outputFeatureMapRows * outputFeatureMapColumns * outputFilters;
+    }
+
+    public int getInputFeatureMapColumns() {
+        return inputFeatureMapColumns;
+    }
+
+    public void setInputFeatureMapColumns(int inputFeatureMapColumns) {
+        this.inputFeatureMapColumns = inputFeatureMapColumns;
+    }
+
+    public int getInputFeatureMapRows() {
+        return inputFeatureMapRows;
+    }
+
+    public void setInputFeatureMapRows(int inputFeatureMapRows) {
+        this.inputFeatureMapRows = inputFeatureMapRows;
+    }
+
+    public int getInputFeatureMapLength() {
+	return inputFeatureMapRows * inputFeatureMapColumns;
+    }
+    
+    public int getOutputFeatureMapLength() {
+	return outputFeatureMapRows * outputFeatureMapColumns;
+    }
+
+    public int getInputFilters() {
+        return inputFilters;
+    }
+
+    public void setInputFilters(int inputFilters) {
+        this.inputFilters = inputFilters;
+    }
+
+    public int getOutputFeatureMapColumns() {
+        return outputFeatureMapColumns;
+    }
+
+    public void setOutputFeatureMapColumns(int outputFeatureMapColumns) {
+        this.outputFeatureMapColumns = outputFeatureMapColumns;
+    }
+
+    public int getOutputFeatureMapRows() {
+        return outputFeatureMapRows;
+    }
+
+    public void setOutputFeatureMapRows(int outputFeatureMapRows) {
+        this.outputFeatureMapRows = outputFeatureMapRows;
+    }
+
+    public int getOutputFilters() {
+        return outputFilters;
+    }
+
+    public void setOutputFilters(int outputFilters) {
+        this.outputFilters = outputFilters;
     }
 }

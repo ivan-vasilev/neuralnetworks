@@ -15,11 +15,7 @@ The design is tiered, each tier depending on the previous ones.
 
 Architecture
 ------------
-Each NeuralNetwork (default NeuralNetworkImpl) is defined by a list of Layers. Each layer has a set of Connections (default ConnectionsImpl) that link it to the other layers of the network. Each neural network is essentially a directed acyclic graph. This structure can accommodate simple feedforwad networks, but also more complex architectures like http://www.cs.toronto.edu/~hinton/absps/imagenet.pdf.
-
-###Layer types
-- Default Layer - has a neuron count property.
-- ConvGridLayer - Convolutional 2D layer that contains information about the number of feature maps and width and height of each feature map.
+Each NeuralNetwork (default NeuralNetworkImpl) is defined by a list of Layers (Layer). Each layer has a set of Connections (default ConnectionsImpl) that link it to the other layers of the network. Each neural network is essentially a directed acyclic graph. This structure can accommodate simple feedforwad networks, but also more complex architectures like http://www.cs.toronto.edu/~hinton/absps/imagenet.pdf.
 
 ###Connections between layers
 - FullyConnected - fully connected layers of neurons. The weights are matrices (of the type Matrix).

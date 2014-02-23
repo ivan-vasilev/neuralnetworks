@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Set;
 
 import com.github.neuralnetworks.architecture.Connections;
-import com.github.neuralnetworks.architecture.ConvGridLayer;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
@@ -112,7 +111,7 @@ public class TrainerFactory {
 		    ConnectionCalculator ffcc = null;
 		    if (Util.isBias(current)) {
 			ffcc = lc.getConnectionCalculator(current.getConnections().get(0).getOutputLayer());
-		    } else if (current instanceof ConvGridLayer) {
+		    } else if (Util.isConvolutional(current) || Util.isSubsampling(current)) {
 			if (chunk.size() != 1) {
 			    throw new IllegalArgumentException("Convolutional layer with more than one connection");
 			}

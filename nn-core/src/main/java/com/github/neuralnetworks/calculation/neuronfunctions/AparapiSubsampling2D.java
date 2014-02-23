@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.amd.aparapi.Kernel;
 import com.github.neuralnetworks.architecture.Connections;
-import com.github.neuralnetworks.architecture.ConvGridLayer;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.Subsampling2DConnection;
@@ -91,22 +90,20 @@ public abstract class AparapiSubsampling2D extends Kernel implements ConnectionC
 
     public AparapiSubsampling2D(Subsampling2DConnection c, int miniBatchSize) {
 	this.miniBatchSize = miniBatchSize;
-	ConvGridLayer inputLayer = (ConvGridLayer) c.getInputLayer();
-	ConvGridLayer outputLayer = (ConvGridLayer) c.getOutputLayer();
-	this.inputFeatureMapColumns = inputLayer.getFeatureMapColumns();
-	this.inputFeatureMapLength = inputLayer.getFeatureMapLength();
-	this.outputFeatureMapColumns = outputLayer.getFeatureMapColumns();
-	this.outputFeatureMapLength = outputLayer.getFeatureMapLength();
+	this.inputFeatureMapColumns = c.getInputFeatureMapColumns();
+	this.inputFeatureMapLength = c.getInputFeatureMapLength();
+	this.outputFeatureMapColumns = c.getOutputFeatureMapColumns();
+	this.outputFeatureMapLength = c.getOutputFeatureMapLength();
 	this.subsamplingRows = c.getSubsamplingRegionRows();
 	this.subsamplingCols = c.getSubsamplingRegionCols();
 	this.regionLength = c.getSubsamplingRegionLength();
-	this.ioRowsOffset = (inputLayer.getFeatureMapRows() % subsamplingRows) / 2;
-	this.ioColumnsOffset = (inputLayer.getFeatureMapColumns() % subsamplingCols) / 2;
+	this.ioRowsOffset = (c.getInputFeatureMapRows() % subsamplingRows) / 2;
+	this.ioColumnsOffset = (c.getInputFeatureMapColumns() % subsamplingCols) / 2;
 	this.featureMapOffsets = new int[regionLength];
 
 	for (int i = 0, j = 0; j < subsamplingRows; j++) {
 	    for (int k = 0; k < subsamplingCols; k++, i++) {
-		featureMapOffsets[i] = j * inputLayer.getFeatureMapColumns() + k;
+		featureMapOffsets[i] = j * c.getInputFeatureMapColumns() + k;
 	    }
 	}
     }

@@ -1,7 +1,7 @@
 package com.github.neuralnetworks.architecture.types;
 
+import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
-import com.github.neuralnetworks.architecture.ConvGridLayer;
 import com.github.neuralnetworks.architecture.FullyConnected;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
@@ -57,7 +57,7 @@ public class NNFactory {
 
 	Layer prev = null;
 	int prevUnitCount = layers[0][0] * layers[0][1] * layers[0][2];
-	result.addLayer(prev = new ConvGridLayer(layers[0][0], layers[0][1], layers[0][2]));
+	result.addLayer(prev = new Layer());
 	for (int i = 1; i < layers.length; i++) {
 	    int[] l = layers[i];
 	    Layer newLayer = null;
@@ -69,14 +69,42 @@ public class NNFactory {
 		}
 
 		prevUnitCount = l[0];
-	    } else if (l.length == 3) {
-		newLayer = new Conv2DConnection((ConvGridLayer) prev, l[0], l[1], l[2]).getOutputLayer();
-		if (addBias) {
-		    ConvGridLayer nl = (ConvGridLayer) newLayer;
-		    new Conv2DConnection((ConvGridLayer) (biasLayer = new ConvGridLayer(nl.getFeatureMapRows(), nl.getFeatureMapColumns(), 1, true)), (ConvGridLayer) newLayer);
+	    } else if (l.length == 3 || l.length == 2) {
+		Integer inputFMRows = null;
+		Integer inputFMCols = null;
+		Integer filters = null;
+		if (i == 1) {
+		    inputFMRows = layers[0][0];
+		    inputFMCols = layers[0][1];
+		    filters = layers[0][2];
+		} else {
+		    for (Connections c : prev.getConnections()) {
+			if (c.getOutputLayer() == prev) {
+			    if (c instanceof Conv2DConnection) {
+				Conv2DConnection cc = (Conv2DConnection) c;
+				inputFMRows = cc.getOutputFeatureMapRows();
+				inputFMCols = cc.getOutputFeatureMapColumns();
+				filters = cc.getOutputFilters();
+				break;
+			    } else if (c instanceof Subsampling2DConnection) {
+				Subsampling2DConnection sc = (Subsampling2DConnection) c;
+				inputFMRows = sc.getOutputFeatureMapRows();
+				inputFMCols = sc.getOutputFeatureMapColumns();
+				filters = sc.getFilters();
+				break;
+			    }
+			}
+		    }
 		}
-	    } else if (l.length == 2) {
-		newLayer = new Subsampling2DConnection((ConvGridLayer) prev, l[0], l[1]).getOutputLayer();
+
+		if (l.length == 3) {
+		    Conv2DConnection c = new Conv2DConnection(prev, newLayer = new Layer(), inputFMRows, inputFMCols, filters, l[0], l[1], l[2]);
+		    if (addBias) {
+			new Conv2DConnection(biasLayer = new Layer(), newLayer, c.getOutputFeatureMapRows(), c.getOutputFeatureMapColumns(), 1, 1, 1, l[2]);
+		    }
+		} else if (l.length == 2) {
+		    new Subsampling2DConnection(prev, newLayer = new Layer(), inputFMRows, inputFMCols, l[0], l[1], filters);
+		}
 	    }
 
 	    result.addLayer(newLayer);
@@ -137,10 +165,8 @@ public class NNFactory {
 	    if (!Util.isBias(l)) {
 		if (outputCC != null && nn.getOutputLayer() == l) {
 		    lc.addConnectionCalculator(l, outputCC);
-		} else if (l instanceof ConvGridLayer) {
-		    if (Util.isConvolutional(l)) {
-			lc.addConnectionCalculator(l, new ConnectionCalculatorConv());
-		    }
+		} else if (Util.isConvolutional(l)) {
+		    lc.addConnectionCalculator(l, new ConnectionCalculatorConv());
 		} else {
 		    lc.addConnectionCalculator(l, new ConnectionCalculatorFullyConnected());
 		}
@@ -158,10 +184,8 @@ public class NNFactory {
 	    if (!Util.isBias(l)) {
 		if (outputCC != null && nn.getOutputLayer() == l) {
 		    lc.addConnectionCalculator(l, outputCC);
-		} else if (l instanceof ConvGridLayer) {
-		    if (Util.isConvolutional(l)) {
-			lc.addConnectionCalculator(l, new AparapiConv2DSigmoid());
-		    }
+		} else if (Util.isConvolutional(l)) {
+		    lc.addConnectionCalculator(l, new AparapiConv2DSigmoid());
 		} else {
 		    lc.addConnectionCalculator(l, new AparapiSigmoid());
 		}
@@ -185,10 +209,8 @@ public class NNFactory {
 			c.addActivationFunction(new SoftmaxFunction());
 			lc.addConnectionCalculator(l, c);
 		    }
-		} else if (l instanceof ConvGridLayer) {
-		    if (Util.isConvolutional(l)) {
-			lc.addConnectionCalculator(l, new AparapiConv2DSoftReLU());
-		    }
+		} else if (Util.isConvolutional(l)) {
+		    lc.addConnectionCalculator(l, new AparapiConv2DSoftReLU());
 		} else {
 		    lc.addConnectionCalculator(l, new AparapiSoftReLU());
 		}
@@ -212,10 +234,8 @@ public class NNFactory {
 			c.addActivationFunction(new SoftmaxFunction());
 			lc.addConnectionCalculator(l, c);
 		    }
-		} else if (l instanceof ConvGridLayer) {
-		    if (Util.isConvolutional(l)) {
-			lc.addConnectionCalculator(l, new AparapiConv2DReLU());
-		    }
+		} else if (Util.isConvolutional(l)) {
+		    lc.addConnectionCalculator(l, new AparapiConv2DReLU());
 		} else {
 		    lc.addConnectionCalculator(l, new AparapiReLU());
 		}
@@ -233,10 +253,8 @@ public class NNFactory {
 	    if (!Util.isBias(l)) {
 		if (outputCC != null && nn.getOutputLayer() == l) {
 		    lc.addConnectionCalculator(l, outputCC);
-		} else if (l instanceof ConvGridLayer) {
-		    if (Util.isConvolutional(l)) {
-			lc.addConnectionCalculator(l, new AparapiConv2DTanh());
-		    }
+		} else if (Util.isConvolutional(l)) {
+		    lc.addConnectionCalculator(l, new AparapiConv2DTanh());
 		} else {
 		    lc.addConnectionCalculator(l, new AparapiTanh());
 		}

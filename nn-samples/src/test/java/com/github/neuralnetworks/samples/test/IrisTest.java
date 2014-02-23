@@ -122,7 +122,7 @@ public class IrisTest {
 
 	TrainingInputProvider trainInputProvider = new IrisInputProvider(150, 150000, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
 	TrainingInputProvider testInputProvider = new IrisInputProvider(1, 150, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
-
+ 
 	// rbm trainers for each layer
 	AparapiCDTrainer firstTrainer = TrainerFactory.cdSigmoidTrainer(dbn.getFirstNeuralNetwork(), null, null, null, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.01f, 0.5f, 0f, 0f, 1, true);
 	AparapiCDTrainer lastTrainer = TrainerFactory.cdSigmoidTrainer(dbn.getLastNeuralNetwork(), null, null, null, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.01f, 0.5f, 0f, 0f, 1, true);

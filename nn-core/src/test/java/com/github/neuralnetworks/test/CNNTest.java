@@ -13,7 +13,6 @@ import org.junit.Test;
 import com.amd.aparapi.Kernel.EXECUTION_MODE;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
-import com.github.neuralnetworks.architecture.ConvGridLayer;
 import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Matrix;
@@ -50,22 +49,18 @@ public class CNNTest {
     @Test
     public void testDimensions() {
 	// convolution dimensions
-	Conv2DConnection conv = new Conv2DConnection(new ConvGridLayer(4, 4, 3), 2, 2, 2);
+	Conv2DConnection conv = new Conv2DConnection(new Layer(), new Layer(), 4, 4, 3, 2, 2, 2);
 
-	ConvGridLayer output = (ConvGridLayer) conv.getOutputLayer();
-
-	assertEquals(3, output.getFeatureMapColumns(), 0);
-	assertEquals(3, output.getFeatureMapRows(), 0);
-	assertEquals(2, output.getFilters(), 0);
+	assertEquals(3, conv.getOutputFeatureMapColumns(), 0);
+	assertEquals(3, conv.getOutputFeatureMapRows(), 0);
+	assertEquals(2, conv.getOutputFilters(), 0);
 
 	// subsampling dimensions
-	Subsampling2DConnection sub = new Subsampling2DConnection(new ConvGridLayer(5, 5, 3), 2, 2);
+	Subsampling2DConnection sub = new Subsampling2DConnection(new Layer(), new Layer(), 5, 5, 2, 2, 3);
 
-	output = (ConvGridLayer) sub.getOutputLayer();
-
-	assertEquals(2, output.getFeatureMapColumns(), 0);
-	assertEquals(2, output.getFeatureMapRows(), 0);
-	assertEquals(3, output.getFilters(), 0);
+	assertEquals(2, sub.getOutputFeatureMapColumns(), 0);
+	assertEquals(2, sub.getOutputFeatureMapRows(), 0);
+	assertEquals(3, sub.getFilters(), 0);
     }
 
     @Test
@@ -73,30 +68,35 @@ public class CNNTest {
 	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 32, 32, 1 }, { 5, 5, 6 }, { 2, 2 }, { 5, 5, 16 }, { 2, 2 }, { 5, 5, 120 }, {84}, {10} }, true);
 	assertEquals(13, nn.getLayers().size(), 0);
 
-	ConvGridLayer l = (ConvGridLayer) nn.getInputLayer().getConnections().get(0).getOutputLayer();
-	assertEquals(28, l.getFeatureMapRows(), 0);
-	assertEquals(28, l.getFeatureMapColumns(), 0);
-	assertEquals(6, l.getFilters(), 0);
+	Layer l = nn.getInputLayer().getConnections().get(0).getOutputLayer();
+	Conv2DConnection cc = (Conv2DConnection) nn.getInputLayer().getConnections().get(0);
+	assertEquals(28, cc.getOutputFeatureMapRows(), 0);
+	assertEquals(28, cc.getOutputFeatureMapColumns(), 0);
+	assertEquals(6, cc.getOutputFilters(), 0);
 
-	l = (ConvGridLayer) l.getConnections().get(2).getOutputLayer();
-	assertEquals(14, l.getFeatureMapRows(), 0);
-	assertEquals(14, l.getFeatureMapColumns(), 0);
-	assertEquals(6, l.getFilters(), 0);
+	Subsampling2DConnection sc = (Subsampling2DConnection) l.getConnections().get(2);
+	l = l.getConnections().get(2).getOutputLayer();
+	assertEquals(14, sc.getOutputFeatureMapRows(), 0);
+	assertEquals(14, sc.getOutputFeatureMapColumns(), 0);
+	assertEquals(6, sc.getFilters(), 0);
 
-	l = (ConvGridLayer) l.getConnections().get(1).getOutputLayer();
-	assertEquals(10, l.getFeatureMapRows(), 0);
-	assertEquals(10, l.getFeatureMapColumns(), 0);
-	assertEquals(16, l.getFilters(), 0);
+	cc = (Conv2DConnection) l.getConnections().get(1);
+	l = l.getConnections().get(1).getOutputLayer();
+	assertEquals(10, cc.getOutputFeatureMapRows(), 0);
+	assertEquals(10, cc.getOutputFeatureMapColumns(), 0);
+	assertEquals(16, cc.getOutputFilters(), 0);
 
-	l = (ConvGridLayer) l.getConnections().get(2).getOutputLayer();
-	assertEquals(5, l.getFeatureMapRows(), 0);
-	assertEquals(5, l.getFeatureMapColumns(), 0);
-	assertEquals(16, l.getFilters(), 0);
+	sc = (Subsampling2DConnection) l.getConnections().get(2);
+	l = l.getConnections().get(2).getOutputLayer();
+	assertEquals(5, sc.getOutputFeatureMapRows(), 0);
+	assertEquals(5, sc.getOutputFeatureMapColumns(), 0);
+	assertEquals(16, sc.getFilters(), 0);
 
-	l = (ConvGridLayer) l.getConnections().get(1).getOutputLayer();
-	assertEquals(1, l.getFeatureMapRows(), 0);
-	assertEquals(1, l.getFeatureMapColumns(), 0);
-	assertEquals(120, l.getFilters(), 0);
+	cc = (Conv2DConnection) l.getConnections().get(1);
+	l = l.getConnections().get(1).getOutputLayer();
+	assertEquals(1, cc.getOutputFeatureMapRows(), 0);
+	assertEquals(1, cc.getOutputFeatureMapColumns(), 0);
+	assertEquals(120, cc.getOutputFilters(), 0);
 
 	GraphConnections cg = (GraphConnections) l.getConnections().get(2);
 	assertEquals(84, cg.getConnectionGraph().getRows(), 0);
@@ -110,25 +110,29 @@ public class CNNTest {
 	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 28, 28, 1 }, { 5, 5, 20 }, { 2, 2 }, { 5, 5, 50 }, { 2, 2 }, {500}, {10} }, true);
 	assertEquals(11, nn.getLayers().size(), 0);
 
-	ConvGridLayer l = (ConvGridLayer) nn.getInputLayer().getConnections().get(0).getOutputLayer();
-	assertEquals(24, l.getFeatureMapRows(), 0);
-	assertEquals(24, l.getFeatureMapColumns(), 0);
-	assertEquals(20, l.getFilters(), 0);
+	Conv2DConnection cc = (Conv2DConnection) nn.getInputLayer().getConnections().get(0);
+	Layer l = nn.getInputLayer().getConnections().get(0).getOutputLayer();
+	assertEquals(24, cc.getOutputFeatureMapRows(), 0);
+	assertEquals(24, cc.getOutputFeatureMapColumns(), 0);
+	assertEquals(20, cc.getOutputFilters(), 0);
 
-	l = (ConvGridLayer) l.getConnections().get(2).getOutputLayer();
-	assertEquals(12, l.getFeatureMapRows(), 0);
-	assertEquals(12, l.getFeatureMapColumns(), 0);
-	assertEquals(20, l.getFilters(), 0);
+	Subsampling2DConnection sc = (Subsampling2DConnection) l.getConnections().get(2);
+	l = l.getConnections().get(2).getOutputLayer();
+	assertEquals(12, sc.getOutputFeatureMapRows(), 0);
+	assertEquals(12, sc.getOutputFeatureMapColumns(), 0);
+	assertEquals(20, sc.getFilters(), 0);
 
-	l = (ConvGridLayer) l.getConnections().get(1).getOutputLayer();
-	assertEquals(8, l.getFeatureMapRows(), 0);
-	assertEquals(8, l.getFeatureMapColumns(), 0);
-	assertEquals(50, l.getFilters(), 0);
+	cc = (Conv2DConnection) l.getConnections().get(1);
+	l = l.getConnections().get(1).getOutputLayer();
+	assertEquals(8, cc.getOutputFeatureMapRows(), 0);
+	assertEquals(8, cc.getOutputFeatureMapColumns(), 0);
+	assertEquals(50, cc.getOutputFilters(), 0);
 
-	l = (ConvGridLayer) l.getConnections().get(2).getOutputLayer();
-	assertEquals(4, l.getFeatureMapRows(), 0);
-	assertEquals(4, l.getFeatureMapColumns(), 0);
-	assertEquals(50, l.getFilters(), 0);
+	sc = (Subsampling2DConnection) l.getConnections().get(2);
+	l = l.getConnections().get(2).getOutputLayer();
+	assertEquals(4, sc.getOutputFeatureMapRows(), 0);
+	assertEquals(4, sc.getOutputFeatureMapColumns(), 0);
+	assertEquals(50, sc.getFilters(), 0);
 	assertEquals(50 * 4 * 4, l.getConnections().get(0).getOutputUnitCount(), 0);
 
 	Layer layer = l.getConnections().get(1).getOutputLayer();
@@ -202,7 +206,7 @@ public class CNNTest {
     @Test
     public void testConvolutions() {
 	NeuralNetworkImpl nn = new NeuralNetworkImpl();
-	Conv2DConnection c = new Conv2DConnection(new ConvGridLayer(3, 3, 2), 2, 2, 1);
+	Conv2DConnection c = new Conv2DConnection(new Layer(), new Layer(), 3, 3, 2, 2, 2, 1);
 	nn.addConnection(c);
 	c.getWeights()[0] = 1;
 	c.getWeights()[1] = 2;
@@ -231,7 +235,7 @@ public class CNNTest {
 
     @Test
     public void testConvolutions2() {
-	Conv2DConnection c = new Conv2DConnection(new ConvGridLayer(3, 3, 2), 2, 2, 2);
+	Conv2DConnection c = new Conv2DConnection(new Layer(), new Layer(), 3, 3, 2, 2, 2, 2);
 	c.getWeights()[0] = 1;
 	c.getWeights()[1] = 2;
 	c.getWeights()[2] = 3;
@@ -309,7 +313,7 @@ public class CNNTest {
 
     @Test
     public void testMaxPooling() {
-	Subsampling2DConnection c = new Subsampling2DConnection(new ConvGridLayer(4, 4, 2), 2, 2);
+	Subsampling2DConnection c = new Subsampling2DConnection(new Layer(), new Layer(), 4, 4, 2, 2, 2);
 	Matrix i1 = new Matrix(new float[] { 0.5f, 1, 1, 2, 1.5f, 3, 2, 4, 2.5f, 5, 3, 6, 3.5f, 7, 4f, 8, 4.5f, 9, 5f, 10, 5.5f, 11, 6f, 12, 6.5f, 13, 7f, 14, 8f, 16, 7.5f, 15, 8.5f, 17, 9f, 18, 9.5f, 19, 10f, 20, 10.5f, 21, 11f, 22, 11.5f, 23, 12f, 24, 12.5f, 25, 13f, 26, 13.5f, 27, 14f, 28, 14.5f, 29, 15f, 30, 16f, 32, 15.5f, 31 }, 2);
 	List<Connections> connections = new ArrayList<Connections>();
 	connections.add(c);
@@ -344,7 +348,7 @@ public class CNNTest {
 
     @Test
     public void testAveragePooling() {
-	Subsampling2DConnection c = new Subsampling2DConnection(new ConvGridLayer(4, 4, 2), 2, 2);
+	Subsampling2DConnection c = new Subsampling2DConnection(new Layer(), new Layer(), 4, 4, 2, 2, 2);
 	Matrix i1 = new Matrix(new float[] { 0.5f, 1, 1, 2, 1.5f, 3, 2, 4, 2.5f, 5, 3, 6, 3.5f, 7, 4f, 8, 4.5f, 9, 5f, 10, 5.5f, 11, 6f, 12, 6.5f, 13, 7f, 14, 8f, 16, 7.5f, 15, 8.5f, 17, 9f, 18, 9.5f, 19, 10f, 20, 10.5f, 21, 11f, 22, 11.5f, 23, 12f, 24, 12.5f, 25, 13f, 26, 13.5f, 27, 14f, 28, 14.5f, 29, 15f, 30, 16f, 32, 15.5f, 31 }, 2);
 	List<Connections> connections = new ArrayList<Connections>();
 	connections.add(c);
@@ -379,7 +383,7 @@ public class CNNTest {
 
     @Test
     public void testStochasticPooling() {
-	Subsampling2DConnection c = new Subsampling2DConnection(new ConvGridLayer(3, 3, 1), 3, 3);
+	Subsampling2DConnection c = new Subsampling2DConnection(new Layer(), new Layer(), 3, 3, 3, 3, 1);
 	Matrix i1 = new Matrix(new float[] { 1.6f, 1.6f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2.4f, 2.4f }, 2);
 	List<Connections> connections = new ArrayList<Connections>();
 	connections.add(c);
@@ -399,7 +403,7 @@ public class CNNTest {
 
     @Test
     public void testMaxPoolingBackpropagation() {
-	Subsampling2DConnection c = new Subsampling2DConnection(new ConvGridLayer(4, 4, 2), 2, 2);
+	Subsampling2DConnection c = new Subsampling2DConnection(new Layer(), new Layer(), 4, 4, 2, 2, 2);
 	Matrix a1 = new Matrix(new float[] { 0.5f, 1, 1, 2, 1.5f, 3, 2, 4, 2.5f, 5, 3, 6, 3.5f, 7, 4f, 8, 4.5f, 9, 5f, 10, 5.5f, 11, 6f, 12, 6.5f, 13, 7f, 14, 8f, 16, 7.5f, 15, 8.5f, 17, 9f, 18, 9.5f, 19, 10f, 20, 10.5f, 21, 11f, 22, 11.5f, 23, 12f, 24, 12.5f, 25, 13f, 26, 13.5f, 27, 14f, 28, 14.5f, 29, 15f, 30, 16f, 32, 15.5f, 31 }, 2);
 	Matrix o = new Matrix(8, 2);
 
@@ -440,7 +444,7 @@ public class CNNTest {
     @Test
     public void testAveragePoolingBackpropagation() {
 	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
-	Subsampling2DConnection c = new Subsampling2DConnection(new ConvGridLayer(4, 4, 2), 2, 2);
+	Subsampling2DConnection c = new Subsampling2DConnection(new Layer(), new Layer(), 4, 4, 2, 2, 2);
 	Matrix a1 = new Matrix(new float[] { 0.5f, 1, 1, 2, 1.5f, 3, 2, 4, 2.5f, 5, 3, 6, 3.5f, 7, 4f, 8, 4.5f, 9, 5f, 10, 5.5f, 11, 6f, 12, 6.5f, 13, 7f, 14, 8f, 16, 7.5f, 15, 8.5f, 17, 9f, 18, 9.5f, 19, 10f, 20, 10.5f, 21, 11f, 22, 11.5f, 23, 12f, 24, 12.5f, 25, 13f, 26, 13.5f, 27, 14f, 28, 14.5f, 29, 15f, 30, 16f, 32, 15.5f, 31 }, 2);
 
 	// max pooling

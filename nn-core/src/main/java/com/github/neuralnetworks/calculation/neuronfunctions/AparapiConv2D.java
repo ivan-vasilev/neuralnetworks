@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 import com.amd.aparapi.Kernel;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
-import com.github.neuralnetworks.architecture.ConvGridLayer;
 import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.util.Environment;
 
@@ -70,21 +69,18 @@ public abstract class AparapiConv2D extends Kernel implements Serializable {
     public AparapiConv2D(Conv2DConnection c, int miniBatchSize) {
 	super();
 
-	ConvGridLayer inputLayer = (ConvGridLayer) c.getInputLayer();
-	ConvGridLayer outputLayer = (ConvGridLayer) c.getOutputLayer();
-
 	this.weights = c.getWeights();
 	this.miniBatchSize = miniBatchSize;
-	this.inputColumns = inputLayer.getFeatureMapColumns();
-	this.outputColumns = outputLayer.getFeatureMapColumns();
-	this.outputFeatureMapLength = outputLayer.getFeatureMapLength();
-	this.featureMapWeights = c.getWeights().length / outputLayer.getFilters();
+	this.inputColumns = c.getInputFeatureMapColumns();
+	this.outputColumns = c.getOutputFeatureMapColumns();
+	this.outputFeatureMapLength = c.getOutputFeatureMapLength();
+	this.featureMapWeights = c.getWeights().length / c.getOutputFilters();
 	this.featureMapOffsets = new int[featureMapWeights];
 
-	for (int i = 0, offset = 0; i < inputLayer.getFilters(); i++) {
+	for (int i = 0, offset = 0; i < c.getInputFilters(); i++) {
 	    for (int j = 0; j < c.getKernelRows(); j++) {
 		for (int k = 0; k < c.getKernelColumns(); k++) {
-		    featureMapOffsets[offset++] = i * inputLayer.getFeatureMapLength() + j * inputLayer.getFeatureMapColumns() + k;
+		    featureMapOffsets[offset++] = i * c.getInputFeatureMapLength() + j * c.getInputFeatureMapColumns() + k;
 		}
 	    }
 	}
