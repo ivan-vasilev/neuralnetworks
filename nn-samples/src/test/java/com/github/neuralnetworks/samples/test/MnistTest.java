@@ -91,7 +91,7 @@ public class MnistTest {
     @Test
     @Ignore
     public void testLeNet() {
-	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 28, 28, 1 }, { 5, 5, 20 }, { 2, 2 }, { 5, 5, 50 }, { 2, 2 }, {512}, {10} }, true);
+	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 28, 28, 1 }, { 5, 5, 20, 1 }, { 2, 2 }, { 5, 5, 50, 1 }, { 2, 2 }, {512}, {10} }, true);
 	nn.setLayerCalculator(NNFactory.lcSigmoid(nn, null));
 	NNFactory.lcMaxPooling(nn);
 
@@ -117,7 +117,7 @@ public class MnistTest {
 
     @Test
     public void testLeNetSmall() {
-	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 28, 28, 1 }, { 5, 5, 4 }, { 2, 2 }, { 5, 5, 6 }, { 2, 2 }, {120}, {10} }, false);
+	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 28, 28, 1 }, { 5, 5, 4, 1 }, { 2, 2 }, { 5, 5, 6, 1 }, { 2, 2 }, {120}, {10} }, false);
 	nn.setLayerCalculator(NNFactory.lcSigmoid(nn, null));
 	NNFactory.lcMaxPooling(nn);
 

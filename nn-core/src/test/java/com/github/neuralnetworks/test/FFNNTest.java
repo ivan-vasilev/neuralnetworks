@@ -420,7 +420,7 @@ public class FFNNTest {
 	assertTrue(ccc.get(1).connection == l.getConnections().get(1));
 
 	// CNN
-	NeuralNetworkImpl cnn = NNFactory.convNN(new int[][] { { 3, 3, 2 }, { 2, 2, 1 } }, true);
+	NeuralNetworkImpl cnn = NNFactory.convNN(new int[][] { { 3, 3, 2 }, { 2, 2, 1, 1 } }, true);
 
 	calculated = new HashSet<Layer>();
 	calculated.add(cnn.getInputLayer());

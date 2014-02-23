@@ -12,22 +12,20 @@ public class Conv2DConnection extends ConnectionsImpl {
     protected int inputFeatureMapColumns;
     protected int inputFeatureMapRows;
     protected int inputFilters;
-    protected int outputFeatureMapColumns;
-    protected int outputFeatureMapRows;
+    protected int kernelRows;
+    protected int kernelColumns;
     protected int outputFilters;
+    protected int stride;
 
-    public Conv2DConnection(Layer inputLayer, Layer outputLayer, int inputFeatureMapColumns, int inputFeatureMapRows, int inputFilters, int kernelRows, int kernelColumns, int outputFilters) {
+    public Conv2DConnection(Layer inputLayer, Layer outputLayer, int inputFeatureMapColumns, int inputFeatureMapRows, int inputFilters, int kernelRows, int kernelColumns, int outputFilters, int stride) {
 	super(inputLayer, outputLayer);
 	this.inputFeatureMapColumns = inputFeatureMapColumns;
 	this.inputFeatureMapRows = inputFeatureMapRows;
 	this.inputFilters = inputFilters;
 	this.outputFilters = outputFilters;
-	setOutputDimensions(kernelRows, kernelColumns);
-    }
-
-    public void setOutputDimensions(int kernelRows, int kernelColumns) {
-	outputFeatureMapRows = inputFeatureMapRows - kernelRows + 1;
-	outputFeatureMapColumns = inputFeatureMapColumns - kernelColumns + 1;
+	this.kernelRows = kernelRows;
+	this.kernelColumns = kernelColumns;
+	this.stride = stride;
 	updateDimensions();
     }
 
@@ -50,11 +48,11 @@ public class Conv2DConnection extends ConnectionsImpl {
     }
 
     public int getKernelRows() {
-	return inputFeatureMapRows % outputFeatureMapRows + 1;
+	return kernelRows;
     }
 
     public int getKernelColumns() {
-	return inputFeatureMapColumns % outputFeatureMapColumns + 1;
+	return kernelColumns;
     }
 
     @Override
@@ -64,7 +62,7 @@ public class Conv2DConnection extends ConnectionsImpl {
 
     @Override
     public int getOutputUnitCount() {
-	return outputFeatureMapRows * outputFeatureMapColumns * outputFilters;
+	return getOutputFeatureMapLength() * outputFilters;
     }
 
     public int getInputFeatureMapColumns() {
@@ -88,7 +86,7 @@ public class Conv2DConnection extends ConnectionsImpl {
     }
     
     public int getOutputFeatureMapLength() {
-	return outputFeatureMapRows * outputFeatureMapColumns;
+	return getOutputFeatureMapRows() * getOutputFeatureMapColumns();
     }
 
     public int getInputFilters() {
@@ -100,19 +98,11 @@ public class Conv2DConnection extends ConnectionsImpl {
     }
 
     public int getOutputFeatureMapColumns() {
-        return outputFeatureMapColumns;
-    }
-
-    public void setOutputFeatureMapColumns(int outputFeatureMapColumns) {
-        this.outputFeatureMapColumns = outputFeatureMapColumns;
+        return (inputFeatureMapRows - kernelRows) / stride + 1;
     }
 
     public int getOutputFeatureMapRows() {
-        return outputFeatureMapRows;
-    }
-
-    public void setOutputFeatureMapRows(int outputFeatureMapRows) {
-        this.outputFeatureMapRows = outputFeatureMapRows;
+        return (inputFeatureMapColumns - kernelColumns) / stride + 1;
     }
 
     public int getOutputFilters() {
@@ -121,5 +111,13 @@ public class Conv2DConnection extends ConnectionsImpl {
 
     public void setOutputFilters(int outputFilters) {
         this.outputFilters = outputFilters;
+    }
+
+    public int getStride() {
+        return stride;
+    }
+
+    public void setStride(int stride) {
+        this.stride = stride;
     }
 }

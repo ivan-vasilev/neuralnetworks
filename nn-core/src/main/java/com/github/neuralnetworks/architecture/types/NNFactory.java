@@ -37,7 +37,7 @@ public class NNFactory {
      * Create convolutional network
      * @param layers
      * The first layer must have 3 parameters - rows, columns and filter count (usually 1)
-     * Convolutional connections must have 3 parameters - kernelRows, kernelColumns, filters. The first layer must be convolutional.
+     * Convolutional connections must have 4 parameters - kernelRows, kernelColumns, filters and stride. The first layer must be convolutional.
      * Subsampling connections must have 2 parameters - subsamplingRegionRows, subsamplingRegionCols
      * Regular layers must have 1 parameter - neuron count
      * 
@@ -69,7 +69,7 @@ public class NNFactory {
 		}
 
 		prevUnitCount = l[0];
-	    } else if (l.length == 3 || l.length == 2) {
+	    } else if (l.length == 4 || l.length == 2) {
 		Integer inputFMRows = null;
 		Integer inputFMCols = null;
 		Integer filters = null;
@@ -97,10 +97,10 @@ public class NNFactory {
 		    }
 		}
 
-		if (l.length == 3) {
-		    Conv2DConnection c = new Conv2DConnection(prev, newLayer = new Layer(), inputFMRows, inputFMCols, filters, l[0], l[1], l[2]);
+		if (l.length == 4) {
+		    Conv2DConnection c = new Conv2DConnection(prev, newLayer = new Layer(), inputFMRows, inputFMCols, filters, l[0], l[1], l[2], l[3]);
 		    if (addBias) {
-			new Conv2DConnection(biasLayer = new Layer(), newLayer, c.getOutputFeatureMapRows(), c.getOutputFeatureMapColumns(), 1, 1, 1, l[2]);
+			new Conv2DConnection(biasLayer = new Layer(), newLayer, c.getOutputFeatureMapRows(), c.getOutputFeatureMapColumns(), 1, 1, 1, l[2], l[3]);
 		    }
 		} else if (l.length == 2) {
 		    new Subsampling2DConnection(prev, newLayer = new Layer(), inputFMRows, inputFMCols, l[0], l[1], filters);

@@ -49,7 +49,7 @@ public class CNNTest {
     @Test
     public void testDimensions() {
 	// convolution dimensions
-	Conv2DConnection conv = new Conv2DConnection(new Layer(), new Layer(), 4, 4, 3, 2, 2, 2);
+	Conv2DConnection conv = new Conv2DConnection(new Layer(), new Layer(), 4, 4, 3, 2, 2, 2, 1);
 
 	assertEquals(3, conv.getOutputFeatureMapColumns(), 0);
 	assertEquals(3, conv.getOutputFeatureMapRows(), 0);
@@ -65,7 +65,7 @@ public class CNNTest {
 
     @Test
     public void testCNNConstruction() {
-	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 32, 32, 1 }, { 5, 5, 6 }, { 2, 2 }, { 5, 5, 16 }, { 2, 2 }, { 5, 5, 120 }, {84}, {10} }, true);
+	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 32, 32, 1 }, { 5, 5, 6, 1 }, { 2, 2 }, { 5, 5, 16, 1 }, { 2, 2 }, { 5, 5, 120, 1 }, {84}, {10} }, true);
 	assertEquals(13, nn.getLayers().size(), 0);
 
 	Layer l = nn.getInputLayer().getConnections().get(0).getOutputLayer();
@@ -107,7 +107,7 @@ public class CNNTest {
 
     @Test
     public void testCNNConstruction2() {
-	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 28, 28, 1 }, { 5, 5, 20 }, { 2, 2 }, { 5, 5, 50 }, { 2, 2 }, {500}, {10} }, true);
+	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 28, 28, 1 }, { 5, 5, 20, 1 }, { 2, 2 }, { 5, 5, 50, 1 }, { 2, 2 }, {500}, {10} }, true);
 	assertEquals(11, nn.getLayers().size(), 0);
 
 	Conv2DConnection cc = (Conv2DConnection) nn.getInputLayer().getConnections().get(0);
@@ -143,8 +143,25 @@ public class CNNTest {
     }
 
     @Test
+    public void testCNNConstruction3() {
+	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 6, 6, 1 }, { 3, 3, 2, 2 }, { 2, 2 } }, true);
+	assertEquals(4, nn.getLayers().size(), 0);
+
+	Conv2DConnection cc = (Conv2DConnection) nn.getInputLayer().getConnections().get(0);
+	Layer l = nn.getInputLayer().getConnections().get(0).getOutputLayer();
+	assertEquals(2, cc.getOutputFeatureMapRows(), 0);
+	assertEquals(2, cc.getOutputFeatureMapColumns(), 0);
+	assertEquals(2, cc.getOutputFilters(), 0);
+
+	Subsampling2DConnection sc = (Subsampling2DConnection) l.getConnections().get(2);
+	l = l.getConnections().get(2).getOutputLayer();
+	assertEquals(1, sc.getOutputFeatureMapRows(), 0);
+	assertEquals(1, sc.getOutputFeatureMapColumns(), 0);
+	assertEquals(2, sc.getFilters(), 0);
+    }
+
     public void testCNNLayerCalculatorConstruction() {
-	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 28, 28, 1 }, { 5, 5, 20 }, { 2, 2 }, { 5, 5, 50 }, { 2, 2 }, {500}, {10} }, true);
+	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 28, 28, 1 }, { 5, 5, 20, 1 }, { 2, 2 }, { 5, 5, 50, 1 }, { 2, 2 }, {500}, {10} }, true);
 	nn.setLayerCalculator(NNFactory.lcSigmoid(nn, null));
 	NNFactory.lcMaxPooling(nn);
 
@@ -206,7 +223,7 @@ public class CNNTest {
     @Test
     public void testConvolutions() {
 	NeuralNetworkImpl nn = new NeuralNetworkImpl();
-	Conv2DConnection c = new Conv2DConnection(new Layer(), new Layer(), 3, 3, 2, 2, 2, 1);
+	Conv2DConnection c = new Conv2DConnection(new Layer(), new Layer(), 3, 3, 2, 2, 2, 1, 1);
 	nn.addConnection(c);
 	c.getWeights()[0] = 1;
 	c.getWeights()[1] = 2;
@@ -235,7 +252,7 @@ public class CNNTest {
 
     @Test
     public void testConvolutions2() {
-	Conv2DConnection c = new Conv2DConnection(new Layer(), new Layer(), 3, 3, 2, 2, 2, 2);
+	Conv2DConnection c = new Conv2DConnection(new Layer(), new Layer(), 3, 3, 2, 2, 2, 2, 1);
 	c.getWeights()[0] = 1;
 	c.getWeights()[1] = 2;
 	c.getWeights()[2] = 3;
@@ -274,7 +291,7 @@ public class CNNTest {
 
     @Test
     public void testSimpleCNN() {
-	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] {{3, 3, 2}, {2, 2, 2}, {2, 2}}, false);
+	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] {{3, 3, 2}, {2, 2, 2, 1}, {2, 2}}, false);
 	nn.setLayerCalculator(NNFactory.lcWeightedSum(nn, null));
 	NNFactory.lcMaxPooling(nn);
 
@@ -495,7 +512,7 @@ public class CNNTest {
     public void testCNNBackpropagation() {
 	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 
-	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 3, 3, 2 }, { 2, 2, 1 } }, true);
+	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 3, 3, 2 }, { 2, 2, 1, 1 } }, true);
 	nn.setLayerCalculator(NNFactory.lcSigmoid(nn, null));
 
 	Conv2DConnection c = (Conv2DConnection) nn.getInputLayer().getConnections().get(0);
@@ -517,5 +534,29 @@ public class CNNTest {
 	assertEquals(0.82364, c.getWeights()[6], 0.00001);
 	assertEquals(0.93248, c.getWeights()[7], 0.00001);
 	assertEquals(-2.911599, b.getWeights()[0], 0.00001);
+    }
+
+    @Test
+    public void testCNNStride() {
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
+
+	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 5, 5, 1 }, { 2, 2, 1, 2 } }, false);
+	nn.setLayerCalculator(NNFactory.lcWeightedSum(nn, null));
+
+	Conv2DConnection cc = (Conv2DConnection) nn.getInputLayer().getConnections().get(0);
+	Util.fillArray(cc.getWeights(), 1);
+
+	ValuesProvider vp = new ValuesProvider();
+	vp.addValues(nn.getInputLayer(), new Matrix(new float[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25}, 1));
+
+	Set<Layer> calculatedLayers = new HashSet<>();
+	calculatedLayers.add(nn.getInputLayer());
+	nn.getLayerCalculator().calculate(nn, nn.getOutputLayer(), calculatedLayers, vp);
+
+	Matrix o = vp.getValues(nn.getOutputLayer());
+	assertEquals(16, o.get(0, 0), 0.00001);
+	assertEquals(24, o.get(1, 0), 0.00001);
+	assertEquals(56, o.get(2, 0), 0.00001);
+	assertEquals(64, o.get(3, 0), 0.00001);
     }
 }

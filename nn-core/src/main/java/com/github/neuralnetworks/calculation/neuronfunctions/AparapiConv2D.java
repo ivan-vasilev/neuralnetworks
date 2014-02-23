@@ -44,6 +44,11 @@ public abstract class AparapiConv2D extends Kernel implements Serializable {
     protected final int featureMapWeights;
 
     /**
+     * stride
+     */
+    protected final int stride;
+
+    /**
      * input offset for each feature map in respect to the start index
      */
     //@Local TODO
@@ -74,6 +79,7 @@ public abstract class AparapiConv2D extends Kernel implements Serializable {
 	this.inputColumns = c.getInputFeatureMapColumns();
 	this.outputColumns = c.getOutputFeatureMapColumns();
 	this.outputFeatureMapLength = c.getOutputFeatureMapLength();
+	this.stride = c.getStride();
 	this.featureMapWeights = c.getWeights().length / c.getOutputFilters();
 	this.featureMapOffsets = new int[featureMapWeights];
 
@@ -105,7 +111,7 @@ public abstract class AparapiConv2D extends Kernel implements Serializable {
     public void run() {
 	int id = getGlobalId();
 
-	conv(featureMapWeights * (id / outputFeatureMapLength), ((id % outputFeatureMapLength) / outputColumns) * inputColumns + id % outputColumns);
+	conv(featureMapWeights * (id / outputFeatureMapLength), ((id % outputFeatureMapLength) / outputColumns) * inputColumns * stride + (id % outputColumns) * stride);
     }
 
     /**
