@@ -153,4 +153,8 @@ public abstract class AparapiSubsampling2D extends Kernel implements ConnectionC
      */
     protected void pool(int inputStartIndex) {
     }
+
+    public int getMiniBatchSize() {
+        return miniBatchSize;
+    }
 }

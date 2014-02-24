@@ -48,6 +48,7 @@ public class MnistTest {
 	assertEquals(0, bpt.getOutputError().getTotalNetworkError(), 0.1);
     }
 
+    @Ignore
     @Test
     public void testSigmoidHiddenBP() {
 	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 784, 300, 100, 10 }, true);
@@ -113,8 +114,6 @@ public class MnistTest {
 	assertEquals(0, bpt.getOutputError().getTotalNetworkError(), 0.1);
     }
 
-    @Ignore
-
     @Test
     public void testLeNetSmall() {
 	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 28, 28, 1 }, { 5, 5, 4, 1 }, { 2, 2 }, { 5, 5, 6, 1 }, { 2, 2 }, {120}, {10} }, false);
@@ -126,7 +125,7 @@ public class MnistTest {
 	MnistInputProvider testInputProvider = new MnistInputProvider("t10k-images.idx3-ubyte", "t10k-labels.idx1-ubyte", 1000, 1, new MnistTargetMultiNeuronOutputConverter());
 	testInputProvider.addInputModifier(new ScalingInputFunction(255));
 
-	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(nn, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.01f, 0.5f, 0f, 0f);
+	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(nn, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.1f, 0.9f, 0f, 0f);
 
 	bpt.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName(), false, true));
 
@@ -138,5 +137,4 @@ public class MnistTest {
 
 	assertEquals(0, bpt.getOutputError().getTotalNetworkError(), 0.1);
     }
-
 }

@@ -15,11 +15,11 @@ public class AparapiStochasticPooling2D implements ConnectionCalculator {
 
     private static final long serialVersionUID = 8165829315701496713L;
 
-    private ConnectionCalculator cc;
+    private AparapiStochasticPooling2DCC cc;
 
     @Override
     public void calculate(List<Connections> connections, ValuesProvider valuesProvider, Layer targetLayer) {
-	if (cc == null) {
+	if (cc == null || cc.getMiniBatchSize() != valuesProvider.getColumns()) {
 	    cc = new AparapiStochasticPooling2DCC((Subsampling2DConnection) connections.get(0), valuesProvider.getColumns());
 	}
 

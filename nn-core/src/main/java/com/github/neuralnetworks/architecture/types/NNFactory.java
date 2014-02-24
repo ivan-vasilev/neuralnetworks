@@ -186,7 +186,7 @@ public class NNFactory {
 		    lc.addConnectionCalculator(l, outputCC);
 		} else if (Util.isConvolutional(l)) {
 		    lc.addConnectionCalculator(l, new AparapiConv2DSigmoid());
-		} else {
+		} else if (!Util.isSubsampling(l)) {
 		    lc.addConnectionCalculator(l, new AparapiSigmoid());
 		}
 	    } else {

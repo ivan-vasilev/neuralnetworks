@@ -43,19 +43,35 @@ public class BackPropagationTrainer<N extends NeuralNetwork> extends OneStepTrai
      */
     @Override
     protected void learnInput(TrainingInputData data, int batch) {
+	propagateForward(data.getInput());
+	propagateBackward(data.getTarget());
+    }
+
+    public void propagateForward(Matrix input) {
 	NeuralNetwork nn = getNeuralNetwork();
 	Set<Layer> calculatedLayers = new UniqueList<Layer>();
-
-	activations.addValues(nn.getInputLayer(), data.getInput());
 	calculatedLayers.add(nn.getInputLayer());
+	activations.addValues(nn.getInputLayer(), input);
 	nn.getLayerCalculator().calculate(nn, nn.getOutputLayer(), calculatedLayers, activations);
+    }
+
+    public void propagateBackward(Matrix target) {
+	NeuralNetwork nn = getNeuralNetwork();
 
 	OutputErrorDerivative d = getProperties().getParameter(Constants.OUTPUT_ERROR_DERIVATIVE);
-	Matrix outputErrorDerivative = d.getOutputErrorDerivative(activations.getValues(nn.getOutputLayer()), data.getTarget());
+	Matrix outputErrorDerivative = d.getOutputErrorDerivative(activations.getValues(nn.getOutputLayer()), target);
 	backpropagation.addValues(nn.getOutputLayer(), outputErrorDerivative);
-	calculatedLayers.clear();
+	Set<Layer> calculatedLayers = new UniqueList<Layer>();
 	calculatedLayers.add(nn.getOutputLayer());
-	BackPropagationLayerCalculator blc = getProperties().getParameter(Constants.BACKPROPAGATION);
+	BackPropagationLayerCalculator blc = getBPLayerCalculator();
 	blc.backpropagate(nn, calculatedLayers, activations, backpropagation);
+    }
+
+    public BackPropagationLayerCalculator getBPLayerCalculator() {
+	return getProperties().getParameter(Constants.BACKPROPAGATION);
+    }
+
+    public void setBPLayerCalculator(BackPropagationLayerCalculator bplc) {
+	getProperties().setParameter(Constants.BACKPROPAGATION, bplc);
     }
 }
