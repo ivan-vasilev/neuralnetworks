@@ -26,7 +26,6 @@ import com.github.neuralnetworks.util.Environment;
  */
 public class MnistTest {
 
-    @Ignore
     @Test
     public void testSigmoidBP() {
 	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 784, 10 }, true);
@@ -90,8 +89,7 @@ public class MnistTest {
     }
 
     @Test
-    @Ignore
-    public void testLeNet() {
+    public void testLeNetSmall() {
 	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 28, 28, 1 }, { 5, 5, 20, 1 }, { 2, 2 }, { 5, 5, 50, 1 }, { 2, 2 }, {512}, {10} }, true);
 	nn.setLayerCalculator(NNFactory.lcSigmoid(nn, null));
 	NNFactory.lcMaxPooling(nn);
@@ -105,9 +103,9 @@ public class MnistTest {
 
 	bpt.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName(), false, true));
 
-	bpt.train();
-
 	Environment.getInstance().setExecutionMode(EXECUTION_MODE.CPU);
+
+	bpt.train();
 
 	bpt.test();
 
@@ -115,17 +113,44 @@ public class MnistTest {
     }
 
     @Test
-    public void testLeNetSmall() {
-	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 28, 28, 1 }, { 5, 5, 4, 1 }, { 2, 2 }, { 5, 5, 6, 1 }, { 2, 2 }, {120}, {10} }, false);
+    public void testLeNetTiny() {
+	// very simple convolutional network with a single subsampling layer
+	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 28, 28, 1 }, { 2, 2 }, {10} }, true);
 	nn.setLayerCalculator(NNFactory.lcSigmoid(nn, null));
 	NNFactory.lcMaxPooling(nn);
 
 	MnistInputProvider trainInputProvider = new MnistInputProvider("train-images.idx3-ubyte", "train-labels.idx1-ubyte", 1, 1, new MnistTargetMultiNeuronOutputConverter());
 	trainInputProvider.addInputModifier(new ScalingInputFunction(255));
-	MnistInputProvider testInputProvider = new MnistInputProvider("t10k-images.idx3-ubyte", "t10k-labels.idx1-ubyte", 1000, 1, new MnistTargetMultiNeuronOutputConverter());
+	MnistInputProvider testInputProvider = new MnistInputProvider("t10k-images.idx3-ubyte", "t10k-labels.idx1-ubyte", 1, 1, new MnistTargetMultiNeuronOutputConverter());
 	testInputProvider.addInputModifier(new ScalingInputFunction(255));
 
-	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(nn, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.1f, 0.9f, 0f, 0f);
+	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(nn, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.02f, 0.5f, 0f, 0f);
+
+	bpt.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName(), false, true));
+
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.CPU);
+
+	bpt.train();
+
+	bpt.test();
+
+	assertEquals(0, bpt.getOutputError().getTotalNetworkError(), 0.1);
+    }
+
+
+    @Test
+    public void testLeNetTiny2() {
+	// very simple convolutional network with a single convolutional and single subsampling layer
+	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 28, 28, 1 }, { 5, 5, 6, 1 }, {2, 2}, {10} }, true);
+	nn.setLayerCalculator(NNFactory.lcSigmoid(nn, null));
+	NNFactory.lcMaxPooling(nn);
+
+	MnistInputProvider trainInputProvider = new MnistInputProvider("train-images.idx3-ubyte", "train-labels.idx1-ubyte", 1, 1, new MnistTargetMultiNeuronOutputConverter());
+	trainInputProvider.addInputModifier(new ScalingInputFunction(255));
+	MnistInputProvider testInputProvider = new MnistInputProvider("t10k-images.idx3-ubyte", "t10k-labels.idx1-ubyte", 1, 1, new MnistTargetMultiNeuronOutputConverter());
+	testInputProvider.addInputModifier(new ScalingInputFunction(255));
+
+	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(nn, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.02f, 0.5f, 0f, 0f);
 
 	bpt.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName(), false, true));
 

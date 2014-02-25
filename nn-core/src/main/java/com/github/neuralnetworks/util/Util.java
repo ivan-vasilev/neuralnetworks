@@ -1,5 +1,7 @@
 package com.github.neuralnetworks.util;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Collection;
 
 import com.github.neuralnetworks.architecture.Connections;
@@ -118,5 +120,20 @@ public class Util {
 	}
 
 	return false;
+    }
+
+    public static void printMatrix(float[] array, int rows, int columns) {
+	StringBuilder sb = new StringBuilder();
+	NumberFormat formatter = new DecimalFormat("#0.00");
+
+	for (int i = 0; i < rows; i++) {
+	    for (int j = 0; j < columns; j++) {
+		sb.append(formatter.format(array[i * columns + j])).append(" ");
+	    }
+
+	    sb.append(System.getProperty("line.separator"));
+	}
+
+	System.out.println(sb.toString());
     }
 }

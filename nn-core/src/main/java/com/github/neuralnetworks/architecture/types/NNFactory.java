@@ -102,8 +102,11 @@ public class NNFactory {
 		    if (addBias) {
 			new Conv2DConnection(biasLayer = new Layer(), newLayer, c.getOutputFeatureMapRows(), c.getOutputFeatureMapColumns(), 1, 1, 1, l[2], l[3]);
 		    }
+
+		    prevUnitCount = c.getOutputUnitCount();
 		} else if (l.length == 2) {
-		    new Subsampling2DConnection(prev, newLayer = new Layer(), inputFMRows, inputFMCols, l[0], l[1], filters);
+		    Subsampling2DConnection c = new Subsampling2DConnection(prev, newLayer = new Layer(), inputFMRows, inputFMCols, l[0], l[1], filters);
+		    prevUnitCount = c.getOutputUnitCount();
 		}
 	    }
 
