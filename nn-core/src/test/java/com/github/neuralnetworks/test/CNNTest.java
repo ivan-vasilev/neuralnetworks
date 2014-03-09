@@ -142,6 +142,7 @@ public class CNNTest {
 	assertEquals(500, layer.getConnections().get(0).getOutputUnitCount(), 0);
 
 	layer = layer.getConnections().get(2).getOutputLayer();
+	assertEquals(500, layer.getConnections().get(0).getInputUnitCount(), 0);
 	assertEquals(10, layer.getConnections().get(0).getOutputUnitCount(), 0);
     }
 

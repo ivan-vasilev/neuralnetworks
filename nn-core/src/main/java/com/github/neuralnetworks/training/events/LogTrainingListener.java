@@ -113,7 +113,6 @@ public class LogTrainingListener implements TrainingEventListener {
 			    sb.append(target.get(j, i)).append("  ");
 			}
 		    }
-
 		    sb.append(s).append(s);
 		}
 	    }

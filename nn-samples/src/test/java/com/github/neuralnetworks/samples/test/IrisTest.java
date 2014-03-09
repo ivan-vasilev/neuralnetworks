@@ -47,18 +47,18 @@ public class IrisTest {
 	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 4, 2, 3 }, true);
 
 	// training and testing data providers
-	IrisInputProvider trainInputProvider = new IrisInputProvider(150, 150000, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
+	IrisInputProvider trainInputProvider = new IrisInputProvider(150, 300000, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
 	IrisInputProvider testInputProvider = new IrisInputProvider(1, 150, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
 	OutputError outputError = new MultipleNeuronsOutputError();
 
 	// trainer
-	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(mlp, trainInputProvider, testInputProvider, outputError, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.5f), 0.01f, 0.5f, 0f, 0f);
+	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(mlp, trainInputProvider, testInputProvider, outputError, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.5f), 0.02f, 0.7f, 0f, 0f);
 
 	// log data
 	bpt.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
 
 	// early stopping
-	bpt.addEventListener(new EarlyStoppingListener(testInputProvider, 15000, 0.02f));
+	bpt.addEventListener(new EarlyStoppingListener(testInputProvider, 100, 0.015f));
 
 	// execution mode
 	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);

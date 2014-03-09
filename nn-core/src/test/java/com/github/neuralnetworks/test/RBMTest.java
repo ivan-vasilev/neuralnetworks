@@ -12,12 +12,93 @@ import com.github.neuralnetworks.calculation.RBMLayerCalculator;
 import com.github.neuralnetworks.input.MultipleNeuronsOutputError;
 import com.github.neuralnetworks.training.TrainerFactory;
 import com.github.neuralnetworks.training.TrainingInputProvider;
+import com.github.neuralnetworks.training.events.LogTrainingListener;
 import com.github.neuralnetworks.training.random.MersenneTwisterRandomInitializer;
 import com.github.neuralnetworks.training.random.NNRandomInitializer;
 import com.github.neuralnetworks.training.rbm.AparapiCDTrainer;
 import com.github.neuralnetworks.util.Environment;
 
 public class RBMTest {
+
+    /**
+     * Contrastive Divergence testing
+     */
+    @Test
+    public void testContrastiveDivergence() {
+	// RBM with 6 visible, 2 hidden units and a bias
+	RBM rbm = NNFactory.rbm(6, 2, true);
+
+	// We'll use a simple dataset of symptoms of a flu illness. There are 6
+	// input features and the first three are symptoms of the illness - for
+	// example 1 0 0 0 0 0 means that a patient has high temperature, 0 1
+	// 0 0 0 0 - coughing, 1 1 0 0 0 0 - coughing and high temperature
+	// and so on. The second three features are "counter" symptomps - when a
+	// patient has one of those it is less likely that he's sick. For
+	// example 0 0 0 1 0 0 means that he has a flu vaccine. It's possible
+	// to have combinations between both - for exmample 0 1 0 1 0 0 means
+	// that the patient is vaccinated, but he's also coughing. We will
+	// consider a patient to be sick when he has at least two of the first
+	// three and healthy if he has two of the second three
+	TrainingInputProvider trainInputProvider = new SimpleInputProvider(new float[][] { { 1, 1, 1, 0, 0, 0 }, { 1, 0, 1, 0, 0, 0 }, { 1, 1, 0, 0, 0, 0 }, { 0, 1, 1, 0, 0, 0 }, { 0, 1, 1, 1, 0, 0 }, { 0, 0, 0, 1, 1, 1 }, { 0, 0, 1, 1, 1, 0 }, { 0, 0, 0, 1, 0, 1 }, { 0, 0, 0, 0, 1, 1 }, { 0, 0, 0, 1, 1, 0 } }, null, 1000, 1);
+	TrainingInputProvider testInputProvider = new SimpleInputProvider(new float[][] { { 1, 1, 1, 0, 0, 0 }, { 1, 0, 1, 0, 0, 0 }, { 1, 1, 0, 0, 0, 0 }, { 0, 1, 1, 0, 0, 0 }, { 0, 1, 1, 1, 0, 0 }, { 0, 0, 0, 1, 1, 1 }, { 0, 0, 1, 1, 1, 0 }, { 0, 0, 0, 1, 0, 1 }, { 0, 0, 0, 0, 1, 1 }, { 0, 0, 0, 1, 1, 0 } }, new float[][] { { 1, 0 }, { 1, 0 }, { 1, 0 }, { 1, 0 }, { 1, 0 }, { 0, 1 }, { 0, 1 }, { 0, 1 }, { 0, 1 }, { 0, 1 } }, 10, 1);
+	MultipleNeuronsOutputError error = new MultipleNeuronsOutputError();
+
+	// Contrastive divergence training
+	AparapiCDTrainer t = TrainerFactory.cdSigmoidTrainer(rbm, trainInputProvider, testInputProvider, error, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.02f, 0.5f, 0f, 0f, 1, false);
+	t.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
+
+	// log data
+	t.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName(), true, false));
+
+	// training
+	t.train();
+
+	// testing
+	t.test();
+
+	assertEquals(0, t.getOutputError().getTotalNetworkError(), 0);
+    }
+    
+    /**
+     * Persistent Contrastive Divergence testing
+     */
+    @Test
+    public void testPersistentContrastiveDivergence() {
+	// RBM with 6 visible, 2 hidden units and bias
+	RBM rbm = NNFactory.rbm(6, 2, true);
+	
+	// We'll use a simple dataset of symptoms of a flu illness. There are 6
+	// input features and the first three are symptoms of the illness - for
+	// example 1 0 0 0 0 0 means that a patient has high temperature, 0 1
+	// 0 0 0 0 - coughing, 1 1 0 0 0 0 - coughing and high temperature
+	// and so on. The second three features are "counter" symptomps - when a
+	// patient has one of those it is less likely that he's sick. For
+	// example 0 0 0 1 0 0 means that he has a flu vaccine. It's possible
+	// to have combinations between both - for exmample 0 1 0 1 0 0 means
+	// that the patient is vaccinated, but he's also coughing. We will
+	// consider a patient to be sick when he has at least two of the first
+	// three and healthy if he has two of the second three
+	TrainingInputProvider trainInputProvider = new SimpleInputProvider(new float[][] { { 1, 1, 1, 0, 0, 0 }, { 1, 0, 1, 0, 0, 0 }, { 1, 1, 0, 0, 0, 0 }, { 0, 1, 1, 0, 0, 0 }, { 0, 1, 1, 1, 0, 0 }, { 0, 0, 0, 1, 1, 1 }, { 0, 0, 1, 1, 1, 0 }, { 0, 0, 0, 1, 0, 1 }, { 0, 0, 0, 0, 1, 1 }, { 0, 0, 0, 1, 1, 0 } }, null, 1000, 1);
+	TrainingInputProvider testInputProvider = new SimpleInputProvider(new float[][] { { 1, 1, 1, 0, 0, 0 }, { 1, 0, 1, 0, 0, 0 }, { 1, 1, 0, 0, 0, 0 }, { 0, 1, 1, 0, 0, 0 }, { 0, 1, 1, 1, 0, 0 }, { 0, 0, 0, 1, 1, 1 }, { 0, 0, 1, 1, 1, 0 }, { 0, 0, 0, 1, 0, 1 }, { 0, 0, 0, 0, 1, 1 }, { 0, 0, 0, 1, 1, 0 } }, new float[][] { { 1, 0 }, { 1, 0 }, { 1, 0 }, { 1, 0 }, { 1, 0 }, { 0, 1 }, { 0, 1 }, { 0, 1 }, { 0, 1 }, { 0, 1 } }, 10, 1);
+	MultipleNeuronsOutputError error = new MultipleNeuronsOutputError();
+
+	// Persistent Contrastive divergence trainer
+	AparapiCDTrainer t = TrainerFactory.cdSigmoidTrainer(rbm, trainInputProvider, testInputProvider, error, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.02f, 0.5f, 0f, 0f, 1, true);
+	t.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
+
+	// log data
+	t.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName(), true, false));
+
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
+
+	// training
+	t.train();
+
+	// testing
+	t.test();
+	
+	assertEquals(0, t.getOutputError().getTotalNetworkError(), 0);
+    }
 
     @Test
     public void testRBMLayerCalculator1() {
@@ -115,7 +196,7 @@ public class RBMTest {
     }
 
     @Test
-    public void testContrastiveDivergence() {
+    public void testOneStepContrastiveDivergence() {
 	RBM rbm = NNFactory.rbm(3, 2, true);
 
 	Matrix cg1 = rbm.getMainConnections().getConnectionGraph();
@@ -155,47 +236,5 @@ public class RBMTest {
 	assertEquals(-0.3 + 0.26158813, cg1.get(1, 0), 0.00001);
 	assertEquals(0.1 - 0.3014404,  cg1.get(1, 1), 0.00001);
 	assertEquals(0.2 + 0.25742438, cg1.get(1, 2), 0.00001);
-    }
-
-    /**
-     * Contrastive Divergence testing
-     */
-    @Test
-    public void testContrastiveDivergence2() {
-	RBM rbm = NNFactory.rbm(6, 2, false);
-
-	TrainingInputProvider trainInputProvider = new SimpleInputProvider(new float[][] {{1, 1, 1, 0, 0, 0}, {1, 0, 1, 0, 0, 0}, {0, 1, 1, 1, 0, 0}, {0, 0, 0, 1, 1, 1}, {0, 0, 1, 1, 1, 0}, {0, 0, 0, 1, 0, 1} }, null, 1000, 1);
-	TrainingInputProvider testInputProvider =  new SimpleInputProvider(new float[][] {{1, 1, 1, 0, 0, 0}, {1, 0, 1, 0, 0, 0}, {0, 1, 1, 1, 0, 0}, {0, 0, 0, 1, 1, 1}, {0, 0, 1, 1, 1, 0}, {0, 0, 0, 1, 0, 1} }, new float[][] {{1, 0}, {1, 0}, {1, 0}, {0, 1}, {0, 1}, {0, 1} }, 6, 1);
-	MultipleNeuronsOutputError error = new MultipleNeuronsOutputError();
-
-	AparapiCDTrainer t = TrainerFactory.cdSigmoidTrainer(rbm, trainInputProvider, testInputProvider, error, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.02f, 0.5f, 0f, 0f, 1, false);
-	t.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
-
-	t.train();
-	t.test();
-
-	assertEquals(0, t.getOutputError().getTotalNetworkError(), 0);
-    }
-    
-    /**
-     * Contrastive Divergence testing
-     */
-    @Test
-    public void testPersistentContrastiveDivergence() {
-	RBM rbm = NNFactory.rbm(6, 2, false);
-	
-	TrainingInputProvider trainInputProvider = new SimpleInputProvider(new float[][] {{1, 1, 1, 0, 0, 0}, {1, 0, 1, 0, 0, 0}, {0, 1, 1, 1, 0, 0}, {0, 0, 0, 1, 1, 1}, {0, 0, 1, 1, 1, 0}, {0, 0, 0, 1, 0, 1} }, null, 600, 1);
-	TrainingInputProvider testInputProvider =  new SimpleInputProvider(new float[][] {{1, 1, 1, 0, 0, 0}, {1, 0, 1, 0, 0, 0}, {0, 1, 1, 1, 0, 0}, {0, 0, 0, 1, 1, 1}, {0, 0, 1, 1, 1, 0}, {0, 0, 0, 1, 0, 1} }, new float[][] {{1, 0}, {1, 0}, {1, 0}, {0, 1}, {0, 1}, {0, 1} }, 6, 1);
-	MultipleNeuronsOutputError error = new MultipleNeuronsOutputError();
-	
-	AparapiCDTrainer t = TrainerFactory.cdSigmoidTrainer(rbm, trainInputProvider, testInputProvider, error, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.02f, 0.5f, 0f, 0f, 1, true);
-	t.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
-	
-	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
-	
-	t.train();
-	t.test();
-	
-	assertEquals(0, t.getOutputError().getTotalNetworkError(), 0);
     }
 }

@@ -5,7 +5,8 @@ import com.github.neuralnetworks.training.TrainingInputData;
 import com.github.neuralnetworks.training.TrainingInputProvider;
 
 /**
- * simple input provider for testing purposes
+ * Simple input provider for testing purposes.
+ * Training and target data are two dimensional float arrays
  */
 public class SimpleInputProvider implements TrainingInputProvider {
 

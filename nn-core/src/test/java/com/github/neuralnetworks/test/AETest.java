@@ -2,7 +2,6 @@ package com.github.neuralnetworks.test;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.amd.aparapi.Kernel.EXECUTION_MODE;
@@ -18,53 +17,48 @@ import com.github.neuralnetworks.training.random.NNRandomInitializer;
 import com.github.neuralnetworks.util.Environment;
 
 public class AETest {
-    
+
     /**
      * Autoencoder backpropagation
      */
     @Test
     public void testAEBackpropagation() {
+	// autoencoder with 6 input/output and 2 hidden units
 	Autoencoder ae = NNFactory.autoencoderSigmoid(6, 2, true);
 
-	TrainingInputProvider trainInputProvider = new SimpleInputProvider(new float[][] {{1, 1, 1, 0, 0, 0}, {1, 0, 1, 0, 0, 0}, {0, 1, 1, 1, 0, 0}, {0, 0, 0, 1, 1, 1}, {0, 0, 1, 1, 1, 0}, {0, 0, 0, 1, 0, 1} }, null, 600, 1);
-	TrainingInputProvider testInputProvider =  new SimpleInputProvider(new float[][] {{1, 1, 1, 0, 0, 0}, {1, 0, 1, 0, 0, 0}, {0, 1, 1, 1, 0, 0}, {0, 0, 0, 1, 1, 1}, {0, 0, 1, 1, 1, 0}, {0, 0, 0, 1, 0, 1} }, new float[][] {{1, 0}, {1, 0}, {1, 0}, {0, 1}, {0, 1}, {0, 1} }, 6, 1);
+	// We'll use a simple dataset of symptoms of a flu illness. There are 6
+	// input features and the first three are symptoms of the illness - for
+	// example 1 0 0 0 0 0 means that a patient has high temperature, 0 1
+	// 0 0 0 0 - coughing, 1 1 0 0 0 0 - coughing and high temperature
+	// and so on. The second three features are "counter" symptomps - when a
+	// patient has one of those it is less likely that he's sick. For
+	// example 0 0 0 1 0 0 means that he has a flu vaccine. It's possible
+	// to have combinations between both - for exmample 0 1 0 1 0 0 means
+	// that the patient is vaccinated, but he's also coughing. We will
+	// consider a patient to be sick when he has at least two of the first
+	// three and healthy if he has two of the second three
+	TrainingInputProvider trainInputProvider = new SimpleInputProvider(new float[][] { { 1, 1, 1, 0, 0, 0 }, { 1, 0, 1, 0, 0, 0 }, { 1, 1, 0, 0, 0, 0 }, { 0, 1, 1, 0, 0, 0 }, { 0, 1, 1, 1, 0, 0 }, { 0, 0, 0, 1, 1, 1 }, { 0, 0, 1, 1, 1, 0 }, { 0, 0, 0, 1, 0, 1 }, { 0, 0, 0, 0, 1, 1 }, { 0, 0, 0, 1, 1, 0 } }, null, 1000, 1);
+	TrainingInputProvider testInputProvider = new SimpleInputProvider(new float[][] { { 1, 1, 1, 0, 0, 0 }, { 1, 0, 1, 0, 0, 0 }, { 1, 1, 0, 0, 0, 0 }, { 0, 1, 1, 0, 0, 0 }, { 0, 1, 1, 1, 0, 0 }, { 0, 0, 0, 1, 1, 1 }, { 0, 0, 1, 1, 1, 0 }, { 0, 0, 0, 1, 0, 1 }, { 0, 0, 0, 0, 1, 1 }, { 0, 0, 0, 1, 1, 0 } }, new float[][] { { 1, 0 }, { 1, 0 }, { 1, 0 }, { 1, 0 }, { 1, 0 }, { 0, 1 }, { 0, 1 }, { 0, 1 }, { 0, 1 }, { 0, 1 } }, 10, 1);
 	MultipleNeuronsOutputError error = new MultipleNeuronsOutputError();
-	
+
+	// backpropagation for autoencoders
 	BackPropagationAutoencoder t = TrainerFactory.backPropagationAutoencoder(ae, trainInputProvider, testInputProvider, error, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.1f, 0.5f, 0f, 0f, 0f);
 
+	// log data
 	t.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName(), true, false));
 
+	// sequential execution for debugging
 	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 
+	// training
 	t.train();
+
+	// the output layer is removed, thus making the hidden layer the new output
 	ae.removeLayer(ae.getOutputLayer());
+
+	// testing
 	t.test();
 
-	assertEquals(0, t.getOutputError().getTotalNetworkError(), 0);
-    }
-    
-    /**
-     * Autoencoder backpropagation
-     */
-    @Ignore
-    @Test
-    public void testAEBackpropagation2() {
-	Autoencoder ae = NNFactory.autoencoderSigmoid(6, 3, true);
-	
-	TrainingInputProvider trainInputProvider = new SimpleInputProvider(new float[][] {{1, 1, 0, 0, 0, 0}, {0, 0, 1, 1, 0, 0}, {0, 0, 0, 0, 1, 1}, {1, 0, 0, 0, 0, 0}, {0, 1, 0, 0, 0, 1}, {0, 0, 1, 0, 0, 0}, {0, 0, 0, 1, 0, 0}, {0, 0, 0, 0, 1, 0}, {0, 0, 0, 0, 0, 1} }, null, 180000, 1);
-	TrainingInputProvider testInputProvider  = new SimpleInputProvider(new float[][] {{1, 1, 0, 0, 0, 0}, {0, 0, 1, 1, 0, 0}, {0, 0, 0, 0, 1, 1}, {1, 0, 0, 0, 0, 0}, {0, 1, 0, 0, 0, 1}, {0, 0, 1, 0, 0, 0}, {0, 0, 0, 1, 0, 0}, {0, 0, 0, 0, 1, 0}, {0, 0, 0, 0, 0, 1} }, new float[][] {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}, {1, 0, 0}, {1, 0, 0}, {0, 1, 0}, {0, 1, 0}, {0, 0, 1}, {0, 0, 1} }, 9, 1);
-	MultipleNeuronsOutputError error = new MultipleNeuronsOutputError();
-	
-	BackPropagationAutoencoder t = TrainerFactory.backPropagationAutoencoder(ae, trainInputProvider, testInputProvider, error, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.05f, 0.5f, 0f, 0f, 0f);
-	
-	t.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName(), true, false));
-	
-	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
-	
-	t.train();
-	ae.removeLayer(ae.getOutputLayer());
-	t.test();
-	
 	assertEquals(0, t.getOutputError().getTotalNetworkError(), 0);
     }
 }
