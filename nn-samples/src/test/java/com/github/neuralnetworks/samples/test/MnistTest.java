@@ -112,23 +112,30 @@ public class MnistTest {
 
     @Test
     public void testLeNetSmall() {
+	// Convolutional network
 	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 28, 28, 1 }, { 5, 5, 20, 1 }, { 2, 2 }, { 5, 5, 50, 1 }, { 2, 2 }, {512}, {10} }, true);
 	nn.setLayerCalculator(NNFactory.lcSigmoid(nn, null));
 	NNFactory.lcMaxPooling(nn);
 
+	// Mnist dataset provider
 	MnistInputProvider trainInputProvider = new MnistInputProvider("train-images.idx3-ubyte", "train-labels.idx1-ubyte", 1, 1, new MnistTargetMultiNeuronOutputConverter());
 	trainInputProvider.addInputModifier(new ScalingInputFunction(255));
 	MnistInputProvider testInputProvider = new MnistInputProvider("t10k-images.idx3-ubyte", "t10k-labels.idx1-ubyte", 1000, 1, new MnistTargetMultiNeuronOutputConverter());
 	testInputProvider.addInputModifier(new ScalingInputFunction(255));
 
+	// Backpropagation trainer that also works for convolutional and subsampling layers
 	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(nn, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.5f), 0.01f, 0.5f, 0f, 0f);
 
+	// log data
 	bpt.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName(), false, true));
 
+	// cpu execution mode
 	Environment.getInstance().setExecutionMode(EXECUTION_MODE.CPU);
 
+	// training
 	bpt.train();
 
+	// testing
 	bpt.test();
 
 	assertEquals(0, bpt.getOutputError().getTotalNetworkError(), 0.1);
@@ -136,50 +143,65 @@ public class MnistTest {
 
     @Test
     public void testLeNetTiny() {
-	// very simple convolutional network with a single subsampling layer
+	// very simple convolutional network with a single 2x2 max pooling layer
 	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 28, 28, 1 }, { 2, 2 }, {10} }, true);
 	nn.setLayerCalculator(NNFactory.lcSigmoid(nn, null));
 	NNFactory.lcMaxPooling(nn);
 
+	// MNIST dataset
 	MnistInputProvider trainInputProvider = new MnistInputProvider("train-images.idx3-ubyte", "train-labels.idx1-ubyte", 1, 1, new MnistTargetMultiNeuronOutputConverter());
 	trainInputProvider.addInputModifier(new ScalingInputFunction(255));
 	MnistInputProvider testInputProvider = new MnistInputProvider("t10k-images.idx3-ubyte", "t10k-labels.idx1-ubyte", 1, 1, new MnistTargetMultiNeuronOutputConverter());
 	testInputProvider.addInputModifier(new ScalingInputFunction(255));
 
+	// Backpropagation trainer that also works for convolutional and subsampling layers
 	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(nn, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.02f, 0.5f, 0f, 0f);
 
+	// log data
 	bpt.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName(), false, true));
 
+	// cpu execution
 	Environment.getInstance().setExecutionMode(EXECUTION_MODE.CPU);
 
+	// training
 	bpt.train();
 
+	// testing
 	bpt.test();
 
 	assertEquals(0, bpt.getOutputError().getTotalNetworkError(), 0.1);
     }
 
 
+    /**
+     * MNIST small LeNet network
+     */
     @Test
     public void testLeNetTiny2() {
-	// very simple convolutional network with a single convolutional and single subsampling layer
+	// very simple convolutional network with a single convolutional layer with 6 5x5 filters and a single 2x2 max pooling layer
 	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 28, 28, 1 }, { 5, 5, 6, 1 }, {2, 2}, {10} }, true);
 	nn.setLayerCalculator(NNFactory.lcSigmoid(nn, null));
 	NNFactory.lcMaxPooling(nn);
 
+	// MNIST dataset
 	MnistInputProvider trainInputProvider = new MnistInputProvider("train-images.idx3-ubyte", "train-labels.idx1-ubyte", 1, 1, new MnistTargetMultiNeuronOutputConverter());
 	trainInputProvider.addInputModifier(new ScalingInputFunction(255));
 	MnistInputProvider testInputProvider = new MnistInputProvider("t10k-images.idx3-ubyte", "t10k-labels.idx1-ubyte", 1, 1, new MnistTargetMultiNeuronOutputConverter());
 	testInputProvider.addInputModifier(new ScalingInputFunction(255));
 
+	// Backpropagation trainer that also works for convolutional and subsampling layers
 	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(nn, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.02f, 0.5f, 0f, 0f);
 
+	// log data
 	bpt.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName(), false, true));
 
+	// cpu execution
 	Environment.getInstance().setExecutionMode(EXECUTION_MODE.CPU);
 
+	// training
 	bpt.train();
 
+	// testing
 	bpt.test();
 
 	assertEquals(0, bpt.getOutputError().getTotalNetworkError(), 0.1);
