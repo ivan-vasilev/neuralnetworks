@@ -2,6 +2,7 @@ package com.github.neuralnetworks.architecture;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.github.neuralnetworks.util.UniqueList;
 import com.github.neuralnetworks.util.Util;
@@ -30,14 +31,7 @@ public class Layer implements Serializable {
      * @return list of connections within the specific neural network
      */
     public List<Connections> getConnections(NeuralNetwork network) {
-	List<Connections> result = new UniqueList<Connections>();
-	for (Connections c : connections) {
-	    if (network.getLayers().contains(Util.getOppositeLayer(c, this))) {
-		result.add(c);
-	    }
-	}
-
-	return result;
+	return connections.stream().filter(c -> network.getLayers().contains(Util.getOppositeLayer(c, this))).collect(Collectors.toList());
     }
 
     public List<Connections> getConnections() {
