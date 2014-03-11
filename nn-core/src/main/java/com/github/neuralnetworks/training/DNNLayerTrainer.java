@@ -15,6 +15,8 @@ import com.github.neuralnetworks.util.Properties;
  */
 public class DNNLayerTrainer extends Trainer<DNN<? extends NeuralNetwork>> {
 
+    private static final long serialVersionUID = 1L;
+
     public DNNLayerTrainer(Properties properties) {
 	super(properties);
     }

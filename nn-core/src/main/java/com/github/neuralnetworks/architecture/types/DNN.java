@@ -15,6 +15,8 @@ import com.github.neuralnetworks.util.Util;
  */
 public abstract class DNN<N extends NeuralNetwork> extends NeuralNetworkImpl {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * List of networks in the network
      */

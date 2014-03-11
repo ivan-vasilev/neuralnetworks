@@ -14,6 +14,8 @@ import com.github.neuralnetworks.util.Properties;
  */
 public abstract class CDTrainerBase extends OneStepTrainer<RBM> {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * positive phase visible layer results
      */

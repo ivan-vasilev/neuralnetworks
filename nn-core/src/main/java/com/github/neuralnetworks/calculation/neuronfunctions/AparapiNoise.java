@@ -5,6 +5,8 @@ import com.github.neuralnetworks.training.random.XORShiftKernel;
 
 public class AparapiNoise extends XORShiftKernel implements MatrixFunction {
 
+    private static final long serialVersionUID = 1L;
+
     private final float corruptionLevel;
     private float[] inputOutput;
 

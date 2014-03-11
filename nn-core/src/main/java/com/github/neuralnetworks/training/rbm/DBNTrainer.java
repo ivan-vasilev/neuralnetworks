@@ -14,6 +14,8 @@ import com.github.neuralnetworks.util.Properties;
  */
 public class DBNTrainer extends DNNLayerTrainer implements TrainingEventListener {
 
+    private static final long serialVersionUID = 1L;
+
     public DBNTrainer(Properties properties) {
 	super(properties);
     }

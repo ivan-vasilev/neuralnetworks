@@ -11,6 +11,8 @@ import com.github.neuralnetworks.training.Trainer;
  */
 public class LogTrainingListener implements TrainingEventListener {
 
+    private static final long serialVersionUID = 1L;
+
     private String name;
     private long startTime;
     private long finishTime;

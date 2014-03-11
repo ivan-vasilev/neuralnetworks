@@ -12,6 +12,8 @@ import com.github.neuralnetworks.util.Properties;
  */
 public class AparapiCDTrainer extends CDTrainerBase {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * weights update kernel for the connections between the visible and the hidden layer
      */

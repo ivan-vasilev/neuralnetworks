@@ -1,11 +1,15 @@
 package com.github.neuralnetworks.training.rbm;
 
+import java.io.Serializable;
+
 import com.amd.aparapi.Kernel;
 
 /**
  * Aparapi weight udpates for the connections between the hidden and the visible layers
  */
-public class CDWeightUpdatesKernel extends Kernel {
+public class CDWeightUpdatesKernel extends Kernel implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private final float[] posPhaseHidden;
     private final float[] posPhaseVisible;

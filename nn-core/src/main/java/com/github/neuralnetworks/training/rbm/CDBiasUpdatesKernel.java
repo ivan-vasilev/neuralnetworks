@@ -1,11 +1,15 @@
 package com.github.neuralnetworks.training.rbm;
 
+import java.io.Serializable;
+
 import com.amd.aparapi.Kernel;
 
 /**
  * Aparapi kernerl for update of bias updates
  */
-public class CDBiasUpdatesKernel extends Kernel {
+public class CDBiasUpdatesKernel extends Kernel implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * bias weights

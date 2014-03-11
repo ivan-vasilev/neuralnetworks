@@ -12,6 +12,8 @@ import com.github.neuralnetworks.util.Environment;
  */
 public class BernoulliDistribution implements MatrixFunction {
 
+    private static final long serialVersionUID = 1L;
+
     protected Map<Integer, BernoulliKernel> kernels = new HashMap<>();
 
     @Override

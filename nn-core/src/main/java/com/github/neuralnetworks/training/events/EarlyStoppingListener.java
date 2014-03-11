@@ -18,6 +18,8 @@ import com.github.neuralnetworks.util.UniqueList;
  */
 public class EarlyStoppingListener implements TrainingEventListener {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * input provider for the cross-validation data
      */

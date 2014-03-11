@@ -1,5 +1,6 @@
 package com.github.neuralnetworks.calculation;
 
+import java.io.Serializable;
 import java.util.List;
 
 import com.github.neuralnetworks.architecture.Connections;
@@ -8,7 +9,7 @@ import com.github.neuralnetworks.architecture.Layer;
 /**
  * Strategy for ordering layers within the neural network graph
  */
-public interface LayerOrderStrategy {
+public interface LayerOrderStrategy extends Serializable {
 
     public List<ConnectionCandidate> order();
 

@@ -11,6 +11,8 @@ import com.github.neuralnetworks.util.UniqueList;
  */
 public abstract class ConnectionsImpl implements Connections, Comparable<ConnectionsImpl> {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * input layer of neurons
      */

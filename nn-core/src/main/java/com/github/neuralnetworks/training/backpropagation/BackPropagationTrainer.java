@@ -21,6 +21,8 @@ import com.github.neuralnetworks.util.UniqueList;
  */
 public class BackPropagationTrainer<N extends NeuralNetwork> extends OneStepTrainer<N> {
 
+    private static final long serialVersionUID = 1L;
+
     private ValuesProvider activations;
     private ValuesProvider backpropagation;
 

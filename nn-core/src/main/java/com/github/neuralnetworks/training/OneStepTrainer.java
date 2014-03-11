@@ -13,6 +13,8 @@ import com.github.neuralnetworks.util.Properties;
  */
 public abstract class OneStepTrainer<N extends NeuralNetwork> extends Trainer<N> {
 
+    private static final long serialVersionUID = 1L;
+
     private boolean stopTraining;
 
     public OneStepTrainer() {

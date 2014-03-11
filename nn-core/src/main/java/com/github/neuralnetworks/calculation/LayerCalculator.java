@@ -1,5 +1,6 @@
 package com.github.neuralnetworks.calculation;
 
+import java.io.Serializable;
 import java.util.Set;
 
 import com.github.neuralnetworks.architecture.Layer;
@@ -9,7 +10,7 @@ import com.github.neuralnetworks.architecture.NeuralNetwork;
  * The implementations of this interface provide a way of propagating results
  * from one layer to the next
  */
-public interface LayerCalculator {
+public interface LayerCalculator extends Serializable {
 
     /**
      * This method receives a target layer to calculate, a list of calculated layer results and a list of layers that have already been calculated.

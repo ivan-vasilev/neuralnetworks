@@ -6,6 +6,8 @@ import com.github.neuralnetworks.util.Util;
 
 public class MnistTargetMultiNeuronOutputConverter implements InputConverter {
 
+    private static final long serialVersionUID = 1L;
+
     private Matrix convertedTarget;
 
     @Override

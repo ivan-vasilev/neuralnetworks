@@ -6,6 +6,8 @@ package com.github.neuralnetworks.architecture;
  */
 public class Subsampling2DConnection extends ConnectionsImpl {
 
+    private static final long serialVersionUID = 1L;
+
     protected int inputFeatureMapColumns;
     protected int inputFeatureMapRows;
     protected int outputFeatureMapColumns;

@@ -1,5 +1,6 @@
 package com.github.neuralnetworks.architecture;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
@@ -11,7 +12,7 @@ import com.github.neuralnetworks.calculation.LayerCalculator;
  * whole neural network taking part in committee of machines, single
  * convolutional/subsamplingo layers or even a single connection between the layers
  */
-public interface NeuralNetwork {
+public interface NeuralNetwork extends Serializable {
 
     /**
      * input layer

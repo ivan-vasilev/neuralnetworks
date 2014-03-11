@@ -10,6 +10,8 @@ import com.github.neuralnetworks.training.TrainingInputProvider;
  */
 public class SimpleInputProvider implements TrainingInputProvider {
 
+    private static final long serialVersionUID = 1L;
+
     private float[][] input;
     private float[][] target;
     private SimpleTrainingInputData data;
@@ -70,6 +72,8 @@ public class SimpleInputProvider implements TrainingInputProvider {
     }
 
     private static class SimpleTrainingInputData implements TrainingInputData {
+
+	private static final long serialVersionUID = 1L;
 
 	private Matrix input;
 	private Matrix target;

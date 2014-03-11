@@ -5,6 +5,8 @@ import com.github.neuralnetworks.input.InputConverter;
 
 public class MnistTargetSingleNeuronOutputConverter implements InputConverter {
 
+    private static final long serialVersionUID = 1L;
+
     @Override
     public Matrix convert(Object[] input) {
 	Matrix m = new Matrix(1, input.length);

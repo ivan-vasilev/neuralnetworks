@@ -8,6 +8,8 @@ import com.github.neuralnetworks.calculation.neuronfunctions.MatrixFunction;
  */
 public class ScalingInputFunction implements MatrixFunction {
 
+    private static final long serialVersionUID = 1L;
+
     private float scale;
 
     public ScalingInputFunction(float scale) {

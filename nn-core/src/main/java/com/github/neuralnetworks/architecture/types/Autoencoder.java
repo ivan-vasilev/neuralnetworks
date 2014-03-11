@@ -10,6 +10,8 @@ import com.github.neuralnetworks.util.Util;
  */
 public class Autoencoder extends NeuralNetworkImpl {
 
+    private static final long serialVersionUID = 1L;
+
     private Layer hiddenLayer;
 
     public Autoencoder(int inputUnitCount, int hiddenUnitCount, boolean addBias) {

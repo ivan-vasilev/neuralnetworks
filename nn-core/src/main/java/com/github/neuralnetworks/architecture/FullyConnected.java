@@ -5,6 +5,8 @@ package com.github.neuralnetworks.architecture;
  */
 public class FullyConnected extends ConnectionsImpl implements GraphConnections {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * Weight matrix for the weights of the links
      */

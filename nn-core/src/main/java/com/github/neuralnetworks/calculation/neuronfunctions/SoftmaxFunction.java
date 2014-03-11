@@ -9,6 +9,8 @@ import com.github.neuralnetworks.util.Environment;
  */
 public class SoftmaxFunction extends Kernel implements MatrixFunction {
 
+    private static final long serialVersionUID = 1L;
+
     private float[] values;
     private int rows;
     private int columns;

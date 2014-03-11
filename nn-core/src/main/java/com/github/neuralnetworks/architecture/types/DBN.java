@@ -11,6 +11,8 @@ import com.github.neuralnetworks.util.UniqueList;
  */
 public class DBN extends DNN<RBM> {
 
+    private static final long serialVersionUID = 1L;
+
     public DBN() {
 	super();
     }

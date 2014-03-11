@@ -7,6 +7,8 @@ import com.github.neuralnetworks.architecture.Matrix;
  */
 public class MSEDerivative implements OutputErrorDerivative {
 
+    private static final long serialVersionUID = 1L;
+
     private Matrix result;
 
     @Override

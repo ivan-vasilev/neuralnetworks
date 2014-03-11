@@ -11,6 +11,8 @@ import com.github.neuralnetworks.util.Properties;
  */
 public class BackPropagationAutoencoder extends BackPropagationTrainer<Autoencoder> {
 
+    private static final long serialVersionUID = 1L;
+
     private AutoencoderTrainingInputData autoencoderTrainingInputData;
 
     public BackPropagationAutoencoder() {
@@ -34,6 +36,8 @@ public class BackPropagationAutoencoder extends BackPropagationTrainer<Autoencod
      * Input and target are the same
      */
     private static class AutoencoderTrainingInputData implements TrainingInputData {
+
+	private static final long serialVersionUID = 1L;
 
 	private Matrix input;
 	private Matrix target;

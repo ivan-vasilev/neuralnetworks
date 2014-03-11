@@ -5,6 +5,8 @@ import com.github.neuralnetworks.calculation.OutputError;
 
 public class XorOutputError implements OutputError {
 
+    private static final long serialVersionUID = 1L;
+
     private float networkError;
     private int size;
 

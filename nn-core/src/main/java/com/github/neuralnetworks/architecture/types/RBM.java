@@ -12,6 +12,8 @@ import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
  */
 public class RBM extends NeuralNetworkImpl {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * Weights between the visible and hidden layer
      */

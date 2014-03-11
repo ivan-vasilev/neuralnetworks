@@ -11,6 +11,8 @@ import com.github.neuralnetworks.architecture.Layer;
  */
 public class StackedAutoencoder extends DNN<Autoencoder> {
 
+    private static final long serialVersionUID = 1L;
+
     public StackedAutoencoder(Layer input) {
 	super();
 	addLayer(input);

@@ -8,6 +8,8 @@ import com.github.neuralnetworks.calculation.neuronfunctions.MatrixFunction;
  */
 public class MeanInputFunction implements MatrixFunction {
 
+    private static final long serialVersionUID = 1L;
+
     public MeanInputFunction() {
 	super();
     }

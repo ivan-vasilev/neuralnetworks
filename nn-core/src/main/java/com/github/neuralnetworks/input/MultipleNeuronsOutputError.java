@@ -10,6 +10,8 @@ import com.github.neuralnetworks.calculation.OutputError;
 
 public class MultipleNeuronsOutputError implements OutputError {
 
+    private static final long serialVersionUID = 1L;
+
     private List<OutputTargetTuple> tuples;
     private Map<Integer, Integer> outputToTarget;
     private int nullCount;

@@ -10,6 +10,8 @@ import com.github.neuralnetworks.training.TrainingInputProvider;
  */
 public class XorInputProvider implements TrainingInputProvider {
 
+    private static final long serialVersionUID = 1L;
+
     private int inputSize;
     private int currentInput;
     private TrainingInputData input;

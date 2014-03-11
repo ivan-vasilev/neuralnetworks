@@ -17,6 +17,8 @@ import com.github.neuralnetworks.training.TrainingInputProviderImpl;
  */
 public class MnistInputProvider extends TrainingInputProviderImpl {
 
+    private static final long serialVersionUID = 1L;
+
     private RandomAccessFile images;
     private RandomAccessFile labels;
     private int epochs;

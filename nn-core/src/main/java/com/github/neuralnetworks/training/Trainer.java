@@ -1,5 +1,6 @@
 package com.github.neuralnetworks.training;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -21,7 +22,9 @@ import com.github.neuralnetworks.util.UniqueList;
 /**
  * Base class for training (used for both supervised and unsupervised learning)
  */
-public abstract class Trainer<N extends NeuralNetwork> {
+public abstract class Trainer<N extends NeuralNetwork> implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * Properties for the training (for example learnig rate, weight decay etc)

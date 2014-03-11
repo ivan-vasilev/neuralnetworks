@@ -7,6 +7,8 @@ import com.github.neuralnetworks.calculation.neuronfunctions.MatrixFunction;
 
 public abstract class TrainingInputProviderImpl implements TrainingInputProvider {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * List of modifiers to apply on the input data after the conversion
      */

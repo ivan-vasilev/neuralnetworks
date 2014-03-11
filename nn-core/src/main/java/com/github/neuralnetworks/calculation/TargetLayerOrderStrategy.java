@@ -15,6 +15,8 @@ import com.github.neuralnetworks.util.Util;
  */
 public class TargetLayerOrderStrategy implements LayerOrderStrategy {
 
+    private static final long serialVersionUID = 1L;
+
     private NeuralNetwork neuralNetwork;
     private Layer targetLayer;
     private Set<Layer> calculatedLayers;

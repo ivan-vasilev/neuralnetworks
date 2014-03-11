@@ -15,6 +15,8 @@ import com.github.neuralnetworks.util.Util;
  */
 public class NeuralNetworkImpl implements NeuralNetwork {
 
+    private static final long serialVersionUID = 1L;
+
     private Set<Layer> layers;
     private LayerCalculator layerCalculator;
 

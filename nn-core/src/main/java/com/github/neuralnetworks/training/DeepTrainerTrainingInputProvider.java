@@ -13,6 +13,8 @@ import com.github.neuralnetworks.calculation.ValuesProvider;
  */
 public class DeepTrainerTrainingInputProvider implements TrainingInputProvider {
 
+    private static final long serialVersionUID = 1L;
+
     private TrainingInputProvider inputProvider;
     private DNN<?> dnn;
     private NeuralNetwork currentNN;

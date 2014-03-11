@@ -13,6 +13,8 @@ import com.github.neuralnetworks.training.TrainingInputProvider;
  */
 public class IrisInputProvider implements TrainingInputProvider {
 
+    private static final long serialVersionUID = 1L;
+
     private Matrix dataset;
     private TrainingInputDataImpl currentExample;
     private Integer[] target;

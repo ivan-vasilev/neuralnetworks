@@ -5,6 +5,8 @@ package com.github.neuralnetworks.architecture;
  */
 public class Conv2DConnection extends ConnectionsImpl {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * The list of filters to be used in the connection
      */

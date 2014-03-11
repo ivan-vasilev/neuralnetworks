@@ -7,6 +7,8 @@ import com.github.neuralnetworks.architecture.Matrix;
  */
 public class TrainingInputDataImpl implements TrainingInputData {
 
+    private static final long serialVersionUID = 1L;
+
     private Matrix input;
     private Matrix target;
 
