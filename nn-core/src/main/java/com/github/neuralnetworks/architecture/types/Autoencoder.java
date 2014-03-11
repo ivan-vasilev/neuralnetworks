@@ -1,6 +1,5 @@
 package com.github.neuralnetworks.architecture.types;
 
-import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.util.Util;
@@ -26,27 +25,11 @@ public class Autoencoder extends NeuralNetworkImpl {
     }
 
     public Layer getHiddenBiasLayer() {
-	Layer hiddenLayer = getHiddenLayer();
-	for (Connections c : hiddenLayer.getConnections()) {
-	    Layer l = Util.getOppositeLayer(c, hiddenLayer);
-	    if (Util.isBias(l)) {
-		return l;
-	    }
-	}
-
-	return null;
+	return getHiddenLayer().getConnections().stream().map(c -> Util.getOppositeLayer(c, hiddenLayer)).filter(l -> Util.isBias(l)).findFirst().get();
     }
 
     public Layer getOutputBiasLayer() {
-	Layer outputLayer = getOutputLayer();
-	for (Connections c : outputLayer.getConnections()) {
-	    Layer l = Util.getOppositeLayer(c, outputLayer);
-	    if (Util.isBias(l)) {
-		return l;
-	    }
-	}
-
-	return null;
+	return getOutputLayer().getConnections().stream().map(c -> Util.getOppositeLayer(c, hiddenLayer)).filter(l -> Util.isBias(l)).findFirst().get();
     }
 
     public Layer getHiddenLayer() {
