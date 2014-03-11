@@ -18,9 +18,7 @@ public abstract class TrainingInputProviderImpl implements TrainingInputProvider
     public TrainingInputData getNextInput() {
 	TrainingInputData result = getNextUnmodifiedInput();
 	if (result != null && inputModifiers != null) {
-	    for (MatrixFunction m : inputModifiers) {
-		m.value(result.getInput());
-	    }
+	    inputModifiers.forEach(m -> m.value(result.getInput()));
 	}
 
 	return result;
