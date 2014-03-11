@@ -75,17 +75,11 @@ public class LayerCalculatorBase implements Serializable {
 
     protected void triggerEvent(PropagationEvent event) {
 	if (listeners != null) {
-	    for (PropagationEventListener l : listeners) {
-		l.handleEvent(event);
-	    }
+	    listeners.forEach(l -> l.handleEvent(event));
 	}
 
 	if (calculators != null) {
-	    for (ConnectionCalculator cc : calculators.values()) {
-		if (cc instanceof PropagationEventListener) {
-		    ((PropagationEventListener) cc).handleEvent(event);
-		}
-	    }
+	    calculators.values().stream().filter(cc -> cc instanceof PropagationEventListener).forEach(cc -> ((PropagationEventListener) cc).handleEvent(event));
 	}
     }
 }
