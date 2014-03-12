@@ -27,11 +27,11 @@ public class Autoencoder extends NeuralNetworkImpl {
     }
 
     public Layer getHiddenBiasLayer() {
-	return getHiddenLayer().getConnections().stream().map(c -> Util.getOppositeLayer(c, hiddenLayer)).filter(l -> Util.isBias(l)).findFirst().get();
+	return getHiddenLayer().getConnections().stream().map(c -> Util.getOppositeLayer(c, hiddenLayer)).filter(l -> Util.isBias(l)).findFirst().orElse(null);
     }
 
     public Layer getOutputBiasLayer() {
-	return getOutputLayer().getConnections().stream().map(c -> Util.getOppositeLayer(c, hiddenLayer)).filter(l -> Util.isBias(l)).findFirst().get();
+	return getOutputLayer().getConnections().stream().map(c -> Util.getOppositeLayer(c, hiddenLayer)).filter(l -> Util.isBias(l)).findFirst().orElse(null);
     }
 
     public Layer getHiddenLayer() {

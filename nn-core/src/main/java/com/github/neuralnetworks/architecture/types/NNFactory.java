@@ -272,11 +272,7 @@ public class NNFactory {
     public static void lcMaxPooling(NeuralNetworkImpl nn) {
 	if (nn.getLayerCalculator() instanceof LayerCalculatorImpl) {
 	    LayerCalculatorImpl lc = (LayerCalculatorImpl) nn.getLayerCalculator();
-	    for (Layer l : nn.getLayers()) {
-		if (Util.isSubsampling(l)) {
-		    lc.addConnectionCalculator(l, new AparapiMaxPooling2D());
-		}
-	    }
+	    nn.getLayers().stream().filter(l -> Util.isSubsampling(l)).forEach(l -> lc.addConnectionCalculator(l, new AparapiMaxPooling2D()));
 	} else {
 	    throw new IllegalArgumentException("LayerCalculator type not supported");
 	}
@@ -285,11 +281,7 @@ public class NNFactory {
     public static void lcAveragePooling(NeuralNetworkImpl nn) {
 	if (nn.getLayerCalculator() instanceof LayerCalculatorImpl) {
 	    LayerCalculatorImpl lc = (LayerCalculatorImpl) nn.getLayerCalculator();
-	    for (Layer l : nn.getLayers()) {
-		if (Util.isSubsampling(l)) {
-		    lc.addConnectionCalculator(l, new AparapiAveragePooling2D());
-		}
-	    }
+	    nn.getLayers().stream().filter(l -> Util.isSubsampling(l)).forEach(l -> lc.addConnectionCalculator(l, new AparapiAveragePooling2D()));
 	} else {
 	    throw new IllegalArgumentException("LayerCalculator type not supported");
 	}
@@ -298,11 +290,7 @@ public class NNFactory {
     public static void lcStochasticPooling(NeuralNetworkImpl nn) {
 	if (nn.getLayerCalculator() instanceof LayerCalculatorImpl) {
 	    LayerCalculatorImpl lc = (LayerCalculatorImpl) nn.getLayerCalculator();
-	    for (Layer l : nn.getLayers()) {
-		if (Util.isSubsampling(l)) {
-		    lc.addConnectionCalculator(l, new AparapiStochasticPooling2D());
-		}
-	    }
+	    nn.getLayers().stream().filter(l -> Util.isSubsampling(l)).forEach(l -> lc.addConnectionCalculator(l, new AparapiStochasticPooling2D()));
 	} else {
 	    throw new IllegalArgumentException("LayerCalculator type not supported");
 	}
@@ -498,10 +486,6 @@ public class NNFactory {
     }
 
     public static void populateBiasLayers(LayerCalculatorImpl lc, NeuralNetwork nn) {
-	for (Layer l : nn.getLayers()) {
-	    if (Util.isBias(l)) {
-		lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
-	    }
-	}
+	nn.getLayers().stream().filter(l -> Util.isBias(l)).forEach(l -> lc.addConnectionCalculator(l, new ConstantConnectionCalculator()));
     }
 }

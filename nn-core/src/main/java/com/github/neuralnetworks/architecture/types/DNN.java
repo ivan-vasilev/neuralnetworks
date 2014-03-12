@@ -3,12 +3,10 @@ package com.github.neuralnetworks.architecture.types;
 import java.util.Collection;
 import java.util.List;
 
-import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.util.UniqueList;
-import com.github.neuralnetworks.util.Util;
 
 /**
  * Default implementation of the DeepNeuralNetwork interface
@@ -45,25 +43,6 @@ public abstract class DNN<N extends NeuralNetwork> extends NeuralNetworkImpl {
      * @param nn
      */
     protected abstract Collection<Layer> getRelevantLayers(N nn);
-
-    /**
-     * @param nn
-     * @return the output layer of nn in the context of the deep network
-     */
-    public Layer getOutputLayer(N nn) {
-	Layer output = nn.getOutputLayer();
-	if (!getLayers().contains(output)) {
-	    for (Connections c : output.getConnections()) {
-		Layer opposite = Util.getOppositeLayer(c, output);
-		if (!Util.isBias(opposite) && getLayers().contains(opposite)) {
-		    output = opposite;
-		    break;
-		}
-	    }
-	}
-
-	return output;
-    }
 
     public N getNeuralNetwork(int index) {
 	if (neuralNetworks != null) {

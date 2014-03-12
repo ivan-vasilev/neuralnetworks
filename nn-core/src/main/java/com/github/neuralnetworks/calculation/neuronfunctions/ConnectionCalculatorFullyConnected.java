@@ -69,13 +69,7 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator,
 
 	    if (notBias.size() > 0) {
 		if (preTransferFunctions != null && preTransferFunctions.size() > 0) {
-		    for (MatrixFunction f : preTransferFunctions) {
-			for (Connections c : connections) {
-			    if (!Util.isBias(c.getInputLayer())) {
-				f.value(valuesProvider.getValues(Util.getOppositeLayer(c, targetLayer), c));
-			    }
-			}
-		    }
+		    preTransferFunctions.forEach(f -> connections.stream().filter(c -> !Util.isBias(c.getInputLayer())).forEach(c -> f.value(valuesProvider.getValues(Util.getOppositeLayer(c, targetLayer), c))));
 		}
 
 		calculateBias(bias, valuesProvider);
@@ -85,19 +79,14 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator,
 		    miniBatchSize = valuesProvider.getColumns();
 		    currentLayer = targetLayer;
 		    SortedMap<GraphConnections, Integer> map = new TreeMap<>();
-		    for (Connections c : notBias) {
-			map.put((GraphConnections) c, valuesProvider.getValues(Util.getOppositeLayer(c, targetLayer), c).getElements().length);
-		    }
-
+		    notBias.forEach(c -> map.put((GraphConnections) c, valuesProvider.getValues(Util.getOppositeLayer(c, targetLayer), c).getElements().length));
 		    inputFunction = createInputFunction(map, valuesProvider, targetLayer);
 		}
 
 		inputFunction.calculate(notBias, valuesProvider, targetLayer);
 
 		if (activationFunctions != null) {
-		    for (MatrixFunction f : activationFunctions) {
-			f.value(valuesProvider.getValues(targetLayer, notBias));
-		    }
+		    activationFunctions.forEach(f -> f.value(valuesProvider.getValues(targetLayer, notBias)));
 		}
 	    }
 	}
@@ -121,19 +110,11 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator,
     @Override
     public void handleEvent(PropagationEvent event) {
 	if (preTransferFunctions != null) {
-	    for (MatrixFunction f : preTransferFunctions) {
-		if (f instanceof PropagationEventListener) {
-		    ((PropagationEventListener) f).handleEvent(event);
-		}
-	    }
+	    preTransferFunctions.stream().filter(f -> f instanceof PropagationEventListener).forEach(f -> ((PropagationEventListener) f).handleEvent(event));
 	}
 
 	if (activationFunctions != null) {
-	    for (MatrixFunction f : activationFunctions) {
-		if (f instanceof PropagationEventListener) {
-		    ((PropagationEventListener) f).handleEvent(event);
-		}
-	    }
+	    activationFunctions.stream().filter(f -> f instanceof PropagationEventListener).forEach(f -> ((PropagationEventListener) f).handleEvent(event));
 	}
     }
 

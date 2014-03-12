@@ -57,7 +57,7 @@ public class NeuralNetworkImpl implements NeuralNetwork {
      */
     @Override
     public Layer getInputLayer() {
-	return layers.stream().filter(l -> l.getConnections(this).stream().noneMatch(c -> l == c.getOutputLayer() && !Util.isBias(c.getInputLayer()))).findFirst().get();
+	return layers.stream().filter(l -> l.getConnections(this).stream().noneMatch(c -> l == c.getOutputLayer() && !Util.isBias(c.getInputLayer()))).findFirst().orElse(null);
     }
 
     @Override
@@ -66,7 +66,7 @@ public class NeuralNetworkImpl implements NeuralNetwork {
     }
 
     protected Layer getNoOutboundConnectionsLayer() {
-	return layers.stream().filter(l -> l.getConnections(this).stream().noneMatch(c -> l == c.getInputLayer())).findFirst().get();
+	return layers.stream().filter(l -> l.getConnections(this).stream().noneMatch(c -> l == c.getInputLayer())).findFirst().orElse(null);
     }
 
     /*
@@ -94,7 +94,7 @@ public class NeuralNetworkImpl implements NeuralNetwork {
      * @return Connection between the two layers if it exists
      */
     public Connections getConnection(Layer inputLayer, Layer outputLayer) {
-	return getConnections().stream().filter(c -> (c.getInputLayer() == inputLayer && c.getOutputLayer() == outputLayer) || (c.getInputLayer() == outputLayer && c.getOutputLayer() == inputLayer)).findFirst().get();
+	return getConnections().stream().filter(c -> (c.getInputLayer() == inputLayer && c.getOutputLayer() == outputLayer) || (c.getInputLayer() == outputLayer && c.getOutputLayer() == inputLayer)).findFirst().orElse(null);
     }
 
     /**
