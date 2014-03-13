@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import com.amd.aparapi.Kernel.EXECUTION_MODE;
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.architecture.types.RBM;
 import com.github.neuralnetworks.calculation.RBMLayerCalculator;
@@ -17,6 +16,7 @@ import com.github.neuralnetworks.training.random.MersenneTwisterRandomInitialize
 import com.github.neuralnetworks.training.random.NNRandomInitializer;
 import com.github.neuralnetworks.training.rbm.AparapiCDTrainer;
 import com.github.neuralnetworks.util.Environment;
+import com.github.neuralnetworks.util.Matrix;
 
 public class RBMTest {
 

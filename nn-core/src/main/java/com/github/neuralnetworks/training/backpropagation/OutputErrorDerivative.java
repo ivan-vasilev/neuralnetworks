@@ -2,7 +2,7 @@ package com.github.neuralnetworks.training.backpropagation;
 
 import java.io.Serializable;
 
-import com.github.neuralnetworks.architecture.Matrix;
+import com.github.neuralnetworks.util.Matrix;
 
 /**
  * Implementations provide output error derivative

@@ -1,5 +1,7 @@
 package com.github.neuralnetworks.architecture;
 
+import com.github.neuralnetworks.util.Matrix;
+
 /**
  * Fully connected weight matrix between two layers of neurons
  */

@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.calculation.OutputError;
+import com.github.neuralnetworks.util.Matrix;
 
 public class MultipleNeuronsOutputError implements OutputError {
 

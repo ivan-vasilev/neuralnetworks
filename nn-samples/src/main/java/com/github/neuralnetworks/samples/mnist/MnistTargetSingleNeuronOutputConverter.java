@@ -1,7 +1,7 @@
 package com.github.neuralnetworks.samples.mnist;
 
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.input.InputConverter;
+import com.github.neuralnetworks.util.Matrix;
 
 public class MnistTargetSingleNeuronOutputConverter implements InputConverter {
 

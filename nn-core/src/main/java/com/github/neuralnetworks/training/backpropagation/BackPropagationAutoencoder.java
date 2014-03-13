@@ -1,8 +1,8 @@
 package com.github.neuralnetworks.training.backpropagation;
 
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.types.Autoencoder;
 import com.github.neuralnetworks.training.TrainingInputData;
+import com.github.neuralnetworks.util.Matrix;
 import com.github.neuralnetworks.util.Properties;
 
 /**

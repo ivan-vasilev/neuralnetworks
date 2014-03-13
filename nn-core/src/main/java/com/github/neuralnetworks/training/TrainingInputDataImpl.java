@@ -1,6 +1,6 @@
 package com.github.neuralnetworks.training;
 
-import com.github.neuralnetworks.architecture.Matrix;
+import com.github.neuralnetworks.util.Matrix;
 
 /**
  * Training input data with target value default implementation

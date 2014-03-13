@@ -2,7 +2,7 @@ package com.github.neuralnetworks.calculation;
 
 import java.io.Serializable;
 
-import com.github.neuralnetworks.architecture.Matrix;
+import com.github.neuralnetworks.util.Matrix;
 
 /**
  * Implementations should calculate the output error, which will be presented as the result of the training. This is not the same as the output error derivative in BP.

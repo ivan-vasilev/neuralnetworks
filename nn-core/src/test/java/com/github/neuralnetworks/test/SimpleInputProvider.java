@@ -1,8 +1,8 @@
 package com.github.neuralnetworks.test;
 
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.training.TrainingInputData;
 import com.github.neuralnetworks.training.TrainingInputProvider;
+import com.github.neuralnetworks.util.Matrix;
 
 /**
  * Simple input provider for testing purposes.

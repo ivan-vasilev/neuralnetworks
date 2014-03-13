@@ -4,8 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.types.RBM;
+import com.github.neuralnetworks.util.Matrix;
 
 /**
  * Implementation of LayerCalculatorImpl for RBMs

@@ -10,7 +10,7 @@ import java.util.Set;
 
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.architecture.Matrix;
+import com.github.neuralnetworks.util.Matrix;
 
 /**
  * Provides Matrix instances for the layers of the network. It ensures that the

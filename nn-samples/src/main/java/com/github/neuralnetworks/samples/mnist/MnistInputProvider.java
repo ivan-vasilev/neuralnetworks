@@ -6,11 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.input.InputConverter;
 import com.github.neuralnetworks.training.TrainingInputData;
 import com.github.neuralnetworks.training.TrainingInputDataImpl;
 import com.github.neuralnetworks.training.TrainingInputProviderImpl;
+import com.github.neuralnetworks.util.Matrix;
 
 /**
  * MNIST data set with random order

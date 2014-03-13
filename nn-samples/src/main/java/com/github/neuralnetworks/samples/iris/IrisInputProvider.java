@@ -2,11 +2,11 @@ package com.github.neuralnetworks.samples.iris;
 
 import java.util.Random;
 
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.input.InputConverter;
 import com.github.neuralnetworks.training.TrainingInputData;
 import com.github.neuralnetworks.training.TrainingInputDataImpl;
 import com.github.neuralnetworks.training.TrainingInputProvider;
+import com.github.neuralnetworks.util.Matrix;
 
 /**
  * Iris dataset (http://archive.ics.uci.edu/ml/datasets/Iris) with random order

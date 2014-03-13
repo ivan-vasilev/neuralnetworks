@@ -1,10 +1,10 @@
 package com.github.neuralnetworks.training.events;
 
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.calculation.OutputError;
 import com.github.neuralnetworks.events.TrainingEvent;
 import com.github.neuralnetworks.events.TrainingEventListener;
 import com.github.neuralnetworks.training.Trainer;
+import com.github.neuralnetworks.util.Matrix;
 
 /**
  * Time/error log

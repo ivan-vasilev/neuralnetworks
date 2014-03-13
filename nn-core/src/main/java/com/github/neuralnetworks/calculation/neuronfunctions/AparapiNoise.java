@@ -1,7 +1,7 @@
 package com.github.neuralnetworks.calculation.neuronfunctions;
 
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.training.random.XORShiftKernel;
+import com.github.neuralnetworks.util.Matrix;
 
 public class AparapiNoise extends XORShiftKernel implements MatrixFunction {
 

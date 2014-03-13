@@ -1,4 +1,4 @@
-package com.github.neuralnetworks.architecture;
+package com.github.neuralnetworks.util;
 
 import java.io.Serializable;
 

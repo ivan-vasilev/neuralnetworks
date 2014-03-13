@@ -2,7 +2,7 @@ package com.github.neuralnetworks.input;
 
 import java.io.Serializable;
 
-import com.github.neuralnetworks.architecture.Matrix;
+import com.github.neuralnetworks.util.Matrix;
 
 /**
  * Converts input values to matrices
