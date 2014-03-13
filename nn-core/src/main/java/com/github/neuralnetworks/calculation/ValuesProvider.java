@@ -61,13 +61,7 @@ public class ValuesProvider implements Serializable {
 	}
 
 	Set<Matrix> set = values.get(targetLayer);
-	Matrix result = null;
-	for (Matrix m : set) {
-	    if (m.getRows() == rows && m.getColumns() == getColumns()) {
-		result = m;
-		break;
-	    }
-	}
+	Matrix result = set.stream().filter(m -> m.getRows() == rows && m.getColumns() == getColumns()).findFirst().orElse(null);
 
 	if (result == null) {
 	    set.add(result = new Matrix(rows, getColumns()));
@@ -113,18 +107,8 @@ public class ValuesProvider implements Serializable {
 	Set<Matrix> set = values.get(l);
 	if (set == null) {
 	    values.put(l, set = new HashSet<Matrix>());
-	}
-
-	Matrix old = null;
-	for (Matrix o : set) {
-	    if (o.getRows() == m.getRows()) {
-		old = o;
-		break;
-	    }
-	}
-
-	if (old != null) {
-	    set.remove(old);
+	} else {
+	    set.removeIf(o -> o.getRows() == m.getRows());
 	}
 
 	setColumns(m.getColumns());
@@ -133,13 +117,7 @@ public class ValuesProvider implements Serializable {
 
     public int getColumns() {
 	if (columns == 0) {
-	    for (Set<Matrix> s : values.values()) {
-		for (Matrix m : s) {
-		    if (columns < m.getColumns()) {
-			columns = m.getColumns();
-		    }
-		}
-	    }
+	    values.values().forEach(v -> v.stream().filter(m -> columns < m.getColumns()).forEach(m -> columns = m.getColumns()));
 	}
 
 	return columns;

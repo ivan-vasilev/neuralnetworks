@@ -69,3 +69,6 @@ All the trainers are using the _Trainer_ base class. They are optimized to run o
 
 ###Input data
 Input is provided to the neural network by the trainers via _TrainingInputProvider_ interface. Eeach _TrainingInputProvider_ provides training samples in the form of _TrainingInputData_ (default implementation is _TrainingInputDataImpl_). The input can be modified by a list of modifiers - for example _MeanInputFunction_ (for subtracting the mean value) and _ScalingInputFunction_ (scaling within a range). Currently _MnistInputProvider_ and _IrisInputProvider_ are implemented.
+
+####License
+[MIT License](http://opensource.org/licenses/MIT)>>>>>>> some more java 8 stuff
