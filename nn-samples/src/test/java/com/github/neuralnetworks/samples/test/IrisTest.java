@@ -28,7 +28,6 @@ import com.github.neuralnetworks.training.TrainerFactory;
 import com.github.neuralnetworks.training.TrainingInputProvider;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationAutoencoder;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationTrainer;
-import com.github.neuralnetworks.training.events.EarlyStoppingListener;
 import com.github.neuralnetworks.training.events.LogTrainingListener;
 import com.github.neuralnetworks.training.random.MersenneTwisterRandomInitializer;
 import com.github.neuralnetworks.training.random.NNRandomInitializer;
@@ -58,7 +57,7 @@ public class IrisTest {
 	bpt.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
 
 	// early stopping
-	bpt.addEventListener(new EarlyStoppingListener(testInputProvider, 100, 0.015f));
+	//bpt.addEventListener(new EarlyStoppingListener(testInputProvider, 100, 0.015f));
 
 	// execution mode
 	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);

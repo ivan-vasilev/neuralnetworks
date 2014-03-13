@@ -1,7 +1,7 @@
 package com.github.neuralnetworks.samples.xor;
 
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.calculation.OutputError;
+import com.github.neuralnetworks.util.Matrix;
 
 public class XorOutputError implements OutputError {
 

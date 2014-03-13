@@ -11,7 +11,6 @@ import org.junit.Test;
 
 import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.architecture.types.Autoencoder;
 import com.github.neuralnetworks.architecture.types.DBN;
@@ -25,6 +24,7 @@ import com.github.neuralnetworks.training.DNNLayerTrainer;
 import com.github.neuralnetworks.training.OneStepTrainer;
 import com.github.neuralnetworks.training.TrainerFactory;
 import com.github.neuralnetworks.training.rbm.AparapiCDTrainer;
+import com.github.neuralnetworks.util.Matrix;
 import com.github.neuralnetworks.util.Util;
 
 public class DNNTest {

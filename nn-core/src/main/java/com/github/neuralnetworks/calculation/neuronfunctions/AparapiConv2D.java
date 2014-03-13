@@ -4,8 +4,8 @@ import java.io.Serializable;
 
 import com.amd.aparapi.Kernel;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.util.Environment;
+import com.github.neuralnetworks.util.Matrix;
 
 /**
  * Base class for convolutional operations (2d)

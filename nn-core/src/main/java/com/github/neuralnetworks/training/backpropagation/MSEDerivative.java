@@ -1,6 +1,6 @@
 package com.github.neuralnetworks.training.backpropagation;
 
-import com.github.neuralnetworks.architecture.Matrix;
+import com.github.neuralnetworks.util.Matrix;
 
 /**
  * Mean squared error derivative

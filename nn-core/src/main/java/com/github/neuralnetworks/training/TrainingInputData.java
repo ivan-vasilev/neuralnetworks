@@ -2,7 +2,7 @@ package com.github.neuralnetworks.training;
 
 import java.io.Serializable;
 
-import com.github.neuralnetworks.architecture.Matrix;
+import com.github.neuralnetworks.util.Matrix;
 
 /**
  * Training input data with target value

@@ -14,7 +14,6 @@ import com.amd.aparapi.Kernel.EXECUTION_MODE;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.FullyConnected;
 import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.calculation.BreadthFirstOrderStrategy;
@@ -26,6 +25,7 @@ import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculato
 import com.github.neuralnetworks.training.TrainerFactory;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationTrainer;
 import com.github.neuralnetworks.util.Environment;
+import com.github.neuralnetworks.util.Matrix;
 import com.github.neuralnetworks.util.Util;
 
 /**

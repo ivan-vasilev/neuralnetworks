@@ -1,7 +1,7 @@
 package com.github.neuralnetworks.samples.iris;
 
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.input.InputConverter;
+import com.github.neuralnetworks.util.Matrix;
 import com.github.neuralnetworks.util.Util;
 
 public class IrisTargetMultiNeuronOutputConverter implements InputConverter {

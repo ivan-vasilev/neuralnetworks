@@ -1,9 +1,9 @@
 package com.github.neuralnetworks.training.rbm;
 
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.types.RBM;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Environment;
+import com.github.neuralnetworks.util.Matrix;
 import com.github.neuralnetworks.util.Properties;
 
 /**

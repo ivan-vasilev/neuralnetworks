@@ -1,6 +1,6 @@
 package com.github.neuralnetworks.calculation.neuronfunctions;
 
-import com.github.neuralnetworks.architecture.Matrix;
+import com.github.neuralnetworks.util.Matrix;
 
 /**
  * Threshold binary activation function

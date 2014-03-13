@@ -1,7 +1,7 @@
 package com.github.neuralnetworks.input;
 
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.calculation.neuronfunctions.MatrixFunction;
+import com.github.neuralnetworks.util.Matrix;
 
 /**
  * Scaling input function

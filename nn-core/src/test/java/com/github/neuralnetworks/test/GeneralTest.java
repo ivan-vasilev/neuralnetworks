@@ -7,13 +7,13 @@ import org.junit.Test;
 
 import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.calculation.ValuesProvider;
 import com.github.neuralnetworks.calculation.neuronfunctions.SoftmaxFunction;
 import com.github.neuralnetworks.training.random.MersenneTwisterRandomInitializer;
 import com.github.neuralnetworks.training.random.NNRandomInitializer;
+import com.github.neuralnetworks.util.Matrix;
 import com.github.neuralnetworks.util.Util;
 
 public class GeneralTest {

@@ -1,9 +1,9 @@
 package com.github.neuralnetworks.samples.xor;
 
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.training.TrainingInputData;
 import com.github.neuralnetworks.training.TrainingInputDataImpl;
 import com.github.neuralnetworks.training.TrainingInputProvider;
+import com.github.neuralnetworks.util.Matrix;
 
 /**
  * XOR input provider

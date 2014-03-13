@@ -3,9 +3,9 @@ package com.github.neuralnetworks.calculation.neuronfunctions;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.training.random.XORShiftKernel;
 import com.github.neuralnetworks.util.Environment;
+import com.github.neuralnetworks.util.Matrix;
 
 /**
  * Bernoulli distribution

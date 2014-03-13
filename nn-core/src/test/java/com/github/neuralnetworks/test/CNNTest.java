@@ -16,7 +16,6 @@ import com.github.neuralnetworks.architecture.Conv2DConnection;
 import com.github.neuralnetworks.architecture.FullyConnected;
 import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.architecture.Subsampling2DConnection;
 import com.github.neuralnetworks.architecture.types.NNFactory;
@@ -42,6 +41,7 @@ import com.github.neuralnetworks.training.backpropagation.BackPropagationTrainer
 import com.github.neuralnetworks.training.backpropagation.BackpropagationAveragePooling2D;
 import com.github.neuralnetworks.training.backpropagation.BackpropagationMaxPooling2D;
 import com.github.neuralnetworks.util.Environment;
+import com.github.neuralnetworks.util.Matrix;
 import com.github.neuralnetworks.util.Util;
 
 /**

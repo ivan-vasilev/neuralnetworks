@@ -1,9 +1,9 @@
 package com.github.neuralnetworks.training.backpropagation;
 
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.Subsampling2DConnection;
 import com.github.neuralnetworks.calculation.ValuesProvider;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSubsampling2D;
+import com.github.neuralnetworks.util.Matrix;
 
 /**
  * BackPropagation base function for subsampling layers
