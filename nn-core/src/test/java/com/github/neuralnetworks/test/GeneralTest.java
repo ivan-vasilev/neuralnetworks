@@ -48,6 +48,7 @@ public class GeneralTest {
 	assertTrue(hm2 == vp.getValues(h, nn.getConnection(h, o)));
 	assertTrue(om == vp.getValues(o, 1));
 	assertTrue(om == vp.getValues(o));
+	assertTrue(2 == vp.getColumns());
     }
 
     @Test
