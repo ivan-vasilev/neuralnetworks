@@ -3,6 +3,7 @@ package com.github.neuralnetworks.util;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Collection;
+import java.util.stream.IntStream;
 
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
@@ -120,13 +121,10 @@ public class Util {
 	StringBuilder sb = new StringBuilder();
 	NumberFormat formatter = new DecimalFormat("#0.00");
 
-	for (int i = 0; i < rows; i++) {
-	    for (int j = 0; j < columns; j++) {
-		sb.append(formatter.format(array[i * columns + j])).append(" ");
-	    }
-
+	IntStream.range(0, columns).forEach(i -> {
+	    IntStream.range(0, columns).forEach(j -> sb.append(formatter.format(array[i * columns + j])).append(" "));
 	    sb.append(System.getProperty("line.separator"));
-	}
+	});
 
 	System.out.println(sb.toString());
     }

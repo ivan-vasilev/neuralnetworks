@@ -6,6 +6,5 @@ package com.github.neuralnetworks.architecture;
  */
 public interface Connections extends NeuralNetwork {
     public int getInputUnitCount();
-
     public int getOutputUnitCount();
 }

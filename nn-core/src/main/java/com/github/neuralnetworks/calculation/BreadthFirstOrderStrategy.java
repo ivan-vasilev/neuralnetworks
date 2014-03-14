@@ -41,14 +41,12 @@ public class BreadthFirstOrderStrategy implements LayerOrderStrategy {
 	while (layersQueue.size() > 0) {
 	    Layer l = layersQueue.poll();
 
-	    for (Connections c : l.getConnections(neuralNetwork)) {
+	    l.getConnections(neuralNetwork).stream().filter(c -> !visitedConnections.contains(c)).forEach(c -> {
 		Layer opposite = Util.getOppositeLayer(c, l);
-		if (!visitedConnections.contains(c)) {
-		    result.add(new ConnectionCandidate(c, opposite));
-		    layersQueue.add(opposite);
-		    visitedConnections.add(c);
-		}
-	    }
+		result.add(new ConnectionCandidate(c, opposite));
+		layersQueue.add(opposite);
+		visitedConnections.add(c);
+	    });
 	}
 
 	return result;
