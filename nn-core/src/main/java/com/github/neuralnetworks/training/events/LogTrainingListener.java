@@ -99,6 +99,7 @@ public class LogTrainingListener implements TrainingEventListener {
 		    for (int i = 0; i < input.getColumns(); i++) {
 			sb.append(s);
 			sb.append("Input:  ");
+
 			for (int j = 0; j < input.getRows(); j++) {
 			    sb.append(input.get(j, i)).append("  ");
 			}
