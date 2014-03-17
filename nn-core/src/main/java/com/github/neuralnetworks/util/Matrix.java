@@ -1,73 +1,47 @@
 package com.github.neuralnetworks.util;
 
-import java.io.Serializable;
-
 /**
- * Simple matrix representation with one-dimensional array.
- * This is required, because Aparapi supports only one-dim arrays (otherwise the execution is transferred to the cpu)
+ * Simple matrix representation with one-dimensional array. This is required,
+ * because Aparapi supports only one-dim arrays (otherwise the execution is
+ * transferred to the cpu)
  */
-public class Matrix implements Serializable {
+public class Matrix extends Tensor {
 
     private static final long serialVersionUID = 1L;
-
-    private float[] elements;
-    private int columns;
 
     public Matrix() {
 	super();
     }
 
-    public Matrix(Matrix copy) {
-	super();
-	this.elements = new float[copy.elements.length];
-	this.columns = copy.columns;
-    }
-
     public Matrix(float[] elements, int columns) {
-	super();
-	this.elements = elements;
-	this.columns = columns;
+	super(elements, elements.length / columns, columns);
     }
 
     public Matrix(int rows, int columns) {
-	super();
-	this.elements = new float[rows * columns];
-	this.columns = columns;
+	super(rows, columns);
     }
 
-    public float[] getElements() {
-	return elements;
+    public Matrix(Matrix copy) {
+	super(copy.getRows(), copy.getColumns());
     }
 
-    public void setElements(float[] elements) {
-	this.elements = elements;
+    public Matrix(Tensor parent, int[] dimStart, int[] dimEnd) {
+	super(parent, dimStart, dimEnd);
     }
 
     public int getColumns() {
-	return columns;
-    }
-
-    public void setColumns(int columns) {
-	this.columns = columns;
+	return getDimensions()[1];
     }
 
     public int getRows() {
-	return this.elements.length / this.columns;
+	return getDimensions()[0];
     }
 
     public void set(int row, int column, float value) {
-	elements[row * columns + column] = value;
+	super.set(value, row, column);
     }
 
     public float get(int row, int column) {
-	return elements[row * columns + column];
-    }
-
-    public int getColumn(int index) {
-	return index % columns;
-    }
-
-    public int getRow(int index) {
-	return index / columns;
+	return super.get(row, column);
     }
 }

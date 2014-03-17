@@ -14,6 +14,7 @@ import com.github.neuralnetworks.calculation.neuronfunctions.SoftmaxFunction;
 import com.github.neuralnetworks.training.random.MersenneTwisterRandomInitializer;
 import com.github.neuralnetworks.training.random.NNRandomInitializer;
 import com.github.neuralnetworks.util.Matrix;
+import com.github.neuralnetworks.util.Tensor;
 import com.github.neuralnetworks.util.Util;
 
 public class GeneralTest {
@@ -22,7 +23,8 @@ public class GeneralTest {
     public void testValuesProvider() {
 	ValuesProvider vp = new ValuesProvider();
 
-	NeuralNetworkImpl nn = new NeuralNetworkImpl();;
+	NeuralNetworkImpl nn = new NeuralNetworkImpl();
+	;
 	Layer i = new Layer();
 	Layer h = new Layer();
 	Layer o = new Layer();
@@ -31,7 +33,7 @@ public class GeneralTest {
 
 	NNFactory.addFullyConnectedLayer(nn, h, 2, 3, true);
 	NNFactory.addFullyConnectedLayer(nn, o, 4, 1, true);
-	
+
 	Matrix im = new Matrix(2, 2);
 	vp.addValues(i, im);
 	Matrix hm1 = vp.getValues(h, 3);
@@ -53,7 +55,7 @@ public class GeneralTest {
 
     @Test
     public void testRandomInitializer() {
-	NeuralNetworkImpl nn = NNFactory.mlp(new int[] {3, 2}, true);
+	NeuralNetworkImpl nn = NNFactory.mlp(new int[] { 3, 2 }, true);
 	NNRandomInitializer rand = new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.1f, 0.1f), 0.5f);
 	rand.initialize(nn);
 
@@ -108,5 +110,42 @@ public class GeneralTest {
 	assertEquals(4 / 15f, m.get(0, 1), 0);
 	assertEquals(5 / 15f, m.get(1, 1), 0);
 	assertEquals(6 / 15f, m.get(2, 1), 0);
+    }
+
+    @Test
+    public void testTensor() {
+	Tensor t = new Tensor(2, 2, 2);
+	float[] elements = t.getElements();
+
+	assertEquals(8, elements.length, 0);
+
+	t.set(1, 0, 0, 0);
+	t.set(2, 0, 0, 1);
+	t.set(3, 0, 1, 0);
+	t.set(4, 0, 1, 1);
+	t.set(5, 1, 0, 0);
+	t.set(6, 1, 0, 1);
+	t.set(7, 1, 1, 0);
+	t.set(8, 1, 1, 1);
+
+	for (int i = 0; i < elements.length; i++) {
+	    assertEquals(i + 1, elements[i], 0);
+	}
+
+	t = new Tensor(5, 5, 5);
+	elements = t.getElements();
+
+	for (int i = 0; i < elements.length; i++) {
+	    elements[i] = i + 1;
+	}
+
+	Tensor t2 = new Tensor(t, new int[] { 3, 0, 0 }, new int[] { 4, 4, 4 });
+
+	assertEquals(76, t2.get(0, 0, 0), 0);
+	assertEquals(77, t2.get(0, 0, 1), 0);
+	assertEquals(81, t2.get(0, 1, 0), 0);
+	assertEquals(101, t2.get(1, 0, 0), 0);
+	assertEquals(106, t2.get(1, 1, 0), 0);
+	assertEquals(112, t2.get(1, 2, 1), 0);
     }
 }
