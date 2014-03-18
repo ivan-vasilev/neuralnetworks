@@ -47,40 +47,40 @@ public class FFNNTest {
 	FullyConnected bc = new FullyConnected(new Layer(), ol, 1, 2);
 
 	Matrix cg = c1.getConnectionGraph();
-	cg.set(0, 0, 1);
-	cg.set(0, 1, 2);
-	cg.set(0, 2, 3);
-	cg.set(1, 0, 4);
-	cg.set(1, 1, 5);
-	cg.set(1, 2, 6);
+	cg.set(1, 0, 0);
+	cg.set(2, 0, 1);
+	cg.set(3, 0, 2);
+	cg.set(4, 1, 0);
+	cg.set(5, 1, 1);
+	cg.set(6, 1, 2);
 
 	cg = c2.getConnectionGraph();
-	cg.set(0, 0, 1);
-	cg.set(0, 1, 2);
-	cg.set(0, 2, 3);
-	cg.set(1, 0, 4);
-	cg.set(1, 1, 5);
-	cg.set(1, 2, 6);
+	cg.set(1, 0, 0);
+	cg.set(2, 0, 1);
+	cg.set(3, 0, 2);
+	cg.set(4, 1, 0);
+	cg.set(5, 1, 1);
+	cg.set(6, 1, 2);
 
 	Matrix i1 = new Matrix(3, 2);
-	i1.set(0, 0, 1);
-	i1.set(1, 0, 2);
-	i1.set(2, 0, 3);
-	i1.set(0, 1, 4);
-	i1.set(1, 1, 5);
-	i1.set(2, 1, 6);
+	i1.set(1, 0, 0);
+	i1.set(2, 1, 0);
+	i1.set(3, 2, 0);
+	i1.set(4, 0, 1);
+	i1.set(5, 1, 1);
+	i1.set(6, 2, 1);
 
 	Matrix i2 = new Matrix(3, 2);
-	i2.set(0, 0, 1);
-	i2.set(1, 0, 2);
-	i2.set(2, 0, 3);
-	i2.set(0, 1, 4);
-	i2.set(1, 1, 5);
-	i2.set(2, 1, 6);
+	i2.set(1, 0, 0);
+	i2.set(2, 1, 0);
+	i2.set(3, 2, 0);
+	i2.set(4, 0, 1);
+	i2.set(5, 1, 1);
+	i2.set(6, 2, 1);
 
 	Matrix bcg = bc.getConnectionGraph();
-	bcg.set(0, 0, 0.1f);
-	bcg.set(1, 0, 0.2f);
+	bcg.set(0.1f, 0, 0);
+	bcg.set(0.2f, 1, 0);
 
 	ConnectionCalculatorFullyConnected aws = new AparapiWeightedSumConnectionCalculator();
 
@@ -153,40 +153,40 @@ public class FFNNTest {
 	FullyConnected bc = new FullyConnected(new Layer(), ol, 1, 2);
 
 	Matrix cg = c1.getConnectionGraph();
-	cg.set(0, 0, 1);
-	cg.set(1, 0, 2);
-	cg.set(2, 0, 3);
-	cg.set(0, 1, 4);
-	cg.set(1, 1, 5);
-	cg.set(2, 1, 6);
+	cg.set(1, 0, 0);
+	cg.set(2, 1, 0);
+	cg.set(3, 2, 0);
+	cg.set(4, 0, 1);
+	cg.set(5, 1, 1);
+	cg.set(6, 2, 1);
 
 	cg = c2.getConnectionGraph();
-	cg.set(0, 0, 1);
-	cg.set(1, 0, 2);
-	cg.set(2, 0, 3);
-	cg.set(0, 1, 4);
-	cg.set(1, 1, 5);
-	cg.set(2, 1, 6);
+	cg.set(1, 0, 0);
+	cg.set(2, 1, 0);
+	cg.set(3, 2, 0);
+	cg.set(4, 0, 1);
+	cg.set(5, 1, 1);
+	cg.set(6, 2, 1);
 
 	Matrix i1 = new Matrix(3, 2);
-	i1.set(0, 0, 1);
-	i1.set(1, 0, 2);
-	i1.set(2, 0, 3);
-	i1.set(0, 1, 4);
-	i1.set(1, 1, 5);
-	i1.set(2, 1, 6);
+	i1.set(1, 0, 0);
+	i1.set(2, 1, 0);
+	i1.set(3, 2, 0);
+	i1.set(4, 0, 1);
+	i1.set(5, 1, 1);
+	i1.set(6, 2, 1);
 
 	Matrix i2 = new Matrix(3, 2);
-	i2.set(0, 0, 1);
-	i2.set(1, 0, 2);
-	i2.set(2, 0, 3);
-	i2.set(0, 1, 4);
-	i2.set(1, 1, 5);
-	i2.set(2, 1, 6);
+	i2.set(1, 0, 0);
+	i2.set(2, 1, 0);
+	i2.set(3, 2, 0);
+	i2.set(4, 0, 1);
+	i2.set(5, 1, 1);
+	i2.set(6, 2, 1);
 
 	Matrix bcg = bc.getConnectionGraph();
-	bcg.set(0, 0, 0.1f);
-	bcg.set(1, 0, 0.2f);
+	bcg.set(0.1f, 0, 0);
+	bcg.set(0.2f, 1, 0);
 
 	ConnectionCalculatorFullyConnected aws = new AparapiWeightedSumConnectionCalculator();
 
@@ -254,15 +254,15 @@ public class FFNNTest {
 
 	FullyConnected c1 = (FullyConnected) mlp.getInputLayer().getConnections().iterator().next();
 	Matrix cg1 = c1.getConnectionGraph();
-	cg1.set(0, 0, 0.1f);
-	cg1.set(0, 1, 0.8f);
-	cg1.set(1, 0, 0.4f);
-	cg1.set(1, 1, 0.6f);
+	cg1.set(0.1f, 0, 0);
+	cg1.set(0.8f, 0, 1);
+	cg1.set(0.4f, 1, 0);
+	cg1.set(0.6f, 1, 1);
 
 	FullyConnected c2 = (FullyConnected) mlp.getOutputLayer().getConnections().iterator().next();
 	Matrix cg2 = c2.getConnectionGraph();
-	cg2.set(0, 0, 0.3f);
-	cg2.set(0, 1, 0.9f);
+	cg2.set(0.3f, 0, 0);
+	cg2.set(0.9f, 0, 1);
 
 	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(mlp, new SimpleInputProvider(new float[][] { { 0.35f, 0.9f } }, new float[][] { { 0.5f } }, 1, 1), new SimpleInputProvider(new float[][] { { 0.35f, 0.9f } }, new float[][] { { 0.5f } }, 1, 1), null, null, 1f, 0f, 0f, 0f);
 	bpt.train();
@@ -285,26 +285,26 @@ public class FFNNTest {
 	List<Connections> c = mlp.getConnections();
 	FullyConnected c1 = (FullyConnected) c.get(0);
 	Matrix cg1 = c1.getConnectionGraph();
-	cg1.set(0, 0, 0.2f);
-	cg1.set(0, 1, 0.4f);
-	cg1.set(0, 2, -0.5f);
-	cg1.set(1, 0, -0.3f);
-	cg1.set(1, 1, 0.1f);
-	cg1.set(1, 2, 0.2f);
+	cg1.set(0.2f, 0, 0);
+	cg1.set(0.4f, 0, 1);
+	cg1.set(-0.5f, 0, 2);
+	cg1.set(-0.3f, 1, 0);
+	cg1.set(0.1f, 1, 1);
+	cg1.set(0.2f, 1, 2);
 
 	FullyConnected cb1 = (FullyConnected) c.get(1);
 	Matrix cgb1 = cb1.getConnectionGraph();
-	cgb1.set(0, 0, -0.4f);
-	cgb1.set(1, 0, 0.2f);
+	cgb1.set(-0.4f, 0, 0);
+	cgb1.set(0.2f, 1, 0);
 
 	FullyConnected c2 = (FullyConnected) c.get(2);
 	Matrix cg2 = c2.getConnectionGraph();
-	cg2.set(0, 0, -0.3f);
-	cg2.set(0, 1, -0.2f);
+	cg2.set(-0.3f, 0, 0);
+	cg2.set(-0.2f, 0, 1);
 
 	FullyConnected cb2 = (FullyConnected) c.get(3);
 	Matrix cgb2 = cb2.getConnectionGraph();
-	cgb2.set(0, 0, 0.1f);
+	cgb2.set(0.1f, 0, 0);
 
 	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(mlp, new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, new float[][] { { 1 } }, 1, 1), new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, new float[][] { { 1 } }, 1, 1), null, null, 0.9f, 0f, 0f, 0f);
 	bpt.train();

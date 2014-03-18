@@ -20,7 +20,7 @@ public class MnistTargetMultiNeuronOutputConverter implements InputConverter {
 
 	for (int i = 0; i < input.length; i++) {
 	    int val = (int) input[i];
-	    convertedTarget.set(val, i, 1);
+	    convertedTarget.set(1, val, i);
 	}
 
 	return convertedTarget;

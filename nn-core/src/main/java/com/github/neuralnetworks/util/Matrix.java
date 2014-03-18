@@ -11,24 +11,30 @@ public class Matrix extends Tensor {
 
     private static final long serialVersionUID = 1L;
 
+    private int[] dimTmp;
+
     public Matrix() {
 	super();
     }
 
     public Matrix(float[] elements, int columns) {
 	super(elements, elements.length / columns, columns);
+	dimTmp = new int[dimensions.length];
     }
 
     public Matrix(int rows, int columns) {
 	super(rows, columns);
+	dimTmp = new int[dimensions.length];
     }
 
     public Matrix(Matrix copy) {
 	super(copy.getRows(), copy.getColumns());
+	dimTmp = new int[dimensions.length];
     }
 
     public Matrix(Tensor parent, int[] dimStart, int[] dimEnd) {
 	super(parent, dimStart, dimEnd);
+	dimTmp = new int[dimensions.length];
     }
 
     public int getColumns() {
@@ -63,7 +69,32 @@ public class Matrix extends Tensor {
 	return d;
     }
 
-    public void set(int row, int column, float value) {
-	super.set(value, row, column);
+    /* (non-Javadoc)
+     * d[0] - rows
+     * d[1] - columns
+     * @see com.github.neuralnetworks.util.Tensor#get(int[])
+     */
+    @Override
+    public float get(int... d) {
+	if (d.length != 2) {
+	    throw new IllegalArgumentException("Please provide row and column only");
+	}
+
+	dimTmp[getRowsDimension()] = d[0];
+	dimTmp[getColumnsDimension()] = d[1];
+
+	return super.get(dimTmp);
+    }
+
+    @Override
+    public void set(float value, int... d) {
+	if (d.length != 2) {
+	    throw new IllegalArgumentException("Please provide row and column only");
+	}
+
+	dimTmp[getRowsDimension()] = d[0];
+	dimTmp[getColumnsDimension()] = d[1];
+
+	super.set(value, dimTmp);
     }
 }

@@ -94,12 +94,12 @@ public class GeneralTest {
     public void testSoftMax() {
 	SoftmaxFunction sf = new SoftmaxFunction();
 	Matrix m = new Matrix(3, 2);
-	m.set(0, 0, 1);
-	m.set(1, 0, 2);
-	m.set(2, 0, 3);
-	m.set(0, 1, 4);
-	m.set(1, 1, 5);
-	m.set(2, 1, 6);
+	m.set(1, 0, 0);
+	m.set(2, 1, 0);
+	m.set(3, 2, 0);
+	m.set(4, 0, 1);
+	m.set(5, 1, 1);
+	m.set(6, 2, 1);
 
 	sf.value(m);
 
@@ -170,7 +170,6 @@ public class GeneralTest {
 	assertEquals(2, m.get(0, 1), 0);
 	assertEquals(6, m.get(0, 5), 0);
 
-
 	m = new Matrix(6, 1);
 	for (int i = 0; i < m.getElements().length; i++) {
 	    m.getElements()[i] = i + 1;
@@ -178,5 +177,38 @@ public class GeneralTest {
 
 	assertEquals(2, m.get(1, 0), 0);
 	assertEquals(6, m.get(5, 0), 0);
+
+	// submatrix
+	Tensor t = new Tensor(5, 5, 5);
+	float[] elements = t.getElements();
+
+	for (int i = 0; i < elements.length; i++) {
+	    elements[i] = i + 1;
+	}
+
+	m = new Matrix(t, new int[] {1, 0, 0}, new int[] {1, 4, 4});
+	assertEquals(26, m.get(0, 0), 0);
+	assertEquals(27, m.get(0, 1), 0);
+	assertEquals(36, m.get(2, 0), 0);
+	assertEquals(38, m.get(2, 2), 0);
+
+	m = new Matrix(t, new int[] {1, 0, 0}, new int[] {1, 4, 4});
+	assertEquals(26, m.get(0, 0), 0);
+	assertEquals(27, m.get(0, 1), 0);
+	assertEquals(36, m.get(2, 0), 0);
+	assertEquals(38, m.get(2, 2), 0);
+
+	m = new Matrix(t, new int[] {0, 0, 1}, new int[] {4, 4, 1});
+	assertEquals(2, m.get(0, 0), 0);
+	assertEquals(7, m.get(0, 1), 0);
+	assertEquals(12, m.get(0, 2), 0);
+	assertEquals(27, m.get(1, 0), 0);
+	assertEquals(32, m.get(1, 1), 0);
+	assertEquals(37, m.get(1, 2), 0);
+
+	m = new Matrix(t, new int[] {2, 2, 1}, new int[] {3, 3, 1});
+	assertEquals(62, m.get(0, 0), 0);
+	assertEquals(67, m.get(0, 1), 0);
+	assertEquals(92, m.get(1, 1), 0);
     }
 }

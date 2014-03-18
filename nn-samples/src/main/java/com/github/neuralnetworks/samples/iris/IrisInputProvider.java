@@ -48,11 +48,11 @@ public class IrisInputProvider implements TrainingInputProvider {
 	    for (int i = 0; i < batchSize; i++, currentInputCount++) {
 		int k = useRandom ? random.nextInt(150) : currentInputCount % 150;
 		for (int j = 0; j < dataset.getRows() - 1; j++) {
-		    currentExample.getInput().set(j, i, dataset.get(j, k));
+		    currentExample.getInput().set(dataset.get(j, k), j, i);
 		}
 
 		if (attachTargetToInput) {
-		    currentExample.getInput().set(currentExample.getInput().getRows() - 1, i, dataset.get(dataset.getRows() - 1, k));
+		    currentExample.getInput().set(dataset.get(dataset.getRows() - 1, k), currentExample.getInput().getRows() - 1, i);
 		}
 
 		target[i] = (int) dataset.get(dataset.getRows() - 1, k);
@@ -232,7 +232,7 @@ public class IrisInputProvider implements TrainingInputProvider {
 
 	Matrix result = new Matrix(new float[d.length], 150);
 	for (int i = 0; i < d.length; i++) {
-	    result.set(i % 5, i / 5, (float) d[i]);
+	    result.set((float) d[i], i % 5, i / 5);
 	}
 
 	if (scale) {
@@ -245,7 +245,7 @@ public class IrisInputProvider implements TrainingInputProvider {
 		}
 
 		for (int j = 0; j < result.getColumns(); j++) {
-		    result.set(i, j, result.get(i, j) / max);
+		    result.set(result.get(i, j) / max, i, j);
 		}
 	    }
 	}

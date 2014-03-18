@@ -28,22 +28,22 @@ public class XorInputProvider implements TrainingInputProvider {
 	    switch (currentInput % 4) {
 	    case 0:
 		input.getInput().set(0, 0, 0);
-		input.getInput().set(1, 0, 0);
+		input.getInput().set(0, 1, 0);
 		input.getTarget().set(0, 0, 0);
 		break;
 	    case 1:
 		input.getInput().set(0, 0, 0);
-		input.getInput().set(1, 0, 1);
-		input.getTarget().set(0, 0, 1);
+		input.getInput().set(1, 1, 0);
+		input.getTarget().set(1, 0, 0);
 		break;
 	    case 2:
-		input.getInput().set(0, 0, 1);
 		input.getInput().set(1, 0, 0);
-		input.getTarget().set(0, 0, 1);
+		input.getInput().set(0, 1, 0);
+		input.getTarget().set(1, 0, 0);
 		break;
 	    case 3:
-		input.getInput().set(0, 0, 1);
-		input.getInput().set(1, 0, 1);
+		input.getInput().set(1, 0, 0);
+		input.getInput().set(1, 1, 0);
 		input.getTarget().set(0, 0, 0);
 		break;
 	    }

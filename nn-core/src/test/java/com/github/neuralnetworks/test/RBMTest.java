@@ -106,10 +106,10 @@ public class RBMTest {
 	rbm.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
 
 	Matrix cg1 = rbm.getMainConnections().getConnectionGraph();
-	cg1.set(0, 0, 0.1f);
-	cg1.set(0, 1, 0.8f);
-	cg1.set(1, 0, 0.4f);
-	cg1.set(1, 1, 0.6f);
+	cg1.set(0.1f, 0, 0);
+	cg1.set(0.8f, 0, 1);
+	cg1.set(0.4f, 1, 0);
+	cg1.set(0.6f, 1, 1);
 
 	RBMLayerCalculator lc = (RBMLayerCalculator) rbm.getLayerCalculator();
 
@@ -127,10 +127,10 @@ public class RBMTest {
 	rbm.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
 
 	Matrix cg1 = rbm.getMainConnections().getConnectionGraph();
-	cg1.set(0, 0, 0.1f);
-	cg1.set(1, 0, 0.8f);
-	cg1.set(0, 1, 0.4f);
-	cg1.set(1, 1, 0.6f);
+	cg1.set(0.1f, 0, 0);
+	cg1.set(0.8f, 1, 0);
+	cg1.set(0.4f, 0, 1);
+	cg1.set(0.6f, 1, 1);
 
 	RBMLayerCalculator lc = (RBMLayerCalculator) rbm.getLayerCalculator();
 
@@ -149,16 +149,16 @@ public class RBMTest {
 	rbm.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
 
 	Matrix cg1 = rbm.getMainConnections().getConnectionGraph();
-	cg1.set(0, 0, 0.2f);
-	cg1.set(0, 1, 0.4f);
-	cg1.set(0, 2, -0.5f);
-	cg1.set(1, 0, -0.3f);
-	cg1.set(1, 1, 0.1f);
-	cg1.set(1, 2, 0.2f);
+	cg1.set(0.2f, 0, 0);
+	cg1.set(0.4f, 0, 1);
+	cg1.set(-0.5f, 0, 2);
+	cg1.set(-0.3f, 1, 0);
+	cg1.set(0.1f, 1, 1);
+	cg1.set(0.2f, 1, 2);
 
 	Matrix cgb1 = rbm.getHiddenBiasConnections().getConnectionGraph();
-	cgb1.set(0, 0, -0.4f);
-	cgb1.set(0, 1, 0.2f);
+	cgb1.set(-0.4f, 0, 0);
+	cgb1.set(0.2f, 0, 1);
 
 	RBMLayerCalculator lc = (RBMLayerCalculator) rbm.getLayerCalculator();
 	Matrix visible = new Matrix(new float[] { 1f, 0f, 1f }, 1);
@@ -175,16 +175,16 @@ public class RBMTest {
 	rbm.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
 
 	Matrix cg1 = rbm.getMainConnections().getConnectionGraph();
-	cg1.set(0, 0, 0.2f);
-	cg1.set(1, 0, 0.4f);
-	cg1.set(2, 0, -0.5f);
-	cg1.set(0, 1, -0.3f);
-	cg1.set(1, 1, 0.1f);
-	cg1.set(2, 1, 0.2f);
+	cg1.set(0.2f, 0, 0);
+	cg1.set(0.4f, 1, 0);
+	cg1.set(-0.5f, 2, 0);
+	cg1.set(-0.3f, 0, 1);
+	cg1.set(0.1f, 1, 1);
+	cg1.set(0.2f, 2, 1);
 
 	Matrix cgb1 = rbm.getVisibleBiasConnections().getConnectionGraph();
-	cgb1.set(0, 0, -0.4f);
-	cgb1.set(0, 1, 0.2f);
+	cgb1.set(-0.4f, 0, 0);
+	cgb1.set(0.2f, 0, 1);
 
 	RBMLayerCalculator lc = (RBMLayerCalculator) rbm.getLayerCalculator();
 	Matrix hidden = new Matrix(new float[] { 1f, 0f, 1f }, 1);
@@ -200,21 +200,21 @@ public class RBMTest {
 	RBM rbm = NNFactory.rbm(3, 2, true);
 
 	Matrix cg1 = rbm.getMainConnections().getConnectionGraph();
-	cg1.set(0, 0, 0.2f);
-	cg1.set(0, 1, 0.4f);
-	cg1.set(0, 2, -0.5f);
-	cg1.set(1, 0, -0.3f);
-	cg1.set(1, 1, 0.1f);
-	cg1.set(1, 2, 0.2f);
+	cg1.set(0.2f, 0, 0);
+	cg1.set(0.4f, 0, 1);
+	cg1.set(-0.5f, 0, 2);
+	cg1.set(-0.3f, 1, 0);
+	cg1.set(0.1f, 1, 1);
+	cg1.set(0.2f, 1, 2);
 
 	Matrix cgb1 = rbm.getVisibleBiasConnections().getConnectionGraph();
-	cgb1.set(0, 0, 0f);
-	cgb1.set(1, 0, 0f);
-	cgb1.set(2, 0, 0f);
+	cgb1.set(0f, 0, 0);
+	cgb1.set(0f, 1, 0);
+	cgb1.set(0f, 2, 0);
 
 	Matrix cgb2 = rbm.getHiddenBiasConnections().getConnectionGraph();
-	cgb2.set(0, 0, -0.4f);
-	cgb2.set(1, 0, 0.2f);
+	cgb2.set(-0.4f, 0, 0);
+	cgb2.set(0.2f, 1, 0);
 
 	AparapiCDTrainer t = TrainerFactory.cdSigmoidTrainer(rbm, new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, null, 1, 1), null, null, null, 1f, 0f, 0f, 0f, 1, true);
 	t.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
