@@ -14,24 +14,24 @@ public class Tensor implements Serializable {
     /**
      * tensor elements
      */
-    private float[] elements;
+    protected float[] elements;
 
     /**
      * dimension lengths for the tensor
      */
-    private int[] dimensions;
+    protected int[] dimensions;
 
     /**
      * sub-tensor start positions for each dimension
      */
-    private int[] dimStart;
+    protected int[] dimStart;
 
     /**
      * sub-tensor end positions for each dimension
      */
-    private int[] dimEnd;
+    protected int[] dimEnd;
 
-    private int[] dimMultiplicators;
+    protected int[] dimMultiplicators;
 
     public Tensor(int... dimensions) {
 	if (dimensions == null || dimensions.length == 0) {

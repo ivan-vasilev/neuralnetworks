@@ -24,7 +24,6 @@ public class GeneralTest {
 	ValuesProvider vp = new ValuesProvider();
 
 	NeuralNetworkImpl nn = new NeuralNetworkImpl();
-	;
 	Layer i = new Layer();
 	Layer h = new Layer();
 	Layer o = new Layer();
@@ -147,5 +146,37 @@ public class GeneralTest {
 	assertEquals(101, t2.get(1, 0, 0), 0);
 	assertEquals(106, t2.get(1, 1, 0), 0);
 	assertEquals(112, t2.get(1, 2, 1), 0);
+    }
+
+    @Test
+    public void testMatrix() {
+	Matrix m = new Matrix(5, 6);
+
+	assertEquals(5, m.getRows(), 0);
+	assertEquals(6, m.getColumns(), 0);
+
+	for (int i = 0; i < m.getElements().length; i++) {
+	    m.getElements()[i] = i + 1;
+	}
+
+	assertEquals(2, m.get(0, 1), 0);
+	assertEquals(15, m.get(2, 2), 0);
+
+	m = new Matrix(1, 6);
+	for (int i = 0; i < m.getElements().length; i++) {
+	    m.getElements()[i] = i + 1;
+	}
+
+	assertEquals(2, m.get(0, 1), 0);
+	assertEquals(6, m.get(0, 5), 0);
+
+
+	m = new Matrix(6, 1);
+	for (int i = 0; i < m.getElements().length; i++) {
+	    m.getElements()[i] = i + 1;
+	}
+
+	assertEquals(2, m.get(1, 0), 0);
+	assertEquals(6, m.get(5, 0), 0);
     }
 }
