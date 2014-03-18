@@ -1,5 +1,7 @@
 package com.github.neuralnetworks.util;
 
+
+
 /**
  * Simple matrix representation with one-dimensional array. This is required,
  * because Aparapi supports only one-dim arrays (otherwise the execution is
@@ -30,11 +32,35 @@ public class Matrix extends Tensor {
     }
 
     public int getColumns() {
-	return getDimension(1);
+	return getDimension(getColumnsDimension());
+    }
+
+    protected int getColumnsDimension() {
+	int d = getRowsDimension() + 1;
+	for (int i = getDimensions().length - 1; i > 0; i--) {
+	    if (dimStart[i] != dimEnd[i] && d < i) {
+		d = i;
+		break;
+	    }
+	}
+
+	return d;
     }
 
     public int getRows() {
-	return getDimension(0);
+	return getDimension(getRowsDimension());
+    }
+
+    protected int getRowsDimension() {
+	int d = getDimensions().length - 2;
+	for (int i = 0; i < getDimensions().length - 1; i++) {
+	    if (dimStart[i] != dimEnd[i]) {
+		d = i;
+		break;
+	    }
+	}
+
+	return d;
     }
 
     public void set(int row, int column, float value) {
