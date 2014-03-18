@@ -132,6 +132,10 @@ public class GeneralTest {
 	}
 
 	t = new Tensor(5, 5, 5);
+	assertEquals(25, t.getDimensionElementsDistance(0), 0);
+	assertEquals(5, t.getDimensionElementsDistance(1), 0);
+	assertEquals(1, t.getDimensionElementsDistance(2), 0);
+
 	elements = t.getElements();
 
 	for (int i = 0; i < elements.length; i++) {
@@ -139,6 +143,11 @@ public class GeneralTest {
 	}
 
 	Tensor t2 = new Tensor(t, new int[] { 3, 0, 0 }, new int[] { 4, 4, 4 });
+	assertEquals(75, t2.getStartIndex(), 0);
+	assertEquals(124, t2.getEndIndex(), 0);
+	assertEquals(25, t2.getDimensionElementsDistance(0), 0);
+	assertEquals(5, t2.getDimensionElementsDistance(1), 0);
+	assertEquals(1, t2.getDimensionElementsDistance(2), 0);
 
 	assertEquals(76, t2.get(0, 0, 0), 0);
 	assertEquals(77, t2.get(0, 0, 1), 0);
