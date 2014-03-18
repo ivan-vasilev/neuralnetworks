@@ -571,15 +571,15 @@ public class CNNTest {
 
 	FullyConnected c1 = (FullyConnected) nn.getInputLayer().getConnections().get(0).getOutputLayer().getConnections().get(1).getOutputLayer().getConnections().get(1);
 	Matrix cg1 = c1.getConnectionGraph();
-	cg1.set(0, 0, 0.1f);
-	cg1.set(0, 1, 0.8f);
-	cg1.set(1, 0, 0.4f);
-	cg1.set(1, 1, 0.6f);
+	cg1.set(0.1f, 0, 0);
+	cg1.set(0.8f, 0, 1);
+	cg1.set(0.4f, 1, 0);
+	cg1.set(0.6f, 1, 1);
 
 	FullyConnected c2 = (FullyConnected) nn.getOutputLayer().getConnections().iterator().next();
 	Matrix cg2 = c2.getConnectionGraph();
-	cg2.set(0, 0, 0.3f);
-	cg2.set(0, 1, 0.9f);
+	cg2.set(0.3f, 0, 0);
+	cg2.set(0.9f, 0, 1);
 
 	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(nn, new SimpleInputProvider(new float[][] { { 0.35f, 0.9f } }, new float[][] { { 0.5f } }, 1, 1), new SimpleInputProvider(new float[][] { { 0.35f, 0.9f } }, new float[][] { { 0.5f } }, 1, 1), null, null, 1f, 0f, 0f, 0f);
 	bpt.train();

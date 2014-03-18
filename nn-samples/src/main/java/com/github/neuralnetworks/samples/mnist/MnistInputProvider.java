@@ -112,7 +112,7 @@ public class MnistInputProvider extends TrainingInputProviderImpl {
 		images.seek(16 + size * indexes[i]);
 		images.readFully(current);
 		for (int j = 0; j < size; j++) {
-		    tempImages.set(j, i, current[j] & 0xFF);
+		    tempImages.set(current[j] & 0xFF, j, i);
 		}
 	    }
 	} catch (IOException e) {

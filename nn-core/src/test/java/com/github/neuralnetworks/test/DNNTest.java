@@ -146,21 +146,21 @@ public class DNNTest {
 	RBM firstRBM = dbn.getFirstNeuralNetwork();
 
 	Matrix cg1 = firstRBM.getMainConnections().getConnectionGraph();
-	cg1.set(0, 0, 0.2f);
-	cg1.set(0, 1, 0.4f);
-	cg1.set(0, 2, -0.5f);
-	cg1.set(1, 0, -0.3f);
-	cg1.set(1, 1, 0.1f);
-	cg1.set(1, 2, 0.2f);
+	cg1.set(0.2f, 0, 0);
+	cg1.set(0.4f, 0, 1);
+	cg1.set(-0.5f, 0, 2);
+	cg1.set(-0.3f, 1, 0);
+	cg1.set(0.1f, 1, 1);
+	cg1.set(0.2f, 1, 2);
 
 	Matrix cgb1 = firstRBM.getVisibleBiasConnections().getConnectionGraph();
-	cgb1.set(0, 0, 0f);
-	cgb1.set(1, 0, 0f);
-	cgb1.set(2, 0, 0f);
+	cgb1.set(0f, 0, 0);
+	cgb1.set(0f, 1, 0);
+	cgb1.set(0f, 2, 0);
 
 	Matrix cgb2 = firstRBM.getHiddenBiasConnections().getConnectionGraph();
-	cgb2.set(0, 0, -0.4f);
-	cgb2.set(1, 0, 0.2f);
+	cgb2.set(-0.4f, 0, 0);
+	cgb2.set(0.2f, 1, 0);
 
 	SimpleInputProvider inputProvider = new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, null, 1, 1);
 
@@ -204,34 +204,34 @@ public class DNNTest {
 	lc.addConnectionCalculator(firstRBM.getHiddenLayer(), new AparapiWeightedSumConnectionCalculator());
 
 	Matrix m1 = firstRBM.getMainConnections().getConnectionGraph();
-	m1.set(0, 0, 1);
-	m1.set(0, 1, 0);
-	m1.set(0, 2, 0);
 	m1.set(1, 0, 0);
+	m1.set(0, 0, 1);
+	m1.set(0, 0, 2);
+	m1.set(0, 1, 0);
 	m1.set(1, 1, 1);
-	m1.set(1, 2, 0);
-	m1.set(2, 0, 0);
-	m1.set(2, 1, 0);
-	m1.set(2, 2, 1);
+	m1.set(0, 1, 2);
+	m1.set(0, 2, 0);
+	m1.set(0, 2, 1);
+	m1.set(1, 2, 2);
 
 	RBM secondRBM = dbn.getLastNeuralNetwork();
 	
 	Matrix cg1 = secondRBM.getMainConnections().getConnectionGraph();
-	cg1.set(0, 0, 0.2f);
-	cg1.set(0, 1, 0.4f);
-	cg1.set(0, 2, -0.5f);
-	cg1.set(1, 0, -0.3f);
-	cg1.set(1, 1, 0.1f);
-	cg1.set(1, 2, 0.2f);
+	cg1.set(0.2f, 0, 0);
+	cg1.set(0.4f, 0, 1);
+	cg1.set(-0.5f, 0, 2);
+	cg1.set(-0.3f, 1, 0);
+	cg1.set(0.1f, 1, 1);
+	cg1.set(0.2f, 1, 2);
 	
 	Matrix cgb1 = secondRBM.getVisibleBiasConnections().getConnectionGraph();
-	cgb1.set(0, 0, 0f);
-	cgb1.set(1, 0, 0f);
-	cgb1.set(2, 0, 0f);
+	cgb1.set(0f, 0, 0);
+	cgb1.set(0f, 1, 0);
+	cgb1.set(0f, 2, 0);
 	
 	Matrix cgb2 = secondRBM.getHiddenBiasConnections().getConnectionGraph();
-	cgb2.set(0, 0, -0.4f);
-	cgb2.set(1, 0, 0.2f);
+	cgb2.set(-0.4f, 0, 0);
+	cgb2.set(0.2f, 1, 0);
 	
 	SimpleInputProvider inputProvider = new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, null, 1, 1);
 

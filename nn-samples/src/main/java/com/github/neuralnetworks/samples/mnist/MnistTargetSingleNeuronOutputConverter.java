@@ -12,7 +12,7 @@ public class MnistTargetSingleNeuronOutputConverter implements InputConverter {
 	Matrix m = new Matrix(1, input.length);
 
 	for (int i = 0; i < input.length; i++) {
-	    m.set(0, i, (int) input[i]);
+	    m.set((int) input[i], 0, i);
 	}
 
 	return m;

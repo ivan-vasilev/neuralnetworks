@@ -54,13 +54,13 @@ public class SimpleInputProvider implements TrainingInputProvider {
 	    for (int i = 0; i < miniBatchSize; i++, current++) {
 		if (input != null) {
 		    for (int j = 0; j < input[current % input.length].length; j++) {
-			data.getInput().set(j, i, input[current % input.length][j]);
+			data.getInput().set(input[current % input.length][j], j, i);
 		    }
 		}
 
 		if (target != null) {
 		    for (int j = 0; j < target[current % target.length].length; j++) {
-			data.getTarget().set(j, i, target[current % target.length][j]);
+			data.getTarget().set(target[current % target.length][j], j, i);
 		    }
 		}
 	    }
