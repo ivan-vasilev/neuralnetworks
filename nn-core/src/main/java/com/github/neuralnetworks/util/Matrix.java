@@ -30,18 +30,14 @@ public class Matrix extends Tensor {
     }
 
     public int getColumns() {
-	return getDimensions()[1];
+	return getDimension(1);
     }
 
     public int getRows() {
-	return getDimensions()[0];
+	return getDimension(0);
     }
 
     public void set(int row, int column, float value) {
 	super.set(value, row, column);
-    }
-
-    public float get(int row, int column) {
-	return super.get(row, column);
     }
 }

@@ -295,7 +295,7 @@ public class FFNNTest {
 	FullyConnected cb1 = (FullyConnected) c.get(1);
 	Matrix cgb1 = cb1.getConnectionGraph();
 	cgb1.set(0, 0, -0.4f);
-	cgb1.set(0, 1, 0.2f);
+	cgb1.set(1, 0, 0.2f);
 
 	FullyConnected c2 = (FullyConnected) c.get(2);
 	Matrix cg2 = c2.getConnectionGraph();
@@ -320,7 +320,7 @@ public class FFNNTest {
 	assertEquals(-0.138, cg2.get(0, 1), 0.001);
 
 	assertEquals(-0.408, cgb1.get(0, 0), 0.001);
-	assertEquals(0.194, cgb1.get(0, 1), 0.001);
+	assertEquals(0.194, cgb1.get(1, 0), 0.001);
 
 	assertEquals(0.218, cgb2.get(0, 0), 0.001);
     }
