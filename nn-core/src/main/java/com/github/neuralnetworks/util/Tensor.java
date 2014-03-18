@@ -39,12 +39,13 @@ public class Tensor implements Serializable {
 	}
 
 	this.dimensions = dimensions;
-	this.dimEnd = dimensions;
 	this.dimStart = new int[dimensions.length];
+	this.dimEnd = new int[dimensions.length];
 	this.elements = new float[IntStream.of(dimensions).reduce(1, (a, b) -> a * b)];
+	this.dimMultiplicators = new int[dimensions.length];
 
-	dimMultiplicators = new int[dimensions.length];
-	IntStream.range(0, dimMultiplicators.length).forEach(i -> {
+	IntStream.range(0, dimensions.length).forEach(i -> {
+	    dimEnd[i] = dimensions[i] - 1;
 	    dimMultiplicators[i] = 1;
 	    Arrays.stream(dimensions).skip(i + 1).limit(dimensions.length).forEach(j -> dimMultiplicators[i] *= j);
 	});
@@ -56,12 +57,13 @@ public class Tensor implements Serializable {
 	}
 	
 	this.dimensions = dimensions;
-	this.dimEnd = dimensions;
 	this.dimStart = new int[dimensions.length];
+	this.dimEnd = new int[dimensions.length];
 	this.elements = elements;
 	
 	dimMultiplicators = new int[dimensions.length];
 	IntStream.range(0, dimMultiplicators.length).forEach(i -> {
+	    dimEnd[i] = dimensions[i] - 1;
 	    dimMultiplicators[i] = 1;
 	    Arrays.stream(dimensions).skip(i + 1).limit(dimensions.length).forEach(j -> dimMultiplicators[i] *= j);
 	});
@@ -83,6 +85,18 @@ public class Tensor implements Serializable {
 	elements[getIndex(d)] = value;
     }
 
+    public float[] getElements() {
+        return elements;
+    }
+
+    public int[] getDimensions() {
+        return dimensions;
+    }
+
+    public int getDimension(int d) {
+	return dimEnd[d] - dimStart[d] + 1;
+    }
+
     protected int getIndex(int... d) {
 	if (d == null || d.length == 0 || d.length != dimensions.length) {
 	    throw new IllegalArgumentException("Please provide indices");
@@ -97,13 +111,5 @@ public class Tensor implements Serializable {
 	}).sum();
 
 	return id;
-    }
-
-    public float[] getElements() {
-        return elements;
-    }
-
-    public int[] getDimensions() {
-        return dimensions;
     }
 }
