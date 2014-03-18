@@ -13,7 +13,7 @@ import com.github.neuralnetworks.util.Util;
 /**
  * BackPropagation base function for convolutional layers
  */
-public class AparapiBackpropagationConv2D extends AparapiConv2D implements BackpropagationConnectionCalculator {
+public class AparapiBackpropagationConv2D extends AparapiConv2D implements BackPropagationConnectionCalculator {
 
     private static final long serialVersionUID = -345286029645674230L;
 

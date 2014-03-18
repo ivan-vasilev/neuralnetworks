@@ -20,7 +20,7 @@ public class BackPropagationConv2D extends BackPropagationConnectionCalculatorIm
     }
 
     @Override
-    protected void addBackpropFunction(SortedMap<Connections, Integer> inputConnections, Map<Connections, BackpropagationConnectionCalculator> connectionCalculators, Layer targetLayer) {
+    protected void addBackpropFunction(SortedMap<Connections, Integer> inputConnections, Map<Connections, BackPropagationConnectionCalculator> connectionCalculators, Layer targetLayer) {
 	Conv2DConnection con = null;
 	for (Connections c : inputConnections.keySet()) {
 	    if (c instanceof Conv2DConnection) {

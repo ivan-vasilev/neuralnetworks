@@ -8,7 +8,7 @@ import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSubsampling2
 /**
  * BackPropagation base function for subsampling layers
  */
-public class AparapiBackpropagationSubsampling2D extends AparapiSubsampling2D implements BackpropagationConnectionCalculator {
+public class AparapiBackpropagationSubsampling2D extends AparapiSubsampling2D implements BackPropagationConnectionCalculator {
 
     private static final long serialVersionUID = -345286029645674230L;
 

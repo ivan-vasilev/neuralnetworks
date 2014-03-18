@@ -14,7 +14,7 @@ import com.github.neuralnetworks.util.Util;
  * Aparapi Backpropagation base weighted sum Supports learning rate, momentum
  * and weight decay
  */
-public class AparapiBackpropagationFullyConnected extends AparapiWeightedSum implements BackpropagationConnectionCalculator {
+public class AparapiBackpropagationFullyConnected extends AparapiWeightedSum implements BackPropagationConnectionCalculator {
 
     private static final long serialVersionUID = -5101971690861270462L;
 

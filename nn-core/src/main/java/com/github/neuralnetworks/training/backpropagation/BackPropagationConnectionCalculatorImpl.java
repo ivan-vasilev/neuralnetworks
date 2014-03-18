@@ -20,13 +20,13 @@ import com.github.neuralnetworks.util.Util;
  * Connection calculator for the backpropagation phase of the algorithm
  * The difference with the regular ConnectionCalculatorImpl is that forwardBackprop's and backwardBackprop's properties (learing rate, momentum, weight decay) are updated before each propagation
  */
-public abstract class BackPropagationConnectionCalculatorImpl implements BackpropagationConnectionCalculator {
+public abstract class BackPropagationConnectionCalculatorImpl implements BackPropagationConnectionCalculator {
 
     private static final long serialVersionUID = -8854054073444883314L;
 
     private Properties properties;
-    protected Map<Connections, BackpropagationConnectionCalculator> connectionCalculators;
-    protected Set<BackpropagationConnectionCalculator> calculators;
+    protected Map<Connections, BackPropagationConnectionCalculator> connectionCalculators;
+    protected Set<BackPropagationConnectionCalculator> calculators;
     protected ValuesProvider activations;
     protected Layer currentLayer;
     protected int miniBatchSize;
@@ -54,7 +54,7 @@ public abstract class BackPropagationConnectionCalculatorImpl implements Backpro
 	}
 
 	List<Connections> chunkCalc = new ArrayList<>();
-	for (BackpropagationConnectionCalculator bc : calculators) {
+	for (BackPropagationConnectionCalculator bc : calculators) {
 	    chunkCalc.clear();
 
 	    Layer target = targetLayer;
@@ -77,7 +77,7 @@ public abstract class BackPropagationConnectionCalculatorImpl implements Backpro
 	}
     }
 
-    protected abstract void addBackpropFunction(SortedMap<Connections, Integer> inputConnections, Map<Connections, BackpropagationConnectionCalculator> connectionCalculators, Layer targetLayer);
+    protected abstract void addBackpropFunction(SortedMap<Connections, Integer> inputConnections, Map<Connections, BackPropagationConnectionCalculator> connectionCalculators, Layer targetLayer);
 
     public int getMiniBatchSize() {
 	return miniBatchSize;

@@ -10,11 +10,11 @@ import com.github.neuralnetworks.calculation.ValuesProvider;
 /**
  * Backpropagation for average pooling layers
  */
-public class BackpropagationAveragePooling2D implements BackpropagationConnectionCalculator {
+public class BackpropagationAveragePooling2D implements BackPropagationConnectionCalculator {
 
     private static final long serialVersionUID = 8165829315701496713L;
 
-    private BackpropagationConnectionCalculator cc;
+    private BackPropagationConnectionCalculator cc;
     protected ValuesProvider activations;
 
     @Override

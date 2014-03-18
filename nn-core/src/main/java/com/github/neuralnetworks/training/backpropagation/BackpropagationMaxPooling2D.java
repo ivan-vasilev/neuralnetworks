@@ -10,11 +10,11 @@ import com.github.neuralnetworks.calculation.ValuesProvider;
 /**
  * Backpropagation for max pooling layers
  */
-public class BackpropagationMaxPooling2D implements BackpropagationConnectionCalculator {
+public class BackpropagationMaxPooling2D implements BackPropagationConnectionCalculator {
 
     private static final long serialVersionUID = 8165829315701496713L;
 
-    private BackpropagationConnectionCalculator cc;
+    private BackPropagationConnectionCalculator cc;
     protected ValuesProvider activations;
 
     @Override

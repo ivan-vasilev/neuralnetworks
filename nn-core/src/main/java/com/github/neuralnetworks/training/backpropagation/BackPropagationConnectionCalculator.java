@@ -3,7 +3,7 @@ package com.github.neuralnetworks.training.backpropagation;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.calculation.ValuesProvider;
 
-public interface BackpropagationConnectionCalculator extends ConnectionCalculator {
+public interface BackPropagationConnectionCalculator extends ConnectionCalculator {
 
     public float getLearningRate();
 
