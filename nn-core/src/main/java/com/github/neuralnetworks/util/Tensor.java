@@ -33,6 +33,11 @@ public class Tensor implements Serializable {
 
     protected int[] dimMultiplicators;
 
+    /**
+     * temporary array
+     */
+    protected int[] dimTmp;
+
     public Tensor(int... dimensions) {
 	if (dimensions == null || dimensions.length == 0) {
 	    throw new IllegalArgumentException("Please provide dimensions");
@@ -41,6 +46,7 @@ public class Tensor implements Serializable {
 	this.dimensions = dimensions;
 	this.dimStart = new int[dimensions.length];
 	this.dimEnd = new int[dimensions.length];
+	this.dimTmp = new int[dimensions.length];
 	this.elements = new float[IntStream.of(dimensions).reduce(1, (a, b) -> a * b)];
 	this.dimMultiplicators = new int[dimensions.length];
 
@@ -59,6 +65,7 @@ public class Tensor implements Serializable {
 	this.dimensions = dimensions;
 	this.dimStart = new int[dimensions.length];
 	this.dimEnd = new int[dimensions.length];
+	this.dimTmp = new int[dimensions.length];
 	this.elements = elements;
 	
 	dimMultiplicators = new int[dimensions.length];
@@ -75,6 +82,7 @@ public class Tensor implements Serializable {
 	this.dimMultiplicators = parent.dimMultiplicators;
 	this.dimStart = dimStart;
 	this.dimEnd = dimEnd;
+	this.dimTmp = new int[dimensions.length];
     }
 
     public float get(int... d) {
@@ -89,12 +97,40 @@ public class Tensor implements Serializable {
         return elements;
     }
 
-    public int[] getDimensions() {
-        return dimensions;
+    /**
+     * @return start index (in the elements array) for this tensor
+     */
+    public int getStartIndex() {
+	Util.fillArray(dimTmp, 0);
+	return getIndex(dimTmp);
     }
 
-    public int getDimension(int d) {
+    /**
+     * @return end index (in the elements array) for this tensor
+     */
+    public int getEndIndex() {
+	IntStream.range(0, dimensions.length).forEach(i -> dimTmp[i] = dimEnd[i] - dimStart[i]);
+	return getIndex(dimTmp);
+    }
+
+    /**
+     * @param d
+     * @return the length of this dimension
+     */
+    public int getDimensionLength(int d) {
 	return dimEnd[d] - dimStart[d] + 1;
+    }
+
+    /**
+     * @param d
+     * @return the distance between two neighboring elements in this dimension in the elements array
+     */
+    public int getDimensionElementsDistance(int d) {
+	return dimMultiplicators[d];
+    }
+
+    public int getDimensionsSize() {
+	return dimensions.length;
     }
 
     protected int getIndex(int... d) {
