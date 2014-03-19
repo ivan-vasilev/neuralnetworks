@@ -36,17 +36,14 @@ public class AparapiMaxPooling2D implements ConnectionCalculator {
 
 	@Override
 	protected void pool(int inputStartIndex) {
-	    int rl = regionLength;
-	    int miniBatch = miniBatchSize;
 	    float max = 0;
-
-	    for (int i = 0; i < miniBatch; i++) {
-		max = input[(inputStartIndex + featureMapOffsets[0]) * miniBatch + i];
-		for (int j = 1; j < rl; j++) {
-		    max = max(input[(inputStartIndex + featureMapOffsets[j]) * miniBatch + i], max);
+	    for (int i = 0; i < miniBatchSize; i++) {
+		max = input[(inputStartIndex + featureMapOffsets[0]) * miniBatchSize + i];
+		for (int j = 1; j < regionLength; j++) {
+		    max = max(input[(inputStartIndex + featureMapOffsets[j]) * miniBatchSize + i], max);
 		}
 
-		output[getGlobalId() * miniBatch + i] = max;
+		output[getGlobalId() * miniBatchSize + i] = max;
 	    }
 	}
     }

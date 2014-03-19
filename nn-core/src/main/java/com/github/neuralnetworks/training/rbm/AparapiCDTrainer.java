@@ -44,7 +44,7 @@ public class AparapiCDTrainer extends CDTrainerBase {
 	int mbs = posPhaseHidden.getColumns();
 
 	if (weightUpdatesKernel == null || weightUpdatesKernel.getMiniBatchSize() != mbs) {
-	    weightUpdatesKernel = new CDWeightUpdatesKernel(posPhaseVisible.getElements(), posPhaseHidden.getElements(), negPhaseVisible.getElements(), negPhaseHidden.getElements(), rbm.getMainConnections().getConnectionGraph().getElements(), rbm.getMainConnections().getConnectionGraph().getColumns(), getLearningRate(), getMomentum(), getl1weightDecay(), getl2weightDecay(), mbs);
+	    weightUpdatesKernel = new CDWeightUpdatesKernel(posPhaseVisible, posPhaseHidden, negPhaseVisible, negPhaseHidden, rbm.getMainConnections().getConnectionGraph(), getLearningRate(), getMomentum(), getl1weightDecay(), getl2weightDecay());
 	}
 	Environment.getInstance().getExecutionStrategy().execute(weightUpdatesKernel, rbm.getMainConnections().getConnectionGraph().getRows());
 

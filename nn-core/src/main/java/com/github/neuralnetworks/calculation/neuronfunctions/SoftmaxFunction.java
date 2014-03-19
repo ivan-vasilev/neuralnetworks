@@ -12,31 +12,37 @@ public class SoftmaxFunction extends Kernel implements MatrixFunction {
     private static final long serialVersionUID = 1L;
 
     private float[] values;
+    private int startIndex;
+    private int nextRowStep;
+    private int nextColumnStep;
     private int rows;
-    private int columns;
 
     @Override
     public void value(Matrix inputOutput) {
 	this.values = inputOutput.getElements();
+	this.startIndex = inputOutput.getColumnsStartIndex();
+	this.nextRowStep = inputOutput.getRowElementsDistance();
+	this.nextColumnStep = inputOutput.getColumnElementsDistance();
 	this.rows = inputOutput.getRows();
-	this.columns = inputOutput.getColumns();
 
-	Environment.getInstance().getExecutionStrategy().execute(this, columns);
+	Environment.getInstance().getExecutionStrategy().execute(this, inputOutput.getColumns());
     }
 
     @Override
     public void run() {
 	float sum = 0;
+	int start = startIndex;
 	int r = rows;
-	int c = columns;
+	int nr = nextRowStep;
+	int nc = nextColumnStep;
 	int id = getGlobalId();
 
 	for (int i = 0; i < r; i++) {
-	    sum += values[i * c + id];
+	    sum += values[start + i * nr + id * nc];
 	}
 
 	for (int i = 0; i < r; i++) {
-	    values[i * c + id] /= sum;
+	    values[start + i * nr + id * nc] /= sum;
 	}
     }
 }

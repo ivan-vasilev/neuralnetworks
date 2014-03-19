@@ -3,6 +3,8 @@ package com.github.neuralnetworks.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.stream.IntStream;
+
 import org.junit.Test;
 
 import com.github.neuralnetworks.architecture.GraphConnections;
@@ -93,7 +95,11 @@ public class GeneralTest {
     @Test
     public void testSoftMax() {
 	SoftmaxFunction sf = new SoftmaxFunction();
-	Matrix m = new Matrix(3, 2);
+
+	Tensor t = new Tensor(5, 4, 2);
+	IntStream.range(0, t.getElements().length).forEach(i -> t.getElements()[i] = i + 1);
+	Matrix m = new Matrix(t, new int[] { 1, 1, 1 }, new int[] { 3, 2, 1 });
+
 	m.set(1, 0, 0);
 	m.set(2, 1, 0);
 	m.set(3, 2, 0);
@@ -143,11 +149,12 @@ public class GeneralTest {
 	}
 
 	Tensor t2 = new Tensor(t, new int[] { 3, 0, 0 }, new int[] { 4, 4, 4 });
-	assertEquals(75, t2.getStartIndex(), 0);
+	assertEquals(75, t2.getStartIndex(2), 0);
 	assertEquals(124, t2.getEndIndex(), 0);
 	assertEquals(25, t2.getDimensionElementsDistance(0), 0);
 	assertEquals(5, t2.getDimensionElementsDistance(1), 0);
 	assertEquals(1, t2.getDimensionElementsDistance(2), 0);
+	assertEquals(50, t2.getSize(), 0);
 
 	assertEquals(76, t2.get(0, 0, 0), 0);
 	assertEquals(77, t2.get(0, 0, 1), 0);
@@ -163,6 +170,10 @@ public class GeneralTest {
 
 	assertEquals(5, m.getRows(), 0);
 	assertEquals(6, m.getColumns(), 0);
+	assertEquals(6, m.getDimensionElementsDistance(0), 0);
+	assertEquals(1, m.getDimensionElementsDistance(1), 0);
+	assertEquals(5, m.getDimensionLength(0), 0);
+	assertEquals(6, m.getDimensionLength(1), 0);
 
 	for (int i = 0; i < m.getElements().length; i++) {
 	    m.getElements()[i] = i + 1;
@@ -219,5 +230,16 @@ public class GeneralTest {
 	assertEquals(62, m.get(0, 0), 0);
 	assertEquals(67, m.get(0, 1), 0);
 	assertEquals(92, m.get(1, 1), 0);
+
+	m = new Matrix(4, 4);
+	for (int i = 0; i < m.getElements().length; i++) {
+	    m.getElements()[i] = i + 1;
+	}
+
+	Matrix m2 = new Matrix(m, new int[] {1,1}, new int[] {2, 2});
+	assertEquals(6, m2.get(0, 0), 0);
+	assertEquals(7, m2.get(0, 1), 0);
+	assertEquals(10, m2.get(1, 0), 0);
+	assertEquals(11, m2.get(1, 1), 0);
     }
 }

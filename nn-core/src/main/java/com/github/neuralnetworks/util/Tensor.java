@@ -98,11 +98,25 @@ public class Tensor implements Serializable {
     }
 
     /**
+     * @return Number of elements (may be different than
+     */
+    public int getSize() {
+	return IntStream.range(0, dimensions.length).map(i -> getDimensionLength(i)).reduce(1, (a, b) -> a * b);
+    }
+
+    /**
      * @return start index (in the elements array) for this tensor
      */
-    public int getStartIndex() {
-	Util.fillArray(dimTmp, 0);
-	return getIndex(dimTmp);
+    public int getStartIndex(int d) {
+	int dim[] = null;
+	if (d == dimensions.length) {
+	    Util.fillArray(dimTmp, 0);
+	    dim = dimTmp;
+	} else {
+	    dim = new int[d];
+	}
+
+	return getIndex(dim);
     }
 
     /**
@@ -134,11 +148,11 @@ public class Tensor implements Serializable {
     }
 
     protected int getIndex(int... d) {
-	if (d == null || d.length == 0 || d.length != dimensions.length) {
+	if (d == null || d.length == 0 || d.length > dimensions.length) {
 	    throw new IllegalArgumentException("Please provide indices");
 	}
 
-	int id = IntStream.range(0, dimensions.length).map(i -> {
+	int id = IntStream.range(0, d.length).map(i -> {
 	    if (d[i] + dimStart[i] > dimEnd[i]) {
 		throw new IllegalArgumentException("Index out of range: " + i + " -> " + d[i] + "+" + dimStart[i] + " to " + dimStart[i]);
 	    }

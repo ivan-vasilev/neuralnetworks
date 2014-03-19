@@ -46,9 +46,25 @@ public class Matrix extends Tensor {
 
 	return d;
     }
+    
+    public int getColumnElementsDistance() {
+	return getDimensionElementsDistance(getColumnsDimension());
+    }
+
+    public int getColumnsStartIndex() {
+	return getStartIndex(getColumnsDimension());
+    }
 
     public int getRows() {
 	return getDimensionLength(getRowsDimension());
+    }
+
+    public int getRowElementsDistance() {
+	return getDimensionElementsDistance(getRowsDimension());
+    }
+
+    public int getRowsStartIndex() {
+	return getStartIndex(getRowsDimension());
     }
 
     protected int getRowsDimension() {

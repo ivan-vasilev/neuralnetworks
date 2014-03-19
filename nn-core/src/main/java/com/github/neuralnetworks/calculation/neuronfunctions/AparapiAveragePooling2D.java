@@ -37,17 +37,15 @@ public class AparapiAveragePooling2D implements ConnectionCalculator {
 
 	@Override
 	protected void pool(int inputStartIndex) {
-	    int rl = regionLength;
-	    int miniBatch = miniBatchSize;
 	    float sum = 0;
 
-	    for (int i = 0; i < miniBatch; i++) {
+	    for (int i = 0; i < miniBatchSize; i++) {
 		sum = 0;
-		for (int j = 0; j < rl; j++) {
-		    sum += input[(inputStartIndex + featureMapOffsets[j]) * miniBatch + i];
+		for (int j = 0; j < regionLength; j++) {
+		    sum += input[(inputStartIndex + featureMapOffsets[j]) * miniBatchSize + i];
 		}
 
-		output[getGlobalId() * miniBatch + i] = sum / rl;
+		output[getGlobalId() * miniBatchSize + i] = sum / regionLength;
 	    }
 	}
     }

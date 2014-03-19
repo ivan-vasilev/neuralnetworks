@@ -158,7 +158,7 @@ public class RBMTest {
 
 	Matrix cgb1 = rbm.getHiddenBiasConnections().getConnectionGraph();
 	cgb1.set(-0.4f, 0, 0);
-	cgb1.set(0.2f, 0, 1);
+	cgb1.set(0.2f, 1, 0);
 
 	RBMLayerCalculator lc = (RBMLayerCalculator) rbm.getLayerCalculator();
 	Matrix visible = new Matrix(new float[] { 1f, 0f, 1f }, 1);
@@ -184,7 +184,7 @@ public class RBMTest {
 
 	Matrix cgb1 = rbm.getVisibleBiasConnections().getConnectionGraph();
 	cgb1.set(-0.4f, 0, 0);
-	cgb1.set(0.2f, 0, 1);
+	cgb1.set(0.2f, 1, 0);
 
 	RBMLayerCalculator lc = (RBMLayerCalculator) rbm.getLayerCalculator();
 	Matrix hidden = new Matrix(new float[] { 1f, 0f, 1f }, 1);
