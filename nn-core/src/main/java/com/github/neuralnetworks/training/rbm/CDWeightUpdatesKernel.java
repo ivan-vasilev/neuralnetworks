@@ -14,22 +14,22 @@ public class CDWeightUpdatesKernel extends Kernel implements Serializable {
 
     // data parameters
     private final float[] posPhaseVisible;
-    private final int posPhaseVisibleStartPosition;
+    private final int posPhaseVisibleStartIndex;
     private final int posPhaseVisibleRowStep;
     private final int posPhaseVisibleColumnStep;
 
     private final float[] posPhaseHidden;
-    private final int posPhaseHiddenStartPosition;
+    private final int posPhaseHiddenStartIndex;
     private final int posPhaseHiddenRowStep;
     private final int posPhaseHiddenColumnStep;
 
     private final float[] negPhaseVisible;
-    private final int negPhaseVisibleStartPosition;
+    private final int negPhaseVisibleStartIndex;
     private final int negPhaseVisibleRowStep;
     private final int negPhaseVisibleColumnStep;
 
     private final float[] negPhaseHidden;
-    private final int negPhaseHiddenStartPosition;
+    private final int negPhaseHiddenStartIndex;
     private final int negPhaseHiddenRowStep;
     private final int negPhaseHiddenColumnStep;
 
@@ -37,7 +37,7 @@ public class CDWeightUpdatesKernel extends Kernel implements Serializable {
 
     // weights parameters
     private final float[] weights;
-    private final int weightsStartPosition;
+    private final int weightsStartIndex;
     private final int weightsRowStep;
     private final int weightsColumnStep;
     private final int weightsColumns;
@@ -52,27 +52,27 @@ public class CDWeightUpdatesKernel extends Kernel implements Serializable {
     public CDWeightUpdatesKernel(Matrix posPhaseVisible, Matrix posPhaseHidden, Matrix negPhaseVisible, Matrix negPhaseHidden, Matrix weights, float learningRate, float momentum, float l1weightDecay, float l2weightDecay) {
 	super();
 	this.posPhaseVisible = posPhaseVisible.getElements();
-	this.posPhaseVisibleStartPosition = posPhaseVisible.getColumnsStartIndex();
+	this.posPhaseVisibleStartIndex = posPhaseVisible.getStartIndex();
 	this.posPhaseVisibleRowStep = posPhaseVisible.getRowElementsDistance();
 	this.posPhaseVisibleColumnStep = posPhaseVisible.getColumnElementsDistance();
 
 	this.posPhaseHidden = posPhaseHidden.getElements();
-	this.posPhaseHiddenStartPosition = posPhaseHidden.getColumnsStartIndex();
+	this.posPhaseHiddenStartIndex = posPhaseHidden.getStartIndex();
 	this.posPhaseHiddenRowStep = posPhaseHidden.getRowElementsDistance();
 	this.posPhaseHiddenColumnStep = posPhaseHidden.getColumnElementsDistance();
 
 	this.negPhaseVisible = negPhaseVisible.getElements();
-	this.negPhaseVisibleStartPosition = negPhaseVisible.getColumnsStartIndex();
+	this.negPhaseVisibleStartIndex = negPhaseVisible.getStartIndex();
 	this.negPhaseVisibleRowStep = negPhaseVisible.getRowElementsDistance();
 	this.negPhaseVisibleColumnStep = negPhaseVisible.getColumnElementsDistance();
 
 	this.negPhaseHidden = negPhaseHidden.getElements();
-	this.negPhaseHiddenStartPosition = negPhaseHidden.getColumnsStartIndex();
+	this.negPhaseHiddenStartIndex = negPhaseHidden.getStartIndex();
 	this.negPhaseHiddenRowStep = negPhaseHidden.getRowElementsDistance();
 	this.negPhaseHiddenColumnStep = negPhaseHidden.getColumnElementsDistance();
 
 	this.weights = weights.getElements();
-	this.weightsStartPosition = weights.getColumnsStartIndex();
+	this.weightsStartIndex = weights.getStartIndex();
 	this.weightsRowStep = weights.getRowElementsDistance();
 	this.weightsColumnStep = weights.getColumnElementsDistance();
 	this.weightsColumns = weights.getColumns();
@@ -96,10 +96,10 @@ public class CDWeightUpdatesKernel extends Kernel implements Serializable {
 	    weightUpdate = 0;
 
 	    for (int j = 0; j < miniBatchSize; j++) {
-		weightUpdate += posPhaseHidden[posPhaseHiddenStartPosition + id * posPhaseHiddenRowStep + j * posPhaseHiddenColumnStep] * posPhaseVisible[posPhaseVisibleStartPosition + i * posPhaseVisibleRowStep + j * posPhaseVisibleColumnStep] - negPhaseHidden[negPhaseHiddenStartPosition + id * negPhaseHiddenRowStep + j * negPhaseHiddenColumnStep] * negPhaseVisible[negPhaseVisibleStartPosition + i * negPhaseVisibleRowStep + j * negPhaseVisibleColumnStep];
+		weightUpdate += posPhaseHidden[posPhaseHiddenStartIndex + id * posPhaseHiddenRowStep + j * posPhaseHiddenColumnStep] * posPhaseVisible[posPhaseVisibleStartIndex + i * posPhaseVisibleRowStep + j * posPhaseVisibleColumnStep] - negPhaseHidden[negPhaseHiddenStartIndex + id * negPhaseHiddenRowStep + j * negPhaseHiddenColumnStep] * negPhaseVisible[negPhaseVisibleStartIndex + i * negPhaseVisibleRowStep + j * negPhaseVisibleColumnStep];
 	    }
 
-	    weightId = weightsStartPosition + id * weightsRowStep + i * weightsColumnStep;
+	    weightId = weightsStartIndex + id * weightsRowStep + i * weightsColumnStep;
 	    weightUpdateId = id * weightsColumns + i;
 	    weight = weights[weightId];
 	    weightUpdate = learningRate * (weightUpdate /*/ mbs*/ - l1weightDecay * abs(weight) - l2weightDecay * weight * weight / 2) + momentum * weightUpdates[weightUpdateId];

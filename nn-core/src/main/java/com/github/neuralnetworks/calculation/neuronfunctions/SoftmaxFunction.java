@@ -20,7 +20,7 @@ public class SoftmaxFunction extends Kernel implements MatrixFunction {
     @Override
     public void value(Matrix inputOutput) {
 	this.values = inputOutput.getElements();
-	this.startIndex = inputOutput.getColumnsStartIndex();
+	this.startIndex = inputOutput.getStartIndex();
 	this.nextRowStep = inputOutput.getRowElementsDistance();
 	this.nextColumnStep = inputOutput.getColumnElementsDistance();
 	this.rows = inputOutput.getRows();

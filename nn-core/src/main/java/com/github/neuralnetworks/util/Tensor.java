@@ -107,16 +107,9 @@ public class Tensor implements Serializable {
     /**
      * @return start index (in the elements array) for this tensor
      */
-    public int getStartIndex(int d) {
-	int dim[] = null;
-	if (d == dimensions.length) {
-	    Util.fillArray(dimTmp, 0);
-	    dim = dimTmp;
-	} else {
-	    dim = new int[d];
-	}
-
-	return getIndex(dim);
+    public int getStartIndex() {
+	Util.fillArray(dimTmp, 0);
+	return getIndex(dimTmp);
     }
 
     /**

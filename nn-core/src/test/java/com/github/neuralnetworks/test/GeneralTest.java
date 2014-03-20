@@ -7,6 +7,7 @@ import java.util.stream.IntStream;
 
 import org.junit.Test;
 
+import com.amd.aparapi.Kernel.EXECUTION_MODE;
 import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
@@ -15,6 +16,7 @@ import com.github.neuralnetworks.calculation.ValuesProvider;
 import com.github.neuralnetworks.calculation.neuronfunctions.SoftmaxFunction;
 import com.github.neuralnetworks.training.random.MersenneTwisterRandomInitializer;
 import com.github.neuralnetworks.training.random.NNRandomInitializer;
+import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.Matrix;
 import com.github.neuralnetworks.util.Tensor;
 import com.github.neuralnetworks.util.Util;
@@ -94,12 +96,9 @@ public class GeneralTest {
 
     @Test
     public void testSoftMax() {
-	SoftmaxFunction sf = new SoftmaxFunction();
-
 	Tensor t = new Tensor(5, 4, 2);
 	IntStream.range(0, t.getElements().length).forEach(i -> t.getElements()[i] = i + 1);
 	Matrix m = new Matrix(t, new int[] { 1, 1, 1 }, new int[] { 3, 2, 1 });
-
 	m.set(1, 0, 0);
 	m.set(2, 1, 0);
 	m.set(3, 2, 0);
@@ -107,6 +106,8 @@ public class GeneralTest {
 	m.set(5, 1, 1);
 	m.set(6, 2, 1);
 
+	SoftmaxFunction sf = new SoftmaxFunction();
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 	sf.value(m);
 
 	assertEquals(1 / 6f, m.get(0, 0), 0);
@@ -149,13 +150,12 @@ public class GeneralTest {
 	}
 
 	Tensor t2 = new Tensor(t, new int[] { 3, 0, 0 }, new int[] { 4, 4, 4 });
-	assertEquals(75, t2.getStartIndex(2), 0);
+	assertEquals(75, t2.getStartIndex(), 0);
 	assertEquals(124, t2.getEndIndex(), 0);
 	assertEquals(25, t2.getDimensionElementsDistance(0), 0);
 	assertEquals(5, t2.getDimensionElementsDistance(1), 0);
 	assertEquals(1, t2.getDimensionElementsDistance(2), 0);
 	assertEquals(50, t2.getSize(), 0);
-
 	assertEquals(76, t2.get(0, 0, 0), 0);
 	assertEquals(77, t2.get(0, 0, 1), 0);
 	assertEquals(81, t2.get(0, 1, 0), 0);

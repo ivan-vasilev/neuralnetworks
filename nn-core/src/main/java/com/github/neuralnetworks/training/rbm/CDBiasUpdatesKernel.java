@@ -3,6 +3,7 @@ package com.github.neuralnetworks.training.rbm;
 import java.io.Serializable;
 
 import com.amd.aparapi.Kernel;
+import com.github.neuralnetworks.util.Matrix;
 
 /**
  * Aparapi kernerl for update of bias updates
@@ -25,24 +26,39 @@ public class CDBiasUpdatesKernel extends Kernel implements Serializable {
      * positive phase
      */
     private final float[] posPhase;
+    private final int posPhaseStartIndex;
+    private final int posPhaseRowStep;
+    private final int posPhaseColumnStep;
 
     /**
      * negative phase
      */
     private final float[] negPhase;
+    private final int negPhaseStartIndex;
+    private final int negPhaseRowStep;
+    private final int negPhaseColumnStep;
+
     private float learningRate;
     private final float momentum;
     private final int miniBatchSize;
 
-    public CDBiasUpdatesKernel(float[] hiddenBiasWeights, float[] posPhase, float[] negPhase, float learningRate, float momentum, int miniBatchSize) {
+    public CDBiasUpdatesKernel(float[] hiddenBiasWeights, Matrix posPhase, Matrix negPhase, float learningRate, float momentum) {
 	super();
+	this.posPhase = posPhase.getElements();
+	this.posPhaseStartIndex = posPhase.getStartIndex();
+	this.posPhaseRowStep = posPhase.getRowElementsDistance();
+	this.posPhaseColumnStep = posPhase.getColumnElementsDistance();
+
+	this.negPhase = negPhase.getElements();
+	this.negPhaseStartIndex = negPhase.getStartIndex();
+	this.negPhaseRowStep = negPhase.getRowElementsDistance();
+	this.negPhaseColumnStep = negPhase.getColumnElementsDistance();
+
 	this.biasWeights = hiddenBiasWeights;
 	this.biasUpdates = new float[hiddenBiasWeights.length];
-	this.posPhase = posPhase;
-	this.negPhase = negPhase;
 	this.learningRate = learningRate;
 	this.momentum = momentum;
-	this.miniBatchSize = miniBatchSize;
+	this.miniBatchSize = posPhase.getColumns();
     }
 
     @Override
@@ -51,7 +67,7 @@ public class CDBiasUpdatesKernel extends Kernel implements Serializable {
 	float weightUpdate = 0;
 
 	for (int i = 0; i < miniBatchSize; i++) {
-	    weightUpdate += posPhase[id * miniBatchSize + i] - negPhase[id * miniBatchSize + i];
+	    weightUpdate += posPhase[posPhaseStartIndex + id * posPhaseRowStep + i * posPhaseColumnStep] - negPhase[negPhaseStartIndex + id * negPhaseRowStep + i * negPhaseColumnStep];
 	}
 
 	weightUpdate = learningRate * weightUpdate /*/ mbs */ + momentum * biasUpdates[id];
