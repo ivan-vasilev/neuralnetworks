@@ -104,7 +104,7 @@ public class BackpropagationMaxPooling2D implements BackPropagationConnectionCal
 		    }
 		}
 
-		input[maxId] = output[getGlobalId() * miniBatchSize + i];
+		input[maxId] = output[outputStartIndex + i * outputMiniBatchDistance];
 	    }
 	}
     }

@@ -45,13 +45,13 @@ public class AparapiStochasticPooling2D implements ConnectionCalculator {
 		result = 0;
 
 		for (int j = 0; j < regionLength; j++) {
-		    sum += input[inputStartIndex + featureMapOffsets[regionLength * miniBatchSize + j]];
+		    sum += input[inputStartIndex + featureMapOffsets[i * regionLength + j]];
 		}
 
 		if (sum > 0) {
 		    a = 0;
 		    for (int j = 0; j < regionLength; j++) {
-			a = input[inputStartIndex + featureMapOffsets[regionLength * miniBatchSize + j]];
+			a = input[inputStartIndex + featureMapOffsets[i * regionLength + j]];
 			result += a * (a / sum);
 		    }
 		}

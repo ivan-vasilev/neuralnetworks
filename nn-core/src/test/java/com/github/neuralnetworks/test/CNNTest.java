@@ -368,8 +368,6 @@ public class CNNTest {
 	vp.setMiniBatchSize(2);
 	vp.getValues(c.getInputLayer()).setElements(new float[] { 0.5f, 1, 1, 2, 1.5f, 3, 2, 4, 2.5f, 5, 3, 6, 3.5f, 7, 4f, 8, 4.5f, 9, 5f, 10, 5.5f, 11, 6f, 12, 6.5f, 13, 7f, 14, 8f, 16, 7.5f, 15, 8.5f, 17, 9f, 18, 9.5f, 19, 10f, 20, 10.5f, 21, 11f, 22, 11.5f, 23, 12f, 24, 12.5f, 25, 13f, 26, 13.5f, 27, 14f, 28, 14.5f, 29, 15f, 30, 16f, 32, 15.5f, 31 });
 
-	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
-
 	calc.calculate(connections, vp, c.getOutputLayer());
 
 	Tensor o = vp.getValues(c.getOutputLayer());
@@ -396,146 +394,145 @@ public class CNNTest {
     @Test
     public void testAveragePooling() {
 	Subsampling2DConnection c = new Subsampling2DConnection(new Layer(), new Layer(), 4, 4, 2, 2, 2);
-	Matrix i1 = new Matrix(new float[] { 0.5f, 1, 1, 2, 1.5f, 3, 2, 4, 2.5f, 5, 3, 6, 3.5f, 7, 4f, 8, 4.5f, 9, 5f, 10, 5.5f, 11, 6f, 12, 6.5f, 13, 7f, 14, 8f, 16, 7.5f, 15, 8.5f, 17, 9f, 18, 9.5f, 19, 10f, 20, 10.5f, 21, 11f, 22, 11.5f, 23, 12f, 24, 12.5f, 25, 13f, 26, 13.5f, 27, 14f, 28, 14.5f, 29, 15f, 30, 16f, 32, 15.5f, 31 }, 2);
 	List<Connections> connections = new ArrayList<Connections>();
 	connections.add(c);
 
 	AparapiAveragePooling2D calc = new AparapiAveragePooling2D();
-	Matrix o = new Matrix(8, 2);
 
 	ValuesProvider vp = new ValuesProvider();
-	vp.addValues(c.getInputLayer(), i1);
-	vp.addValues(c.getOutputLayer(), o);
+	vp.setMiniBatchSize(2);
+	vp.getValues(c.getInputLayer()).setElements(new float[] { 0.5f, 1, 1, 2, 1.5f, 3, 2, 4, 2.5f, 5, 3, 6, 3.5f, 7, 4f, 8, 4.5f, 9, 5f, 10, 5.5f, 11, 6f, 12, 6.5f, 13, 7f, 14, 8f, 16, 7.5f, 15, 8.5f, 17, 9f, 18, 9.5f, 19, 10f, 20, 10.5f, 21, 11f, 22, 11.5f, 23, 12f, 24, 12.5f, 25, 13f, 26, 13.5f, 27, 14f, 28, 14.5f, 29, 15f, 30, 16f, 32, 15.5f, 31 });
 
 	calc.calculate(connections, vp, c.getOutputLayer());
 
-	assertEquals(1.75, o.get(0, 0), 0);
-	assertEquals(2.75, o.get(1, 0), 0);
-	assertEquals(5.75, o.get(2, 0), 0);
-	assertEquals(6.75, o.get(3, 0), 0);
-	assertEquals(9.75, o.get(4, 0), 0);
-	assertEquals(10.75, o.get(5, 0), 0);
-	assertEquals(13.75, o.get(6, 0), 0);
-	assertEquals(14.75, o.get(7, 0), 0);
+	Tensor o = vp.getValues(c.getOutputLayer());
 
-	assertEquals(3.5, o.get(0, 1), 0);
-	assertEquals(5.5, o.get(1, 1), 0);
-	assertEquals(11.5, o.get(2, 1), 0);
-	assertEquals(13.5, o.get(3, 1), 0);
-	assertEquals(19.5, o.get(4, 1), 0);
-	assertEquals(21.5, o.get(5, 1), 0);
-	assertEquals(27.5, o.get(6, 1), 0);
-	assertEquals(29.5, o.get(7, 1), 0);
+	assertEquals(1.75, o.get(0, 0, 0, 0), 0);
+	assertEquals(2.75, o.get(0, 0, 1, 0), 0);
+	assertEquals(5.75, o.get(0, 1, 0, 0), 0);
+	assertEquals(6.75, o.get(0, 1, 1, 0), 0);
+	assertEquals(9.75, o.get(1, 0, 0, 0), 0);
+	assertEquals(10.75, o.get(1, 0, 1, 0), 0);
+	assertEquals(13.75, o.get(1, 1, 0, 0), 0);
+	assertEquals(14.75, o.get(1, 1, 1, 0), 0);
+
+	assertEquals(3.5, o.get(0, 0, 0, 1), 0);
+	assertEquals(5.5, o.get(0, 0, 1, 1), 0);
+	assertEquals(11.5, o.get(0, 1, 0, 1), 0);
+	assertEquals(13.5, o.get(0, 1, 1, 1), 0);
+	assertEquals(19.5, o.get(1, 0, 0, 1), 0);
+	assertEquals(21.5, o.get(1, 0, 1, 1), 0);
+	assertEquals(27.5, o.get(1, 1, 0, 1), 0);
+	assertEquals(29.5, o.get(1, 1, 1, 1), 0);
     }
 
     @Test
     public void testStochasticPooling() {
 	Subsampling2DConnection c = new Subsampling2DConnection(new Layer(), new Layer(), 3, 3, 3, 3, 1);
-	Matrix i1 = new Matrix(new float[] { 1.6f, 1.6f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2.4f, 2.4f }, 2);
 	List<Connections> connections = new ArrayList<Connections>();
 	connections.add(c);
 
-	Matrix o = new Matrix(1, 2);
-
 	ValuesProvider vp = new ValuesProvider();
-	vp.addValues(c.getInputLayer(), i1);
-	vp.addValues(c.getOutputLayer(), o);
+	vp.setMiniBatchSize(2);
+	vp.getValues(c.getInputLayer()).setElements(new float[] { 1.6f, 1.6f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2.4f, 2.4f });
 
 	AparapiStochasticPooling2D calc = new AparapiStochasticPooling2D();
 	calc.calculate(connections, vp, c.getOutputLayer());
 
-	assertEquals(2.08, o.get(0, 0), 0.01);
-	assertEquals(2.08, o.get(0, 1), 0.01);
+	Tensor t = vp.getValues(c.getOutputLayer());
+
+	assertEquals(2.08, t.get(0, 0, 0, 0), 0.01);
+	assertEquals(2.08, t.get(0, 0, 0, 1), 0.01);
     }
 
     @Test
     public void testMaxPoolingBackpropagation() {
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 	Subsampling2DConnection c = new Subsampling2DConnection(new Layer(), new Layer(), 4, 4, 2, 2, 2);
-	Matrix a1 = new Matrix(new float[] { 0.5f, 1, 1, 2, 1.5f, 3, 2, 4, 2.5f, 5, 3, 6, 3.5f, 7, 4f, 8, 4.5f, 9, 5f, 10, 5.5f, 11, 6f, 12, 6.5f, 13, 7f, 14, 8f, 16, 7.5f, 15, 8.5f, 17, 9f, 18, 9.5f, 19, 10f, 20, 10.5f, 21, 11f, 22, 11.5f, 23, 12f, 24, 12.5f, 25, 13f, 26, 13.5f, 27, 14f, 28, 14.5f, 29, 15f, 30, 16f, 32, 15.5f, 31 }, 2);
-	Matrix o = new Matrix(8, 2);
 
 	List<Connections> connections = new ArrayList<Connections>();
 	connections.add(c);
 
 	// max pooling
-	ValuesProvider vp = new ValuesProvider();
-	vp.addValues(c.getInputLayer(), a1);
-	vp.addValues(c.getOutputLayer(), o);
+	ValuesProvider activations = new ValuesProvider();
+	activations.setMiniBatchSize(2);
+	activations.getValues(c.getInputLayer()).setElements(new float[] { 0.5f, 1, 1, 2, 1.5f, 3, 2, 4, 2.5f, 5, 3, 6, 3.5f, 7, 4f, 8, 4.5f, 9, 5f, 10, 5.5f, 11, 6f, 12, 6.5f, 13, 7f, 14, 8f, 16, 7.5f, 15, 8.5f, 17, 9f, 18, 9.5f, 19, 10f, 20, 10.5f, 21, 11f, 22, 11.5f, 23, 12f, 24, 12.5f, 25, 13f, 26, 13.5f, 27, 14f, 28, 14.5f, 29, 15f, 30, 16f, 32, 15.5f, 31 });
 
 	ConnectionCalculator calc = new AparapiMaxPooling2D();
-	calc.calculate(connections, vp, c.getOutputLayer());
+	calc.calculate(connections, activations, c.getOutputLayer());
 
-	ValuesProvider activations = new ValuesProvider();
-	activations.addValues(c.getInputLayer(), a1);
-
-	Matrix bpo = new Matrix(32, 2);
-
-	vp = new ValuesProvider();
-	vp.addValues(c.getOutputLayer(), o);
-	vp.addValues(c.getInputLayer(), bpo);
+	ValuesProvider vp = new ValuesProvider();
+	vp.setMiniBatchSize(2);
+	vp.addValues(c.getOutputLayer(), activations.getValues(c.getOutputLayer()));
 
 	BackpropagationMaxPooling2D bp = new BackpropagationMaxPooling2D();
 	bp.setActivations(activations);
 	bp.calculate(connections, vp, c.getInputLayer());
 
-	assertEquals(true, bpo.get(5, 0) == a1.get(5, 0));
-	assertEquals(true, bpo.get(7, 0) == a1.get(7, 0));
-	assertEquals(true, bpo.get(13, 0) == a1.get(13, 0));
-	assertEquals(true, bpo.get(14, 0) == a1.get(14, 0));
-	assertEquals(true, bpo.get(5, 1) == a1.get(5, 1));
-	assertEquals(true, bpo.get(7, 1) == a1.get(7, 1));
-	assertEquals(true, bpo.get(13, 1) == a1.get(13, 1));
-	assertEquals(true, bpo.get(14, 1) == a1.get(14, 1));
+	Tensor a = activations.getValues(c.getInputLayer());
+	Tensor bpo = vp.getValues(c.getInputLayer());
+
+	assertEquals(true, bpo.get(0, 1, 1, 0) == a.get(0, 1, 1, 0));
+	assertEquals(true, bpo.get(0, 1, 3, 0) == a.get(0, 1, 3, 0));
+	assertEquals(true, bpo.get(0, 3, 1, 0) == a.get(0, 3, 1, 0));
+	assertEquals(true, bpo.get(0, 3, 2, 0) == a.get(0, 3, 2, 0));
+	assertEquals(true, bpo.get(0, 1, 1, 1) == a.get(0, 1, 1, 1));
+	assertEquals(true, bpo.get(0, 1, 3, 1) == a.get(0, 1, 3, 1));
+	assertEquals(true, bpo.get(0, 3, 1, 1) == a.get(0, 3, 1, 1));
+	assertEquals(true, bpo.get(0, 3, 2, 1) == a.get(0, 3, 2, 1));
+	assertEquals(true, bpo.get(1, 1, 1, 0) == a.get(1, 1, 1, 0));
+	assertEquals(true, bpo.get(1, 1, 3, 0) == a.get(1, 1, 3, 0));
+	assertEquals(true, bpo.get(1, 3, 1, 0) == a.get(1, 3, 1, 0));
+	assertEquals(true, bpo.get(1, 3, 2, 0) == a.get(1, 3, 2, 0));
+	assertEquals(true, bpo.get(1, 1, 1, 1) == a.get(1, 1, 1, 1));
+	assertEquals(true, bpo.get(1, 1, 3, 1) == a.get(1, 1, 3, 1));
+	assertEquals(true, bpo.get(1, 3, 1, 1) == a.get(1, 3, 1, 1));
+	assertEquals(true, bpo.get(1, 3, 2, 1) == a.get(1, 3, 2, 1));
     }
 
     @Test
     public void testAveragePoolingBackpropagation() {
-	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 	Subsampling2DConnection c = new Subsampling2DConnection(new Layer(), new Layer(), 4, 4, 2, 2, 2);
-	Matrix a1 = new Matrix(new float[] { 0.5f, 1, 1, 2, 1.5f, 3, 2, 4, 2.5f, 5, 3, 6, 3.5f, 7, 4f, 8, 4.5f, 9, 5f, 10, 5.5f, 11, 6f, 12, 6.5f, 13, 7f, 14, 8f, 16, 7.5f, 15, 8.5f, 17, 9f, 18, 9.5f, 19, 10f, 20, 10.5f, 21, 11f, 22, 11.5f, 23, 12f, 24, 12.5f, 25, 13f, 26, 13.5f, 27, 14f, 28, 14.5f, 29, 15f, 30, 16f, 32, 15.5f, 31 }, 2);
 
-	// max pooling
+	// average pooling
 	ConnectionCalculator calc = new AparapiAveragePooling2D();
 
 	List<Connections> connections = new ArrayList<Connections>();
 	connections.add(c);
 
-	ValuesProvider vp = new ValuesProvider();
-	vp.addValues(c.getInputLayer(), a1);
-	Matrix o = new Matrix(8, 2);
-	vp.addValues(c.getOutputLayer(), o);
-
-	calc.calculate(connections, vp, c.getOutputLayer());
-
 	ValuesProvider activations = new ValuesProvider();
-	activations.addValues(c.getInputLayer(), a1);
+	activations.setMiniBatchSize(2);
+	activations.getValues(c.getInputLayer()).setElements(new float[] { 0.5f, 1, 1, 2, 1.5f, 3, 2, 4, 2.5f, 5, 3, 6, 3.5f, 7, 4f, 8, 4.5f, 9, 5f, 10, 5.5f, 11, 6f, 12, 6.5f, 13, 7f, 14, 8f, 16, 7.5f, 15, 8.5f, 17, 9f, 18, 9.5f, 19, 10f, 20, 10.5f, 21, 11f, 22, 11.5f, 23, 12f, 24, 12.5f, 25, 13f, 26, 13.5f, 27, 14f, 28, 14.5f, 29, 15f, 30, 16f, 32, 15.5f, 31 });
+
+	calc.calculate(connections, activations, c.getOutputLayer());
 
 	BackpropagationAveragePooling2D bp = new BackpropagationAveragePooling2D();
 	bp.setActivations(activations);
 
-	vp = new ValuesProvider();
-	vp.addValues(c.getOutputLayer(), o);
-	Matrix bpo = new Matrix(32, 2);
-	vp.addValues(c.getInputLayer(), bpo);
+	ValuesProvider vp = new ValuesProvider();
+	vp.setMiniBatchSize(2);
+	vp.addValues(c.getOutputLayer(), activations.getValues(c.getOutputLayer()));
 
 	bp.calculate(connections, vp, c.getInputLayer());
 
-	assertEquals(true, bpo.get(0, 0) == o.get(0, 0) / c.getSubsamplingRegionLength());
-	assertEquals(true, bpo.get(1, 0) == o.get(0, 0) / c.getSubsamplingRegionLength());
-	assertEquals(true, bpo.get(4, 0) == o.get(0, 0) / c.getSubsamplingRegionLength());
-	assertEquals(true, bpo.get(5, 0) == o.get(0, 0) / c.getSubsamplingRegionLength());
-	assertEquals(true, bpo.get(10, 0) == o.get(3, 0) / c.getSubsamplingRegionLength());
-	assertEquals(true, bpo.get(11, 0) == o.get(3, 0) / c.getSubsamplingRegionLength());
-	assertEquals(true, bpo.get(14, 0) == o.get(3, 0) / c.getSubsamplingRegionLength());
-	assertEquals(true, bpo.get(15, 0) == o.get(3, 0) / c.getSubsamplingRegionLength());
-	assertEquals(true, bpo.get(0, 1) == o.get(0, 1) / c.getSubsamplingRegionLength());
-	assertEquals(true, bpo.get(1, 1) == o.get(0, 1) / c.getSubsamplingRegionLength());
-	assertEquals(true, bpo.get(4, 1) == o.get(0, 1) / c.getSubsamplingRegionLength());
-	assertEquals(true, bpo.get(5, 1) == o.get(0, 1) / c.getSubsamplingRegionLength());
-	assertEquals(true, bpo.get(10, 1) == o.get(3, 1) / c.getSubsamplingRegionLength());
-	assertEquals(true, bpo.get(11, 1) == o.get(3, 1) / c.getSubsamplingRegionLength());
-	assertEquals(true, bpo.get(14, 1) == o.get(3, 1) / c.getSubsamplingRegionLength());
-	assertEquals(true, bpo.get(15, 1) == o.get(3, 1) / c.getSubsamplingRegionLength());
+	Tensor o = activations.getValues(c.getOutputLayer());
+	Tensor bpo = vp.getValues(c.getInputLayer());
+	assertEquals(true, bpo.get(0, 0, 0, 0) == o.get(0, 0, 0, 0) / c.getSubsamplingRegionLength());
+	assertEquals(true, bpo.get(0, 0, 2, 0) == o.get(0, 0, 1, 0) / c.getSubsamplingRegionLength());
+	assertEquals(true, bpo.get(0, 2, 0, 0) == o.get(0, 1, 0, 0) / c.getSubsamplingRegionLength());
+	assertEquals(true, bpo.get(0, 2, 2, 0) == o.get(0, 1, 1, 0) / c.getSubsamplingRegionLength());
+	assertEquals(true, bpo.get(1, 0, 0, 0) == o.get(1, 0, 0, 0) / c.getSubsamplingRegionLength());
+	assertEquals(true, bpo.get(1, 0, 2, 0) == o.get(1, 0, 1, 0) / c.getSubsamplingRegionLength());
+	assertEquals(true, bpo.get(1, 2, 0, 0) == o.get(1, 1, 0, 0) / c.getSubsamplingRegionLength());
+	assertEquals(true, bpo.get(1, 2, 2, 0) == o.get(1, 1, 1, 0) / c.getSubsamplingRegionLength());
+	assertEquals(true, bpo.get(0, 0, 0, 1) == o.get(0, 0, 0, 1) / c.getSubsamplingRegionLength());
+	assertEquals(true, bpo.get(0, 0, 2, 1) == o.get(0, 0, 1, 1) / c.getSubsamplingRegionLength());
+	assertEquals(true, bpo.get(0, 2, 0, 1) == o.get(0, 1, 0, 1) / c.getSubsamplingRegionLength());
+	assertEquals(true, bpo.get(0, 2, 2, 1) == o.get(0, 1, 1, 1) / c.getSubsamplingRegionLength());
+	assertEquals(true, bpo.get(1, 0, 0, 1) == o.get(1, 0, 0, 1) / c.getSubsamplingRegionLength());
+	assertEquals(true, bpo.get(1, 0, 2, 1) == o.get(1, 0, 1, 1) / c.getSubsamplingRegionLength());
+	assertEquals(true, bpo.get(1, 2, 0, 1) == o.get(1, 1, 0, 1) / c.getSubsamplingRegionLength());
+	assertEquals(true, bpo.get(1, 2, 2, 1) == o.get(1, 1, 1, 1) / c.getSubsamplingRegionLength());
     }
 
     @Test
