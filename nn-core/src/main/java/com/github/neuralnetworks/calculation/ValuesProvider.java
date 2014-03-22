@@ -7,10 +7,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.IntStream;
 
 import com.github.neuralnetworks.architecture.Connections;
+import com.github.neuralnetworks.architecture.Conv2DConnection;
+import com.github.neuralnetworks.architecture.FullyConnected;
 import com.github.neuralnetworks.architecture.Layer;
+import com.github.neuralnetworks.architecture.Subsampling2DConnection;
 import com.github.neuralnetworks.util.Matrix;
+import com.github.neuralnetworks.util.Tensor;
 
 /**
  * Provides Matrix instances for the layers of the network. It ensures that the
@@ -20,8 +25,8 @@ public class ValuesProvider implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private int columns;
-    private Map<Layer, Set<Matrix>> values;
+    private int miniBatchSize;
+    private Map<Layer, Set<Tensor>> values;
 
     public ValuesProvider() {
 	super();
@@ -29,101 +34,126 @@ public class ValuesProvider implements Serializable {
     }
 
     /**
-     * @return Matrix for connections. The connections must have a common layer and they must have the same dimensions.
+     * @return Tensor for connections. The connections must have a common layer and they must have the same dimensions.
      */
-    public Matrix getValues(Layer targetLayer, Collection<Connections> connections) {
-	return getValues(targetLayer, getUnitCount(targetLayer, connections));
+    public <T extends Tensor> T getValues(Layer targetLayer, Collection<Connections> connections) {
+	return getValues(targetLayer, getDataDimensions(targetLayer, connections));
     }
 
     /**
-     * @return Matrix for connections. The connections must have a common layer and they must have the same dimensions.
+     * @return Tensor for connections. The connections must have a common layer and they must have the same dimensions.
      */
-    public Matrix getValues(Layer targetLayer, Connections c) {
+    public <T extends Tensor> T getValues(Layer targetLayer, Connections c) {
 	return getValues(targetLayer, Arrays.asList(new Connections[] {c}));
     }
 
     /**
-     * @return Matrix for layer. Works only in the case when the layer has only one associated matrix.
+     * @return Tensor for layer. Works only in the case when the layer has only one associated tensor.
      */
-    public Matrix getValues(Layer targetLayer) {
+    public <T extends Tensor> T getValues(Layer targetLayer) {
 	return getValues(targetLayer, targetLayer.getConnections());
     }
 
     /**
-     * Get values for layer based on provided dimensions
+     * Get values for layer based on provided dimensions (excluding the minibatch size dimension)
      * @param targetLayer
-     * @param rows
+     * @param unitCount
      * @return
      */
-    public Matrix getValues(Layer targetLayer, int rows) {
-	if (!values.containsKey(targetLayer)) {
-	    values.put(targetLayer, new HashSet<Matrix>());
+    @SuppressWarnings("unchecked")
+    public <T extends Tensor> T getValues(Layer targetLayer, int... dimensions) {
+	if (dimensions == null) {
+	    throw new IllegalArgumentException("No dimensions provided");
 	}
 
-	Set<Matrix> set = values.get(targetLayer);
-	Matrix result = set.stream().filter(m -> m.getRows() == rows && m.getColumns() == getColumns()).findFirst().orElse(null);
+	if (!values.containsKey(targetLayer)) {
+	    values.put(targetLayer, new HashSet<Tensor>());
+	}
+
+	int dimSize = IntStream.of(dimensions).reduce(1, (a, b) -> a * b);
+	Set<Tensor> set = values.get(targetLayer);
+	Tensor result = set.stream().filter(t -> t.getSize() == dimSize).findFirst().orElse(null);
 
 	if (result == null) {
-	    set.add(result = new Matrix(rows, getColumns()));
+	    if (dimensions.length == 1) {
+		set.add(result = new Matrix(dimensions[0], getMiniBatchSize()));
+	    } else {
+		set.add(result = new Tensor(dimensions));
+	    }
+	} else if (result.getDimensionsSize() != dimensions.length) {
+	    if (dimensions.length == 2) {
+		result = new Matrix(result.getElements(), getMiniBatchSize());
+	    }
 	}
 
-	return result;
+	return (T) result;
     }
 
-    public int getUnitCount(Layer targetLayer, Collection<Connections> connections) {
-	int result = 0;
+    private int[] getDataDimensions(Layer targetLayer, Collection<Connections> connections) {
+	int[] result = null;
+	boolean hasFullyConnected = false, hasSubsampling = false, hasConvolutional = false;
 	for (Connections c : connections) {
-	    if (c.getInputLayer() == targetLayer) {
-		if (result == 0) {
-		    result = c.getInputUnitCount();
-		}
+	    if (c instanceof FullyConnected) {
+		hasFullyConnected = true;
+	    } else if (c instanceof Conv2DConnection) {
+		hasConvolutional = true;
+	    } else if (c instanceof Subsampling2DConnection) {
+		hasSubsampling = true;
+	    }
+	}
 
-		if (result != c.getInputUnitCount()) {
-		    throw new IllegalArgumentException("Some connections require different unit count");
-		}
-	    } else if (c.getOutputLayer() == targetLayer) {
-		if (result == 0) {
-		    result = c.getOutputUnitCount();
-		}
+	if (hasFullyConnected && (hasSubsampling || hasConvolutional)) {
+	    throw new IllegalArgumentException("Cannot have fully connected and subsampling connections");
+	}
 
-		if (result != c.getOutputUnitCount()) {
-		    throw new IllegalArgumentException("Some connections require different unit count");
-		}
-	    } else {
-		throw new IllegalArgumentException("A connection doesn't have the targetLayer as either input or output");
+	if (hasFullyConnected) {
+	    result = new int[] {targetLayer.getUnitCount(connections), getMiniBatchSize() };
+	} else if (hasSubsampling) {
+	    Subsampling2DConnection c = (Subsampling2DConnection) connections.iterator().next();
+	    if (c.getOutputLayer() == targetLayer) {
+		result = new int[] { c.getFilters(), c.getOutputFeatureMapRows(), c.getOutputFeatureMapColumns(), getMiniBatchSize() };
+	    } else if (c.getInputLayer() == targetLayer) {
+		result = new int[] { c.getFilters(), c.getInputFeatureMapRows(), c.getInputFeatureMapColumns(), getMiniBatchSize() };
+	    }
+	} else if (hasConvolutional) {
+	    Conv2DConnection c = (Conv2DConnection) connections.iterator().next();
+	    if (c.getOutputLayer() == targetLayer) {
+		result = new int[] { c.getOutputFilters(), c.getOutputFeatureMapRows(), c.getOutputFeatureMapColumns(), getMiniBatchSize() };
+	    } else if (c.getInputLayer() == targetLayer) {
+		result = new int[] { c.getInputFilters(), c.getInputFeatureMapRows(), c.getInputFeatureMapColumns(), getMiniBatchSize() };
 	    }
 	}
 
 	return result;
     }
 
-    public int getUnitCount(Layer targetLayer, Connections c) {
+    public int[] getUnitCount(Layer targetLayer, Connections c) {
 	Set<Connections> cs = new HashSet<>();
 	cs.add(c);
-	return getUnitCount(targetLayer, cs);
+	return getDataDimensions(targetLayer, cs);
     }
 
-    public void addValues(Layer l, Matrix m) {
-	Set<Matrix> set = values.get(l);
+    public void addValues(Layer l, Tensor t) {
+	Set<Tensor> set = values.get(l);
 	if (set == null) {
-	    values.put(l, set = new HashSet<Matrix>());
+	    values.put(l, set = new HashSet<Tensor>());
 	} else {
-	    set.removeIf(o -> o.getRows() == m.getRows());
+	    set.removeIf(o -> o.getSize() == t.getSize());
 	}
 
-	setColumns(m.getColumns());
-	set.add(m);
+	setMiniBatchSize(t.getDimensionLength(t.getDimensionsSize() - 1));
+	set.add(t);
     }
 
-    public int getColumns() {
-	if (columns == 0) {
-	    values.values().forEach(v -> v.stream().filter(m -> columns < m.getColumns()).forEach(m -> columns = m.getColumns()));
+    public int getMiniBatchSize() {
+	if (miniBatchSize == 0) {
+	    values.values().forEach(v -> v.stream().filter(t -> miniBatchSize < t.getDimensionLength(t.getDimensionsSize() - 1)).forEach(t -> miniBatchSize = t.getDimensionLength(t.getDimensionsSize() - 1)));
 	}
 
-	return columns;
+	return miniBatchSize;
     }
 
-    public void setColumns(int columns) {
-	this.columns = columns;
+    public void setMiniBatchSize(int miniBatchSize) {
+	this.miniBatchSize = miniBatchSize;
     }
 }

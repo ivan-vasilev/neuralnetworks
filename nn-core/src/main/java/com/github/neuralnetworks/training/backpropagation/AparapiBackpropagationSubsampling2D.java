@@ -1,9 +1,12 @@
 package com.github.neuralnetworks.training.backpropagation;
 
+import java.util.List;
+
+import com.github.neuralnetworks.architecture.Connections;
+import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Subsampling2DConnection;
 import com.github.neuralnetworks.calculation.ValuesProvider;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSubsampling2D;
-import com.github.neuralnetworks.util.Matrix;
 
 /**
  * BackPropagation base function for subsampling layers
@@ -12,8 +15,8 @@ public class AparapiBackpropagationSubsampling2D extends AparapiSubsampling2D im
 
     private static final long serialVersionUID = -345286029645674230L;
 
-    public AparapiBackpropagationSubsampling2D(Subsampling2DConnection c, int miniBatchSize) {
-	super(c, miniBatchSize);
+    public AparapiBackpropagationSubsampling2D(Subsampling2DConnection c, ValuesProvider valuesProvider, Layer targetLayer) {
+	super(c, valuesProvider, targetLayer);
     }
 
     /**
@@ -27,10 +30,13 @@ public class AparapiBackpropagationSubsampling2D extends AparapiSubsampling2D im
     protected ValuesProvider activations;
 
     @Override
-    protected void init(Subsampling2DConnection c, Matrix input, Matrix output) {
-	super.init(c, input, output);
+    public void calculate(List<Connections> connections, ValuesProvider valuesProvider, Layer targetLayer) {
+	if (connections.size() > 0) {
+	    Subsampling2DConnection c = (Subsampling2DConnection) connections.get(0);
+	    ffActivation = activations.getValues(c.getInputLayer(), c).getElements();
+	}
 
-	ffActivation = activations.getValues(c.getInputLayer(), c).getElements();
+	super.calculate(connections, valuesProvider, targetLayer);
     }
 
     @Override

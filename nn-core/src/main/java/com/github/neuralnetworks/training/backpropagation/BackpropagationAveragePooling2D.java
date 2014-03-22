@@ -20,7 +20,7 @@ public class BackpropagationAveragePooling2D implements BackPropagationConnectio
     @Override
     public void calculate(List<Connections> connections, ValuesProvider valuesProvider, Layer targetLayer) {
 	if (cc == null) {
-	    cc = new BackpropagationAveragePooling2DCC((Subsampling2DConnection) connections.get(0), valuesProvider.getColumns());
+	    cc = new BackpropagationAveragePooling2DCC((Subsampling2DConnection) connections.get(0), valuesProvider, targetLayer);
 	    cc.setActivations(activations);
 	}
 
@@ -84,20 +84,18 @@ public class BackpropagationAveragePooling2D implements BackPropagationConnectio
 
 	private static final long serialVersionUID = -8888670594631428090L;
 
-	public BackpropagationAveragePooling2DCC(Subsampling2DConnection c, int miniBatchSize) {
-	    super(c, miniBatchSize);
+	public BackpropagationAveragePooling2DCC(Subsampling2DConnection c, ValuesProvider valuesProvider, Layer targetLayer) {
+	    super(c, valuesProvider, targetLayer);
 	}
 
 	@Override
-	protected void pool(int inputStartIndex) {
-	    int rl = regionLength;
-	    int miniBatch = miniBatchSize;
+	protected void pool(int inputStartIndex, int outputStartIndex) {
 	    float div = 0;
 
-	    for (int i = 0; i < miniBatch; i++) {
-		div = output[getGlobalId() * miniBatch + i] / rl;
-		for (int j = 0; j < rl; j++) {
-		    input[(inputStartIndex + featureMapOffsets[j]) * miniBatch + i] = div;
+	    for (int i = 0; i < miniBatchSize; i++) {
+		div = output[outputStartIndex + i * outputMiniBatchDistance] / regionLength;
+		for (int j = 0; j < regionLength; j++) {
+		    input[inputStartIndex + featureMapOffsets[i * regionLength + j]] = div;
 		}
 	    }
 	}

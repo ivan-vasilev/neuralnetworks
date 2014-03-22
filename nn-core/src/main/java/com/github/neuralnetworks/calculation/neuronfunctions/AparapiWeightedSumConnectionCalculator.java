@@ -16,6 +16,6 @@ public class AparapiWeightedSumConnectionCalculator extends ConnectionCalculator
 
     @Override
     protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Integer> inputConnections, ValuesProvider valuesProvider, Layer targetLayer) {
-	return new AparapiWeightedSum(inputConnections, valuesProvider.getColumns(), targetLayer);
+	return new AparapiWeightedSum(inputConnections, valuesProvider.getMiniBatchSize(), targetLayer);
     }
 }

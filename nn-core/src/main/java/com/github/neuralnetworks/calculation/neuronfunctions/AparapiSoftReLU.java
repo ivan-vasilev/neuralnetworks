@@ -16,7 +16,7 @@ public class AparapiSoftReLU extends ConnectionCalculatorFullyConnected {
 
     @Override
     protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Integer> inputConnections, ValuesProvider valuesProvider, Layer targetLayer) {
-	return new AparapiSoftReLUFunction(inputConnections, valuesProvider.getColumns(), targetLayer);
+	return new AparapiSoftReLUFunction(inputConnections, valuesProvider.getMiniBatchSize(), targetLayer);
     }
 
     public static class AparapiSoftReLUFunction extends AparapiWeightedSum {

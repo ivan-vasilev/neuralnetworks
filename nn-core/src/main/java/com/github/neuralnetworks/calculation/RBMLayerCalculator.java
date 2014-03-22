@@ -73,8 +73,8 @@ public class RBMLayerCalculator extends LayerCalculatorImpl {
     private Matrix getLayerResult(Layer layer, Matrix realResult, boolean useIntermediateResults) {
 	Matrix result = realResult;
 	if (useIntermediateResults) {
-	    intermediateResults.setColumns(realResult.getColumns());
-	    result = intermediateResults.getValues(layer, realResult.getRows());
+	    intermediateResults.setMiniBatchSize(realResult.getColumns());
+	    result = intermediateResults.getValues(layer, realResult.getRows(), realResult.getColumns());
 	    if (result == null) {
 		intermediateResults.addValues(layer, result = new Matrix(realResult));
 	    }

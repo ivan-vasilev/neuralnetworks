@@ -16,7 +16,7 @@ public class AparapiSigmoid extends ConnectionCalculatorFullyConnected {
 
     @Override
     protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Integer> inputConnections, ValuesProvider valuesProvider, Layer targetLayer) {
-	return new AparapiSigmoidFunction(inputConnections, valuesProvider.getColumns(), targetLayer);
+	return new AparapiSigmoidFunction(inputConnections, valuesProvider.getMiniBatchSize(), targetLayer);
     }
 
     public static class AparapiSigmoidFunction extends AparapiWeightedSum {

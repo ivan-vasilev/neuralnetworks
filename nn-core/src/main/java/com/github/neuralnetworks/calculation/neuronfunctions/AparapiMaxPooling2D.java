@@ -19,8 +19,8 @@ public class AparapiMaxPooling2D implements ConnectionCalculator {
 
     @Override
     public void calculate(List<Connections> connections, ValuesProvider valuesProvider, Layer targetLayer) {
-	if (cc == null || cc.getMiniBatchSize() != valuesProvider.getColumns()) {
-	    cc = new AparapiMaxPooling2DCC((Subsampling2DConnection) connections.get(0), valuesProvider.getColumns());
+	if (cc == null || cc.getMiniBatchSize() != valuesProvider.getMiniBatchSize()) {
+	    cc = new AparapiMaxPooling2DCC((Subsampling2DConnection) connections.get(0), valuesProvider, targetLayer);
 	}
 
 	cc.calculate(connections, valuesProvider, targetLayer);
@@ -30,20 +30,20 @@ public class AparapiMaxPooling2D implements ConnectionCalculator {
 
 	private static final long serialVersionUID = -2393526660090301257L;
 
-	public AparapiMaxPooling2DCC(Subsampling2DConnection c, int miniBatchSize) {
-	    super(c, miniBatchSize);
+	public AparapiMaxPooling2DCC(Subsampling2DConnection c, ValuesProvider valuesProvider, Layer targetLayer) {
+	    super(c, valuesProvider, targetLayer);
 	}
 
 	@Override
-	protected void pool(int inputStartIndex) {
+	protected void pool(int inputStartIndex, int outputStartIndex) {
 	    float max = 0;
 	    for (int i = 0; i < miniBatchSize; i++) {
-		max = input[(inputStartIndex + featureMapOffsets[0]) * miniBatchSize + i];
+		max = input[inputStartIndex + featureMapOffsets[i * regionLength]];
 		for (int j = 1; j < regionLength; j++) {
-		    max = max(input[(inputStartIndex + featureMapOffsets[j]) * miniBatchSize + i], max);
+		    max = max(input[inputStartIndex + featureMapOffsets[i * regionLength + j]], max);
 		}
 
-		output[getGlobalId() * miniBatchSize + i] = max;
+		output[outputStartIndex + i * outputMiniBatchDistance] = max;
 	    }
 	}
     }

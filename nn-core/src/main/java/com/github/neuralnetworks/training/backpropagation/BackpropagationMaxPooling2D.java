@@ -20,7 +20,7 @@ public class BackpropagationMaxPooling2D implements BackPropagationConnectionCal
     @Override
     public void calculate(List<Connections> connections, ValuesProvider valuesProvider, Layer targetLayer) {
 	if (cc == null) {
-	    cc = new BackpropagationMaxPooling2DCC((Subsampling2DConnection) connections.get(0), valuesProvider.getColumns());
+	    cc = new BackpropagationMaxPooling2DCC((Subsampling2DConnection) connections.get(0), valuesProvider, targetLayer);
 	    cc.setActivations(activations);
 	}
 
@@ -83,23 +83,20 @@ public class BackpropagationMaxPooling2D implements BackPropagationConnectionCal
 
 	private static final long serialVersionUID = -8888670594631428090L;
 
-	public BackpropagationMaxPooling2DCC(Subsampling2DConnection c, int miniBatchSize) {
-	    super(c, miniBatchSize);
+	public BackpropagationMaxPooling2DCC(Subsampling2DConnection c, ValuesProvider valuesProvider, Layer targetLayer) {
+	    super(c, valuesProvider, targetLayer);
 	}
 
 	@Override
-	protected void pool(int inputStartIndex) {
-	    int rl = regionLength;
-	    int mbs = miniBatchSize;
+	protected void pool(int inputStartIndex, int outputStartIndex) {
 	    int maxId = 0;
 	    int ffActivationId = 0;
 	    float max = 0;
 
-	    for (int i = 0; i < mbs; i++) {
-		ffActivationId = (inputStartIndex + featureMapOffsets[0]) * mbs + i;
-		max = ffActivation[ffActivationId];
-		for (int j = 1; j < rl; j++) {
-		    ffActivationId = (inputStartIndex + featureMapOffsets[j]) * mbs + i;
+	    for (int i = 0; i < miniBatchSize; i++) {
+		max = ffActivation[inputStartIndex + featureMapOffsets[i * regionLength]];
+		for (int j = 1; j < regionLength; j++) {
+		    ffActivationId = inputStartIndex + featureMapOffsets[i * regionLength + j];
 		    float v = ffActivation[ffActivationId];
 		    if (v > max) {
 			maxId = ffActivationId;
@@ -107,7 +104,7 @@ public class BackpropagationMaxPooling2D implements BackPropagationConnectionCal
 		    }
 		}
 
-		input[maxId] = output[getGlobalId() * mbs + i];
+		input[maxId] = output[getGlobalId() * miniBatchSize + i];
 	    }
 	}
     }

@@ -16,7 +16,7 @@ public class AparapiTanh extends ConnectionCalculatorFullyConnected {
 
     @Override
     protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Integer> inputConnections, ValuesProvider valuesProvider, Layer targetLayer) {
-	return new AparapiTanhFunction(inputConnections, valuesProvider.getColumns(), targetLayer);
+	return new AparapiTanhFunction(inputConnections, valuesProvider.getMiniBatchSize(), targetLayer);
     }
 
     public static class AparapiTanhFunction extends AparapiWeightedSum {

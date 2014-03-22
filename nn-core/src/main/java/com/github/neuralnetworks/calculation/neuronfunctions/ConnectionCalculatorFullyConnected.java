@@ -75,8 +75,8 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator,
 		calculateBias(bias, valuesProvider);
 
 		// new input function is required
-		if (inputFunction == null || targetLayer != currentLayer || miniBatchSize != valuesProvider.getColumns()) {
-		    miniBatchSize = valuesProvider.getColumns();
+		if (inputFunction == null || targetLayer != currentLayer || miniBatchSize != valuesProvider.getMiniBatchSize()) {
+		    miniBatchSize = valuesProvider.getMiniBatchSize();
 		    currentLayer = targetLayer;
 		    SortedMap<GraphConnections, Integer> map = new TreeMap<>();
 		    notBias.forEach(c -> map.put((GraphConnections) c, valuesProvider.getValues(Util.getOppositeLayer(c, targetLayer), c).getElements().length));
@@ -102,7 +102,7 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator,
 	    float[] out = valuesProvider.getValues(bias.getOutputLayer(), bias).getElements();
 	    for (int i = 0; i < out.length; i++) {
 		GraphConnections gc = (GraphConnections) bias;
-		out[i] += gc.getConnectionGraph().getElements()[i / valuesProvider.getColumns()];
+		out[i] += gc.getConnectionGraph().getElements()[i / valuesProvider.getMiniBatchSize()];
 	    }
 	}
     }
@@ -119,7 +119,7 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator,
     }
 
     protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Integer> inputConnections, ValuesProvider valuesProvider, Layer targetLayer) {
-	return new AparapiWeightedSum(inputConnections, valuesProvider.getColumns(), targetLayer);
+	return new AparapiWeightedSum(inputConnections, valuesProvider.getMiniBatchSize(), targetLayer);
     }
 
     public void addPreTransferFunction(MatrixFunction function) {

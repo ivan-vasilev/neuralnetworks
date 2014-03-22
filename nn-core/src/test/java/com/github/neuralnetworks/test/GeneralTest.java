@@ -39,21 +39,21 @@ public class GeneralTest {
 
 	Matrix im = new Matrix(2, 2);
 	vp.addValues(i, im);
-	Matrix hm1 = vp.getValues(h, 3);
+	Matrix hm1 = vp.getValues(h, 3, 2);
 	Matrix hm2 = new Matrix(4, 2);
 	vp.addValues(h, hm2);
 
-	Matrix om = vp.getValues(o);
+	Matrix om = (Matrix) vp.getValues(o);
 
-	assertTrue(im == vp.getValues(i, 2));
+	assertTrue(im == vp.getValues(i, 2, 2));
 	assertTrue(im == vp.getValues(i));
-	assertTrue(hm1 == vp.getValues(h, 3));
-	assertTrue(hm2 == vp.getValues(h, 4));
+	assertTrue(hm1 == vp.getValues(h, 3, 2));
+	assertTrue(hm2 == vp.getValues(h, 4, 2));
 	assertTrue(hm1 == vp.getValues(h, nn.getConnection(i, h)));
 	assertTrue(hm2 == vp.getValues(h, nn.getConnection(h, o)));
-	assertTrue(om == vp.getValues(o, 1));
+	assertTrue(om == vp.getValues(o, 1, 2));
 	assertTrue(om == vp.getValues(o));
-	assertTrue(2 == vp.getColumns());
+	assertTrue(2 == vp.getMiniBatchSize());
     }
 
     @Test

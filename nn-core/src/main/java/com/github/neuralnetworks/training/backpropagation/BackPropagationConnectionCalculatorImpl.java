@@ -41,13 +41,13 @@ public abstract class BackPropagationConnectionCalculatorImpl implements BackPro
     public void calculate(List<Connections> connections, ValuesProvider valuesProvider, Layer targetLayer) {
 	SortedMap<Connections, Integer> chunk = new TreeMap<>();
 	for (Connections c : connections) {
-	    if (!connectionCalculators.containsKey(c) || targetLayer != currentLayer || miniBatchSize != valuesProvider.getColumns()) {
-		chunk.put(c, valuesProvider.getColumns() * valuesProvider.getUnitCount(Util.getOppositeLayer(c, targetLayer), c));
+	    if (!connectionCalculators.containsKey(c) || targetLayer != currentLayer || miniBatchSize != valuesProvider.getMiniBatchSize()) {
+		chunk.put(c, valuesProvider.getValues(Util.getOppositeLayer(c, targetLayer), c).getSize());
 	    }
 	}
 
 	if (chunk.size() > 0) {
-	    miniBatchSize = valuesProvider.getColumns();
+	    miniBatchSize = valuesProvider.getMiniBatchSize();
 	    currentLayer = targetLayer;
 	    addBackpropFunction(chunk, connectionCalculators, targetLayer);
 	    calculators.addAll(connectionCalculators.values());

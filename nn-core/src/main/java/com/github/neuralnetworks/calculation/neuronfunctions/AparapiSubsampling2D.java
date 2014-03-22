@@ -9,7 +9,7 @@ import com.github.neuralnetworks.architecture.Subsampling2DConnection;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.calculation.ValuesProvider;
 import com.github.neuralnetworks.util.Environment;
-import com.github.neuralnetworks.util.Matrix;
+import com.github.neuralnetworks.util.Tensor;
 import com.github.neuralnetworks.util.Util;
 
 /**
@@ -21,26 +21,6 @@ import com.github.neuralnetworks.util.Util;
 public abstract class AparapiSubsampling2D extends Kernel implements ConnectionCalculator {
 
     private static final long serialVersionUID = 8931101094464503687L;
-    
-    /**
-     * input feature map columns
-     */
-    protected final int inputFeatureMapColumns;
-
-    /**
-     * Length of the input image (rows * cols)
-     */
-    protected final int inputFeatureMapLength;
-    
-    /**
-     * output feature map columns
-     */
-    protected final int outputFeatureMapColumns;
-
-    /**
-     * Length of the output image (rows * cols)
-     */
-    protected final int outputFeatureMapLength;
 
     /**
      * input samples count
@@ -82,28 +62,63 @@ public abstract class AparapiSubsampling2D extends Kernel implements ConnectionC
      * input data
      */
     protected float[] input;
+    protected final int inputStartIndex;
+    protected final int inputFeatureMapsDistance;
+    protected final int inputFeatureMapRowsDistance;
+    protected final int inputFeatureMapColumnsDistance;
 
     /**
      * output
      */
     protected float[] output;
+    protected final int outputStartIndex;
+    protected final int outputFeatureMapsDistance;
+    protected final int outputFeatureMapRowsDistance;
+    protected final int outputFeatureMapColumnsDistance;
+    protected final int outputFeatureMapLength;
+    protected final int outputFeatureMapColumns;
+    protected final int outputMiniBatchDistance;
 
-    public AparapiSubsampling2D(Subsampling2DConnection c, int miniBatchSize) {
-	this.miniBatchSize = miniBatchSize;
-	this.inputFeatureMapColumns = c.getInputFeatureMapColumns();
-	this.inputFeatureMapLength = c.getInputFeatureMapLength();
-	this.outputFeatureMapColumns = c.getOutputFeatureMapColumns();
+    public AparapiSubsampling2D(Subsampling2DConnection c, ValuesProvider valuesProvider, Layer targetLayer) {
+	Tensor input = null, output = null;
+	if (targetLayer == c.getOutputLayer()) {
+	    input = valuesProvider.getValues(Util.getOppositeLayer(c, targetLayer), c);
+	    output = valuesProvider.getValues(targetLayer, c);
+	} else {
+	    input = valuesProvider.getValues(targetLayer, c);
+	    output = valuesProvider.getValues(Util.getOppositeLayer(c, targetLayer), c);
+	}
+
+	this.input = input.getElements();
+	this.inputStartIndex = input.getStartIndex();
+	this.inputFeatureMapsDistance =  input.getDimensionElementsDistance(0);
+	this.inputFeatureMapRowsDistance = input.getDimensionElementsDistance(1);
+	this.inputFeatureMapColumnsDistance = input.getDimensionElementsDistance(2);
+
+	this.output = output.getElements();
+	this.outputStartIndex =  output.getStartIndex();
+	this.outputFeatureMapsDistance =  output.getDimensionElementsDistance(0);
+	this.outputFeatureMapRowsDistance = output.getDimensionElementsDistance(1);
+	this.outputFeatureMapColumnsDistance = output.getDimensionElementsDistance(2);
+	this.outputMiniBatchDistance = output.getDimensionElementsDistance(3);
 	this.outputFeatureMapLength = c.getOutputFeatureMapLength();
+	this.outputFeatureMapColumns = c.getOutputFeatureMapColumns();
+
+	this.miniBatchSize = input.getDimensionLength(3);
+
 	this.subsamplingRows = c.getSubsamplingRegionRows();
 	this.subsamplingCols = c.getSubsamplingRegionCols();
 	this.regionLength = c.getSubsamplingRegionLength();
 	this.ioRowsOffset = (c.getInputFeatureMapRows() % subsamplingRows) / 2;
 	this.ioColumnsOffset = (c.getInputFeatureMapColumns() % subsamplingCols) / 2;
-	this.featureMapOffsets = new int[regionLength];
 
-	for (int i = 0, j = 0; j < subsamplingRows; j++) {
-	    for (int k = 0; k < subsamplingCols; k++, i++) {
-		featureMapOffsets[i] = j * c.getInputFeatureMapColumns() + k;
+	this.featureMapOffsets = new int[regionLength * miniBatchSize];
+	int inputMiniBatchDistance = input.getDimensionElementsDistance(3);
+	for (int m = 0, i = 0; m < miniBatchSize; m++) {
+	    for (int j = 0; j < subsamplingRows; j++) {
+		for (int k = 0; k < subsamplingCols; k++, i++) {
+		    featureMapOffsets[i] = j * inputFeatureMapRowsDistance + k * inputFeatureMapColumnsDistance + m * inputMiniBatchDistance;
+		}
 	    }
 	}
     }
@@ -113,25 +128,11 @@ public abstract class AparapiSubsampling2D extends Kernel implements ConnectionC
 	if (connections.size() > 0) {
 	    Subsampling2DConnection c = (Subsampling2DConnection) connections.get(0);
 	    if (targetLayer == c.getOutputLayer()) {
-		init(c, valuesProvider.getValues(Util.getOppositeLayer(c, targetLayer), c), valuesProvider.getValues(targetLayer, c));
-		Environment.getInstance().getExecutionStrategy().execute(this, valuesProvider.getUnitCount(targetLayer, c));
+		Environment.getInstance().getExecutionStrategy().execute(this, targetLayer.getUnitCount(connections));
 	    } else {
-		init(c, valuesProvider.getValues(targetLayer, c), valuesProvider.getValues(Util.getOppositeLayer(c, targetLayer), c));
-		Environment.getInstance().getExecutionStrategy().execute(this, valuesProvider.getUnitCount(Util.getOppositeLayer(c, targetLayer), c));
+		Environment.getInstance().getExecutionStrategy().execute(this, Util.getOppositeLayer(c, targetLayer).getUnitCount(connections));
 	    }
-
 	}
-    }
-
-    /**
-     * Populates featureMapOffsets and outputInputIndexes
-     * @param c
-     * @param input
-     * @param output
-     */
-    protected void init(Subsampling2DConnection c, Matrix input, Matrix output) {
-	this.input = input.getElements();
-	this.output = output.getElements();
     }
 
     /* (non-Javadoc)
@@ -143,15 +144,19 @@ public abstract class AparapiSubsampling2D extends Kernel implements ConnectionC
 	int id = getGlobalId();
 
 	// get current offset
+	int fm = id / outputFeatureMapLength;
 	int fmOffset = id % outputFeatureMapLength;
+	int fmRow = fmOffset / outputFeatureMapColumns;
+	int fmCol = fmOffset % outputFeatureMapColumns;
 
-	pool((id / outputFeatureMapLength) * inputFeatureMapLength + (ioRowsOffset + (fmOffset / outputFeatureMapColumns) * subsamplingRows) * inputFeatureMapColumns + ioColumnsOffset + (fmOffset % outputFeatureMapColumns) * subsamplingCols);
+	pool(	inputStartIndex + fm * inputFeatureMapsDistance + (ioRowsOffset + fmRow * subsamplingRows) * inputFeatureMapRowsDistance + (ioColumnsOffset + fmCol * subsamplingCols) * inputFeatureMapColumnsDistance,
+		outputStartIndex + fm * outputFeatureMapsDistance + fmRow * outputFeatureMapRowsDistance + fmCol * outputFeatureMapColumnsDistance);
     }
 
     /**
      * This is where the subsampling happens
      */
-    protected void pool(int inputStartIndex) {
+    protected void pool(int inputStartIndex, int outputStartIndex) {
     }
 
     public int getMiniBatchSize() {

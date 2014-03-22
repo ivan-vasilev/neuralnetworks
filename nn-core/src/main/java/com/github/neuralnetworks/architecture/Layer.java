@@ -1,6 +1,7 @@
 package com.github.neuralnetworks.architecture;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,5 +49,32 @@ public class Layer implements Serializable {
 	}
 
 	connections.add(connection);
+    }
+
+    public int getUnitCount(Collection<Connections> connections) {
+	int result = 0;
+	for (Connections c : connections) {
+	    if (c.getInputLayer() == this) {
+		if (result == 0) {
+		    result = c.getInputUnitCount();
+		}
+
+		if (result != c.getInputUnitCount()) {
+		    throw new IllegalArgumentException("Some connections require different unit count");
+		}
+	    } else if (c.getOutputLayer() == this) {
+		if (result == 0) {
+		    result = c.getOutputUnitCount();
+		}
+
+		if (result != c.getOutputUnitCount()) {
+		    throw new IllegalArgumentException("Some connections require different unit count");
+		}
+	    } else {
+		throw new IllegalArgumentException("A connection doesn't have the targetLayer as either input or output");
+	    }
+	}
+
+	return result;
     }
 }

@@ -38,8 +38,8 @@ public class ConnectionCalculatorConv implements ConnectionCalculator {
 
 	if (c != null) {
 	    // currently works only as a feedforward (including bp)
-	    if (inputFunction == null || miniBatchSize != valuesProvider.getColumns()) {
-		miniBatchSize = valuesProvider.getColumns();
+	    if (inputFunction == null || miniBatchSize != valuesProvider.getMiniBatchSize()) {
+		miniBatchSize = valuesProvider.getMiniBatchSize();
 		inputFunction = createInputFunction(c, miniBatchSize);
 	    }
 

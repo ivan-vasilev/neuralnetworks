@@ -157,7 +157,8 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
     public void calculate(List<Connections> connections, ValuesProvider valuesProvider, Layer targetLayer) {
 	if (connections.size() > 0) {
 	    init(connections, valuesProvider, targetLayer);
-	    Environment.getInstance().getExecutionStrategy().execute(this, valuesProvider.getUnitCount(targetLayer, connections));
+	    
+	    Environment.getInstance().getExecutionStrategy().execute(this, targetLayer.getUnitCount(connections));
 	}
     }
 

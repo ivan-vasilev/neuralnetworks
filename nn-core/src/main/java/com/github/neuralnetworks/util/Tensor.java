@@ -12,6 +12,11 @@ public class Tensor implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
+     * Start offset in case there is different dimentionality
+     */
+    protected int startOffset;
+
+    /**
      * tensor elements
      */
     protected float[] elements;
@@ -61,13 +66,13 @@ public class Tensor implements Serializable {
 	if (dimensions == null || dimensions.length == 0) {
 	    throw new IllegalArgumentException("Please provide dimensions");
 	}
-	
+
 	this.dimensions = dimensions;
 	this.dimStart = new int[dimensions.length];
 	this.dimEnd = new int[dimensions.length];
 	this.dimTmp = new int[dimensions.length];
 	this.elements = elements;
-	
+
 	dimMultiplicators = new int[dimensions.length];
 	IntStream.range(0, dimMultiplicators.length).forEach(i -> {
 	    dimEnd[i] = dimensions[i] - 1;
@@ -75,7 +80,7 @@ public class Tensor implements Serializable {
 	    Arrays.stream(dimensions).skip(i + 1).limit(dimensions.length).forEach(j -> dimMultiplicators[i] *= j);
 	});
     }
-    
+
     public Tensor(Tensor parent, int[] dimStart, int[] dimEnd) {
 	this.dimensions = parent.dimensions;
 	this.elements = parent.elements;
@@ -97,13 +102,17 @@ public class Tensor implements Serializable {
         return elements;
     }
 
+    public void setElements(float[] elements) {
+        this.elements = elements;
+    }
+
     /**
-     * @return Number of elements (may be different than
+     * @return Number of elements (may be different than elements.length)
      */
     public int getSize() {
 	return IntStream.range(0, dimensions.length).map(i -> getDimensionLength(i)).reduce(1, (a, b) -> a * b);
     }
-
+ 
     /**
      * @return start index (in the elements array) for this tensor
      */
@@ -140,6 +149,14 @@ public class Tensor implements Serializable {
 	return dimensions.length;
     }
 
+    public int getStartOffset() {
+        return startOffset;
+    }
+
+    public void setStartOffset(int startOffset) {
+        this.startOffset = startOffset;
+    }
+
     protected int getIndex(int... d) {
 	if (d == null || d.length == 0 || d.length > dimensions.length) {
 	    throw new IllegalArgumentException("Please provide indices");
@@ -153,6 +170,6 @@ public class Tensor implements Serializable {
 	    return (d[i] + dimStart[i]) * dimMultiplicators[i];
 	}).sum();
 
-	return id;
+	return startOffset + id;
     }
 }

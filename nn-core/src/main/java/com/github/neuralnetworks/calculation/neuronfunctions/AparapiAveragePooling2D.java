@@ -20,8 +20,8 @@ public class AparapiAveragePooling2D implements ConnectionCalculator {
 
     @Override
     public void calculate(List<Connections> connections, ValuesProvider valuesProvider, Layer targetLayer) {
-	if (cc == null || cc.getMiniBatchSize() != valuesProvider.getColumns()) {
-	    cc = new AparapiAveragePooling2DCC((Subsampling2DConnection) connections.get(0), valuesProvider.getColumns());
+	if (cc == null || cc.getMiniBatchSize() != valuesProvider.getMiniBatchSize()) {
+	    cc = new AparapiAveragePooling2DCC((Subsampling2DConnection) connections.get(0), valuesProvider, targetLayer);
 	}
 
 	cc.calculate(connections, valuesProvider, targetLayer);
@@ -31,21 +31,21 @@ public class AparapiAveragePooling2D implements ConnectionCalculator {
 
 	private static final long serialVersionUID = -2393526660090301257L;
 
-	public AparapiAveragePooling2DCC(Subsampling2DConnection c, int miniBatchSize) {
-	    super(c, miniBatchSize);
+	public AparapiAveragePooling2DCC(Subsampling2DConnection c, ValuesProvider valuesProvider, Layer targetLayer) {
+	    super(c, valuesProvider, targetLayer);
 	}
 
 	@Override
-	protected void pool(int inputStartIndex) {
+	protected void pool(int inputStartIndex, int outputStartIndex) {
 	    float sum = 0;
 
 	    for (int i = 0; i < miniBatchSize; i++) {
 		sum = 0;
 		for (int j = 0; j < regionLength; j++) {
-		    sum += input[(inputStartIndex + featureMapOffsets[j]) * miniBatchSize + i];
+		    sum += input[inputStartIndex + featureMapOffsets[i * regionLength + j]];
 		}
 
-		output[getGlobalId() * miniBatchSize + i] = sum / regionLength;
+		output[outputStartIndex + i * outputMiniBatchDistance] = sum / regionLength;
 	    }
 	}
     }
