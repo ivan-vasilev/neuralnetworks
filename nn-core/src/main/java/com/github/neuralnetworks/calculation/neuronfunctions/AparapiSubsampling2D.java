@@ -116,8 +116,8 @@ public abstract class AparapiSubsampling2D extends Kernel implements ConnectionC
 	int inputMiniBatchDistance = input.getDimensionElementsDistance(3);
 	for (int m = 0, i = 0; m < miniBatchSize; m++) {
 	    for (int j = 0; j < subsamplingRows; j++) {
-		for (int k = 0; k < subsamplingCols; k++, i++) {
-		    featureMapOffsets[i] = j * inputFeatureMapRowsDistance + k * inputFeatureMapColumnsDistance + m * inputMiniBatchDistance;
+		for (int k = 0; k < subsamplingCols; k++) {
+		    featureMapOffsets[i++] = j * inputFeatureMapRowsDistance + k * inputFeatureMapColumnsDistance + m * inputMiniBatchDistance;
 		}
 	    }
 	}

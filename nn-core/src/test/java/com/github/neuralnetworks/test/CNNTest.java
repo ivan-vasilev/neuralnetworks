@@ -250,9 +250,8 @@ public class CNNTest {
 
     @Test
     public void testConvolutions() {
-	NeuralNetworkImpl nn = new NeuralNetworkImpl();
 	Conv2DConnection c = new Conv2DConnection(new Layer(), new Layer(), 3, 3, 2, 2, 2, 1, 1);
-	nn.addConnection(c);
+
 	c.getWeights()[0] = 1;
 	c.getWeights()[1] = 2;
 	c.getWeights()[2] = 3;
@@ -262,20 +261,20 @@ public class CNNTest {
 	c.getWeights()[6] = 3;
 	c.getWeights()[7] = 4;
 
-	Matrix i1 = new Matrix(new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 }, 1);
+	ValuesProvider vp = new ValuesProvider();
+	vp.setMiniBatchSize(1);
+	vp.getValues(c.getInputLayer()).setElements(new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 });
 
-	Matrix o = new Matrix(4, 1);
-
-	AparapiConv2D conv = new AparapiConv2DFF(c, 1);
-
-	conv.calculate(c, i1, o);
+	AparapiConv2D conv = new AparapiConv2DFF(c, vp, c.getOutputLayer());
+	conv.calculate(c, vp, c.getOutputLayer());
 
 	// most simple case
-	assertEquals(164, o.get(0, 0), 0);
-	assertEquals(184, o.get(0, 1), 0);
-	assertEquals(224, o.get(0, 2), 0);
-	assertEquals(244, o.get(0, 3), 0);
-	Util.fillArray(o.getElements(), 0);
+	Tensor o = vp.getValues(c.getOutputLayer());
+
+	assertEquals(164, o.get(0, 0, 0, 0), 0);
+	assertEquals(184, o.get(0, 0, 1, 0), 0);
+	assertEquals(224, o.get(0, 1, 0, 0), 0);
+	assertEquals(244, o.get(0, 1, 1, 0), 0);
     }
 
     @Test
@@ -298,23 +297,23 @@ public class CNNTest {
 	c.getWeights()[14] = 3;
 	c.getWeights()[15] = 4;
 
-	Matrix i1 = new Matrix(new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 }, 1);
+	ValuesProvider vp = new ValuesProvider();
+	vp.setMiniBatchSize(1);
+	vp.getValues(c.getInputLayer()).setElements(new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 });
 
-	Matrix o = new Matrix(8, 1);
+	AparapiConv2D conv = new AparapiConv2DFF(c, vp, c.getOutputLayer());
+	conv.calculate(c, vp, c.getOutputLayer());
 
-	AparapiConv2D conv = new AparapiConv2DFF(c, 1);
+	Tensor o = vp.getValues(c.getOutputLayer());
 
-	conv.calculate(c, i1, o);
-
-	assertEquals(164, o.get(0, 0), 0);
-	assertEquals(184, o.get(0, 1), 0);
-	assertEquals(224, o.get(0, 2), 0);
-	assertEquals(244, o.get(0, 3), 0);
-	assertEquals(164, o.get(0, 4), 0);
-	assertEquals(184, o.get(0, 5), 0);
-	assertEquals(224, o.get(0, 6), 0);
-	assertEquals(244, o.get(0, 7), 0);
-	Util.fillArray(o.getElements(), 0);
+	assertEquals(164, o.get(0, 0, 0, 0), 0);
+	assertEquals(184, o.get(0, 0, 1, 0), 0);
+	assertEquals(224, o.get(0, 1, 0, 0), 0);
+	assertEquals(244, o.get(0, 1, 1, 0), 0);
+	assertEquals(164, o.get(1, 0, 0, 0), 0);
+	assertEquals(184, o.get(1, 0, 1, 0), 0);
+	assertEquals(224, o.get(1, 1, 0, 0), 0);
+	assertEquals(244, o.get(1, 1, 1, 0), 0);
     }
 
     @Test

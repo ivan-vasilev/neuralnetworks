@@ -8,6 +8,7 @@ import java.util.TreeMap;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
+import com.github.neuralnetworks.calculation.ValuesProvider;
 import com.github.neuralnetworks.util.Properties;
 import com.github.neuralnetworks.util.Util;
 
@@ -23,7 +24,7 @@ public class BackPropagationSigmoid extends BackPropagationConnectionCalculatorI
     }
 
     @Override
-    protected void addBackpropFunction(SortedMap<Connections, Integer> inputConnections, Map<Connections, BackPropagationConnectionCalculator> connectionCalculators, Layer targetLayer) {
+    protected void addBackpropFunction(SortedMap<Connections, Integer> inputConnections, Map<Connections, BackPropagationConnectionCalculator> connectionCalculators, ValuesProvider valuesProvider, Layer targetLayer) {
 	for (Entry<Connections, Integer> e : inputConnections.entrySet()) {
 	    SortedMap<GraphConnections, Integer> m = new TreeMap<>();
 	    if (Util.isBias(e.getKey().getInputLayer()) && targetLayer != e.getKey().getInputLayer()) {

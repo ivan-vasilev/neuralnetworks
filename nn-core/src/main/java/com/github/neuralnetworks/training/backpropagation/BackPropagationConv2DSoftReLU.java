@@ -6,6 +6,7 @@ import java.util.SortedMap;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
 import com.github.neuralnetworks.architecture.Layer;
+import com.github.neuralnetworks.calculation.ValuesProvider;
 import com.github.neuralnetworks.util.Properties;
 import com.github.neuralnetworks.util.Util;
 
@@ -21,7 +22,7 @@ public class BackPropagationConv2DSoftReLU extends BackPropagationConnectionCalc
     }
 
     @Override
-    protected void addBackpropFunction(SortedMap<Connections, Integer> inputConnections, Map<Connections, BackPropagationConnectionCalculator> connectionCalculators, Layer targetLayer) {
+    protected void addBackpropFunction(SortedMap<Connections, Integer> inputConnections, Map<Connections, BackPropagationConnectionCalculator> connectionCalculators, ValuesProvider valuesProvider, Layer targetLayer) {
 	Conv2DConnection con = null;
 	for (Connections c : inputConnections.keySet()) {
 	    if (c instanceof Conv2DConnection && !Util.isBias(c.getInputLayer())) {
@@ -31,7 +32,7 @@ public class BackPropagationConv2DSoftReLU extends BackPropagationConnectionCalc
 	}
 
 	if (con != null) {
-	    connectionCalculators.put(con, new AparapiBackpropConv2DSoftReLU(con, miniBatchSize));
+	    connectionCalculators.put(con, new AparapiBackpropConv2DSoftReLU(con, valuesProvider, targetLayer));
 	}
     }
 
@@ -39,8 +40,8 @@ public class BackPropagationConv2DSoftReLU extends BackPropagationConnectionCalc
 
 	private static final long serialVersionUID = -3580345016542506932L;
 
-	public AparapiBackpropConv2DSoftReLU(Conv2DConnection c, int miniBatchSize) {
-	    super(c, miniBatchSize);
+	public AparapiBackpropConv2DSoftReLU(Conv2DConnection c, ValuesProvider valuesProvider, Layer targetLayer) {
+	    super(c, valuesProvider, targetLayer);
 	}
 
 	@Override

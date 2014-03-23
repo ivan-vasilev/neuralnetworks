@@ -49,7 +49,7 @@ public abstract class BackPropagationConnectionCalculatorImpl implements BackPro
 	if (chunk.size() > 0) {
 	    miniBatchSize = valuesProvider.getMiniBatchSize();
 	    currentLayer = targetLayer;
-	    addBackpropFunction(chunk, connectionCalculators, targetLayer);
+	    addBackpropFunction(chunk, connectionCalculators, valuesProvider, targetLayer);
 	    calculators.addAll(connectionCalculators.values());
 	}
 
@@ -77,7 +77,7 @@ public abstract class BackPropagationConnectionCalculatorImpl implements BackPro
 	}
     }
 
-    protected abstract void addBackpropFunction(SortedMap<Connections, Integer> inputConnections, Map<Connections, BackPropagationConnectionCalculator> connectionCalculators, Layer targetLayer);
+    protected abstract void addBackpropFunction(SortedMap<Connections, Integer> inputConnections, Map<Connections, BackPropagationConnectionCalculator> connectionCalculators, ValuesProvider valuesProvider, Layer targetLayer);
 
     public int getMiniBatchSize() {
 	return miniBatchSize;

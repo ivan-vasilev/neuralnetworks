@@ -7,7 +7,6 @@ import com.github.neuralnetworks.architecture.Conv2DConnection;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.calculation.ValuesProvider;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2D;
-import com.github.neuralnetworks.util.Matrix;
 import com.github.neuralnetworks.util.Util;
 
 /**
@@ -41,8 +40,8 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements BackP
      */
     protected ValuesProvider activations;
 
-    public AparapiBackpropagationConv2D(Conv2DConnection c, int miniBatchSize) {
-	super(c, miniBatchSize);
+    public AparapiBackpropagationConv2D(Conv2DConnection c, ValuesProvider valuesProvider, Layer targetLayer) {
+	super(c, valuesProvider, targetLayer);
 	this.weightUpdates = new float[c.getWeights().length];
 	this.weightUpdatesMomentum = new float[c.getWeights().length];
     }
@@ -58,6 +57,12 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements BackP
 	}
 
 	if (c != null) {
+	    Util.fillArray(weightUpdates, 0);
+
+	    if (ffActivation != activations.getValues(c.getInputLayer(), c).getElements()) {
+		ffActivation = activations.getValues(c.getInputLayer(), c).getElements();
+	    }
+
 	    // currently works only as a feedforward (including bp)
 	    if (targetLayer == c.getOutputLayer()) {
 		super.calculate(c, valuesProvider.getValues(Util.getOppositeLayer(c, targetLayer), c), valuesProvider.getValues(targetLayer, c));
@@ -70,18 +75,7 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements BackP
     }
 
     @Override
-    protected void init(Conv2DConnection c, Matrix input, Matrix output) {
-	super.init(c, input, output);
-
-	Util.fillArray(weightUpdates, 0);
-
-	if (ffActivation != activations.getValues(c.getInputLayer(), c).getElements()) {
-	    ffActivation = activations.getValues(c.getInputLayer(), c).getElements();
-	}
-    }
-
-    @Override
-    protected void conv(int weightsStartId, int inputStartId) {
+    protected void conv(int weightsStartId, int inputStartId, int outputStartId) {
 	int id = getGlobalId();
 
 	float activationDerivative = 0;

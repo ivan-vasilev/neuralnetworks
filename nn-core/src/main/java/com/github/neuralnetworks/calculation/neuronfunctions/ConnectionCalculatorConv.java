@@ -40,7 +40,7 @@ public class ConnectionCalculatorConv implements ConnectionCalculator {
 	    // currently works only as a feedforward (including bp)
 	    if (inputFunction == null || miniBatchSize != valuesProvider.getMiniBatchSize()) {
 		miniBatchSize = valuesProvider.getMiniBatchSize();
-		inputFunction = createInputFunction(c, miniBatchSize);
+		inputFunction = createInputFunction(c, valuesProvider, targetLayer);
 	    }
 
 	    calculateBias(bias, valuesProvider);
@@ -53,8 +53,8 @@ public class ConnectionCalculatorConv implements ConnectionCalculator {
 	}
     }
 
-    protected AparapiConv2D createInputFunction(Conv2DConnection c, int miniBatchSize) {
-	return new AparapiConv2DFF(c, miniBatchSize);
+    protected AparapiConv2D createInputFunction(Conv2DConnection c, ValuesProvider valuesProvider, Layer targetLayer) {
+	return new AparapiConv2DFF(c, valuesProvider, targetLayer);
     }
 
     protected void calculateBias(Conv2DConnection bias, ValuesProvider vp) {

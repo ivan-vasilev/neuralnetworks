@@ -1,11 +1,15 @@
 package com.github.neuralnetworks.calculation.neuronfunctions;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 import com.amd.aparapi.Kernel;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
+import com.github.neuralnetworks.architecture.Layer;
+import com.github.neuralnetworks.calculation.ValuesProvider;
 import com.github.neuralnetworks.util.Environment;
-import com.github.neuralnetworks.util.Matrix;
+import com.github.neuralnetworks.util.Tensor;
+import com.github.neuralnetworks.util.Util;
 
 /**
  * Base class for convolutional operations (2d)
@@ -19,34 +23,35 @@ public abstract class AparapiConv2D extends Kernel implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * input column count (columns of image for example)
+     * input
      */
-    protected final int inputColumns;
+    protected float[] input;
+    protected final int inputStartIndex;
+    protected final int inputFeatureMapRowsDistance;
+    protected final int inputFeatureMapColumnsDistance;
 
     /**
-     * output column count (columns of image for example)
+     * output
      */
-    protected final int outputColumns;
+    protected float[] output;
+    protected final int outputStartIndex;
+    protected final int outputFeatureMapsDistance;
+    protected final int outputFeatureMapRowsDistance;
+    protected final int outputFeatureMapColumnsDistance;
+    protected final int outputMiniBatchDistance;
+    protected final int outputFeatureMapLength; // output columns * output rows
+    protected final int outputColumns; // output column count (columns of image for example)
 
     /**
-     * number of samples per calculation (for example number of images)
+     * combined feature weights of all feature maps
      */
-    protected final int miniBatchSize;
+    //@Local TODO
+    protected final float[] weights;
 
-    /**
-     * output columns * output rows
-     */
-    protected final int outputFeatureMapLength;
-    
     /**
      * weights for single feature map
      */
     protected final int featureMapWeights;
-
-    /**
-     * stride
-     */
-    protected final int stride;
 
     /**
      * input offset for each feature map in respect to the start index
@@ -56,69 +61,93 @@ public abstract class AparapiConv2D extends Kernel implements Serializable {
     protected final int[] featureMapOffsets;
 
     /**
-     * input
+     * number of samples per calculation (for example number of images)
      */
-    protected float[] input;
+    protected final int miniBatchSize;
 
     /**
-     * output
+     * stride
      */
-    protected float[] output;
+    protected final int stride;
 
-    /**
-     * combined feature weights of all feature maps
-     */
-    //@Local TODO
-    protected final float[] weights;
-
-    public AparapiConv2D(Conv2DConnection c, int miniBatchSize) {
+    public AparapiConv2D(Conv2DConnection c, ValuesProvider valuesProvider, Layer targetLayer) {
 	super();
 
+	Tensor input = null, output = null;
+	if (targetLayer == c.getOutputLayer()) {
+	    input = valuesProvider.getValues(Util.getOppositeLayer(c, targetLayer), c);
+	    output = valuesProvider.getValues(targetLayer, c);
+	} else {
+	    input = valuesProvider.getValues(targetLayer, c);
+	    output = valuesProvider.getValues(Util.getOppositeLayer(c, targetLayer), c);
+	}
+
+	this.input = input.getElements();
+	this.inputStartIndex = input.getStartIndex();
+	this.inputFeatureMapRowsDistance = input.getDimensionElementsDistance(1);
+	this.inputFeatureMapColumnsDistance = input.getDimensionElementsDistance(2);
+
+	this.output = output.getElements();
+	this.outputStartIndex =  output.getStartIndex();
+	this.outputFeatureMapsDistance =  output.getDimensionElementsDistance(0);
+	this.outputFeatureMapRowsDistance = output.getDimensionElementsDistance(1);
+	this.outputFeatureMapColumnsDistance = output.getDimensionElementsDistance(2);
+	this.outputMiniBatchDistance = output.getDimensionElementsDistance(3);
+
 	this.weights = c.getWeights();
-	this.miniBatchSize = miniBatchSize;
-	this.inputColumns = c.getInputFeatureMapColumns();
+	this.miniBatchSize = valuesProvider.getMiniBatchSize();
 	this.outputColumns = c.getOutputFeatureMapColumns();
 	this.outputFeatureMapLength = c.getOutputFeatureMapLength();
 	this.stride = c.getStride();
-	this.featureMapWeights = c.getWeights().length / c.getOutputFilters();
-	this.featureMapOffsets = new int[featureMapWeights];
+	this.featureMapWeights = c.getKernelColumns() * c.getKernelRows() * c.getInputFilters();
+	this.featureMapOffsets = new int[featureMapWeights * miniBatchSize];
+
+	//	this.featureMapOffsets = new int[featureMapWeights];
+//
+//	for (int m = 0, i = 0; m < miniBatchSize; m++) {
+//	    for (int j = 0; j < subsamplingRows; j++) {
+//		for (int k = 0; k < subsamplingCols; k++, i++) {
+//		    featureMapOffsets[i] = j * inputFeatureMapRowsDistance + k * inputFeatureMapColumnsDistance + m * inputMiniBatchDistance;
+//		}
+//	    }
+//	}
+
+
+	int inputMiniBatchDistance = input.getDimensionElementsDistance(3);
+	int inputFeatureMapsDistance =  input.getDimensionElementsDistance(0);
 
 	for (int i = 0, offset = 0; i < c.getInputFilters(); i++) {
-	    for (int j = 0; j < c.getKernelRows(); j++) {
-		for (int k = 0; k < c.getKernelColumns(); k++) {
-		    featureMapOffsets[offset++] = i * c.getInputFeatureMapLength() + j * c.getInputFeatureMapColumns() + k;
+	    for (int m = 0; m < miniBatchSize; m++) {
+		for (int j = 0; j < c.getKernelRows(); j++) {
+		    for (int k = 0; k < c.getKernelColumns(); k++) {
+			featureMapOffsets[offset++] = i * inputFeatureMapsDistance + j * inputFeatureMapRowsDistance + k * inputFeatureMapColumnsDistance + m * inputMiniBatchDistance;
+		    }
 		}
 	    }
 	}
     }
 
-    public void calculate(Conv2DConnection c, Matrix input, Matrix output) {
+    public void calculate(Conv2DConnection c, ValuesProvider valuesProvider, Layer targetLayer) {
 	if (c != null) {
-	    init(c, input, output);
-	    Environment.getInstance().getExecutionStrategy().execute(this, output.getRows());
+	    Environment.getInstance().getExecutionStrategy().execute(this, targetLayer.getUnitCount(Arrays.asList(new Conv2DConnection[] {c})));
 	}
-    }
-
-    /**
-     * Converts connection, input and output data to one dimensional arrays (because of the Aparapi limitations)
-     */
-    protected void init(Conv2DConnection c, Matrix input, Matrix output) {
-	this.input = input.getElements();
-	this.output = output.getElements();
     }
 
     @Override
     public void run() {
 	int id = getGlobalId();
 
-	conv(featureMapWeights * (id / outputFeatureMapLength), ((id % outputFeatureMapLength) / outputColumns) * inputColumns * stride + (id % outputColumns) * stride);
+	conv(	featureMapWeights * (id / outputFeatureMapLength),
+		inputStartIndex + ((id % outputFeatureMapLength) / outputColumns) * inputFeatureMapRowsDistance * stride + (id % outputColumns) * inputFeatureMapColumnsDistance * stride,
+		outputStartIndex + (id / outputFeatureMapLength) * outputFeatureMapsDistance + ((id % outputFeatureMapLength) / outputColumns) * outputFeatureMapRowsDistance + (id % outputColumns) * outputFeatureMapColumnsDistance);
     }
 
     /**
      * the actual convolution
      * @param weightsStartId
      * @param inputStartId
+     * @param outputStartId
      */
-    protected void conv(int weightsStartId, int inputStartId) {
+    protected void conv(int weightsStartId, int inputStartId, int outputStartId) {
     }
 }
