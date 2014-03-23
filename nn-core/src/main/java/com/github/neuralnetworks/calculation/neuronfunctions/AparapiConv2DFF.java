@@ -22,14 +22,14 @@ public class AparapiConv2DFF extends AparapiConv2D {
 	// calculate sum based on feature map offsets and feature map weights
 	float sum = 0;
 
-	for (int p = 0; p < miniBatchSize; p++) {
-	    sum = output[id * miniBatchSize + p];
+	for (int i = 0; i < miniBatchSize; i++) {
+	    sum = output[id * miniBatchSize + i];
 
-	    for (int i = 0; i < featureMapWeights; i++) {
-		sum += input[inputStartId + featureMapOffsets[i]] * weights[weightsStartId + i];
+	    for (int j = 0; j < featureMapWeights; j++) {
+		sum += input[inputStartId + featureMapOffsets[i * featureMapWeights + j]] * weights[weightsStartId + j];
 	    }
 
-	    output[outputStartId + p * outputMiniBatchDistance] = activationFunction(sum);
+	    output[outputStartId + i * outputMiniBatchDistance] = activationFunction(sum);
 	}
     }
 

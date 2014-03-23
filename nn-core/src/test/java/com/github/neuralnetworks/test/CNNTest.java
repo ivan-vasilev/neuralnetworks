@@ -252,14 +252,7 @@ public class CNNTest {
     public void testConvolutions() {
 	Conv2DConnection c = new Conv2DConnection(new Layer(), new Layer(), 3, 3, 2, 2, 2, 1, 1);
 
-	c.getWeights()[0] = 1;
-	c.getWeights()[1] = 2;
-	c.getWeights()[2] = 3;
-	c.getWeights()[3] = 4;
-	c.getWeights()[4] = 1;
-	c.getWeights()[5] = 2;
-	c.getWeights()[6] = 3;
-	c.getWeights()[7] = 4;
+	c.getWeights().setElements(new float[] {1, 2, 3, 4, 1, 2, 3, 4});
 
 	ValuesProvider vp = new ValuesProvider();
 	vp.setMiniBatchSize(1);
@@ -280,22 +273,7 @@ public class CNNTest {
     @Test
     public void testConvolutions2() {
 	Conv2DConnection c = new Conv2DConnection(new Layer(), new Layer(), 3, 3, 2, 2, 2, 2, 1);
-	c.getWeights()[0] = 1;
-	c.getWeights()[1] = 2;
-	c.getWeights()[2] = 3;
-	c.getWeights()[3] = 4;
-	c.getWeights()[4] = 1;
-	c.getWeights()[5] = 2;
-	c.getWeights()[6] = 3;
-	c.getWeights()[7] = 4;
-	c.getWeights()[8] = 1;
-	c.getWeights()[9] = 2;
-	c.getWeights()[10] = 3;
-	c.getWeights()[11] = 4;
-	c.getWeights()[12] = 1;
-	c.getWeights()[13] = 2;
-	c.getWeights()[14] = 3;
-	c.getWeights()[15] = 4;
+	c.getWeights().setElements(new float[] {1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4});
 
 	ValuesProvider vp = new ValuesProvider();
 	vp.setMiniBatchSize(1);
@@ -323,36 +301,20 @@ public class CNNTest {
 	NNFactory.lcMaxPooling(nn);
 
 	Conv2DConnection c = (Conv2DConnection) nn.getInputLayer().getConnections().get(0);
-	c.getWeights()[0] = 1;
-	c.getWeights()[1] = 2;
-	c.getWeights()[2] = 3;
-	c.getWeights()[3] = 4;
-	c.getWeights()[4] = 1;
-	c.getWeights()[5] = 2;
-	c.getWeights()[6] = 3;
-	c.getWeights()[7] = 4;
-	c.getWeights()[8] = 1;
-	c.getWeights()[9] = 2;
-	c.getWeights()[10] = 3;
-	c.getWeights()[11] = 4;
-	c.getWeights()[12] = 1;
-	c.getWeights()[13] = 2;
-	c.getWeights()[14] = 3;
-	c.getWeights()[15] = 4;
-
-	Matrix i1 = new Matrix(new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 }, 1);
+	c.getWeights().setElements(new float[] {1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4});
 
 	ValuesProvider vp = new ValuesProvider();
-	vp.addValues(nn.getInputLayer(), i1);
+	vp.setMiniBatchSize(1);
+	vp.getValues(nn.getInputLayer()).setElements(new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 });
 
 	Set<Layer> calculatedLayers = new HashSet<>();
 	calculatedLayers.add(nn.getInputLayer());
 	nn.getLayerCalculator().calculate(nn, nn.getOutputLayer(), calculatedLayers, vp);
 
-	Matrix o = (Matrix) vp.getValues(nn.getOutputLayer());
+	Tensor o = vp.getValues(nn.getOutputLayer());
 
-	assertEquals(244, o.get(0, 0), 0);
-	assertEquals(244, o.get(1, 0), 0);
+	assertEquals(244, o.get(0, 0, 0, 0), 0);
+	assertEquals(244, o.get(1, 0, 0, 0), 0);
     }
 
     @Test
@@ -542,24 +504,24 @@ public class CNNTest {
 	nn.setLayerCalculator(NNFactory.lcSigmoid(nn, null));
 
 	Conv2DConnection c = (Conv2DConnection) nn.getInputLayer().getConnections().get(0);
-	c.setWeights(new float [] {0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f});
+	c.getWeights().setElements(new float [] {0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f});
 
 	Conv2DConnection b = (Conv2DConnection) nn.getOutputLayer().getConnections().get(1);
-	b.setWeights(new float [] {-3f});
+	b.getWeights().setElements(new float [] {-3f});
 	
 	SimpleInputProvider ts = new SimpleInputProvider(new float[][] { { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1, 1.1f, 1.2f, 1.3f, 1.4f, 1.5f, 1.6f, 1.7f, 1.8f } }, new float[][] { { 1, 1, 1, 1 } }, 1, 1);
 	BackPropagationTrainer<?> t = TrainerFactory.backPropagation(nn, ts, null, null, null, 0.5f, 0f, 0f, 0f);
 	t.train();
 
-	assertEquals(0.11756, c.getWeights()[0], 0.00001);
-	assertEquals(0.22640, c.getWeights()[1], 0.00001);
-	assertEquals(0.34408, c.getWeights()[2], 0.00001);
-	assertEquals(0.45292, c.getWeights()[3], 0.00001);
-	assertEquals(0.59712, c.getWeights()[4], 0.00001);
-	assertEquals(0.70596, c.getWeights()[5], 0.00001);
-	assertEquals(0.82364, c.getWeights()[6], 0.00001);
-	assertEquals(0.93248, c.getWeights()[7], 0.00001);
-	assertEquals(-2.911599, b.getWeights()[0], 0.00001);
+	assertEquals(0.11756, c.getWeights().getElements()[0], 0.00001);
+	assertEquals(0.22640, c.getWeights().getElements()[1], 0.00001);
+	assertEquals(0.34408, c.getWeights().getElements()[2], 0.00001);
+	assertEquals(0.45292, c.getWeights().getElements()[3], 0.00001);
+	assertEquals(0.59712, c.getWeights().getElements()[4], 0.00001);
+	assertEquals(0.70596, c.getWeights().getElements()[5], 0.00001);
+	assertEquals(0.82364, c.getWeights().getElements()[6], 0.00001);
+	assertEquals(0.93248, c.getWeights().getElements()[7], 0.00001);
+	assertEquals(-2.911599, b.getWeights().getElements()[0], 0.00001);
     }
 
     @Test
@@ -599,19 +561,20 @@ public class CNNTest {
 	nn.setLayerCalculator(NNFactory.lcWeightedSum(nn, null));
 
 	Conv2DConnection cc = (Conv2DConnection) nn.getInputLayer().getConnections().get(0);
-	Util.fillArray(cc.getWeights(), 1);
+	Util.fillArray(cc.getWeights().getElements(), 1);
 
 	ValuesProvider vp = new ValuesProvider();
-	vp.addValues(nn.getInputLayer(), new Matrix(new float[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25}, 1));
+	vp.setMiniBatchSize(1);
+	vp.getValues(nn.getInputLayer()).setElements(new float[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25});
 
 	Set<Layer> calculatedLayers = new HashSet<>();
 	calculatedLayers.add(nn.getInputLayer());
 	nn.getLayerCalculator().calculate(nn, nn.getOutputLayer(), calculatedLayers, vp);
 
-	Matrix o = (Matrix) vp.getValues(nn.getOutputLayer());
-	assertEquals(16, o.get(0, 0), 0.00001);
-	assertEquals(24, o.get(1, 0), 0.00001);
-	assertEquals(56, o.get(2, 0), 0.00001);
-	assertEquals(64, o.get(3, 0), 0.00001);
+	Tensor o = vp.getValues(nn.getOutputLayer());
+	assertEquals(16, o.get(0, 0, 0, 0), 0.00001);
+	assertEquals(24, o.get(0, 0, 1, 0), 0.00001);
+	assertEquals(56, o.get(0, 1, 0, 0), 0.00001);
+	assertEquals(64, o.get(0, 1, 1, 0), 0.00001);
     }
 }

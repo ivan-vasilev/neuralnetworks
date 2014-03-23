@@ -7,6 +7,7 @@ import com.github.neuralnetworks.architecture.Conv2DConnection;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.calculation.ValuesProvider;
+import com.github.neuralnetworks.util.Tensor;
 import com.github.neuralnetworks.util.Util;
 
 /**
@@ -46,9 +47,9 @@ public class ConnectionCalculatorConv implements ConnectionCalculator {
 	    calculateBias(bias, valuesProvider);
 
 	    if (targetLayer == c.getOutputLayer()) {
-		inputFunction.calculate(c, valuesProvider.getValues(Util.getOppositeLayer(c, targetLayer), c), valuesProvider.getValues(targetLayer, c));
+		inputFunction.calculate(c, valuesProvider, targetLayer);
 	    } else {
-		inputFunction.calculate(c, valuesProvider.getValues(targetLayer, c), valuesProvider.getValues(Util.getOppositeLayer(c, targetLayer), c));
+		inputFunction.calculate(c, valuesProvider, Util.getOppositeLayer(c, targetLayer));
 	    }
 	}
     }
@@ -64,10 +65,17 @@ public class ConnectionCalculatorConv implements ConnectionCalculator {
 		Util.fillArray(biasValue, 1);
 	    }
 
-	    float[] a = vp.getValues(bias.getOutputLayer(), bias).getElements();
-	    int fm = a.length / bias.getWeights().length;
-	    for (int i = 0; i < a.length; i++) {
-		a[i] += bias.getWeights()[i / fm];
+	    Tensor v = vp.getValues(bias.getOutputLayer(), bias);
+	    Tensor w = bias.getWeights();
+	    for (int i = 0; i < v.getDimensionLength(0); i++) {
+		float b = w.get(i, 0, 0, 0);
+		for (int j = 0; j < v.getDimensionElementsDistance(1); j++) {
+		    for (int p = 0; p < v.getDimensionElementsDistance(2); p++) {
+			for (int k = 0; k < v.getDimensionElementsDistance(3); k++) {
+			    v.set(v.get(i, j, p, k) + b, i, j, p, k);
+			}
+		    }
+		}
 	    }
 	}
     }

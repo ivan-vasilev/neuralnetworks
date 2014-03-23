@@ -72,14 +72,14 @@ public class NNRandomInitializer implements Serializable {
 		Conv2DConnection c = (Conv2DConnection) cc.connection;
 		if (Util.isBias(c.getInputLayer())) {
 		    if (biasDefaultValue != null) {
-			Util.fillArray(c.getWeights(), biasDefaultValue);
+			Util.fillArray(c.getWeights().getElements(), biasDefaultValue);
 		    } else if (biasRandomInitializer != null) {
-			biasRandomInitializer.initialize(c.getWeights());
+			biasRandomInitializer.initialize(c.getWeights().getElements());
 		    } else {
-			randomInitializer.initialize(c.getWeights());
+			randomInitializer.initialize(c.getWeights().getElements());
 		    }
 		} else {
-		    randomInitializer.initialize(c.getWeights());
+		    randomInitializer.initialize(c.getWeights().getElements());
 		}
 	    }
 	}

@@ -42,8 +42,8 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements BackP
 
     public AparapiBackpropagationConv2D(Conv2DConnection c, ValuesProvider valuesProvider, Layer targetLayer) {
 	super(c, valuesProvider, targetLayer);
-	this.weightUpdates = new float[c.getWeights().length];
-	this.weightUpdatesMomentum = new float[c.getWeights().length];
+	this.weightUpdates = new float[c.getWeights().getSize()];
+	this.weightUpdatesMomentum = new float[c.getWeights().getSize()];
     }
 
     @Override
