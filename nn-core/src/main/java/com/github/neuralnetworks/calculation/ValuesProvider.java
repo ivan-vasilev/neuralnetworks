@@ -75,7 +75,7 @@ public class ValuesProvider implements Serializable {
 	Tensor result = set.stream().filter(t -> t.getSize() == dimSize).findFirst().orElse(null);
 
 	if (result == null) {
-	    if (dimensions.length == 1) {
+	    if (dimensions.length == 2) {
 		set.add(result = new Matrix(dimensions[0], getMiniBatchSize()));
 	    } else {
 		set.add(result = new Tensor(dimensions));
