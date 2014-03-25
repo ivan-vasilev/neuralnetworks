@@ -91,8 +91,8 @@ public class LogTrainingListener implements TrainingEventListener {
 	    if (isTesting && logTestResults) {
 		MiniBatchFinishedEvent mbe = (MiniBatchFinishedEvent) event;
 		if (mbe.getResults() != null) {
-		    Matrix input = mbe.getData().getInput();
-		    Matrix target = mbe.getData().getTarget();
+		    Matrix input = (Matrix) mbe.getData().getInput();
+		    Matrix target = (Matrix) mbe.getData().getTarget();
 		    Trainer<?> t = (Trainer<?>) mbe.getSource();
 		    Matrix networkOutput = (Matrix) mbe.getResults().getValues(t.getNeuralNetwork().getOutputLayer());
 

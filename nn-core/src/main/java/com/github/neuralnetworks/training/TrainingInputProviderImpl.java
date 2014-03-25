@@ -3,7 +3,7 @@ package com.github.neuralnetworks.training;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.neuralnetworks.calculation.neuronfunctions.MatrixFunction;
+import com.github.neuralnetworks.calculation.neuronfunctions.TensorFunction;
 
 public abstract class TrainingInputProviderImpl implements TrainingInputProvider {
 
@@ -12,7 +12,7 @@ public abstract class TrainingInputProviderImpl implements TrainingInputProvider
     /**
      * List of modifiers to apply on the input data after the conversion
      */
-    private List<MatrixFunction> inputModifiers;
+    private List<TensorFunction> inputModifiers;
 
     @Override
     public TrainingInputData getNextInput() {
@@ -24,7 +24,7 @@ public abstract class TrainingInputProviderImpl implements TrainingInputProvider
 	return result;
     }
 
-    public void addInputModifier(MatrixFunction modifier) {
+    public void addInputModifier(TensorFunction modifier) {
 	if (inputModifiers == null) {
 	    inputModifiers = new ArrayList<>();
 	}
@@ -32,7 +32,7 @@ public abstract class TrainingInputProviderImpl implements TrainingInputProvider
 	inputModifiers.add(modifier);
     }
 
-    public void removeModifier(MatrixFunction modifier) {
+    public void removeModifier(TensorFunction modifier) {
 	if (inputModifiers != null) {
 	    inputModifiers.remove(modifier);
 	}

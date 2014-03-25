@@ -2,6 +2,7 @@ package com.github.neuralnetworks.util;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.stream.IntStream;
 
 /**
@@ -22,19 +23,19 @@ public class Tensor implements Serializable {
     protected float[] elements;
 
     /**
-     * dimension lengths for the tensor
+     * global dimension lengths for the tensor (based on the full elements array)
+     */
+    protected int[] globalDimensions;
+
+    /**
+     * local dimension size of the tensor based on the globalDimensions
      */
     protected int[] dimensions;
 
     /**
-     * sub-tensor start positions for each dimension
+     * sub-tensor position limits for each dimension
      */
-    protected int[] dimStart;
-
-    /**
-     * sub-tensor end positions for each dimension
-     */
-    protected int[] dimEnd;
+    protected int[][] globalDimensionsLimit;
 
     protected int[] dimMultiplicators;
 
@@ -48,15 +49,14 @@ public class Tensor implements Serializable {
 	    throw new IllegalArgumentException("Please provide dimensions");
 	}
 
-	this.dimensions = dimensions;
-	this.dimStart = new int[dimensions.length];
-	this.dimEnd = new int[dimensions.length];
-	this.dimTmp = new int[dimensions.length];
+	this.globalDimensions = this.dimensions = dimensions;
+	this.globalDimensionsLimit = new int[2][dimensions.length];
+	this.dimTmp = new int[globalDimensions.length];
 	this.elements = new float[IntStream.of(dimensions).reduce(1, (a, b) -> a * b)];
 	this.dimMultiplicators = new int[dimensions.length];
 
 	IntStream.range(0, dimensions.length).forEach(i -> {
-	    dimEnd[i] = dimensions[i] - 1;
+	    globalDimensionsLimit[1][i] = dimensions[i] - 1;
 	    dimMultiplicators[i] = 1;
 	    Arrays.stream(dimensions).skip(i + 1).limit(dimensions.length).forEach(j -> dimMultiplicators[i] *= j);
 	});
@@ -67,27 +67,32 @@ public class Tensor implements Serializable {
 	    throw new IllegalArgumentException("Please provide dimensions");
 	}
 
-	this.dimensions = dimensions;
-	this.dimStart = new int[dimensions.length];
-	this.dimEnd = new int[dimensions.length];
-	this.dimTmp = new int[dimensions.length];
+	this.globalDimensions = this.dimensions = dimensions;
+	this.globalDimensionsLimit = new int[2][dimensions.length];
+	this.dimTmp = new int[globalDimensions.length];
 	this.elements = elements;
 
 	dimMultiplicators = new int[dimensions.length];
 	IntStream.range(0, dimMultiplicators.length).forEach(i -> {
-	    dimEnd[i] = dimensions[i] - 1;
+	    globalDimensionsLimit[1][i] = dimensions[i] - 1;
 	    dimMultiplicators[i] = 1;
 	    Arrays.stream(dimensions).skip(i + 1).limit(dimensions.length).forEach(j -> dimMultiplicators[i] *= j);
 	});
     }
 
-    public Tensor(Tensor parent, int[] dimStart, int[] dimEnd) {
-	this.dimensions = parent.dimensions;
+    public Tensor(Tensor parent, int[][] dimensionsLimit) {
+	this.globalDimensions = parent.globalDimensions;
 	this.elements = parent.elements;
 	this.dimMultiplicators = parent.dimMultiplicators;
-	this.dimStart = dimStart;
-	this.dimEnd = dimEnd;
-	this.dimTmp = new int[dimensions.length];
+	this.globalDimensionsLimit = dimensionsLimit;
+	this.dimTmp = new int[globalDimensions.length];
+
+	this.dimensions = new int[(int) IntStream.range(0, globalDimensions.length).filter(i -> dimensionsLimit[0][i] != dimensionsLimit[1][i]).count()];
+	for (int i = 0, j = 0; i < globalDimensions.length; i++) {
+	    if (dimensionsLimit[0][i] != dimensionsLimit[1][i]) {
+		dimensions[j++] = dimensionsLimit[1][i] - dimensionsLimit[0][i] + 1;
+	    }
+	}
     }
 
     public float get(int... d) {
@@ -98,19 +103,11 @@ public class Tensor implements Serializable {
 	elements[getIndex(d)] = value;
     }
 
-    public float[] getElements() {
-        return elements;
-    }
-
-    public void setElements(float[] elements) {
-        this.elements = elements;
-    }
-
     /**
      * @return Number of elements (may be different than elements.length)
      */
     public int getSize() {
-	return IntStream.range(0, dimensions.length).map(i -> getDimensionLength(i)).reduce(1, (a, b) -> a * b);
+	return IntStream.range(0, dimensions.length).map(i -> dimensions[i]).reduce(1, (a, b) -> a * b);
     }
  
     /**
@@ -125,16 +122,8 @@ public class Tensor implements Serializable {
      * @return end index (in the elements array) for this tensor
      */
     public int getEndIndex() {
-	IntStream.range(0, dimensions.length).forEach(i -> dimTmp[i] = dimEnd[i] - dimStart[i]);
+	IntStream.range(0, globalDimensions.length).forEach(i -> dimTmp[i] = globalDimensionsLimit[1][i] - globalDimensionsLimit[0][i]);
 	return getIndex(dimTmp);
-    }
-
-    /**
-     * @param d
-     * @return the length of this dimension
-     */
-    public int getDimensionLength(int d) {
-	return dimEnd[d] - dimStart[d] + 1;
     }
 
     /**
@@ -145,8 +134,20 @@ public class Tensor implements Serializable {
 	return dimMultiplicators[d];
     }
 
-    public int getDimensionsSize() {
-	return dimensions.length;
+    public float[] getElements() {
+        return elements;
+    }
+
+    public void setElements(float[] elements) {
+        this.elements = elements;
+    }
+
+    public int[] getDimensions() {
+	return dimensions;
+    }
+
+    public void setDimensions(int[] dimensions) {
+        this.dimensions = dimensions;
     }
 
     public int getStartOffset() {
@@ -158,18 +159,79 @@ public class Tensor implements Serializable {
     }
 
     protected int getIndex(int... d) {
-	if (d == null || d.length == 0 || d.length > dimensions.length) {
+	if (d == null || d.length == 0 || d.length > globalDimensions.length) {
 	    throw new IllegalArgumentException("Please provide indices");
 	}
 
-	int id = IntStream.range(0, d.length).map(i -> {
-	    if (d[i] + dimStart[i] > dimEnd[i]) {
-		throw new IllegalArgumentException("Index out of range: " + i + " -> " + d[i] + "+" + dimStart[i] + " to " + dimStart[i]);
+	int id = 0;
+	for (int i = 0, j = 0; i < globalDimensions.length; i++) {
+	    if (globalDimensionsLimit[0][i] != globalDimensionsLimit[1][i] || d.length - j >= globalDimensions.length - i) {
+		if (d[j] + globalDimensionsLimit[0][i] > globalDimensionsLimit[1][i]) {
+		    throw new IllegalArgumentException("Index out of range: " + i + " -> " + d[j] + "+" + globalDimensionsLimit[0][i] + " to " + globalDimensionsLimit[1][i]);
+		}
+		
+		id += (d[j++] + globalDimensionsLimit[0][i]) * dimMultiplicators[i];
+	    } else {
+		id += globalDimensionsLimit[0][i] * dimMultiplicators[i];
 	    }
-
-	    return (d[i] + dimStart[i]) * dimMultiplicators[i];
-	}).sum();
+	}
 
 	return startOffset + id;
+    }
+
+    public Iterator<Float> iterator() {
+	return new TensorIterator(this);
+    }
+
+    public Iterator<Float> iterator(int[][] limits) {
+	return new TensorIterator(this, limits);
+    }
+
+    /**
+     * Iterate over the "real" indexes of the elements array
+     */
+    private static class TensorIterator implements java.util.Iterator<Float> {
+
+	private Tensor tensor;
+	private int[] current;
+	private int[][] limits;
+
+	public TensorIterator(Tensor tensor) {
+	    super();
+	    this.tensor = tensor;
+	    this.current = new int[tensor.dimensions.length];
+	    this.limits = new int[2][tensor.dimensions.length];
+	    IntStream.range(0, tensor.dimensions.length).forEach(i -> limits[1][i] = tensor.dimensions[i] - 1);
+	    current[current.length - 1] = -1;
+	}
+
+	public TensorIterator(Tensor tensor, int[][] limits) {
+	    super();
+	    this.tensor = tensor;
+	    this.current = new int[tensor.dimensions.length];
+	    this.limits = limits;
+	    IntStream.range(0, tensor.dimensions.length).forEach(i -> limits[1][i] = tensor.dimensions[i] - 1);
+	    IntStream.range(0, tensor.dimensions.length - 1).forEach(i -> current[i] = limits[0][i]);
+	    current[current.length - 1] = limits[0][current.length - 1] - 1;
+	}
+
+	@Override
+	public boolean hasNext() {
+	    return IntStream.range(0, tensor.dimensions.length).anyMatch(i -> current[i] < limits[1][i]);
+	}
+
+	@Override
+	public Float next() {
+	    for (int d = tensor.dimensions.length - 1; d >= 0; d--) {
+		if (current[d] != limits[1][d]) {
+		    current[d]++;
+		    break;
+		} else {
+		    current[d] = limits[0][d];
+		}
+	    }
+
+	    return tensor.elements[tensor.getIndex(current)];
+	}
     }
 }

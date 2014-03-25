@@ -30,21 +30,21 @@ public class Conv2DConnection extends ConnectionsImpl {
     }
 
     public int getKernelRows() {
-	return wights.getDimensionLength(2);
+	return wights.getDimensions()[2];
     }
 
     public int getKernelColumns() {
-	return wights.getDimensionLength(3);
+	return wights.getDimensions()[3];
     }
 
     @Override
     public int getInputUnitCount() {
-	return inputFeatureMapRows * inputFeatureMapColumns * wights.getDimensionLength(1);
+	return inputFeatureMapRows * inputFeatureMapColumns * wights.getDimensions()[1];
     }
 
     @Override
     public int getOutputUnitCount() {
-	return getOutputFeatureMapLength() * wights.getDimensionLength(0);
+	return getOutputFeatureMapLength() * wights.getDimensions()[0];
     }
 
     public int getInputFeatureMapColumns() {
@@ -64,19 +64,19 @@ public class Conv2DConnection extends ConnectionsImpl {
     }
 
     public int getInputFilters() {
-        return wights.getDimensionLength(1);
+        return wights.getDimensions()[1];
     }
 
     public int getOutputFeatureMapColumns() {
-        return (inputFeatureMapRows - wights.getDimensionLength(2)) / stride + 1;
+        return (inputFeatureMapRows - wights.getDimensions()[2]) / stride + 1;
     }
 
     public int getOutputFeatureMapRows() {
-        return (inputFeatureMapColumns - wights.getDimensionLength(3)) / stride + 1;
+        return (inputFeatureMapColumns - wights.getDimensions()[3]) / stride + 1;
     }
 
     public int getOutputFilters() {
-        return wights.getDimensionLength(0);
+        return wights.getDimensions()[0];
     }
 
     public int getStride() {

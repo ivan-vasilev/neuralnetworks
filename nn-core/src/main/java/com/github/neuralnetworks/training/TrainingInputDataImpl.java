@@ -1,6 +1,7 @@
 package com.github.neuralnetworks.training;
 
 import com.github.neuralnetworks.util.Matrix;
+import com.github.neuralnetworks.util.Tensor;
 
 /**
  * Training input data with target value default implementation
@@ -9,34 +10,34 @@ public class TrainingInputDataImpl implements TrainingInputData {
 
     private static final long serialVersionUID = 1L;
 
-    private Matrix input;
-    private Matrix target;
+    private Tensor input;
+    private Tensor target;
 
     public TrainingInputDataImpl() {
 	super();
     }
 
-    public TrainingInputDataImpl(Matrix input) {
+    public TrainingInputDataImpl(Tensor input) {
 	super();
 	this.input = input;
     }
 
-    public TrainingInputDataImpl(Matrix input, Matrix target) {
+    public TrainingInputDataImpl(Tensor input, Tensor target) {
 	this.input = input;
 	this.target = target;
     }
 
     @Override
-    public Matrix getInput() {
+    public Tensor getInput() {
 	return input;
     }
 
-    public void setInput(Matrix input) {
+    public void setInput(Tensor input) {
         this.input = input;
     }
 
     @Override
-    public Matrix getTarget() {
+    public Tensor getTarget() {
 	return target;
     }
 

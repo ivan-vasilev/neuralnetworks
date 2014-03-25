@@ -1,9 +1,9 @@
 package com.github.neuralnetworks.calculation.neuronfunctions;
 
 import com.github.neuralnetworks.training.random.XORShiftKernel;
-import com.github.neuralnetworks.util.Matrix;
+import com.github.neuralnetworks.util.Tensor;
 
-public class AparapiNoise extends XORShiftKernel implements MatrixFunction {
+public class AparapiNoise extends XORShiftKernel implements TensorFunction {
 
     private static final long serialVersionUID = 1L;
 
@@ -16,7 +16,7 @@ public class AparapiNoise extends XORShiftKernel implements MatrixFunction {
     }
 
     @Override
-    public void value(Matrix inputOutput) {
+    public void value(Tensor inputOutput) {
 	this.inputOutput = inputOutput.getElements();
 	execute(this.inputOutput.length);
     }

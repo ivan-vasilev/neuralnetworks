@@ -1,7 +1,9 @@
 package com.github.neuralnetworks.samples.xor;
 
+import java.util.Iterator;
+
 import com.github.neuralnetworks.calculation.OutputError;
-import com.github.neuralnetworks.util.Matrix;
+import com.github.neuralnetworks.util.Tensor;
 
 public class XorOutputError implements OutputError {
 
@@ -11,9 +13,11 @@ public class XorOutputError implements OutputError {
     private int size;
 
     @Override
-    public void addItem(Matrix networkOutput, Matrix targetOutput) {
-	for (int i = 0; i < targetOutput.getColumns(); i++, size++) {
-	    networkError += Math.abs(Math.abs(networkOutput.get(0, i)) - Math.abs(targetOutput.get(0, i)));
+    public void addItem(Tensor networkOutput, Tensor targetOutput) {
+	Iterator<Float> targetIt = targetOutput.iterator();
+	Iterator<Float> actualIt = networkOutput.iterator();
+	while (targetIt.hasNext() && actualIt.hasNext()) {
+	    networkError += Math.abs(Math.abs(actualIt.next()) - Math.abs(targetIt.next()));
 	}
     }
 

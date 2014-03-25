@@ -8,8 +8,8 @@ import com.github.neuralnetworks.calculation.ValuesProvider;
 import com.github.neuralnetworks.training.OneStepTrainer;
 import com.github.neuralnetworks.training.TrainingInputData;
 import com.github.neuralnetworks.util.Constants;
-import com.github.neuralnetworks.util.Matrix;
 import com.github.neuralnetworks.util.Properties;
+import com.github.neuralnetworks.util.Tensor;
 import com.github.neuralnetworks.util.UniqueList;
 
 /**
@@ -49,7 +49,7 @@ public class BackPropagationTrainer<N extends NeuralNetwork> extends OneStepTrai
 	propagateBackward(data.getTarget());
     }
 
-    public void propagateForward(Matrix input) {
+    public void propagateForward(Tensor input) {
 	NeuralNetwork nn = getNeuralNetwork();
 	Set<Layer> calculatedLayers = new UniqueList<Layer>();
 	calculatedLayers.add(nn.getInputLayer());
@@ -57,11 +57,11 @@ public class BackPropagationTrainer<N extends NeuralNetwork> extends OneStepTrai
 	nn.getLayerCalculator().calculate(nn, nn.getOutputLayer(), calculatedLayers, activations);
     }
 
-    public void propagateBackward(Matrix target) {
+    public void propagateBackward(Tensor target) {
 	NeuralNetwork nn = getNeuralNetwork();
 
 	OutputErrorDerivative d = getProperties().getParameter(Constants.OUTPUT_ERROR_DERIVATIVE);
-	Matrix outputErrorDerivative = d.getOutputErrorDerivative(activations.getValues(nn.getOutputLayer()), target);
+	Tensor outputErrorDerivative = d.getOutputErrorDerivative(activations.getValues(nn.getOutputLayer()), target);
 	backpropagation.addValues(nn.getOutputLayer(), outputErrorDerivative);
 	Set<Layer> calculatedLayers = new UniqueList<Layer>();
 	calculatedLayers.add(nn.getOutputLayer());

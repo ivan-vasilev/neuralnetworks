@@ -1,12 +1,12 @@
 package com.github.neuralnetworks.input;
 
-import com.github.neuralnetworks.calculation.neuronfunctions.MatrixFunction;
-import com.github.neuralnetworks.util.Matrix;
+import com.github.neuralnetworks.calculation.neuronfunctions.TensorFunction;
+import com.github.neuralnetworks.util.Tensor;
 
 /**
  * Mean value input function
  */
-public class MeanInputFunction implements MatrixFunction {
+public class MeanInputFunction implements TensorFunction {
 
     private static final long serialVersionUID = 1L;
 
@@ -14,7 +14,7 @@ public class MeanInputFunction implements MatrixFunction {
 	super();
     }
 
-    public static float getMean(Matrix input) {
+    public static float getMean(Tensor input) {
 	float mean = 0;
 	for (float f : input.getElements()) {
 	    mean += f;
@@ -24,7 +24,7 @@ public class MeanInputFunction implements MatrixFunction {
     }
 
     @Override
-    public void value(Matrix inputOutput) {
+    public void value(Tensor inputOutput) {
 	float mean = getMean(inputOutput);
 	float[] elements = inputOutput.getElements();
 	for (int i = 0; i < elements.length; i++) {

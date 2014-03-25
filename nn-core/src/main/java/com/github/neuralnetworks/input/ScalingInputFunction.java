@@ -1,12 +1,12 @@
 package com.github.neuralnetworks.input;
 
-import com.github.neuralnetworks.calculation.neuronfunctions.MatrixFunction;
-import com.github.neuralnetworks.util.Matrix;
+import com.github.neuralnetworks.calculation.neuronfunctions.TensorFunction;
+import com.github.neuralnetworks.util.Tensor;
 
 /**
  * Scaling input function
  */
-public class ScalingInputFunction implements MatrixFunction {
+public class ScalingInputFunction implements TensorFunction {
 
     private static final long serialVersionUID = 1L;
 
@@ -26,7 +26,7 @@ public class ScalingInputFunction implements MatrixFunction {
     }
 
     @Override
-    public void value(Matrix inputOutput) {
+    public void value(Tensor inputOutput) {
 	float[] elements = inputOutput.getElements();
 	for (int i = 0; i < elements.length; i++) {
 	    elements[i] /= scale;

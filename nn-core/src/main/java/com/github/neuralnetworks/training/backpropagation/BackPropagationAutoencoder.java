@@ -2,8 +2,8 @@ package com.github.neuralnetworks.training.backpropagation;
 
 import com.github.neuralnetworks.architecture.types.Autoencoder;
 import com.github.neuralnetworks.training.TrainingInputData;
-import com.github.neuralnetworks.util.Matrix;
 import com.github.neuralnetworks.util.Properties;
+import com.github.neuralnetworks.util.Tensor;
 
 /**
  * BackPropagation for autoencoders (input and target are the same). Supports
@@ -39,23 +39,23 @@ public class BackPropagationAutoencoder extends BackPropagationTrainer<Autoencod
 
 	private static final long serialVersionUID = 1L;
 
-	private Matrix input;
-	private Matrix target;
+	private Tensor input;
+	private Tensor target;
 
 	@Override
-	public Matrix getInput() {
+	public Tensor getInput() {
 	    return input;
 	}
 
 	@Override
-	public Matrix getTarget() {
+	public Tensor getTarget() {
 	    return target;
 	}
 
-	public void setInputOutput(Matrix inputOutput) {
+	public void setInputOutput(Tensor inputOutput) {
 	    this.input = inputOutput;
 	    if (target == null || target.getElements().length != input.getElements().length) {
-		target = new Matrix(input.getRows(), input.getColumns());
+		target = new Tensor(input.getDimensions());
 	    }
 
 	    System.arraycopy(input.getElements(), 0, target.getElements(), 0, target.getElements().length);

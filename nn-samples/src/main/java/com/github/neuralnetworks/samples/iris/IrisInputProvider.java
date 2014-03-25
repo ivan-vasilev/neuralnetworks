@@ -52,7 +52,8 @@ public class IrisInputProvider implements TrainingInputProvider {
 		}
 
 		if (attachTargetToInput) {
-		    currentExample.getInput().set(dataset.get(dataset.getRows() - 1, k), currentExample.getInput().getRows() - 1, i);
+		    Matrix input = (Matrix) currentExample.getInput();
+		    input.set(dataset.get(dataset.getRows() - 1, k), input.getRows() - 1, i);
 		}
 
 		target[i] = (int) dataset.get(dataset.getRows() - 1, k);

@@ -67,7 +67,7 @@ public class ConnectionCalculatorConv implements ConnectionCalculator {
 
 	    Tensor v = vp.getValues(bias.getOutputLayer(), bias);
 	    Tensor w = bias.getWeights();
-	    for (int i = 0; i < v.getDimensionLength(0); i++) {
+	    for (int i = 0; i < v.getDimensions()[0]; i++) {
 		float b = w.get(i, 0, 0, 0);
 		for (int j = 0; j < v.getDimensionElementsDistance(1); j++) {
 		    for (int p = 0; p < v.getDimensionElementsDistance(2); p++) {

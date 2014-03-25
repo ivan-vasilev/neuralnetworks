@@ -23,8 +23,8 @@ import com.github.neuralnetworks.util.Util;
  * traverses the graph of layers, where ConnectionCalculatorImpl only deals with
  * the connections passed as parameter
  * 
- * !!! Important !!! The results of the calculations are represented as matrices
- * (Matrix). This is done, because it is assumed that implementations will
+ * !!! Important !!! The results of the calculations are represented as tensors
+ * (Tensor). This is done, because it is assumed that implementations will
  * provide a way for calculating many input results at once. Each column of the
  * matrix represents a single input. For example if the network is trained to
  * classify MNIST images, each column of the input matrix will represent single
@@ -41,12 +41,12 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator,
     /**
      * Activation functions that are executed before the transfer function
      */
-    protected List<MatrixFunction> preTransferFunctions;
+    protected List<TensorFunction> preTransferFunctions;
 
     /**
      * Activation functions that are called after the transfer function
      */
-    protected List<MatrixFunction> activationFunctions;
+    protected List<TensorFunction> activationFunctions;
 
     public ConnectionCalculatorFullyConnected() {
 	super();
@@ -122,7 +122,7 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator,
 	return new AparapiWeightedSum(inputConnections, valuesProvider.getMiniBatchSize(), targetLayer);
     }
 
-    public void addPreTransferFunction(MatrixFunction function) {
+    public void addPreTransferFunction(TensorFunction function) {
 	if (preTransferFunctions == null) {
 	    preTransferFunctions = new UniqueList<>();
 	}
@@ -130,13 +130,13 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator,
 	preTransferFunctions.add(function);
     }
 
-    public void removePreTransfer(MatrixFunction function) {
+    public void removePreTransfer(TensorFunction function) {
 	if (preTransferFunctions != null) {
 	    preTransferFunctions.remove(function);
 	}
     }
 
-    public void addActivationFunction(MatrixFunction activationFunction) {
+    public void addActivationFunction(TensorFunction activationFunction) {
 	if (activationFunctions == null) {
 	    activationFunctions = new UniqueList<>();
 	}
@@ -144,7 +144,7 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator,
 	activationFunctions.add(activationFunction);
     }
 
-    public void removeActivationFunction(MatrixFunction activationFunction) {
+    public void removeActivationFunction(TensorFunction activationFunction) {
 	if (activationFunctions != null) {
 	    activationFunctions.remove(activationFunction);
 	}

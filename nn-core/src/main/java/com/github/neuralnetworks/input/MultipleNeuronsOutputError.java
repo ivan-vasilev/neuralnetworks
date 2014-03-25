@@ -1,12 +1,14 @@
 package com.github.neuralnetworks.input;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.github.neuralnetworks.calculation.OutputError;
 import com.github.neuralnetworks.util.Matrix;
+import com.github.neuralnetworks.util.Tensor;
 
 public class MultipleNeuronsOutputError implements OutputError {
 
@@ -23,19 +25,22 @@ public class MultipleNeuronsOutputError implements OutputError {
     }
 
     @Override
-    public void addItem(Matrix networkOutput, Matrix targetOutput) {
+    public void addItem(Tensor newtorkOutput, Tensor targetOutput) {
+	Matrix target = (Matrix) targetOutput;
+	Matrix actual = (Matrix) newtorkOutput;
+	
 	if (dim == -1) {
-	    dim = targetOutput.getRows();
+	    dim = target.getRows();
 	}
 
-	if (networkOutput.getRows() != dim || targetOutput.getRows() != dim) {
+	if (Arrays.equals(actual.getDimensions(), target.getDimensions())) {
 	    throw new IllegalArgumentException("Dimensions don't match");
 	}
 
-	for (int i = 0; i < targetOutput.getColumns(); i++) {
+	for (int i = 0; i < target.getColumns(); i++) {
 	    boolean hasDifferentValues = false;
-	    for (int j = 0; j < networkOutput.getRows(); j++) {
-		if (networkOutput.get(j, i) != networkOutput.get(0, i)) {
+	    for (int j = 0; j < actual.getRows(); j++) {
+		if (actual.get(j, i) != actual.get(0, i)) {
 		    hasDifferentValues = true;
 		    break;
 		}
@@ -43,18 +48,18 @@ public class MultipleNeuronsOutputError implements OutputError {
 
 	    if (hasDifferentValues) {
 		int targetPos = 0;
-		for (int j = 0; j < targetOutput.getRows(); j++) {
-		    if (targetOutput.get(j, i) == 1) {
+		for (int j = 0; j < target.getRows(); j++) {
+		    if (target.get(j, i) == 1) {
 			targetPos = j;
 			break;
 		    }
 		}
 
 		int outputPos = 0;
-		float max = networkOutput.get(0, i);
-		for (int j = 0; j < networkOutput.getRows(); j++) {
-		    if (networkOutput.get(j, i) > max) {
-			max = networkOutput.get(j, i);
+		float max = actual.get(0, i);
+		for (int j = 0; j < actual.getRows(); j++) {
+		    if (actual.get(j, i) > max) {
+			max = actual.get(j, i);
 			outputPos = j;
 		    }
 		}

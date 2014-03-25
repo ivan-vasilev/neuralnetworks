@@ -3,11 +3,12 @@ package com.github.neuralnetworks.calculation.neuronfunctions;
 import com.amd.aparapi.Kernel;
 import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.Matrix;
+import com.github.neuralnetworks.util.Tensor;
 
 /**
  * Softmax activation function
  */
-public class SoftmaxFunction extends Kernel implements MatrixFunction {
+public class SoftmaxFunction extends Kernel implements TensorFunction {
 
     private static final long serialVersionUID = 1L;
 
@@ -18,14 +19,16 @@ public class SoftmaxFunction extends Kernel implements MatrixFunction {
     private int rows;
 
     @Override
-    public void value(Matrix inputOutput) {
-	this.values = inputOutput.getElements();
-	this.startIndex = inputOutput.getStartIndex();
-	this.nextRowStep = inputOutput.getRowElementsDistance();
-	this.nextColumnStep = inputOutput.getColumnElementsDistance();
-	this.rows = inputOutput.getRows();
+    public void value(Tensor inputOutput) {
+	Matrix io = (Matrix) inputOutput;
 
-	Environment.getInstance().getExecutionStrategy().execute(this, inputOutput.getColumns());
+	this.values = io.getElements();
+	this.startIndex = io.getStartIndex();
+	this.nextRowStep = io.getRowElementsDistance();
+	this.nextColumnStep = io.getColumnElementsDistance();
+	this.rows = io.getRows();
+
+	Environment.getInstance().getExecutionStrategy().execute(this, io.getColumns());
     }
 
     @Override

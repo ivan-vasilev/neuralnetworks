@@ -80,7 +80,7 @@ public class ValuesProvider implements Serializable {
 	    } else {
 		set.add(result = new Tensor(dimensions));
 	    }
-	} else if (result.getDimensionsSize() != dimensions.length) {
+	} else if (result.getDimensions().length != dimensions.length) {
 	    if (dimensions.length == 2) {
 		result = new Matrix(result.getElements(), getMiniBatchSize());
 	    }
@@ -141,13 +141,13 @@ public class ValuesProvider implements Serializable {
 	    set.removeIf(o -> o.getSize() == t.getSize());
 	}
 
-	setMiniBatchSize(t.getDimensionLength(t.getDimensionsSize() - 1));
+	setMiniBatchSize(t.getDimensions()[t.getDimensions().length - 1]);
 	set.add(t);
     }
 
     public int getMiniBatchSize() {
 	if (miniBatchSize == 0) {
-	    values.values().forEach(v -> v.stream().filter(t -> miniBatchSize < t.getDimensionLength(t.getDimensionsSize() - 1)).forEach(t -> miniBatchSize = t.getDimensionLength(t.getDimensionsSize() - 1)));
+	    values.values().forEach(v -> v.stream().filter(t -> miniBatchSize < t.getDimensions()[t.getDimensions().length - 1]).forEach(t -> miniBatchSize = t.getDimensions()[t.getDimensions().length - 1]));
 	}
 
 	return miniBatchSize;
