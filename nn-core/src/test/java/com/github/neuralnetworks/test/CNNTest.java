@@ -509,7 +509,7 @@ public class CNNTest {
 	Conv2DConnection b = (Conv2DConnection) nn.getOutputLayer().getConnections().get(1);
 	b.getWeights().setElements(new float [] {-3f});
 	
-	SimpleInputProvider ts = new SimpleInputProvider(new float[][] { { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1, 1.1f, 1.2f, 1.3f, 1.4f, 1.5f, 1.6f, 1.7f, 1.8f } }, new float[][] { { 1, 1, 1, 1 } }, 1, 1);
+	SimpleInputProvider ts = new SimpleInputProvider(new Matrix(new float[][] { { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1, 1.1f, 1.2f, 1.3f, 1.4f, 1.5f, 1.6f, 1.7f, 1.8f } }), new Matrix(new float[][] { { 1, 1, 1, 1 } }), 1, 1);
 	BackPropagationTrainer<?> t = TrainerFactory.backPropagation(nn, ts, null, null, null, 0.5f, 0f, 0f, 0f);
 	t.train();
 
@@ -542,7 +542,7 @@ public class CNNTest {
 	cg2.set(0.3f, 0, 0);
 	cg2.set(0.9f, 0, 1);
 
-	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(nn, new SimpleInputProvider(new float[][] { { 0.35f, 0.9f } }, new float[][] { { 0.5f } }, 1, 1), new SimpleInputProvider(new float[][] { { 0.35f, 0.9f } }, new float[][] { { 0.5f } }, 1, 1), null, null, 1f, 0f, 0f, 0f);
+	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(nn, new SimpleInputProvider(new Matrix(new float[][] { { 0.35f, 0.9f } }), new Matrix(new float[][] { { 0.5f } }), 1, 1), new SimpleInputProvider(new Matrix(new float[][] { { 0.35f, 0.9f } }), new Matrix(new float[][] { { 0.5f } }), 1, 1), null, null, 1f, 0f, 0f, 0f);
 	bpt.train();
 
 	assertEquals(0.09916, cg1.get(0, 0), 0.01);

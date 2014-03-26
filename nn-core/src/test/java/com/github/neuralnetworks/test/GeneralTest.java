@@ -44,7 +44,7 @@ public class GeneralTest {
 	Matrix hm2 = new Matrix(4, 2);
 	vp.addValues(h, hm2);
 
-	Matrix om = (Matrix) vp.getValues(o);
+	Tensor om = vp.getValues(o);
 
 	assertTrue(im == vp.getValues(i, 2, 2));
 	assertTrue(im == vp.getValues(i));
@@ -135,10 +135,10 @@ public class GeneralTest {
 	t.set(7, 1, 1, 0);
 	t.set(8, 1, 1, 1);
 
-	Iterator<Float> it = t.iterator();
+	Iterator<Integer> it = t.iterator();
 	for (int i = 0; i < elements.length && it.hasNext(); i++) {
 	    assertEquals(i + 1, elements[i], 0);
-	    assertEquals(i + 1, it.next(), 0);
+	    assertEquals(i + 1, elements[it.next()], 0);
 	}
 	
 	t = new Tensor(5, 5, 5);
@@ -237,16 +237,16 @@ public class GeneralTest {
 	assertEquals(62, m.get(0, 0), 0);
 	assertEquals(67, m.get(0, 1), 0);
 	assertEquals(92, m.get(1, 1), 0);
-	Iterator<Float> it = m.iterator();
+	Iterator<Integer> it = m.iterator();
 
-	assertEquals(62, it.next(), 0);
-	assertEquals(67, it.next(), 0);
+	assertEquals(62, m.getElements()[it.next()], 0);
+	assertEquals(67, m.getElements()[it.next()], 0);
 	it.next();
-	assertEquals(92, it.next(), 0);
+	assertEquals(92, m.getElements()[it.next()], 0);
 
 	it = m.iterator(new int[][] { {1, 0}, {1, 1} });
 	it.next();
-	assertEquals(92, it.next(), 0);
+	assertEquals(92, m.getElements()[it.next()], 0);
 
 	m = new Matrix(4, 4);
 	for (int i = 0; i < m.getElements().length; i++) {

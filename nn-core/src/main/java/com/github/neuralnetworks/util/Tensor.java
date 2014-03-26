@@ -2,7 +2,6 @@ package com.github.neuralnetworks.util;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.stream.IntStream;
 
 /**
@@ -179,59 +178,69 @@ public class Tensor implements Serializable {
 	return startOffset + id;
     }
 
-    public Iterator<Float> iterator() {
+    /**
+     * @return iterator over the indexes of the elements array
+     */
+    public TensorIterator iterator() {
 	return new TensorIterator(this);
     }
 
-    public Iterator<Float> iterator(int[][] limits) {
+    /**
+     * @return bordered iterator over the indexes of the elements array
+     */
+    public TensorIterator iterator(int[][] limits) {
 	return new TensorIterator(this, limits);
     }
 
     /**
      * Iterate over the "real" indexes of the elements array
      */
-    private static class TensorIterator implements java.util.Iterator<Float> {
+    public static class TensorIterator implements java.util.Iterator<Integer> {
 
 	private Tensor tensor;
-	private int[] current;
+	private int[] currentPosition;
 	private int[][] limits;
 
 	public TensorIterator(Tensor tensor) {
 	    super();
 	    this.tensor = tensor;
-	    this.current = new int[tensor.dimensions.length];
+	    this.currentPosition = new int[tensor.dimensions.length];
 	    this.limits = new int[2][tensor.dimensions.length];
 	    IntStream.range(0, tensor.dimensions.length).forEach(i -> limits[1][i] = tensor.dimensions[i] - 1);
-	    current[current.length - 1] = -1;
+	    currentPosition[currentPosition.length - 1] = -1;
 	}
 
 	public TensorIterator(Tensor tensor, int[][] limits) {
 	    super();
 	    this.tensor = tensor;
-	    this.current = new int[tensor.dimensions.length];
+	    this.currentPosition = new int[tensor.dimensions.length];
 	    this.limits = limits;
 	    IntStream.range(0, tensor.dimensions.length).forEach(i -> limits[1][i] = tensor.dimensions[i] - 1);
-	    IntStream.range(0, tensor.dimensions.length - 1).forEach(i -> current[i] = limits[0][i]);
-	    current[current.length - 1] = limits[0][current.length - 1] - 1;
+	    IntStream.range(0, tensor.dimensions.length - 1).forEach(i -> currentPosition[i] = limits[0][i]);
+	    currentPosition[currentPosition.length - 1] = limits[0][currentPosition.length - 1] - 1;
 	}
 
 	@Override
 	public boolean hasNext() {
-	    return IntStream.range(0, tensor.dimensions.length).anyMatch(i -> current[i] < limits[1][i]);
+	    return IntStream.range(0, tensor.dimensions.length).anyMatch(i -> currentPosition[i] < limits[1][i]);
 	}
 
 	@Override
-	public Float next() {
+	public Integer next() {
 	    for (int d = tensor.dimensions.length - 1; d >= 0; d--) {
-		if (current[d] != limits[1][d]) {
-		    current[d]++;
+		if (currentPosition[d] != limits[1][d]) {
+		    currentPosition[d]++;
 		    break;
 		} else {
-		    current[d] = limits[0][d];
+		    currentPosition[d] = limits[0][d];
 		}
 	    }
 
-	    return tensor.elements[tensor.getIndex(current)];
+	    return tensor.getIndex(currentPosition);
+	}
+
+	public int[] getCurrentPosition() {
+	    return currentPosition;
 	}
     }
 }

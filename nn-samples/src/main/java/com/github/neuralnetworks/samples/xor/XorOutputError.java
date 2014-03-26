@@ -14,10 +14,10 @@ public class XorOutputError implements OutputError {
 
     @Override
     public void addItem(Tensor networkOutput, Tensor targetOutput) {
-	Iterator<Float> targetIt = targetOutput.iterator();
-	Iterator<Float> actualIt = networkOutput.iterator();
+	Iterator<Integer> targetIt = targetOutput.iterator();
+	Iterator<Integer> actualIt = networkOutput.iterator();
 	while (targetIt.hasNext() && actualIt.hasNext()) {
-	    networkError += Math.abs(Math.abs(actualIt.next()) - Math.abs(targetIt.next()));
+	    networkError += Math.abs(Math.abs(networkOutput.getElements()[actualIt.next()]) - Math.abs(targetOutput.getElements()[targetIt.next()]));
 	}
     }
 

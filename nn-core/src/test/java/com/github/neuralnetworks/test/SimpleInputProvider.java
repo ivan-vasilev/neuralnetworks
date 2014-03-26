@@ -1,8 +1,12 @@
 package com.github.neuralnetworks.test;
 
+import java.util.Arrays;
+
 import com.github.neuralnetworks.training.TrainingInputData;
 import com.github.neuralnetworks.training.TrainingInputProvider;
 import com.github.neuralnetworks.util.Matrix;
+import com.github.neuralnetworks.util.Tensor;
+import com.github.neuralnetworks.util.Tensor.TensorIterator;
 
 /**
  * Simple input provider for testing purposes.
@@ -12,29 +16,35 @@ public class SimpleInputProvider implements TrainingInputProvider {
 
     private static final long serialVersionUID = 1L;
 
-    private float[][] input;
-    private float[][] target;
+    private Tensor input;
+    private TensorIterator inputIterator;
+    private Tensor target;
+    private TensorIterator targetIterator;
+
     private SimpleTrainingInputData data;
     private int count;
     private int miniBatchSize;
     private int current;
 
-    public SimpleInputProvider(float[][] input, float[][] target, int count, int miniBatchSize) {
+    public SimpleInputProvider(Tensor input, Tensor target, int count, int miniBatchSize) {
 	super();
 
+	this.input  = input;
+	this.target = target;
 	this.count = count;
 	this.miniBatchSize = miniBatchSize;
-
-	data = new SimpleTrainingInputData(null, null);
+	this.data = new SimpleTrainingInputData(null, null);
 
 	if (input != null) {
-	    this.input  = input;
-	    data.setInput(new Matrix(input[0].length, miniBatchSize));
+	    int[] inputDims = Arrays.copyOf(input.getDimensions(), input.getDimensions().length);
+	    inputDims[inputDims.length - 1] = miniBatchSize;
+	    data.setInput(inputDims.length == 2 ? new Matrix(inputDims[0], inputDims[1]) : new Tensor(inputDims));
 	}
 
 	if (target != null) {
-	    this.target = target;
-	    data.setTarget(new Matrix(target[0].length, miniBatchSize));
+	    int[] targetDims = Arrays.copyOf(target.getDimensions(), target.getDimensions().length);
+	    targetDims[targetDims.length - 1] = miniBatchSize;
+	    data.setTarget(targetDims.length == 2 ? new Matrix(targetDims[0], targetDims[1]) : new Tensor(targetDims));
 	}
     }
 
@@ -46,6 +56,7 @@ public class SimpleInputProvider implements TrainingInputProvider {
     @Override
     public void reset() {
 	current = 0;
+	inputIterator = targetIterator = null;
     }
 
     @Override
@@ -53,14 +64,32 @@ public class SimpleInputProvider implements TrainingInputProvider {
 	if (current < count) {
 	    for (int i = 0; i < miniBatchSize; i++, current++) {
 		if (input != null) {
-		    for (int j = 0; j < input[current % input.length].length; j++) {
-			data.getInput().set(input[current % input.length][j], j, i);
+		    Tensor mbInput = data.getInput();
+		    TensorIterator mbIt = mbInput.iterator();
+
+		    while (mbIt.hasNext()) {
+			if (inputIterator == null || !inputIterator.hasNext()) {
+			    inputIterator = input.iterator();
+			}
+
+			int mbId = mbIt.next();
+			int inId = inputIterator.next();
+			mbInput.getElements()[mbId] = input.getElements()[inId];
 		    }
 		}
 
 		if (target != null) {
-		    for (int j = 0; j < target[current % target.length].length; j++) {
-			data.getTarget().set(target[current % target.length][j], j, i);
+		    Tensor mbTarget = data.getTarget();
+		    TensorIterator mbIt = mbTarget.iterator();
+
+		    while (mbIt.hasNext()) {
+			if (targetIterator == null || !targetIterator.hasNext()) {
+			    targetIterator = target.iterator();
+			}
+
+			int mbId = mbIt.next();
+			int tId = targetIterator.next();
+			mbTarget.getElements()[mbId] = target.getElements()[tId];
 		    }
 		}
 	    }
@@ -75,30 +104,30 @@ public class SimpleInputProvider implements TrainingInputProvider {
 
 	private static final long serialVersionUID = 1L;
 
-	private Matrix input;
-	private Matrix target;
+	private Tensor input;
+	private Tensor target;
 
-	public SimpleTrainingInputData(Matrix input, Matrix target) {
+	public SimpleTrainingInputData(Tensor input, Tensor target) {
 	    super();
 	    this.input = input;
 	    this.target = target;
 	}
 
 	@Override
-	public Matrix getInput() {
+	public Tensor getInput() {
 	    return input;
 	}
 
-	public void setInput(Matrix input) {
+	public void setInput(Tensor input) {
 	    this.input = input;
 	}
 
 	@Override
-	public Matrix getTarget() {
+	public Tensor getTarget() {
 	    return target;
 	}
 
-	public void setTarget(Matrix target) {
+	public void setTarget(Tensor target) {
 	    this.target = target;
 	}
     }

@@ -264,7 +264,7 @@ public class FFNNTest {
 	cg2.set(0.3f, 0, 0);
 	cg2.set(0.9f, 0, 1);
 
-	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(mlp, new SimpleInputProvider(new float[][] { { 0.35f, 0.9f } }, new float[][] { { 0.5f } }, 1, 1), new SimpleInputProvider(new float[][] { { 0.35f, 0.9f } }, new float[][] { { 0.5f } }, 1, 1), null, null, 1f, 0f, 0f, 0f);
+	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(mlp, new SimpleInputProvider(new Matrix(new float[][] { { 0.35f, 0.9f } }), new Matrix(new float[][] { { 0.5f } }), 1, 1), new SimpleInputProvider(new Matrix(new float[][] { { 0.35f, 0.9f } }), new Matrix(new float[][] { { 0.5f } }), 1, 1), null, null, 1f, 0f, 0f, 0f);
 	bpt.train();
 
 	assertEquals(0.09916, cg1.get(0, 0), 0.01);
@@ -280,6 +280,7 @@ public class FFNNTest {
      */
     @Test
     public void testSigmoidBP2() {
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 3, 2, 1 }, true);
 
 	List<Connections> c = mlp.getConnections();
@@ -306,7 +307,7 @@ public class FFNNTest {
 	Matrix cgb2 = cb2.getConnectionGraph();
 	cgb2.set(0.1f, 0, 0);
 
-	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(mlp, new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, new float[][] { { 1 } }, 1, 1), new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, new float[][] { { 1 } }, 1, 1), null, null, 0.9f, 0f, 0f, 0f);
+	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(mlp, new SimpleInputProvider(new Matrix(new float[][] { { 1, 0, 1 } }), new Matrix(new float[][] { { 1 } }), 1, 1), new SimpleInputProvider(new Matrix(new float[][] { { 1, 0, 1 } }), new Matrix(new float[][] { { 1 } }), 1, 1), null, null, 0.9f, 0f, 0f, 0f);
 	bpt.train();
 
 	assertEquals(0.192, cg1.get(0, 0), 0.001);
@@ -357,8 +358,6 @@ public class FFNNTest {
 
 	ValuesProvider results = new ValuesProvider();
 	results.addValues(input, i);
-
-	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 
 	mlp.getLayerCalculator().calculate(mlp, output, calculated, results);
 

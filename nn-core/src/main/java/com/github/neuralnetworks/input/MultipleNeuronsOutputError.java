@@ -33,7 +33,7 @@ public class MultipleNeuronsOutputError implements OutputError {
 	    dim = target.getRows();
 	}
 
-	if (Arrays.equals(actual.getDimensions(), target.getDimensions())) {
+	if (!Arrays.equals(actual.getDimensions(), target.getDimensions())) {
 	    throw new IllegalArgumentException("Dimensions don't match");
 	}
 

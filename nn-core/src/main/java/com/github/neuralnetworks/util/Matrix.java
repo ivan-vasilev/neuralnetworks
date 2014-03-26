@@ -1,5 +1,7 @@
 package com.github.neuralnetworks.util;
 
+import java.util.stream.IntStream;
+
 /**
  * Simple matrix representation with one-dimensional array. This is required,
  * because Aparapi supports only one-dim arrays (otherwise the execution is
@@ -11,6 +13,16 @@ public class Matrix extends Tensor {
 
     public Matrix() {
 	super();
+    }
+
+    /**
+     * simplified constructor
+     */
+    public Matrix(float[][] elements) {
+	super(elements[0].length, elements.length);
+	IntStream.range(0, elements.length).forEach(i -> IntStream.range(0, elements[i].length).forEach(j -> {
+	    set(elements[i][j], j, i);
+	}));
     }
 
     public Matrix(float[] elements, int columns) {

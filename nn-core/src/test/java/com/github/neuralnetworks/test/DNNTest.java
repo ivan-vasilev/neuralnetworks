@@ -162,7 +162,7 @@ public class DNNTest {
 	cgb2.set(-0.4f, 0, 0);
 	cgb2.set(0.2f, 1, 0);
 
-	SimpleInputProvider inputProvider = new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, null, 1, 1);
+	SimpleInputProvider inputProvider = new SimpleInputProvider(new Matrix(new float[][] { { 1, 0, 1 } }), null, 1, 1);
 
 	AparapiCDTrainer firstTrainer = TrainerFactory.cdSigmoidTrainer(firstRBM, null, null, null, null, 1f, 0f, 0f, 0f, 1, true);
 	firstTrainer.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(firstRBM));
@@ -233,7 +233,7 @@ public class DNNTest {
 	cgb2.set(-0.4f, 0, 0);
 	cgb2.set(0.2f, 1, 0);
 	
-	SimpleInputProvider inputProvider = new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, null, 1, 1);
+	SimpleInputProvider inputProvider = new SimpleInputProvider(new Matrix(new float[][] { { 1, 0, 1 } }), null, 1, 1);
 
 	AparapiCDTrainer firstTrainer = TrainerFactory.cdSigmoidTrainer(firstRBM, null, null, null, null, 0f, 0f, 0f, 0f, 0, true);
 	firstTrainer.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(firstRBM));

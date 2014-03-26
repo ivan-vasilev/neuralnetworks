@@ -1,6 +1,7 @@
 package com.github.neuralnetworks.training.backpropagation;
 
 import java.util.Arrays;
+import java.util.Iterator;
 
 import com.github.neuralnetworks.util.Tensor;
 
@@ -23,8 +24,13 @@ public class MSEDerivative implements OutputErrorDerivative {
 	    result = new Tensor(activation.getDimensions());
 	}
 
-	for (int i = 0; i < activation.getElements().length; i++) {
-	    result.getElements()[i] = (target.getElements()[i] - activation.getElements()[i]) * activation.getElements()[i] * (1 - activation.getElements()[i]);
+	Iterator<Integer> activationIt = activation.iterator();
+	Iterator<Integer> targetIt = target.iterator();
+	Iterator<Integer> resultIt = result.iterator();
+
+	while (resultIt.hasNext()) {
+	    int activationId = activationIt.next();
+	    result.getElements()[resultIt.next()] = (target.getElements()[targetIt.next()] - activation.getElements()[activationId]) * activation.getElements()[activationId] * (1 - activation.getElements()[activationId]);
 	}
 
 	return result;
