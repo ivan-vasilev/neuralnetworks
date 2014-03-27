@@ -215,7 +215,6 @@ public class Tensor implements Serializable {
 	    this.tensor = tensor;
 	    this.currentPosition = new int[tensor.dimensions.length];
 	    this.limits = limits;
-	    IntStream.range(0, tensor.dimensions.length).forEach(i -> limits[1][i] = tensor.dimensions[i] - 1);
 	    IntStream.range(0, tensor.dimensions.length - 1).forEach(i -> currentPosition[i] = limits[0][i]);
 	    currentPosition[currentPosition.length - 1] = limits[0][currentPosition.length - 1] - 1;
 	}

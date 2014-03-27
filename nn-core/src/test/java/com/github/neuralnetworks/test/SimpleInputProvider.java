@@ -1,6 +1,7 @@
 package com.github.neuralnetworks.test;
 
 import java.util.Arrays;
+import java.util.stream.IntStream;
 
 import com.github.neuralnetworks.training.TrainingInputData;
 import com.github.neuralnetworks.training.TrainingInputProvider;
@@ -17,9 +18,7 @@ public class SimpleInputProvider implements TrainingInputProvider {
     private static final long serialVersionUID = 1L;
 
     private Tensor input;
-    private TensorIterator inputIterator;
     private Tensor target;
-    private TensorIterator targetIterator;
 
     private SimpleTrainingInputData data;
     private int count;
@@ -56,7 +55,6 @@ public class SimpleInputProvider implements TrainingInputProvider {
     @Override
     public void reset() {
 	current = 0;
-	inputIterator = targetIterator = null;
     }
 
     @Override
@@ -64,32 +62,42 @@ public class SimpleInputProvider implements TrainingInputProvider {
 	if (current < count) {
 	    for (int i = 0; i < miniBatchSize; i++, current++) {
 		if (input != null) {
-		    Tensor mbInput = data.getInput();
-		    TensorIterator mbIt = mbInput.iterator();
+		    int[] d = input.getDimensions();
+
+		    int[][] lmb = new int[2][d.length];
+		    IntStream.range(0, lmb[1].length).forEach(j -> lmb[1][j] = d[j] - 1);
+		    lmb[0][lmb.length - 1] = lmb[1][lmb.length - 1] = i;
+		    TensorIterator mbIt = data.getInput().iterator(lmb);
+
+		    int[][] li = new int[2][d.length];
+		    IntStream.range(0, li[1].length).forEach(j -> li[1][j] = d[j] - 1);
+		    li[0][li.length - 1] = li[1][li.length - 1] = current % d[d.length - 1];
+		    TensorIterator inputIterator = input.iterator(li);
 
 		    while (mbIt.hasNext()) {
-			if (inputIterator == null || !inputIterator.hasNext()) {
-			    inputIterator = input.iterator();
-			}
-
 			int mbId = mbIt.next();
 			int inId = inputIterator.next();
-			mbInput.getElements()[mbId] = input.getElements()[inId];
+			data.getInput().getElements()[mbId] = input.getElements()[inId];
 		    }
 		}
 
 		if (target != null) {
-		    Tensor mbTarget = data.getTarget();
-		    TensorIterator mbIt = mbTarget.iterator();
+		    int[] d = target.getDimensions();
+
+		    int[][] lmb = new int[2][d.length];
+		    IntStream.range(0, lmb[1].length).forEach(j -> lmb[1][j] = d[j] - 1);
+		    lmb[0][lmb.length - 1] = lmb[1][lmb.length - 1] = i;
+		    TensorIterator mbIt = data.getTarget().iterator(lmb);
+
+		    int[][] li = new int[2][d.length];
+		    IntStream.range(0, li[1].length).forEach(j -> li[1][j] = d[j] - 1);
+		    li[0][li.length - 1] = li[1][li.length - 1] = current % d[d.length - 1];
+		    TensorIterator targetIterator = target.iterator(li);
 
 		    while (mbIt.hasNext()) {
-			if (targetIterator == null || !targetIterator.hasNext()) {
-			    targetIterator = target.iterator();
-			}
-
 			int mbId = mbIt.next();
 			int tId = targetIterator.next();
-			mbTarget.getElements()[mbId] = target.getElements()[tId];
+			data.getTarget().getElements()[mbId] = target.getElements()[tId];
 		    }
 		}
 	    }
