@@ -1,7 +1,7 @@
 group = 'com.github.neuralnetworks'
 description = 'GPU Neural networks for Java - Core'
 dependencies {
-	compile files('lib/aparapi.jar')
+	compile group:  'com.amd', name: 'aparapi', version:'2013_01_23'
     compile group: 'org.uncommons.maths', name: 'uncommons-maths', version:'1.2.2a'
     compile group: 'junit', name: 'junit', version:'4.11'
 }
