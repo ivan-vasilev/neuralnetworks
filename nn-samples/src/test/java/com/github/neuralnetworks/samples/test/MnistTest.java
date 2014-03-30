@@ -28,13 +28,20 @@ import com.github.neuralnetworks.util.Environment;
  */
 public class MnistTest {
 
+	public static final String RESOURCES_PATH = "\\java\\resources\\ML\\datasets\\mnist\\";
+	private static final String T10K_LABELS_IDX1_UBYTE = RESOURCES_PATH+"t10k-labels.idx1-ubyte";
+	private static final String T10K_IMAGES_IDX3_UBYTE = RESOURCES_PATH+"t10k-images.idx3-ubyte";
+	private static final String TRAIN_LABELS_IDX1_UBYTE =RESOURCES_PATH+ "train-labels.idx1-ubyte";
+	private static final String TRAIN_IMAGES_IDX3_UBYTE =RESOURCES_PATH+ "train-images.idx3-ubyte";
+	
+	
     @Test
     public void testSigmoidBP() {
 	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 784, 10 }, true);
 
-	MnistInputProvider trainInputProvider = new MnistInputProvider("train-images.idx3-ubyte", "train-labels.idx1-ubyte", 1, 1, new MnistTargetMultiNeuronOutputConverter());
+	MnistInputProvider trainInputProvider = new MnistInputProvider(TRAIN_IMAGES_IDX3_UBYTE, TRAIN_LABELS_IDX1_UBYTE, 1, 1, new MnistTargetMultiNeuronOutputConverter());
 	trainInputProvider.addInputModifier(new ScalingInputFunction(255));
-	MnistInputProvider testInputProvider = new MnistInputProvider("t10k-images.idx3-ubyte", "t10k-labels.idx1-ubyte", 1000, 1, new MnistTargetMultiNeuronOutputConverter());
+	MnistInputProvider testInputProvider = new MnistInputProvider(T10K_IMAGES_IDX3_UBYTE, T10K_LABELS_IDX1_UBYTE, 1000, 1, new MnistTargetMultiNeuronOutputConverter());
 	testInputProvider.addInputModifier(new ScalingInputFunction(255));
 
 	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(mlp, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.02f, 0.5f, 0f, 0f);
@@ -54,9 +61,9 @@ public class MnistTest {
     public void testSigmoidHiddenBP() {
 	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 784, 300, 100, 10 }, true);
 
-	MnistInputProvider trainInputProvider = new MnistInputProvider("train-images.idx3-ubyte", "train-labels.idx1-ubyte", 1, 2, new MnistTargetMultiNeuronOutputConverter());
+	MnistInputProvider trainInputProvider = new MnistInputProvider(TRAIN_IMAGES_IDX3_UBYTE, TRAIN_LABELS_IDX1_UBYTE, 1, 2, new MnistTargetMultiNeuronOutputConverter());
 	trainInputProvider.addInputModifier(new ScalingInputFunction(255));
-	MnistInputProvider testInputProvider = new MnistInputProvider("t10k-images.idx3-ubyte", "t10k-labels.idx1-ubyte", 1000, 1, new MnistTargetMultiNeuronOutputConverter());
+	MnistInputProvider testInputProvider = new MnistInputProvider(T10K_IMAGES_IDX3_UBYTE, T10K_LABELS_IDX1_UBYTE, 1000, 1, new MnistTargetMultiNeuronOutputConverter());
 	testInputProvider.addInputModifier(new ScalingInputFunction(255));
 
 	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(mlp, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.01f, 0.5f, 0f, 0f);
@@ -74,9 +81,9 @@ public class MnistTest {
     @Test
     public void testRBM() {
 	RBM rbm = NNFactory.rbm(784, 10, false);
-	MnistInputProvider trainInputProvider = new MnistInputProvider("train-images.idx3-ubyte", "train-labels.idx1-ubyte", 1, 1, new MnistTargetMultiNeuronOutputConverter());
+	MnistInputProvider trainInputProvider = new MnistInputProvider(TRAIN_IMAGES_IDX3_UBYTE, TRAIN_LABELS_IDX1_UBYTE, 1, 1, new MnistTargetMultiNeuronOutputConverter());
 	trainInputProvider.addInputModifier(new ScalingInputFunction(255));
-	MnistInputProvider testInputProvider = new MnistInputProvider("t10k-images.idx3-ubyte", "t10k-labels.idx1-ubyte", 1000, 1, new MnistTargetMultiNeuronOutputConverter());
+	MnistInputProvider testInputProvider = new MnistInputProvider(T10K_IMAGES_IDX3_UBYTE, T10K_LABELS_IDX1_UBYTE, 1000, 1, new MnistTargetMultiNeuronOutputConverter());
 	testInputProvider.addInputModifier(new ScalingInputFunction(255));
 
 	AparapiCDTrainer t = TrainerFactory.cdSigmoidTrainer(rbm, trainInputProvider, testInputProvider,  new MultipleNeuronsOutputError(), new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.01f, 0.5f, 0f, 0f, 1, false);
@@ -94,9 +101,9 @@ public class MnistTest {
     public void testAE() {
 	Autoencoder nn = NNFactory.autoencoderSigmoid(784, 10, true);
 
-	MnistInputProvider trainInputProvider = new MnistInputProvider("train-images.idx3-ubyte", "train-labels.idx1-ubyte", 1, 1, new MnistTargetMultiNeuronOutputConverter());
+	MnistInputProvider trainInputProvider = new MnistInputProvider(TRAIN_IMAGES_IDX3_UBYTE, TRAIN_LABELS_IDX1_UBYTE, 1, 1, new MnistTargetMultiNeuronOutputConverter());
 	trainInputProvider.addInputModifier(new ScalingInputFunction(255));
-	MnistInputProvider testInputProvider = new MnistInputProvider("t10k-images.idx3-ubyte", "t10k-labels.idx1-ubyte", 1000, 1, new MnistTargetMultiNeuronOutputConverter());
+	MnistInputProvider testInputProvider = new MnistInputProvider(T10K_IMAGES_IDX3_UBYTE, T10K_LABELS_IDX1_UBYTE, 1000, 1, new MnistTargetMultiNeuronOutputConverter());
 	testInputProvider.addInputModifier(new ScalingInputFunction(255));
 
 	Trainer<?> t = TrainerFactory.backPropagationAutoencoder(nn, trainInputProvider, testInputProvider,  new MultipleNeuronsOutputError(), new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.01f, 0.5f, 0f, 0f, 0f);
@@ -118,9 +125,9 @@ public class MnistTest {
 	NNFactory.lcMaxPooling(nn);
 
 	// Mnist dataset provider
-	MnistInputProvider trainInputProvider = new MnistInputProvider("train-images.idx3-ubyte", "train-labels.idx1-ubyte", 1, 1, new MnistTargetMultiNeuronOutputConverter());
+	MnistInputProvider trainInputProvider = new MnistInputProvider(TRAIN_IMAGES_IDX3_UBYTE, TRAIN_LABELS_IDX1_UBYTE, 1, 1, new MnistTargetMultiNeuronOutputConverter());
 	trainInputProvider.addInputModifier(new ScalingInputFunction(255));
-	MnistInputProvider testInputProvider = new MnistInputProvider("t10k-images.idx3-ubyte", "t10k-labels.idx1-ubyte", 1000, 1, new MnistTargetMultiNeuronOutputConverter());
+	MnistInputProvider testInputProvider = new MnistInputProvider(T10K_IMAGES_IDX3_UBYTE, T10K_LABELS_IDX1_UBYTE, 1000, 1, new MnistTargetMultiNeuronOutputConverter());
 	testInputProvider.addInputModifier(new ScalingInputFunction(255));
 
 	// Backpropagation trainer that also works for convolutional and subsampling layers
@@ -149,9 +156,9 @@ public class MnistTest {
 	NNFactory.lcMaxPooling(nn);
 
 	// MNIST dataset
-	MnistInputProvider trainInputProvider = new MnistInputProvider("train-images.idx3-ubyte", "train-labels.idx1-ubyte", 1, 1, new MnistTargetMultiNeuronOutputConverter());
+	MnistInputProvider trainInputProvider = new MnistInputProvider(TRAIN_IMAGES_IDX3_UBYTE, TRAIN_LABELS_IDX1_UBYTE, 1, 1, new MnistTargetMultiNeuronOutputConverter());
 	trainInputProvider.addInputModifier(new ScalingInputFunction(255));
-	MnistInputProvider testInputProvider = new MnistInputProvider("t10k-images.idx3-ubyte", "t10k-labels.idx1-ubyte", 1, 1, new MnistTargetMultiNeuronOutputConverter());
+	MnistInputProvider testInputProvider = new MnistInputProvider(T10K_IMAGES_IDX3_UBYTE, T10K_LABELS_IDX1_UBYTE, 1, 1, new MnistTargetMultiNeuronOutputConverter());
 	testInputProvider.addInputModifier(new ScalingInputFunction(255));
 
 	// Backpropagation trainer that also works for convolutional and subsampling layers
@@ -184,9 +191,9 @@ public class MnistTest {
 	NNFactory.lcMaxPooling(nn);
 
 	// MNIST dataset
-	MnistInputProvider trainInputProvider = new MnistInputProvider("train-images.idx3-ubyte", "train-labels.idx1-ubyte", 1, 1, new MnistTargetMultiNeuronOutputConverter());
+	MnistInputProvider trainInputProvider = new MnistInputProvider(TRAIN_IMAGES_IDX3_UBYTE, TRAIN_LABELS_IDX1_UBYTE, 1, 1, new MnistTargetMultiNeuronOutputConverter());
 	trainInputProvider.addInputModifier(new ScalingInputFunction(255));
-	MnistInputProvider testInputProvider = new MnistInputProvider("t10k-images.idx3-ubyte", "t10k-labels.idx1-ubyte", 1, 1, new MnistTargetMultiNeuronOutputConverter());
+	MnistInputProvider testInputProvider = new MnistInputProvider(T10K_IMAGES_IDX3_UBYTE, T10K_LABELS_IDX1_UBYTE, 1, 1, new MnistTargetMultiNeuronOutputConverter());
 	testInputProvider.addInputModifier(new ScalingInputFunction(255));
 
 	// Backpropagation trainer that also works for convolutional and subsampling layers
