@@ -6,8 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
@@ -39,10 +37,10 @@ public abstract class BackPropagationConnectionCalculatorImpl implements BackPro
 
     @Override
     public void calculate(List<Connections> connections, ValuesProvider valuesProvider, Layer targetLayer) {
-	SortedMap<Connections, Integer> chunk = new TreeMap<>();
+	List<Connections> chunk = new ArrayList<>();
 	for (Connections c : connections) {
 	    if (!connectionCalculators.containsKey(c) || targetLayer != currentLayer || miniBatchSize != valuesProvider.getMiniBatchSize()) {
-		chunk.put(c, valuesProvider.getValues(Util.getOppositeLayer(c, targetLayer), c).getSize());
+		chunk.add(c);
 	    }
 	}
 
@@ -77,7 +75,7 @@ public abstract class BackPropagationConnectionCalculatorImpl implements BackPro
 	}
     }
 
-    protected abstract void addBackpropFunction(SortedMap<Connections, Integer> inputConnections, Map<Connections, BackPropagationConnectionCalculator> connectionCalculators, ValuesProvider valuesProvider, Layer targetLayer);
+    protected abstract void addBackpropFunction(List<Connections> inputConnections, Map<Connections, BackPropagationConnectionCalculator> connectionCalculators, ValuesProvider valuesProvider, Layer targetLayer);
 
     public int getMiniBatchSize() {
 	return miniBatchSize;

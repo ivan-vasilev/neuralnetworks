@@ -254,7 +254,7 @@ public class DNNTest {
 	assertEquals(-0.3 + 0.26158813, cg1.get(1, 0), 0.00001);
 	assertEquals(0.1 - 0.3014404,  cg1.get(1, 1), 0.00001);
 	assertEquals(0.2 + 0.25742438, cg1.get(1, 2), 0.00001);
-	
+
 	assertEquals(0.52276707, cgb1.get(0, 0), 0.00001);
 	assertEquals(- 0.54617375, cgb1.get(1, 0), 0.00001);
 	assertEquals(0.51522285, cgb1.get(2, 0), 0.00001);

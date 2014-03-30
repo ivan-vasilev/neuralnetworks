@@ -1,7 +1,7 @@
 package com.github.neuralnetworks.training.backpropagation;
 
+import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
 
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
@@ -21,9 +21,9 @@ public class BackPropagationConv2D extends BackPropagationConnectionCalculatorIm
     }
 
     @Override
-    protected void addBackpropFunction(SortedMap<Connections, Integer> inputConnections, Map<Connections, BackPropagationConnectionCalculator> connectionCalculators, ValuesProvider valuesProvider, Layer targetLayer) {
+    protected void addBackpropFunction(List<Connections> inputConnections, Map<Connections, BackPropagationConnectionCalculator> connectionCalculators, ValuesProvider valuesProvider, Layer targetLayer) {
 	Conv2DConnection con = null;
-	for (Connections c : inputConnections.keySet()) {
+	for (Connections c : inputConnections) {
 	    if (c instanceof Conv2DConnection) {
 		con = (Conv2DConnection) c;
 		break;

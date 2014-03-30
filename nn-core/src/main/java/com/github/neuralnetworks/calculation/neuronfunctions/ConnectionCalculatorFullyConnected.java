@@ -2,16 +2,16 @@ package com.github.neuralnetworks.calculation.neuronfunctions;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import com.github.neuralnetworks.architecture.Connections;
-import com.github.neuralnetworks.architecture.GraphConnections;
+import com.github.neuralnetworks.architecture.FullyConnected;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.calculation.ValuesProvider;
 import com.github.neuralnetworks.events.PropagationEvent;
 import com.github.neuralnetworks.events.PropagationEventListener;
+import com.github.neuralnetworks.util.Matrix;
+import com.github.neuralnetworks.util.Tensor.TensorIterator;
 import com.github.neuralnetworks.util.UniqueList;
 import com.github.neuralnetworks.util.Util;
 
@@ -35,7 +35,6 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator,
     private static final long serialVersionUID = -5405654469496055017L;
 
     protected ConnectionCalculator inputFunction;
-    protected Layer currentLayer;
     protected int miniBatchSize;
 
     /**
@@ -69,18 +68,15 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator,
 
 	    if (notBias.size() > 0) {
 		if (preTransferFunctions != null && preTransferFunctions.size() > 0) {
-		    preTransferFunctions.forEach(f -> connections.stream().filter(c -> !Util.isBias(c.getInputLayer())).forEach(c -> f.value(valuesProvider.getValues(Util.getOppositeLayer(c, targetLayer), c))));
+		    preTransferFunctions.forEach(f -> notBias.stream().filter(c -> !Util.isBias(c.getInputLayer())).forEach(c -> f.value(valuesProvider.getValues(Util.getOppositeLayer(c, targetLayer), c))));
 		}
 
 		calculateBias(bias, valuesProvider);
 
 		// new input function is required
-		if (inputFunction == null || targetLayer != currentLayer || miniBatchSize != valuesProvider.getMiniBatchSize()) {
+		if (inputFunction == null || miniBatchSize != valuesProvider.getMiniBatchSize()) {
 		    miniBatchSize = valuesProvider.getMiniBatchSize();
-		    currentLayer = targetLayer;
-		    SortedMap<GraphConnections, Integer> map = new TreeMap<>();
-		    notBias.forEach(c -> map.put((GraphConnections) c, valuesProvider.getValues(Util.getOppositeLayer(c, targetLayer), c).getElements().length));
-		    inputFunction = createInputFunction(map, valuesProvider, targetLayer);
+		    inputFunction = createInputFunction(notBias, valuesProvider, targetLayer);
 		}
 
 		inputFunction.calculate(notBias, valuesProvider, targetLayer);
@@ -99,10 +95,13 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator,
 		Util.fillArray(biasValue, 1);
 	    }
 
-	    float[] out = valuesProvider.getValues(bias.getOutputLayer(), bias).getElements();
-	    for (int i = 0; i < out.length; i++) {
-		GraphConnections gc = (GraphConnections) bias;
-		out[i] += gc.getConnectionGraph().getElements()[i / valuesProvider.getMiniBatchSize()];
+	    Matrix weights = ((FullyConnected) bias).getConnectionGraph();;
+	    Matrix output = valuesProvider.getValues(bias.getOutputLayer(), bias);
+	    TensorIterator it = output.iterator();
+
+	    while (it.hasNext()) {
+		int i = it.next();
+		output.getElements()[i] = weights.get(it.getCurrentPosition()[0], 0);
 	    }
 	}
     }
@@ -118,8 +117,8 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator,
 	}
     }
 
-    protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Integer> inputConnections, ValuesProvider valuesProvider, Layer targetLayer) {
-	return new AparapiWeightedSum(inputConnections, valuesProvider.getMiniBatchSize(), targetLayer);
+    protected ConnectionCalculator createInputFunction(List<Connections> inputConnections, ValuesProvider valuesProvider, Layer targetLayer) {
+	return new AparapiWeightedSum(inputConnections, valuesProvider, targetLayer);
     }
 
     public void addPreTransferFunction(TensorFunction function) {

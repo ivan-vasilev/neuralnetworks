@@ -157,6 +157,20 @@ public class Tensor implements Serializable {
         this.startOffset = startOffset;
     }
 
+    /**
+     * @return iterator over the indexes of the elements array
+     */
+    public TensorIterator iterator() {
+	return new TensorIterator(this);
+    }
+
+    /**
+     * @return bordered iterator over the indexes of the elements array
+     */
+    public TensorIterator iterator(int[][] limits) {
+	return new TensorIterator(this, limits);
+    }
+
     protected int getIndex(int... d) {
 	if (d == null || d.length == 0 || d.length > globalDimensions.length) {
 	    throw new IllegalArgumentException("Please provide indices");
@@ -179,17 +193,23 @@ public class Tensor implements Serializable {
     }
 
     /**
-     * @return iterator over the indexes of the elements array
+     * @param d - dimension
+     * @return the index of this dimension within the global dimensions
      */
-    public TensorIterator iterator() {
-	return new TensorIterator(this);
-    }
+    protected int getDimensionGlobalIndex(int d) {
+	int result = 0;
+	for (int i = 0, dim = 0; i < globalDimensions.length; i++) {
+	    if (globalDimensionsLimit[0][i] != globalDimensionsLimit[1][i]) {
+		if (dim == d) {
+		    result = i;
+		    break;
+		}
 
-    /**
-     * @return bordered iterator over the indexes of the elements array
-     */
-    public TensorIterator iterator(int[][] limits) {
-	return new TensorIterator(this, limits);
+		dim++;
+	    }
+	}
+
+	return result;
     }
 
     /**

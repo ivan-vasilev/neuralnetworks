@@ -1,8 +1,8 @@
 package com.github.neuralnetworks.calculation.neuronfunctions;
 
-import java.util.SortedMap;
+import java.util.List;
 
-import com.github.neuralnetworks.architecture.GraphConnections;
+import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.calculation.ValuesProvider;
@@ -15,25 +15,23 @@ public class AparapiReLU extends ConnectionCalculatorFullyConnected {
     private static final long serialVersionUID = -6602713983386107132L;
 
     @Override
-    protected ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Integer> inputConnections, ValuesProvider valuesProvider, Layer targetLayer) {
-	return new AparapiReLUFunction(inputConnections, valuesProvider.getMiniBatchSize(), targetLayer);
+    protected ConnectionCalculator createInputFunction(List<Connections> inputConnections, ValuesProvider valuesProvider, Layer targetLayer) {
+	return new AparapiReLUFunction(inputConnections, valuesProvider, targetLayer);
     }
 
     public static class AparapiReLUFunction extends AparapiWeightedSum {
 
-	public AparapiReLUFunction(SortedMap<GraphConnections, Integer> inputConnections, int miniBatchSize, Layer targetLayer) {
-	    super(inputConnections, miniBatchSize, targetLayer);
+	public AparapiReLUFunction(List<Connections> inputConnections, ValuesProvider valuesProvider, Layer targetLayer) {
+	    super(inputConnections, valuesProvider, targetLayer);
 	}
 
 	private static final long serialVersionUID = 2572354641295173835L;
 
 	@Override
 	protected void after() {
-	    int mb = miniBatchSize;
-	    int outputId = getGlobalId() * mb;
-	    
-	    for (int i = 0; i < mb; i++) {
-		output[outputId + i] = max(0, output[outputId + i]);
+	    int end = getGlobalId() * outputRowStep + miniBatchSize * outputColumnStep;
+	    for (int i = getGlobalId() * outputRowStep; i < end; i += outputColumnStep) {
+		output[i] = max(0, output[i]);
 	    }
 	}
     }

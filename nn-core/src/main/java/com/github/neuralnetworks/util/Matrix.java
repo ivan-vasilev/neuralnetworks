@@ -46,7 +46,7 @@ public class Matrix extends Tensor {
     }
 
     public int getColumnElementsDistance() {
-	return getDimensionElementsDistance(1);
+	return getDimensionElementsDistance(getDimensionGlobalIndex(1));
     }
 
     public int getRows() {
@@ -54,6 +54,6 @@ public class Matrix extends Tensor {
     }
 
     public int getRowElementsDistance() {
-	return getDimensionElementsDistance(0);
+	return getDimensionElementsDistance(getDimensionGlobalIndex(0));
     }
 }

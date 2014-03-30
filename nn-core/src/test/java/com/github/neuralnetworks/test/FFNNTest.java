@@ -26,6 +26,7 @@ import com.github.neuralnetworks.training.TrainerFactory;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationTrainer;
 import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.Matrix;
+import com.github.neuralnetworks.util.Tensor;
 import com.github.neuralnetworks.util.Util;
 
 /**
@@ -35,15 +36,18 @@ public class FFNNTest {
 
     @Test
     public void testWeightedSumFF() {
-	Environment.getInstance().setExecutionMode(EXECUTION_MODE.GPU);
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 
 	Matrix o = new Matrix(2, 2);
 
 	Layer il1 = new Layer();
 	Layer ol = new Layer();
 	Layer il2 = new Layer();
-	FullyConnected c1 = new FullyConnected(il1, ol, 3, 2);
-	FullyConnected c2 = new FullyConnected(il2, ol, 3, 2);
+
+	Tensor weights = new Tensor(2, 2, 3);
+
+	FullyConnected c1 = new FullyConnected(il1, ol, new Matrix(weights, new int[][]{{0, 0, 0}, {0, 1, 2}}));
+	FullyConnected c2 = new FullyConnected(il2, ol, new Matrix(weights, new int[][]{{1, 0, 0}, {1, 1, 2}}));
 	FullyConnected bc = new FullyConnected(new Layer(), ol, 1, 2);
 
 	Matrix cg = c1.getConnectionGraph();
@@ -62,7 +66,9 @@ public class FFNNTest {
 	cg.set(5, 1, 1);
 	cg.set(6, 1, 2);
 
-	Matrix i1 = new Matrix(3, 2);
+	Tensor t = new Tensor(2, 3, 2);
+
+	Matrix i1 = new Matrix(t, new int[][] { {0, 0, 0}, {0, 2, 1} });
 	i1.set(1, 0, 0);
 	i1.set(2, 1, 0);
 	i1.set(3, 2, 0);
@@ -70,7 +76,7 @@ public class FFNNTest {
 	i1.set(5, 1, 1);
 	i1.set(6, 2, 1);
 
-	Matrix i2 = new Matrix(3, 2);
+	Matrix i2 = new Matrix(t, new int[][] { {1, 0, 0}, {1, 2, 1} });
 	i2.set(1, 0, 0);
 	i2.set(2, 1, 0);
 	i2.set(3, 2, 0);
@@ -148,8 +154,10 @@ public class FFNNTest {
 	Layer il1 = new Layer();
 	Layer ol = new Layer();
 	Layer il2 = new Layer();
-	FullyConnected c1 = new FullyConnected(ol, il1, 2, 3);
-	FullyConnected c2 = new FullyConnected(ol, il2, 2, 3);
+
+	Tensor weights = new Tensor(2, 3, 2);
+	FullyConnected c1 = new FullyConnected(ol, il1, new Matrix(weights, new int[][]{{0, 0, 0}, {0, 2, 1}}));
+	FullyConnected c2 = new FullyConnected(ol, il2, new Matrix(weights, new int[][]{{1, 0, 0}, {1, 2, 1}}));
 	FullyConnected bc = new FullyConnected(new Layer(), ol, 1, 2);
 
 	Matrix cg = c1.getConnectionGraph();
@@ -168,7 +176,9 @@ public class FFNNTest {
 	cg.set(5, 1, 1);
 	cg.set(6, 2, 1);
 
-	Matrix i1 = new Matrix(3, 2);
+	Tensor t = new Tensor(2, 3, 2);
+
+	Matrix i1 = new Matrix(t, new int[][] { {0, 0, 0}, {0, 2, 1} });
 	i1.set(1, 0, 0);
 	i1.set(2, 1, 0);
 	i1.set(3, 2, 0);
@@ -176,7 +186,7 @@ public class FFNNTest {
 	i1.set(5, 1, 1);
 	i1.set(6, 2, 1);
 
-	Matrix i2 = new Matrix(3, 2);
+	Matrix i2 = new Matrix(t, new int[][] { {1, 0, 0}, {1, 2, 1} });
 	i2.set(1, 0, 0);
 	i2.set(2, 1, 0);
 	i2.set(3, 2, 0);
