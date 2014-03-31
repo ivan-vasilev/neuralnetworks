@@ -17,13 +17,11 @@ public class AparapiConv2DFF extends AparapiConv2D {
 
     @Override
     protected void conv(int weightsStartId, int inputStartId, int outputStartId) {
-	int id = getGlobalId();
-
 	// calculate sum based on feature map offsets and feature map weights
 	float sum = 0;
 
 	for (int i = 0; i < miniBatchSize; i++) {
-	    sum = output[id * miniBatchSize + i];
+	    sum = output[outputStartId + i * outputMiniBatchDistance];
 
 	    for (int j = 0; j < featureMapWeights; j++) {
 		sum += input[inputStartId + featureMapOffsets[i * featureMapWeights + j]] * weights[weightsStartId + j];

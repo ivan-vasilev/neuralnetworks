@@ -76,19 +76,17 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements BackP
 
     @Override
     protected void conv(int weightsStartId, int inputStartId, int outputStartId) {
-	int id = getGlobalId();
-
 	float activationDerivative = 0;
 	int inputId = 0;
 
-	for (int p = 0; p < miniBatchSize; p++) {
-	    activationDerivative = activationFunctionDerivative(output[id * miniBatchSize + p]);
-	    output[id * miniBatchSize + p] = activationDerivative;
+	for (int i = 0; i < miniBatchSize; i++) {
+	    activationDerivative = activationFunctionDerivative(output[outputStartId + i * outputMiniBatchDistance]);
+	    output[outputStartId + i * outputMiniBatchDistance] = activationDerivative;
 
-	    for (int i = 0; i < featureMapWeights; i++) {
-		inputId = (inputStartId + featureMapOffsets[i]) * miniBatchSize + p;
-		weightUpdates[weightsStartId + i] += activationDerivative * ffActivation[inputId];
-		input[inputId] += activationDerivative * weights[weightsStartId + i];
+	    for (int j = 0; j < featureMapWeights; j++) {
+		inputId = inputStartId + featureMapOffsets[i * featureMapWeights + j];
+		weightUpdates[weightsStartId + j] += activationDerivative * ffActivation[inputId];
+		input[inputId] += activationDerivative * weights[weightsStartId + j];
 	    }
 	}
     }

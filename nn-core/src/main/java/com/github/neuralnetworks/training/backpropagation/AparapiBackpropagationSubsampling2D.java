@@ -1,8 +1,5 @@
 package com.github.neuralnetworks.training.backpropagation;
 
-import java.util.List;
-
-import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Subsampling2DConnection;
 import com.github.neuralnetworks.calculation.ValuesProvider;
@@ -15,39 +12,15 @@ public class AparapiBackpropagationSubsampling2D extends AparapiSubsampling2D im
 
     private static final long serialVersionUID = -345286029645674230L;
 
-    public AparapiBackpropagationSubsampling2D(Subsampling2DConnection c, ValuesProvider valuesProvider, Layer targetLayer) {
+    public AparapiBackpropagationSubsampling2D(Subsampling2DConnection c, ValuesProvider valuesProvider, ValuesProvider activations, Layer targetLayer) {
 	super(c, valuesProvider, targetLayer);
+	ffActivation = activations.getValues(c.getInputLayer(), c).getElements();
     }
 
     /**
      * Activation of the output layer from the feedforward phase
      */
     protected float[] ffActivation;
-
-    /**
-     * activations from the feedforward phase
-     */
-    protected ValuesProvider activations;
-
-    @Override
-    public void calculate(List<Connections> connections, ValuesProvider valuesProvider, Layer targetLayer) {
-	if (connections.size() > 0) {
-	    Subsampling2DConnection c = (Subsampling2DConnection) connections.get(0);
-	    ffActivation = activations.getValues(c.getInputLayer(), c).getElements();
-	}
-
-	super.calculate(connections, valuesProvider, targetLayer);
-    }
-
-    @Override
-    public ValuesProvider getActivations() {
-        return activations;
-    }
-
-    @Override
-    public void setActivations(ValuesProvider activations) {
-        this.activations = activations;
-    }
 
     @Override
     public float getLearningRate() {
@@ -90,6 +63,17 @@ public class AparapiBackpropagationSubsampling2D extends AparapiSubsampling2D im
 
     @Override
     public void setL2weightDecay(float l2weightDecay) {
+	// UNUSED
+    }
+
+    @Override
+    public ValuesProvider getActivations() {
+	// UNUSED
+	return null;
+    }
+
+    @Override
+    public void setActivations(ValuesProvider activations) {
 	// UNUSED
     }
 }

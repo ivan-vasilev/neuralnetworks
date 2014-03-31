@@ -197,15 +197,18 @@ public class Tensor implements Serializable {
      * @return the index of this dimension within the global dimensions
      */
     protected int getDimensionGlobalIndex(int d) {
-	int result = 0;
-	for (int i = 0, dim = 0; i < globalDimensions.length; i++) {
-	    if (globalDimensionsLimit[0][i] != globalDimensionsLimit[1][i]) {
-		if (dim == d) {
-		    result = i;
-		    break;
-		}
+	int result = d;
 
-		dim++;
+	if (IntStream.range(0, globalDimensions.length).filter(i -> globalDimensionsLimit[1][i] - globalDimensionsLimit[0][i] != globalDimensions[i]).findAny().isPresent()) {
+	    for (int i = 0, dim = 0; i < globalDimensions.length; i++) {
+		if (globalDimensionsLimit[0][i] != globalDimensionsLimit[1][i]) {
+		    if (dim == d) {
+			result = i;
+			break;
+		    }
+
+		    dim++;
+		}
 	    }
 	}
 

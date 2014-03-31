@@ -25,9 +25,9 @@ public class BackPropagationFullyConnected extends BackPropagationConnectionCalc
     protected void addBackpropFunction(List<Connections> inputConnections, Map<Connections, BackPropagationConnectionCalculator> connectionCalculators, ValuesProvider valuesProvider, Layer targetLayer) {
 	for (Connections c : inputConnections) {
 	    if (Util.isBias(c.getInputLayer()) && targetLayer != c.getInputLayer()) {
-		connectionCalculators.put(c, new AparapiBackpropagationFullyConnected(Arrays.asList(new Connections[] {c}), valuesProvider, c.getInputLayer(), getLearningRate(), getMomentum(), getL1weightDecay(), getL2weightDecay()));
+		connectionCalculators.put(c, new AparapiBackpropagationFullyConnected(Arrays.asList(new Connections[] {c}), valuesProvider, activations, c.getInputLayer(), getLearningRate(), getMomentum(), getL1weightDecay(), getL2weightDecay()));
 	    } else {
-		connectionCalculators.put(c, new AparapiBackpropagationFullyConnected(Arrays.asList(new Connections[] {c}), valuesProvider, targetLayer, getLearningRate(), getMomentum(), getL1weightDecay(), getL2weightDecay()));
+		connectionCalculators.put(c, new AparapiBackpropagationFullyConnected(Arrays.asList(new Connections[] {c}), valuesProvider, activations, targetLayer, getLearningRate(), getMomentum(), getL1weightDecay(), getL2weightDecay()));
 	    }
 	}
     }

@@ -191,9 +191,7 @@ public class GeneralTest {
 	}
 
 	assertEquals(2, m.get(0, 1), 0);
-	assertEquals(2, m.get(1), 0);
 	assertEquals(6, m.get(0, 5), 0);
-	assertEquals(6, m.get(5), 0);
 
 	m = new Matrix(6, 1);
 	for (int i = 0; i < m.getElements().length; i++) {
@@ -201,9 +199,7 @@ public class GeneralTest {
 	}
 
 	assertEquals(2, m.get(1, 0), 0);
-	assertEquals(2, m.get(1), 0);
 	assertEquals(6, m.get(5, 0), 0);
-	assertEquals(6, m.get(5), 0);
 
 	// submatrix
 	Tensor t = new Tensor(5, 5, 5);

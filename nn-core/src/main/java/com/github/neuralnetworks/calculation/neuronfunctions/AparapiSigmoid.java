@@ -29,8 +29,8 @@ public class AparapiSigmoid extends ConnectionCalculatorFullyConnected {
 
 	@Override
 	protected void after() {
-	    int end = getGlobalId() * outputRowStep + miniBatchSize * outputColumnStep;
-	    for (int i = getGlobalId() * outputRowStep; i < end; i += outputColumnStep) {
+	    int end = outputStartPosition + getGlobalId() * outputRowStep + miniBatchSize * outputColumnStep;
+	    for (int i = outputStartPosition + getGlobalId() * outputRowStep; i < end; i += outputColumnStep) {
 		output[i] = 1 / (1 + exp(-output[i]));
 	    }
 	}

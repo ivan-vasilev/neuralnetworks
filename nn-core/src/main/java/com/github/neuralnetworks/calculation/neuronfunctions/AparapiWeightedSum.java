@@ -146,80 +146,12 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
 	});
     }
 
-//    public AparapiWeightedSum(int a, List<Connections> inputConnections, ValuesProvider valuesProvider, Layer targetLayer) {
-//	super();
-//
-//	this.miniBatchSize = valuesProvider.getMiniBatchSize();
-//	this.series = inputConnections.size();
-//	this.weightsSize = new int[series];
-//	this.inputStartPositions = new int[series];
-//	this.weightStartPositions = new int[series];
-//	this.weightsInitialStep = new int[series];
-//	this.weightSteps = new int[series];
-//
-//	int totalInputSize = 0, totalWeightSize = 0, i = 0;
-//	for (java.util.Map.Entry<GraphConnections, Integer> e : inputConnections.entrySet()) {
-//	    Matrix cg = e.getKey().getConnectionGraph();
-//
-//	    inputStartPositions[i] = totalInputSize;
-//	    totalInputSize += e.getValue();
-//	    weightStartPositions[i] = totalWeightSize;
-//	    totalWeightSize += e.getKey().getConnectionGraph().getElements().length;
-//
-//	    // depending on the direction of the calculation
-//	    if (e.getKey().getOutputLayer() == targetLayer) {
-//		weightsSize[i] = cg.getColumns();
-//		weightsInitialStep[i] = cg.getColumns();
-//		weightSteps[i] = 1;
-//	    } else {
-//		weightsSize[i] = cg.getRows();
-//		weightsInitialStep[i] = 1;
-//		weightSteps[i] = cg.getColumns();
-//	    }
-//
-//	    i++;
-//	}
-//
-//	if (inputConnections.size() == 1) {
-//	    java.util.Map.Entry<GraphConnections, Integer> e = inputConnections.entrySet().iterator().next();
-//	    this.weights = e.getKey().getConnectionGraph().getElements();
-//	} else {
-//	    weights = new float[totalWeightSize];
-//	    this.input = new float[totalInputSize];
-//
-//	    i = 0;
-//	    for (java.util.Map.Entry<GraphConnections, Integer> e : inputConnections.entrySet()) {
-//		System.arraycopy(e.getKey().getConnectionGraph().getElements(), 0, weights, weightStartPositions[i], e.getKey().getConnectionGraph().getElements().length);
-//		i++;
-//	    }
-//	}
-//    }
-
     @Override
     public void calculate(List<Connections> connections, ValuesProvider valuesProvider, Layer targetLayer) {
 	if (connections.size() > 0) {
 	    Environment.getInstance().getExecutionStrategy().execute(this, targetLayer.getUnitCount(connections));
 	}
     }
-
-    /**
-     * Combines all the inputConnections and initializes all the arrays based on
-     * the connections
-     */
-//    protected void init(List<Connections> inputConnections, ValuesProvider valuesProvider, Layer targetLayer) {
-//	//this.output = valuesProvider.getValues(targetLayer, inputConnections).getElements();
-//
-//	if (inputConnections.size() == 1) {
-//	    this.input = valuesProvider.getValues(Util.getOppositeLayer(inputConnections.get(0), targetLayer), inputConnections).getElements();
-//	} else {
-//	    int offset = 0;
-//	    for (Connections c: inputConnections) {
-//		float[] a = valuesProvider.getValues(Util.getOppositeLayer(c, targetLayer), c).getElements();
-//		System.arraycopy(a, 0, input, offset, a.length);
-//		offset += a.length;
-//	    }
-//	}
-//    };
 
     @Override
     public void run() {
@@ -231,7 +163,7 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
 	// each input example
 	for (int i = 0; i < miniBatchSize; i++) {
 	    // each connection (of the combined connections)
-	    value = output[id * outputRowStep + i * outputColumnStep];
+	    value = output[outputStartPosition + id * outputRowStep + i * outputColumnStep];
 	    for (int k = 0; k < series; k++) {
 		// each element in the row/column
 		inputStartPosition = inputStartPositions[k];
@@ -246,7 +178,7 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
 		}
 	    }
 
-	    output[id * outputRowStep + i * outputColumnStep] = value;
+	    output[outputStartPosition + id * outputRowStep + i * outputColumnStep] = value;
 	}
 
 	after();

@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.IntStream;
@@ -14,8 +15,10 @@ import com.github.neuralnetworks.architecture.Conv2DConnection;
 import com.github.neuralnetworks.architecture.FullyConnected;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Subsampling2DConnection;
+import com.github.neuralnetworks.calculation.LayerOrderStrategy.ConnectionCandidate;
 import com.github.neuralnetworks.util.Matrix;
 import com.github.neuralnetworks.util.Tensor;
+import com.github.neuralnetworks.util.UniqueList;
 
 /**
  * Provides Matrix instances for the layers of the network. It ensures that the
@@ -26,6 +29,7 @@ public class ValuesProvider implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private int miniBatchSize;
+    private LayerOrderStrategy layersOrder;
     private Map<Layer, Set<Tensor>> values;
 
     public ValuesProvider() {
@@ -89,6 +93,42 @@ public class ValuesProvider implements Serializable {
 	return (T) result;
     }
 
+    public int[] getUnitCount(Layer targetLayer, Connections c) {
+	Set<Connections> cs = new HashSet<>();
+	cs.add(c);
+	return getDataDimensions(targetLayer, cs);
+    }
+
+    public void addValues(Layer l, Tensor t) {
+	Set<Tensor> set = values.get(l);
+	if (set == null) {
+	    values.put(l, set = new HashSet<Tensor>());
+	} else {
+	    set.removeIf(o -> o.getSize() == t.getSize());
+	}
+
+	setMiniBatchSize(t.getDimensions()[t.getDimensions().length - 1]);
+	set.add(t);
+    }
+
+    public int getMiniBatchSize() {
+	if (miniBatchSize == 0) {
+	    values.values().forEach(v -> v.stream().filter(t -> miniBatchSize < t.getDimensions()[t.getDimensions().length - 1]).forEach(t -> miniBatchSize = t.getDimensions()[t.getDimensions().length - 1]));
+	}
+
+	return miniBatchSize;
+    }
+
+    public void setMiniBatchSize(int miniBatchSize) {
+	this.miniBatchSize = miniBatchSize;
+    }
+
+    protected void createValues() {
+	List<ConnectionCandidate> ccs = layersOrder.order();
+	List<Layer> layers = new UniqueList<>();
+	ccs.forEach(cc -> layers.add(cc.target));
+    }
+
     private int[] getDataDimensions(Layer targetLayer, Collection<Connections> connections) {
 	int[] result = null;
 	boolean hasFullyConnected = false, hasSubsampling = false, hasConvolutional = false;
@@ -125,35 +165,5 @@ public class ValuesProvider implements Serializable {
 	}
 
 	return result;
-    }
-
-    public int[] getUnitCount(Layer targetLayer, Connections c) {
-	Set<Connections> cs = new HashSet<>();
-	cs.add(c);
-	return getDataDimensions(targetLayer, cs);
-    }
-
-    public void addValues(Layer l, Tensor t) {
-	Set<Tensor> set = values.get(l);
-	if (set == null) {
-	    values.put(l, set = new HashSet<Tensor>());
-	} else {
-	    set.removeIf(o -> o.getSize() == t.getSize());
-	}
-
-	setMiniBatchSize(t.getDimensions()[t.getDimensions().length - 1]);
-	set.add(t);
-    }
-
-    public int getMiniBatchSize() {
-	if (miniBatchSize == 0) {
-	    values.values().forEach(v -> v.stream().filter(t -> miniBatchSize < t.getDimensions()[t.getDimensions().length - 1]).forEach(t -> miniBatchSize = t.getDimensions()[t.getDimensions().length - 1]));
-	}
-
-	return miniBatchSize;
-    }
-
-    public void setMiniBatchSize(int miniBatchSize) {
-	this.miniBatchSize = miniBatchSize;
     }
 }

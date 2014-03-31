@@ -30,13 +30,10 @@ public class AparapiBackpropagationFullyConnected extends AparapiWeightedSum imp
     protected final float l1weightDecay;
     protected final float l2weightDecay;
 
-    /**
-     * activations from the feedforward phase
-     */
-    protected ValuesProvider activations;
-
-    public AparapiBackpropagationFullyConnected(List<Connections> inputConnections, ValuesProvider valuesProvider, Layer targetLayer, float learningRate, float momentum, float l1weightDecay, float l2weightDecay) {
+    public AparapiBackpropagationFullyConnected(List<Connections> inputConnections, ValuesProvider valuesProvider, ValuesProvider activations, Layer targetLayer, float learningRate, float momentum, float l1weightDecay, float l2weightDecay) {
 	super(inputConnections, valuesProvider, targetLayer);
+
+	this.ffActivation = activations.getValues(targetLayer, inputConnections).getElements();
 	this.learningRate = momentum;
 	this.momentum = momentum;
 	this.l1weightDecay = l1weightDecay;
@@ -45,48 +42,60 @@ public class AparapiBackpropagationFullyConnected extends AparapiWeightedSum imp
     }
 
     @Override
-    public void calculate(List<Connections> inputConnections, ValuesProvider valuesProvider, Layer targetLayer) {
-	if (ffActivation != activations.getValues(targetLayer, inputConnections).getElements()) {
-	    ffActivation = activations.getValues(targetLayer, inputConnections).getElements();
-	}
-
-	super.calculate(inputConnections, valuesProvider, targetLayer);
-    }
-
-//    @Override
-//    protected void init(List<Connections> inputConnections, ValuesProvider valuesProvider, Layer targetLayer) {
-//	super.init(inputConnections, valuesProvider, targetLayer);
-//	if (ffActivation != activations.getValues(targetLayer, inputConnections).getElements()) {
-//	    ffActivation = activations.getValues(targetLayer, inputConnections).getElements();
-//	}
-//    }
-
-    @Override
     protected void after() {
-	final int row = getGlobalId() * miniBatchSize;
-	float lr = learningRate;
-	float weight = 0, weightUpdate = 0;
-	int inputStartPosition = 0, initialWeightIndex = 0, weightStep = 0, dim = 0, weightIndex = 0;
+	int id = getGlobalId();
 
-	for (int i = 0; i < series; i++) {
-	    inputStartPosition = inputStartPositions[i];
-	    initialWeightIndex = weightStartPositions[i] + weightsInitialStep[i] * getGlobalId();
-	    weightStep = weightsStep[i];
-	    dim = weightsSize[i];
+	int inputStartPosition = 0, inputRowsStep = 0, inputColumnsStep = 0, weightStartPosition = 0, weightStep = 0, dim = 0, weightIndex = 0;
+	float weight = 0, weightUpdate = 0, lr = learningRate;
+
+	// each input example
+	for (int k = 0; k < series; k++) {
+	    // each element in the row/column
+	    inputStartPosition = inputStartPositions[k];
+	    inputRowsStep = inputRowSteps[k];
+	    inputColumnsStep = inputColumnSteps[k];
+	    weightStartPosition = weightStartPositions[k] + weightsInitialStep[k] * id;
+	    weightStep = weightsStep[k];
+	    dim = weightsSize[k];
 
 	    for (int j = 0; j < dim; j++) {
 		weightUpdate = 0;
-		for (int column = 0; column < miniBatchSize; column++) {
-		    weightUpdate += input[inputStartPosition + j * miniBatchSize + column] * ffActivation[row + column];
+		for (int i = 0; i < miniBatchSize; i++) {
+		    weightUpdate += input[inputStartPosition + j * inputRowsStep + i * inputColumnsStep] * ffActivation[outputStartPosition + id * outputRowStep + i * outputColumnStep];
 		}
 
-		weightIndex = initialWeightIndex + j * weightStep;
+		weightIndex = weightStartPosition + j * weightStep;
 		weight = weights[weightIndex];
 		weightUpdate = lr * weightUpdate + momentum * weightUpdates[weightIndex] - l1weightDecay * abs(weight) - l2weightDecay * weight * weight / 2;
 		weights[weightIndex] += weightUpdate;
 		weightUpdates[weightIndex] = weightUpdate;
 	    }
 	}
+//
+//	final int row = getGlobalId() * miniBatchSize;
+//	float lr = learningRate;
+//	float weight = 0, weightUpdate = 0;
+//	int inputStartPosition = 0, initialWeightIndex = 0, weightStep = 0, dim = 0, weightIndex = 0;
+//
+//	for (int i = 0; i < series; i++) {
+//	    inputStartPosition = inputStartPositions[i];
+//	    initialWeightIndex = weightStartPositions[i] + weightsInitialStep[i] * getGlobalId();
+//	    weightStep = weightsStep[i];
+//	    dim = weightsSize[i];
+//
+//	    for (int j = 0; j < dim; j++) {
+//		weightUpdate = 0;
+//		for (int column = 0; column < miniBatchSize; column++) {
+//		    weightUpdate += input[inputStartPosition + j * miniBatchSize + column] * ffActivation[row + column];
+//		}
+//
+//		weightIndex = initialWeightIndex + j * weightStep;
+//		weight = weights[weightIndex];
+//		weightUpdate = lr * weightUpdate + momentum * weightUpdates[weightIndex] - l1weightDecay * abs(weight) - l2weightDecay * weight * weight / 2;
+//		weights[weightIndex] += weightUpdate;
+//		weightUpdates[weightIndex] = weightUpdate;
+//	    }
+//	}
 
 	calcDerivative();
     }
@@ -136,11 +145,10 @@ public class AparapiBackpropagationFullyConnected extends AparapiWeightedSum imp
 
     @Override
     public ValuesProvider getActivations() {
-	return activations;
+	return null;
     }
 
     @Override
     public void setActivations(ValuesProvider activations) {
-	this.activations = activations;
     }
 }

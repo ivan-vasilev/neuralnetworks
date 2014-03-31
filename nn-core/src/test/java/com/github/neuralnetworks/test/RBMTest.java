@@ -197,6 +197,8 @@ public class RBMTest {
 
     @Test
     public void testOneStepContrastiveDivergence() {
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
+
 	RBM rbm = NNFactory.rbm(3, 2, true);
 
 	Matrix cg1 = rbm.getMainConnections().getConnectionGraph();
@@ -218,8 +220,6 @@ public class RBMTest {
 
 	AparapiCDTrainer t = TrainerFactory.cdSigmoidTrainer(rbm, new SimpleInputProvider(new Matrix(new float[][] { { 1, 0, 1 } }), null, 1, 1), null, null, null, 1f, 0f, 0f, 0f, 1, true);
 	t.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
-
-	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 
 	t.train();
 

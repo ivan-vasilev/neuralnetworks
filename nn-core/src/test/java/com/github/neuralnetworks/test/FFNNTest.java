@@ -260,6 +260,7 @@ public class FFNNTest {
      */
     @Test
     public void testSigmoidBP() {
+	//Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 2, 2, 1 }, false);
 
 	FullyConnected c1 = (FullyConnected) mlp.getInputLayer().getConnections().iterator().next();
@@ -290,7 +291,7 @@ public class FFNNTest {
      */
     @Test
     public void testSigmoidBP2() {
-	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
+	//Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 3, 2, 1 }, true);
 
 	List<Connections> c = mlp.getConnections();

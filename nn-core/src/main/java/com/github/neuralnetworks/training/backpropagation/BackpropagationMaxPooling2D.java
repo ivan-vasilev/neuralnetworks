@@ -20,8 +20,7 @@ public class BackpropagationMaxPooling2D implements BackPropagationConnectionCal
     @Override
     public void calculate(List<Connections> connections, ValuesProvider valuesProvider, Layer targetLayer) {
 	if (cc == null) {
-	    cc = new BackpropagationMaxPooling2DCC((Subsampling2DConnection) connections.get(0), valuesProvider, targetLayer);
-	    cc.setActivations(activations);
+	    cc = new BackpropagationMaxPooling2DCC((Subsampling2DConnection) connections.get(0), valuesProvider, activations, targetLayer);
 	}
 
 	cc.calculate(connections, valuesProvider, targetLayer);
@@ -74,17 +73,14 @@ public class BackpropagationMaxPooling2D implements BackPropagationConnectionCal
     @Override
     public void setActivations(ValuesProvider activations) {
 	this.activations = activations;
-	if (cc != null) {
-	    cc.setActivations(activations);
-	}
     }
 
     public static class BackpropagationMaxPooling2DCC extends AparapiBackpropagationSubsampling2D {
 
 	private static final long serialVersionUID = -8888670594631428090L;
 
-	public BackpropagationMaxPooling2DCC(Subsampling2DConnection c, ValuesProvider valuesProvider, Layer targetLayer) {
-	    super(c, valuesProvider, targetLayer);
+	public BackpropagationMaxPooling2DCC(Subsampling2DConnection c, ValuesProvider valuesProvider, ValuesProvider activations, Layer targetLayer) {
+	    super(c, valuesProvider, activations, targetLayer);
 	}
 
 	@Override

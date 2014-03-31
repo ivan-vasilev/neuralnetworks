@@ -102,17 +102,6 @@ public abstract class AparapiConv2D extends Kernel implements Serializable {
 	this.featureMapWeights = c.getKernelColumns() * c.getKernelRows() * c.getInputFilters();
 	this.featureMapOffsets = new int[featureMapWeights * miniBatchSize];
 
-	//	this.featureMapOffsets = new int[featureMapWeights];
-//
-//	for (int m = 0, i = 0; m < miniBatchSize; m++) {
-//	    for (int j = 0; j < subsamplingRows; j++) {
-//		for (int k = 0; k < subsamplingCols; k++, i++) {
-//		    featureMapOffsets[i] = j * inputFeatureMapRowsDistance + k * inputFeatureMapColumnsDistance + m * inputMiniBatchDistance;
-//		}
-//	    }
-//	}
-
-
 	int inputMiniBatchDistance = input.getDimensionElementsDistance(3);
 	int inputFeatureMapsDistance =  input.getDimensionElementsDistance(0);
 
