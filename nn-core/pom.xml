@@ -20,7 +20,9 @@
 			<groupId>com.amd</groupId>
 			<artifactId>aparapi</artifactId>
 			<version>2013_01_23</version>
-		</dependency>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/aparapi.jar</systemPath>
+        </dependency>
 
 		<dependency>
 			<groupId>org.uncommons.maths</groupId>
