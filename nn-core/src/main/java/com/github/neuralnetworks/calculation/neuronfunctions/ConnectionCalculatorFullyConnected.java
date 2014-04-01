@@ -1,7 +1,9 @@
 package com.github.neuralnetworks.calculation.neuronfunctions;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.FullyConnected;
@@ -34,7 +36,7 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator,
 
     private static final long serialVersionUID = -5405654469496055017L;
 
-    protected ConnectionCalculator inputFunction;
+    protected Set<ConnectionCalculator> inputFunctions;
     protected int miniBatchSize;
 
     /**
@@ -49,6 +51,7 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator,
 
     public ConnectionCalculatorFullyConnected() {
 	super();
+	inputFunctions = new HashSet<>();
     }
 
     @Override
@@ -73,35 +76,11 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator,
 
 		calculateBias(bias, valuesProvider);
 
-		// new input function is required
-		if (inputFunction == null || miniBatchSize != valuesProvider.getMiniBatchSize()) {
-		    miniBatchSize = valuesProvider.getMiniBatchSize();
-		    inputFunction = createInputFunction(notBias, valuesProvider, targetLayer);
-		}
-
-		inputFunction.calculate(notBias, valuesProvider, targetLayer);
+		getConnectionCalculator(notBias, valuesProvider, targetLayer).calculate(notBias, valuesProvider, targetLayer);
 
 		if (activationFunctions != null) {
 		    activationFunctions.forEach(f -> f.value(valuesProvider.getValues(targetLayer, notBias)));
 		}
-	    }
-	}
-    }
-
-    protected void calculateBias(Connections bias, ValuesProvider valuesProvider) {
-	if (bias != null) {
-	    float[] biasValue = valuesProvider.getValues(bias.getInputLayer(), bias).getElements();
-	    if (biasValue[0] == 0) {
-		Util.fillArray(biasValue, 1);
-	    }
-
-	    Matrix weights = ((FullyConnected) bias).getConnectionGraph();;
-	    Matrix output = valuesProvider.getValues(bias.getOutputLayer(), bias);
-	    TensorIterator it = output.iterator();
-
-	    while (it.hasNext()) {
-		int i = it.next();
-		output.getElements()[i] = weights.get(it.getCurrentPosition()[0], 0);
 	    }
 	}
     }
@@ -115,10 +94,6 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator,
 	if (activationFunctions != null) {
 	    activationFunctions.stream().filter(f -> f instanceof PropagationEventListener).forEach(f -> ((PropagationEventListener) f).handleEvent(event));
 	}
-    }
-
-    protected ConnectionCalculator createInputFunction(List<Connections> inputConnections, ValuesProvider valuesProvider, Layer targetLayer) {
-	return new AparapiWeightedSum(inputConnections, valuesProvider, targetLayer);
     }
 
     public void addPreTransferFunction(TensorFunction function) {
@@ -149,11 +124,34 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator,
 	}
     }
 
-    public ConnectionCalculator getInputFunction() {
-	return inputFunction;
+    protected void calculateBias(Connections bias, ValuesProvider valuesProvider) {
+	if (bias != null) {
+	    float[] biasValue = valuesProvider.getValues(bias.getInputLayer(), bias).getElements();
+	    if (biasValue[0] == 0) {
+		Util.fillArray(biasValue, 1);
+	    }
+
+	    Matrix weights = ((FullyConnected) bias).getConnectionGraph();;
+	    Matrix output = valuesProvider.getValues(bias.getOutputLayer(), bias);
+	    TensorIterator it = output.iterator();
+
+	    while (it.hasNext()) {
+		int i = it.next();
+		output.getElements()[i] = weights.get(it.getCurrentPosition()[0], 0);
+	    }
+	}
     }
 
-    public void setInputFunction(ConnectionCalculator inputFunction) {
-	this.inputFunction = inputFunction;
+    protected ConnectionCalculator createInputFunction(List<Connections> inputConnections, ValuesProvider valuesProvider, Layer targetLayer) {
+	return new AparapiWeightedSum(inputConnections, valuesProvider, targetLayer);
+    }
+
+    private ConnectionCalculator getConnectionCalculator(List<Connections> connections, ValuesProvider valuesProvider, Layer targetLayer) {
+	ConnectionCalculator result = inputFunctions.stream().filter(c -> {
+	    return !(c instanceof AparapiWeightedSum) || ((AparapiWeightedSum) c).accept(connections, valuesProvider, targetLayer);
+	}).findFirst().orElse(createInputFunction(connections, valuesProvider, targetLayer));
+	inputFunctions.add(result);
+
+	return result;
     }
 }

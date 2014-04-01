@@ -148,9 +148,31 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
 
     @Override
     public void calculate(List<Connections> connections, ValuesProvider valuesProvider, Layer targetLayer) {
-	if (connections.size() > 0) {
+	if (accept(connections, valuesProvider, targetLayer)) {
 	    Environment.getInstance().getExecutionStrategy().execute(this, targetLayer.getUnitCount(connections));
+	} else {
+	    throw new IllegalArgumentException("A parameter does not match");
 	}
+    }
+
+    public boolean accept(List<Connections> connections, ValuesProvider valuesProvider, Layer targetLayer) {
+	if (valuesProvider.getMiniBatchSize() != miniBatchSize) {
+	    return false;
+	}
+
+	if (valuesProvider.getValues(targetLayer, connections).getElements() != output) {
+	    return false;
+	}
+
+	if (connections.size() != series || connections.size() == 0) {
+	    return false;
+	}
+
+	if (connections.stream().filter(c -> (valuesProvider.getValues(Util.getOppositeLayer(c, targetLayer), c).getElements() != input)).findAny().isPresent()) {
+	    return false;
+	}
+
+	return true;
     }
 
     @Override
