@@ -1,5 +1,6 @@
 package com.github.neuralnetworks.util;
 
+import java.util.Arrays;
 import java.util.stream.IntStream;
 
 public class TensorFactory {
@@ -56,6 +57,33 @@ public class TensorFactory {
      */
     public static <T extends Tensor> T tensor(Tensor copy) {
 	return tensor(copy.getDimensions());
+    }
+
+    /**
+     * Create multiple combined tensors using shared elements array
+     * @param dimensions - dimensions for each tensor
+     * @return array of tensors
+     */
+    public static Tensor[] tensor(int[]... dimensions) {
+	Tensor[] result = new Tensor[dimensions.length];
+	float[] elements = new float[Arrays.stream(dimensions).map(d -> {
+	    return IntStream.of(d).reduce(1, (a, b) -> a * b);
+	}).reduce(0, (a, b) -> a + b)];
+
+	for (int i = 0, offset = 0; i < dimensions.length; i++) {
+	    int[] d = dimensions[i];
+	    int[][] dimensionsLimit = new int[2][d.length];
+	    IntStream.range(0, d.length).forEach(j -> dimensionsLimit[1][j] = d[j] - 1);
+	    if (d.length == 2) {
+		result[i] = new Matrix(offset, elements, d, dimensionsLimit);
+	    } else {
+		result[i] = new Tensor(offset, elements, d, dimensionsLimit);
+	    }
+
+	    offset += IntStream.of(d).reduce(1, (a, b) -> a * b);
+	}
+
+	return result;
     }
 
     /**

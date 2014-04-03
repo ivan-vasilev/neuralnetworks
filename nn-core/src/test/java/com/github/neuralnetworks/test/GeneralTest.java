@@ -166,6 +166,16 @@ public class GeneralTest {
 	assertEquals(101, t2.get(1, 0, 0), 0);
 	assertEquals(106, t2.get(1, 1, 0), 0);
 	assertEquals(112, t2.get(1, 2, 1), 0);
+
+	Tensor[] tarr = TensorFactory.tensor(new int[] {2, 2, 2}, new int[] {3, 3});
+	assertEquals(17, tarr[0].getElements().length, 0);
+	assertEquals(0, tarr[0].getStartOffset(), 0);
+	assertEquals(8, tarr[1].getStartOffset(), 0);
+	assertTrue(tarr[1] instanceof Matrix);
+
+	IntStream.range(0, tarr[0].getElements().length).forEach(i -> tarr[0].getElements()[i] = i + 1);
+	assertEquals(7, tarr[0].get(1, 1, 0), 0);
+	assertEquals(13, tarr[1].get(1, 1), 0);
     }
 
     @Test
