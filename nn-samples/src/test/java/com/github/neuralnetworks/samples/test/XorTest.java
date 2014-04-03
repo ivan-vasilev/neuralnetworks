@@ -1,9 +1,5 @@
 package com.github.neuralnetworks.samples.test;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
-
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.samples.xor.XorInputProvider;
@@ -14,6 +10,9 @@ import com.github.neuralnetworks.training.events.EarlyStoppingListener;
 import com.github.neuralnetworks.training.events.LogTrainingListener;
 import com.github.neuralnetworks.training.random.MersenneTwisterRandomInitializer;
 import com.github.neuralnetworks.training.random.NNRandomInitializer;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class XorTest {
 
