@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
+import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 
 /**
  * Implementations of this interface calculate a single connection between layers

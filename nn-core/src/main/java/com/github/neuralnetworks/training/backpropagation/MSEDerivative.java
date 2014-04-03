@@ -3,8 +3,8 @@ package com.github.neuralnetworks.training.backpropagation;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import com.github.neuralnetworks.util.Matrix;
 import com.github.neuralnetworks.util.Tensor;
+import com.github.neuralnetworks.util.TensorFactory;
 
 /**
  * Mean squared error derivative
@@ -22,7 +22,7 @@ public class MSEDerivative implements OutputErrorDerivative {
 	}
 
 	if (result == null || result.getElements().length != activation.getElements().length) {
-	    result = activation.getDimensions().length == 2 ? new Matrix(activation.getDimensions()[0], activation.getDimensions()[1]) : new Tensor(activation.getDimensions());
+	    result = TensorFactory.tensor(activation.getDimensions());
 	}
 
 	Iterator<Integer> activationIt = activation.iterator();

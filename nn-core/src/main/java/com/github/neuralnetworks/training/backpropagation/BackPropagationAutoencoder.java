@@ -4,6 +4,7 @@ import com.github.neuralnetworks.architecture.types.Autoencoder;
 import com.github.neuralnetworks.training.TrainingInputData;
 import com.github.neuralnetworks.util.Properties;
 import com.github.neuralnetworks.util.Tensor;
+import com.github.neuralnetworks.util.TensorFactory;
 
 /**
  * BackPropagation for autoencoders (input and target are the same). Supports
@@ -55,7 +56,7 @@ public class BackPropagationAutoencoder extends BackPropagationTrainer<Autoencod
 	public void setInputOutput(Tensor inputOutput) {
 	    this.input = inputOutput;
 	    if (target == null || target.getElements().length != input.getElements().length) {
-		target = new Tensor(input.getDimensions());
+		target = TensorFactory.tensor(input.getDimensions());
 	    }
 
 	    System.arraycopy(input.getElements(), 0, target.getElements(), 0, target.getElements().length);

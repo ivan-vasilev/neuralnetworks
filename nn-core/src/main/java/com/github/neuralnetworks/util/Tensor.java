@@ -43,42 +43,6 @@ public class Tensor implements Serializable {
      */
     protected int[] dimTmp;
 
-    public Tensor(int... dimensions) {
-	if (dimensions == null || dimensions.length == 0) {
-	    throw new IllegalArgumentException("Please provide dimensions");
-	}
-
-	this.globalDimensions = this.dimensions = dimensions;
-	this.globalDimensionsLimit = new int[2][dimensions.length];
-	this.dimTmp = new int[globalDimensions.length];
-	this.elements = new float[IntStream.of(dimensions).reduce(1, (a, b) -> a * b)];
-	this.dimMultiplicators = new int[dimensions.length];
-
-	IntStream.range(0, dimensions.length).forEach(i -> {
-	    globalDimensionsLimit[1][i] = dimensions[i] - 1;
-	    dimMultiplicators[i] = 1;
-	    Arrays.stream(dimensions).skip(i + 1).limit(dimensions.length).forEach(j -> dimMultiplicators[i] *= j);
-	});
-    }
-
-    public Tensor(float[] elements, int... dimensions) {
-	if (dimensions == null || dimensions.length == 0) {
-	    throw new IllegalArgumentException("Please provide dimensions");
-	}
-
-	this.globalDimensions = this.dimensions = dimensions;
-	this.globalDimensionsLimit = new int[2][dimensions.length];
-	this.dimTmp = new int[globalDimensions.length];
-	this.elements = elements;
-
-	dimMultiplicators = new int[dimensions.length];
-	IntStream.range(0, dimMultiplicators.length).forEach(i -> {
-	    globalDimensionsLimit[1][i] = dimensions[i] - 1;
-	    dimMultiplicators[i] = 1;
-	    Arrays.stream(dimensions).skip(i + 1).limit(dimensions.length).forEach(j -> dimMultiplicators[i] *= j);
-	});
-    }
-
     public Tensor(Tensor parent, int[][] dimensionsLimit) {
 	this.globalDimensions = parent.globalDimensions;
 	this.elements = parent.elements;
@@ -92,6 +56,34 @@ public class Tensor implements Serializable {
 		dimensions[j++] = dimensionsLimit[1][i] - dimensionsLimit[0][i] + 1;
 	    }
 	}
+    }
+
+    public Tensor(int startOffset, float[] elements, int[] globalDimensions, int[][] globalDimensionsLimit) {
+	super();
+
+	if (globalDimensions == null || globalDimensions.length == 0) {
+	    throw new IllegalArgumentException("Please provide dimensions");
+	}
+
+	this.startOffset = startOffset;
+	this.elements = elements;
+	this.globalDimensions = globalDimensions;
+	this.globalDimensionsLimit = globalDimensionsLimit;
+	this.dimTmp = new int[globalDimensions.length];
+
+	this.dimensions = new int[(int) IntStream.range(0, globalDimensions.length).filter(i -> globalDimensionsLimit[0][i] != globalDimensionsLimit[1][i] || globalDimensionsLimit[1][i] - globalDimensionsLimit[0][i] + 1 == globalDimensions[i]).count()];
+	for (int i = 0, j = 0; i < globalDimensions.length; i++) {
+	    if (globalDimensionsLimit[0][i] != globalDimensionsLimit[1][i] || globalDimensionsLimit[1][i] - globalDimensionsLimit[0][i] + 1 == globalDimensions[i]) {
+		dimensions[j++] = globalDimensionsLimit[1][i] - globalDimensionsLimit[0][i] + 1;
+	    }
+	}
+
+	this.dimMultiplicators = new int[dimensions.length];
+	IntStream.range(0, dimMultiplicators.length).forEach(i -> {
+	    globalDimensionsLimit[1][i] = dimensions[i] - 1;
+	    dimMultiplicators[i] = 1;
+	    Arrays.stream(dimensions).skip(i + 1).limit(dimensions.length).forEach(j -> dimMultiplicators[i] *= j);
+	});
     }
 
     public float get(int... d) {

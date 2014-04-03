@@ -1,6 +1,7 @@
 package com.github.neuralnetworks.architecture;
 
 import com.github.neuralnetworks.util.Tensor;
+import com.github.neuralnetworks.util.TensorFactory;
 
 /**
  * Convolutional connection between layers (for 2d input data)
@@ -22,7 +23,7 @@ public class Conv2DConnection extends ConnectionsImpl {
 	this.inputFeatureMapColumns = inputFeatureMapColumns;
 	this.inputFeatureMapRows = inputFeatureMapRows;
 	this.stride = stride;
-	this.wights = new Tensor(outputFilters, inputFilters, kernelRows, kernelColumns);
+	this.wights = TensorFactory.tensor(outputFilters, inputFilters, kernelRows, kernelColumns);
     }
 
     public Tensor getWeights() {

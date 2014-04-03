@@ -1,7 +1,7 @@
 package com.github.neuralnetworks.training.backpropagation;
 
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
-import com.github.neuralnetworks.calculation.ValuesProvider;
+import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 
 public interface BackPropagationConnectionCalculator extends ConnectionCalculator {
 

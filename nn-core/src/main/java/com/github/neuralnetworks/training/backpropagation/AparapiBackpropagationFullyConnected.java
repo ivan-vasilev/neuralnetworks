@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.calculation.ValuesProvider;
+import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSum;
 
 /**

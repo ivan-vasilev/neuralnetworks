@@ -13,13 +13,14 @@ import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.architecture.types.NNFactory;
-import com.github.neuralnetworks.calculation.ValuesProvider;
+import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.calculation.neuronfunctions.SoftmaxFunction;
 import com.github.neuralnetworks.training.random.MersenneTwisterRandomInitializer;
 import com.github.neuralnetworks.training.random.NNRandomInitializer;
 import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.Matrix;
 import com.github.neuralnetworks.util.Tensor;
+import com.github.neuralnetworks.util.TensorFactory;
 import com.github.neuralnetworks.util.Util;
 
 public class GeneralTest {
@@ -38,10 +39,10 @@ public class GeneralTest {
 	NNFactory.addFullyConnectedLayer(nn, h, 2, 3, true);
 	NNFactory.addFullyConnectedLayer(nn, o, 4, 1, true);
 
-	Matrix im = new Matrix(2, 2);
+	Matrix im = TensorFactory.tensor(2, 2);
 	vp.addValues(i, im);
 	Matrix hm1 = vp.getValues(h, 3, 2);
-	Matrix hm2 = new Matrix(4, 2);
+	Matrix hm2 = TensorFactory.tensor(4, 2);
 	vp.addValues(h, hm2);
 
 	Tensor om = vp.getValues(o);
@@ -97,9 +98,9 @@ public class GeneralTest {
 
     @Test
     public void testSoftMax() {
-	Tensor t = new Tensor(5, 4, 2);
+	Tensor t = TensorFactory.tensor(5, 4, 2);
 	IntStream.range(0, t.getElements().length).forEach(i -> t.getElements()[i] = i + 1);
-	Matrix m = new Matrix(t, new int[][] { { 1, 1, 1 }, { 3, 2, 1 } });
+	Matrix m = TensorFactory.tensor(t, new int[][] { { 1, 1, 1 }, { 3, 2, 1 } });
 	m.set(1, 0, 0);
 	m.set(2, 1, 0);
 	m.set(3, 2, 0);
@@ -121,7 +122,7 @@ public class GeneralTest {
 
     @Test
     public void testTensor() {
-	Tensor t = new Tensor(2, 2, 2);
+	Tensor t = TensorFactory.tensor(2, 2, 2);
 	float[] elements = t.getElements();
 
 	assertEquals(8, elements.length, 0);
@@ -141,7 +142,7 @@ public class GeneralTest {
 	    assertEquals(i + 1, elements[it.next()], 0);
 	}
 	
-	t = new Tensor(5, 5, 5);
+	t = TensorFactory.tensor(5, 5, 5);
 	assertEquals(25, t.getDimensionElementsDistance(0), 0);
 	assertEquals(5, t.getDimensionElementsDistance(1), 0);
 	assertEquals(1, t.getDimensionElementsDistance(2), 0);
@@ -152,7 +153,7 @@ public class GeneralTest {
 	    elements[i] = i + 1;
 	}
 
-	Tensor t2 = new Tensor(t, new int[][] { { 3, 0, 0 }, { 4, 4, 4 } });
+	Tensor t2 = TensorFactory.tensor(t, new int[][] { { 3, 0, 0 }, { 4, 4, 4 } });
 	assertEquals(75, t2.getStartIndex(), 0);
 	assertEquals(124, t2.getEndIndex(), 0);
 	assertEquals(25, t2.getDimensionElementsDistance(0), 0);
@@ -169,7 +170,7 @@ public class GeneralTest {
 
     @Test
     public void testMatrix() {
-	Matrix m = new Matrix(5, 6);
+	Matrix m = TensorFactory.tensor(5, 6);
 
 	assertEquals(5, m.getRows(), 0);
 	assertEquals(6, m.getColumns(), 0);
@@ -185,7 +186,7 @@ public class GeneralTest {
 	assertEquals(2, m.get(0, 1), 0);
 	assertEquals(15, m.get(2, 2), 0);
 
-	m = new Matrix(1, 6);
+	m = TensorFactory.tensor(1, 6);
 	for (int i = 0; i < m.getElements().length; i++) {
 	    m.getElements()[i] = i + 1;
 	}
@@ -193,7 +194,7 @@ public class GeneralTest {
 	assertEquals(2, m.get(0, 1), 0);
 	assertEquals(6, m.get(0, 5), 0);
 
-	m = new Matrix(6, 1);
+	m = TensorFactory.tensor(6, 1);
 	for (int i = 0; i < m.getElements().length; i++) {
 	    m.getElements()[i] = i + 1;
 	}
@@ -202,26 +203,26 @@ public class GeneralTest {
 	assertEquals(6, m.get(5, 0), 0);
 
 	// submatrix
-	Tensor t = new Tensor(5, 5, 5);
+	Tensor t = TensorFactory.tensor(5, 5, 5);
 	float[] elements = t.getElements();
 
 	for (int i = 0; i < elements.length; i++) {
 	    elements[i] = i + 1;
 	}
 
-	m = new Matrix(t, new int[][] { {1, 0, 0}, {1, 4, 4} });
+	m = TensorFactory.tensor(t, new int[][] { {1, 0, 0}, {1, 4, 4} });
 	assertEquals(26, m.get(0, 0), 0);
 	assertEquals(27, m.get(0, 1), 0);
 	assertEquals(36, m.get(2, 0), 0);
 	assertEquals(38, m.get(2, 2), 0);
 
-	m = new Matrix(t, new int[][] { {1, 0, 0}, {1, 4, 4} });
+	m = TensorFactory.tensor(t, new int[][] { {1, 0, 0}, {1, 4, 4} });
 	assertEquals(26, m.get(0, 0), 0);
 	assertEquals(27, m.get(0, 1), 0);
 	assertEquals(36, m.get(2, 0), 0);
 	assertEquals(38, m.get(2, 2), 0);
 
-	m = new Matrix(t, new int[][] { {0, 0, 1}, {4, 4, 1} });
+	m = TensorFactory.tensor(t, new int[][] { {0, 0, 1}, {4, 4, 1} });
 	assertEquals(2, m.get(0, 0), 0);
 	assertEquals(7, m.get(0, 1), 0);
 	assertEquals(12, m.get(0, 2), 0);
@@ -229,7 +230,7 @@ public class GeneralTest {
 	assertEquals(32, m.get(1, 1), 0);
 	assertEquals(37, m.get(1, 2), 0);
 
-	m = new Matrix(t, new int[][] { {2, 2, 1}, {3, 3, 1} });
+	m = TensorFactory.tensor(t, new int[][] { {2, 2, 1}, {3, 3, 1} });
 	assertEquals(62, m.get(0, 0), 0);
 	assertEquals(67, m.get(0, 1), 0);
 	assertEquals(92, m.get(1, 1), 0);
@@ -244,12 +245,12 @@ public class GeneralTest {
 	it.next();
 	assertEquals(92, m.getElements()[it.next()], 0);
 
-	m = new Matrix(4, 4);
+	m = TensorFactory.tensor(4, 4);
 	for (int i = 0; i < m.getElements().length; i++) {
 	    m.getElements()[i] = i + 1;
 	}
 
-	Matrix m2 = new Matrix(m, new int[][] { {1,1}, {2, 2} });
+	Matrix m2 = TensorFactory.tensor(m, new int[][] { {1,1}, {2, 2} });
 	assertEquals(6, m2.get(0, 0), 0);
 	assertEquals(7, m2.get(0, 1), 0);
 	assertEquals(10, m2.get(1, 0), 0);

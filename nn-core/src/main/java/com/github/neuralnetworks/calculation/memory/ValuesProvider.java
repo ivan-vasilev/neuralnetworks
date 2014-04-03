@@ -1,24 +1,20 @@
-package com.github.neuralnetworks.calculation;
+package com.github.neuralnetworks.calculation.memory;
 
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.IntStream;
 
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
 import com.github.neuralnetworks.architecture.FullyConnected;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Subsampling2DConnection;
-import com.github.neuralnetworks.calculation.LayerOrderStrategy.ConnectionCandidate;
-import com.github.neuralnetworks.util.Matrix;
 import com.github.neuralnetworks.util.Tensor;
-import com.github.neuralnetworks.util.UniqueList;
+import com.github.neuralnetworks.util.TensorFactory;
 
 /**
  * Provides Matrix instances for the layers of the network. It ensures that the
@@ -28,9 +24,8 @@ public class ValuesProvider implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private int miniBatchSize;
-    private LayerOrderStrategy layersOrder;
-    private Map<Layer, Set<Tensor>> values;
+    protected int miniBatchSize;
+    protected Map<Layer, Set<Tensor>> values;
 
     public ValuesProvider() {
 	super();
@@ -71,22 +66,19 @@ public class ValuesProvider implements Serializable {
 	}
 
 	if (!values.containsKey(targetLayer)) {
+	    createValues();
 	    values.put(targetLayer, new HashSet<Tensor>());
 	}
 
-	int dimSize = IntStream.of(dimensions).reduce(1, (a, b) -> a * b);
-	Set<Tensor> set = values.get(targetLayer);
-	Tensor result = set.stream().filter(t -> t.getSize() == dimSize).findFirst().orElse(null);
+	Tensor result = values.get(targetLayer).stream().filter(t -> Arrays.equals(t.getDimensions(), dimensions)).findFirst().orElse(null);
 
 	if (result == null) {
-	    if (dimensions.length == 2) {
-		set.add(result = new Matrix(dimensions[0], getMiniBatchSize()));
-	    } else {
-		set.add(result = new Tensor(dimensions));
-	    }
+	    result = TensorFactory.tensor(dimensions);
+	    values.get(targetLayer).add(result);
 	} else if (result.getDimensions().length != dimensions.length) {
 	    if (dimensions.length == 2) {
-		result = new Matrix(result.getElements(), getMiniBatchSize());
+		result = TensorFactory.matrix(result.getElements(), getMiniBatchSize());
+		values.get(targetLayer).add(result);
 	    }
 	}
 
@@ -124,9 +116,6 @@ public class ValuesProvider implements Serializable {
     }
 
     protected void createValues() {
-	List<ConnectionCandidate> ccs = layersOrder.order();
-	List<Layer> layers = new UniqueList<>();
-	ccs.forEach(cc -> layers.add(cc.target));
     }
 
     private int[] getDataDimensions(Layer targetLayer, Collection<Connections> connections) {

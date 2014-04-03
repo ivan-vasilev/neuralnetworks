@@ -18,13 +18,14 @@ import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.architecture.types.RBM;
 import com.github.neuralnetworks.architecture.types.StackedAutoencoder;
 import com.github.neuralnetworks.calculation.LayerCalculatorImpl;
-import com.github.neuralnetworks.calculation.ValuesProvider;
+import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSumConnectionCalculator;
 import com.github.neuralnetworks.training.DNNLayerTrainer;
 import com.github.neuralnetworks.training.OneStepTrainer;
 import com.github.neuralnetworks.training.TrainerFactory;
 import com.github.neuralnetworks.training.rbm.AparapiCDTrainer;
 import com.github.neuralnetworks.util.Matrix;
+import com.github.neuralnetworks.util.TensorFactory;
 import com.github.neuralnetworks.util.Util;
 
 public class DNNTest {
@@ -103,7 +104,7 @@ public class DNNTest {
 
 	ValuesProvider results = new ValuesProvider();
 
-	results.addValues(dbn.getInputLayer(), new Matrix(new float[] {1, 0, 1}, 1));
+	results.addValues(dbn.getInputLayer(), TensorFactory.matrix(new float[] {1, 0, 1}, 1));
 	dbn.getLayerCalculator().calculate(dbn, dbn.getOutputLayer(), calculatedLayers, results);
 
 	assertEquals(1.06, results.getValues(dbn.getOutputLayer()).get(0, 0), 0.00001);
@@ -131,7 +132,7 @@ public class DNNTest {
 	calculatedLayers.add(sae.getInputLayer());
 
 	ValuesProvider results = new ValuesProvider();
-	results.addValues(sae.getInputLayer(), new Matrix(new float[] {1, 0, 1}, 1));
+	results.addValues(sae.getInputLayer(), TensorFactory.matrix(new float[] {1, 0, 1}, 1));
 	sae.getLayerCalculator().calculate(sae, sae.getOutputLayer(), calculatedLayers, results);
 
 	assertEquals(1.06, results.getValues(sae.getOutputLayer()).get(0, 0), 0.00001);
@@ -162,7 +163,7 @@ public class DNNTest {
 	cgb2.set(-0.4f, 0, 0);
 	cgb2.set(0.2f, 1, 0);
 
-	SimpleInputProvider inputProvider = new SimpleInputProvider(new Matrix(new float[][] { { 1, 0, 1 } }), null, 1, 1);
+	SimpleInputProvider inputProvider = new SimpleInputProvider(TensorFactory.matrix(new float[][] { { 1, 0, 1 } }), null, 1, 1);
 
 	AparapiCDTrainer firstTrainer = TrainerFactory.cdSigmoidTrainer(firstRBM, null, null, null, null, 1f, 0f, 0f, 0f, 1, true);
 	firstTrainer.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(firstRBM));
@@ -233,7 +234,7 @@ public class DNNTest {
 	cgb2.set(-0.4f, 0, 0);
 	cgb2.set(0.2f, 1, 0);
 	
-	SimpleInputProvider inputProvider = new SimpleInputProvider(new Matrix(new float[][] { { 1, 0, 1 } }), null, 1, 1);
+	SimpleInputProvider inputProvider = new SimpleInputProvider(TensorFactory.matrix(new float[][] { { 1, 0, 1 } }), null, 1, 1);
 
 	AparapiCDTrainer firstTrainer = TrainerFactory.cdSigmoidTrainer(firstRBM, null, null, null, null, 0f, 0f, 0f, 0f, 0, true);
 	firstTrainer.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(firstRBM));

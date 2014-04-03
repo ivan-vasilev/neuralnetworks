@@ -7,6 +7,7 @@ import com.github.neuralnetworks.training.TrainingInputData;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Matrix;
 import com.github.neuralnetworks.util.Properties;
+import com.github.neuralnetworks.util.TensorFactory;
 
 /**
  * Base class for Contrastive Divergence
@@ -46,9 +47,9 @@ public abstract class CDTrainerBase extends OneStepTrainer<RBM> {
 
 	posPhaseVisible = (Matrix) data.getInput();
 	if (negPhaseVisible == null || negPhaseVisible.getColumns() != posPhaseVisible.getColumns()) {
-	    negPhaseVisible = new Matrix(posPhaseVisible.getRows(), posPhaseVisible.getColumns());
-	    posPhaseHidden = new Matrix(nn.getMainConnections().getConnectionGraph().getRows(), posPhaseVisible.getColumns());
-	    negPhaseHidden = new Matrix(nn.getMainConnections().getConnectionGraph().getRows(), posPhaseVisible.getColumns());
+	    negPhaseVisible = TensorFactory.tensor(posPhaseVisible.getRows(), posPhaseVisible.getColumns());
+	    posPhaseHidden = TensorFactory.tensor(nn.getMainConnections().getConnectionGraph().getRows(), posPhaseVisible.getColumns());
+	    negPhaseHidden = TensorFactory.tensor(nn.getMainConnections().getConnectionGraph().getRows(), posPhaseVisible.getColumns());
 	}
 
 	getLayerCalculator().gibbsSampling(nn, posPhaseVisible, posPhaseHidden, negPhaseVisible, negPhaseHidden, getGibbsSamplingCount(), batch == 0 ? true : getResetRBM(), true);

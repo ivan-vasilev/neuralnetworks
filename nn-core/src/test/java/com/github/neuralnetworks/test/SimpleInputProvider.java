@@ -5,9 +5,9 @@ import java.util.stream.IntStream;
 
 import com.github.neuralnetworks.training.TrainingInputData;
 import com.github.neuralnetworks.training.TrainingInputProvider;
-import com.github.neuralnetworks.util.Matrix;
 import com.github.neuralnetworks.util.Tensor;
 import com.github.neuralnetworks.util.Tensor.TensorIterator;
+import com.github.neuralnetworks.util.TensorFactory;
 
 /**
  * Simple input provider for testing purposes.
@@ -37,13 +37,13 @@ public class SimpleInputProvider implements TrainingInputProvider {
 	if (input != null) {
 	    int[] inputDims = Arrays.copyOf(input.getDimensions(), input.getDimensions().length);
 	    inputDims[inputDims.length - 1] = miniBatchSize;
-	    data.setInput(inputDims.length == 2 ? new Matrix(inputDims[0], inputDims[1]) : new Tensor(inputDims));
+	    data.setInput(TensorFactory.tensor(inputDims));
 	}
 
 	if (target != null) {
 	    int[] targetDims = Arrays.copyOf(target.getDimensions(), target.getDimensions().length);
 	    targetDims[targetDims.length - 1] = miniBatchSize;
-	    data.setTarget(targetDims.length == 2 ? new Matrix(targetDims[0], targetDims[1]) : new Tensor(targetDims));
+	    data.setTarget(TensorFactory.tensor(targetDims));
 	}
     }
 

@@ -2,6 +2,7 @@ package com.github.neuralnetworks.samples.iris;
 
 import com.github.neuralnetworks.input.InputConverter;
 import com.github.neuralnetworks.util.Matrix;
+import com.github.neuralnetworks.util.TensorFactory;
 import com.github.neuralnetworks.util.Util;
 
 public class IrisTargetMultiNeuronOutputConverter implements InputConverter {
@@ -13,7 +14,7 @@ public class IrisTargetMultiNeuronOutputConverter implements InputConverter {
     @Override
     public Matrix convert(Object[] input) {
 	if (convertedTarget == null || convertedTarget.getColumns() != input.length) {
-	    convertedTarget = new Matrix(3, input.length);
+	    convertedTarget = TensorFactory.tensor(3, input.length);
 	} else {
 	    Util.fillArray(convertedTarget.getElements(), 0);
 	}

@@ -1,6 +1,7 @@
 package com.github.neuralnetworks.architecture;
 
 import com.github.neuralnetworks.util.Matrix;
+import com.github.neuralnetworks.util.TensorFactory;
 
 /**
  * Fully connected weight matrix between two layers of neurons
@@ -15,7 +16,7 @@ public class FullyConnected extends ConnectionsImpl implements GraphConnections 
     private final Matrix connectionGraph;
 
     public FullyConnected(Layer inputLayer, Layer outputLayer, int inputUnitCount, int outputUnitCount) {
-	this(inputLayer, outputLayer, new Matrix(new float[inputUnitCount * outputUnitCount], inputUnitCount));
+	this(inputLayer, outputLayer, TensorFactory.matrix(new float[inputUnitCount * outputUnitCount], inputUnitCount));
     }
 
     public FullyConnected(Layer inputLayer, Layer outputLayer, Matrix connectionGraph) {

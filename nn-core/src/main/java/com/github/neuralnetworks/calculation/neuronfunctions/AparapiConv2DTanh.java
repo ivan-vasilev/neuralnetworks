@@ -2,7 +2,7 @@ package com.github.neuralnetworks.calculation.neuronfunctions;
 
 import com.github.neuralnetworks.architecture.Conv2DConnection;
 import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.calculation.ValuesProvider;
+import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 
 /**
  * Tanh convolutional calculator

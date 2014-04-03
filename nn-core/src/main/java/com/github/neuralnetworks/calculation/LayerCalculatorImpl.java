@@ -7,6 +7,7 @@ import java.util.Set;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.calculation.LayerOrderStrategy.ConnectionCandidate;
+import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 
 /**
  * Implementation of the LayerCalculator interface for calculating single target layer

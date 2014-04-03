@@ -3,7 +3,7 @@ package com.github.neuralnetworks.samples.xor;
 import com.github.neuralnetworks.training.TrainingInputData;
 import com.github.neuralnetworks.training.TrainingInputDataImpl;
 import com.github.neuralnetworks.training.TrainingInputProvider;
-import com.github.neuralnetworks.util.Matrix;
+import com.github.neuralnetworks.util.TensorFactory;
 
 /**
  * XOR input provider
@@ -19,7 +19,7 @@ public class XorInputProvider implements TrainingInputProvider {
     public XorInputProvider(int inputSize) {
 	super();
 	this.inputSize = inputSize;
-	this.input = new TrainingInputDataImpl(new Matrix(2, 1), new Matrix(1, 1));
+	this.input = new TrainingInputDataImpl(TensorFactory.tensor(2, 1), TensorFactory.tensor(1, 1));
     }
 
     @Override

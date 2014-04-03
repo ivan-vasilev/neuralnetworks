@@ -5,6 +5,7 @@ import java.util.Set;
 
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
+import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 
 /**
  * The implementations of this interface provide a way of propagating results

@@ -5,7 +5,9 @@ import java.util.Set;
 
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.types.RBM;
+import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.util.Matrix;
+import com.github.neuralnetworks.util.TensorFactory;
 
 /**
  * Implementation of LayerCalculatorImpl for RBMs
@@ -76,7 +78,7 @@ public class RBMLayerCalculator extends LayerCalculatorImpl {
 	    intermediateResults.setMiniBatchSize(realResult.getColumns());
 	    result = intermediateResults.getValues(layer, realResult.getRows(), realResult.getColumns());
 	    if (result == null) {
-		intermediateResults.addValues(layer, result = new Matrix(realResult));
+		intermediateResults.addValues(layer, result = TensorFactory.tensor(realResult));
 	    }
 
 	    System.arraycopy(realResult.getElements(), 0, result.getElements(), 0, result.getElements().length);

@@ -7,6 +7,7 @@ import com.github.neuralnetworks.training.TrainingInputData;
 import com.github.neuralnetworks.training.TrainingInputDataImpl;
 import com.github.neuralnetworks.training.TrainingInputProvider;
 import com.github.neuralnetworks.util.Matrix;
+import com.github.neuralnetworks.util.TensorFactory;
 
 /**
  * Iris dataset (http://archive.ics.uci.edu/ml/datasets/Iris) with random order
@@ -38,7 +39,7 @@ public class IrisInputProvider implements TrainingInputProvider {
 	this.scale = scale;
 	this.attachTargetToInput = attachTargetToInput;
 	this.dataset = createDataset();
-	this.currentExample = new TrainingInputDataImpl(new Matrix(dataset.getRows() - 1 + (attachTargetToInput == true ? 1 : 0), batchSize));
+	this.currentExample = new TrainingInputDataImpl(TensorFactory.tensor(dataset.getRows() - 1 + (attachTargetToInput == true ? 1 : 0), batchSize));
 	reset();
     }
 
@@ -231,7 +232,7 @@ public class IrisInputProvider implements TrainingInputProvider {
 		5.9,3.0,5.1,1.8,2
 	};
 
-	Matrix result = new Matrix(new float[d.length], 150);
+	Matrix result = TensorFactory.matrix(new float[d.length], 150);
 	for (int i = 0; i < d.length; i++) {
 	    result.set((float) d[i], i % 5, i / 5);
 	}

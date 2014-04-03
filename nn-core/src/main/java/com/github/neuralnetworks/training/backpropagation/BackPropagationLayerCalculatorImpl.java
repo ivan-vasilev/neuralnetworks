@@ -9,7 +9,7 @@ import com.github.neuralnetworks.calculation.BreadthFirstOrderStrategy;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.calculation.LayerCalculatorBase;
 import com.github.neuralnetworks.calculation.LayerOrderStrategy.ConnectionCandidate;
-import com.github.neuralnetworks.calculation.ValuesProvider;
+import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 
 /**
  * Aparapi implementation of the backpropagation algorithm

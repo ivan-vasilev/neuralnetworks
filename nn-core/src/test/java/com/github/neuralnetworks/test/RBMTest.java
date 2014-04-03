@@ -17,6 +17,7 @@ import com.github.neuralnetworks.training.random.NNRandomInitializer;
 import com.github.neuralnetworks.training.rbm.AparapiCDTrainer;
 import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.Matrix;
+import com.github.neuralnetworks.util.TensorFactory;
 
 public class RBMTest {
 
@@ -39,8 +40,8 @@ public class RBMTest {
 	// that the patient is vaccinated, but he's also coughing. We will
 	// consider a patient to be sick when he has at least two of the first
 	// three and healthy if he has two of the second three
-	TrainingInputProvider trainInputProvider = new SimpleInputProvider(new Matrix(new float[][] { { 1, 1, 1, 0, 0, 0 }, { 1, 0, 1, 0, 0, 0 }, { 1, 1, 0, 0, 0, 0 }, { 0, 1, 1, 0, 0, 0 }, { 0, 1, 1, 1, 0, 0 }, { 0, 0, 0, 1, 1, 1 }, { 0, 0, 1, 1, 1, 0 }, { 0, 0, 0, 1, 0, 1 }, { 0, 0, 0, 0, 1, 1 }, { 0, 0, 0, 1, 1, 0 } }), null, 1000, 1);
-	TrainingInputProvider testInputProvider = new SimpleInputProvider(new Matrix(new float[][] { { 1, 1, 1, 0, 0, 0 }, { 1, 0, 1, 0, 0, 0 }, { 1, 1, 0, 0, 0, 0 }, { 0, 1, 1, 0, 0, 0 }, { 0, 1, 1, 1, 0, 0 }, { 0, 0, 0, 1, 1, 1 }, { 0, 0, 1, 1, 1, 0 }, { 0, 0, 0, 1, 0, 1 }, { 0, 0, 0, 0, 1, 1 }, { 0, 0, 0, 1, 1, 0 } }), new Matrix(new float[][] { { 1, 0 }, { 1, 0 }, { 1, 0 }, { 1, 0 }, { 1, 0 }, { 0, 1 }, { 0, 1 }, { 0, 1 }, { 0, 1 }, { 0, 1 } }), 10, 1);
+	TrainingInputProvider trainInputProvider = new SimpleInputProvider(TensorFactory.matrix(new float[][] { { 1, 1, 1, 0, 0, 0 }, { 1, 0, 1, 0, 0, 0 }, { 1, 1, 0, 0, 0, 0 }, { 0, 1, 1, 0, 0, 0 }, { 0, 1, 1, 1, 0, 0 }, { 0, 0, 0, 1, 1, 1 }, { 0, 0, 1, 1, 1, 0 }, { 0, 0, 0, 1, 0, 1 }, { 0, 0, 0, 0, 1, 1 }, { 0, 0, 0, 1, 1, 0 } }), null, 1000, 1);
+	TrainingInputProvider testInputProvider = new SimpleInputProvider(TensorFactory.matrix(new float[][] { { 1, 1, 1, 0, 0, 0 }, { 1, 0, 1, 0, 0, 0 }, { 1, 1, 0, 0, 0, 0 }, { 0, 1, 1, 0, 0, 0 }, { 0, 1, 1, 1, 0, 0 }, { 0, 0, 0, 1, 1, 1 }, { 0, 0, 1, 1, 1, 0 }, { 0, 0, 0, 1, 0, 1 }, { 0, 0, 0, 0, 1, 1 }, { 0, 0, 0, 1, 1, 0 } }), TensorFactory.matrix(new float[][] { { 1, 0 }, { 1, 0 }, { 1, 0 }, { 1, 0 }, { 1, 0 }, { 0, 1 }, { 0, 1 }, { 0, 1 }, { 0, 1 }, { 0, 1 } }), 10, 1);
 	MultipleNeuronsOutputError error = new MultipleNeuronsOutputError();
 
 	// Contrastive divergence training
@@ -78,8 +79,8 @@ public class RBMTest {
 	// that the patient is vaccinated, but he's also coughing. We will
 	// consider a patient to be sick when he has at least two of the first
 	// three and healthy if he has two of the second three
-	TrainingInputProvider trainInputProvider = new SimpleInputProvider(new Matrix(new float[][] { { 1, 1, 1, 0, 0, 0 }, { 1, 0, 1, 0, 0, 0 }, { 1, 1, 0, 0, 0, 0 }, { 0, 1, 1, 0, 0, 0 }, { 0, 1, 1, 1, 0, 0 }, { 0, 0, 0, 1, 1, 1 }, { 0, 0, 1, 1, 1, 0 }, { 0, 0, 0, 1, 0, 1 }, { 0, 0, 0, 0, 1, 1 }, { 0, 0, 0, 1, 1, 0 } }), null, 1000, 1);
-	TrainingInputProvider testInputProvider = new SimpleInputProvider(new Matrix(new float[][] { { 1, 1, 1, 0, 0, 0 }, { 1, 0, 1, 0, 0, 0 }, { 1, 1, 0, 0, 0, 0 }, { 0, 1, 1, 0, 0, 0 }, { 0, 1, 1, 1, 0, 0 }, { 0, 0, 0, 1, 1, 1 }, { 0, 0, 1, 1, 1, 0 }, { 0, 0, 0, 1, 0, 1 }, { 0, 0, 0, 0, 1, 1 }, { 0, 0, 0, 1, 1, 0 } }), new Matrix(new float[][] { { 1, 0 }, { 1, 0 }, { 1, 0 }, { 1, 0 }, { 1, 0 }, { 0, 1 }, { 0, 1 }, { 0, 1 }, { 0, 1 }, { 0, 1 } }), 10, 1);
+	TrainingInputProvider trainInputProvider = new SimpleInputProvider(TensorFactory.matrix(new float[][] { { 1, 1, 1, 0, 0, 0 }, { 1, 0, 1, 0, 0, 0 }, { 1, 1, 0, 0, 0, 0 }, { 0, 1, 1, 0, 0, 0 }, { 0, 1, 1, 1, 0, 0 }, { 0, 0, 0, 1, 1, 1 }, { 0, 0, 1, 1, 1, 0 }, { 0, 0, 0, 1, 0, 1 }, { 0, 0, 0, 0, 1, 1 }, { 0, 0, 0, 1, 1, 0 } }), null, 1000, 1);
+	TrainingInputProvider testInputProvider = new SimpleInputProvider(TensorFactory.matrix(new float[][] { { 1, 1, 1, 0, 0, 0 }, { 1, 0, 1, 0, 0, 0 }, { 1, 1, 0, 0, 0, 0 }, { 0, 1, 1, 0, 0, 0 }, { 0, 1, 1, 1, 0, 0 }, { 0, 0, 0, 1, 1, 1 }, { 0, 0, 1, 1, 1, 0 }, { 0, 0, 0, 1, 0, 1 }, { 0, 0, 0, 0, 1, 1 }, { 0, 0, 0, 1, 1, 0 } }), TensorFactory.matrix(new float[][] { { 1, 0 }, { 1, 0 }, { 1, 0 }, { 1, 0 }, { 1, 0 }, { 0, 1 }, { 0, 1 }, { 0, 1 }, { 0, 1 }, { 0, 1 } }), 10, 1);
 	MultipleNeuronsOutputError error = new MultipleNeuronsOutputError();
 
 	// Persistent Contrastive divergence trainer
@@ -113,8 +114,8 @@ public class RBMTest {
 
 	RBMLayerCalculator lc = (RBMLayerCalculator) rbm.getLayerCalculator();
 
-	Matrix visible = new Matrix(new float[] { 0.35f, 0.9f }, 1);
-	Matrix hidden = new Matrix(2, 1);
+	Matrix visible = TensorFactory.matrix(new float[] { 0.35f, 0.9f }, 1);
+	Matrix hidden = TensorFactory.tensor(2, 1);
 	lc.calculateHiddenLayer(rbm, visible, hidden);
 
 	assertEquals(0.68, hidden.get(0, 0), 0.01);
@@ -134,8 +135,8 @@ public class RBMTest {
 
 	RBMLayerCalculator lc = (RBMLayerCalculator) rbm.getLayerCalculator();
 
-	Matrix visible = new Matrix(2, 1);
-	Matrix hidden = new Matrix(new float[] { 0.35f, 0.9f }, 1);
+	Matrix visible = TensorFactory.tensor(2, 1);
+	Matrix hidden = TensorFactory.matrix(new float[] { 0.35f, 0.9f }, 1);
 
 	lc.calculateVisibleLayer(rbm, visible, hidden);
 
@@ -161,8 +162,8 @@ public class RBMTest {
 	cgb1.set(0.2f, 1, 0);
 
 	RBMLayerCalculator lc = (RBMLayerCalculator) rbm.getLayerCalculator();
-	Matrix visible = new Matrix(new float[] { 1f, 0f, 1f }, 1);
-	Matrix hidden = new Matrix(2, 1);
+	Matrix visible = TensorFactory.matrix(new float[] { 1f, 0f, 1f }, 1);
+	Matrix hidden = TensorFactory.tensor(2, 1);
 	lc.calculateHiddenLayer(rbm, visible, hidden);
 
 	assertEquals(0.332, hidden.get(0, 0), 0.001);
@@ -187,8 +188,8 @@ public class RBMTest {
 	cgb1.set(0.2f, 1, 0);
 
 	RBMLayerCalculator lc = (RBMLayerCalculator) rbm.getLayerCalculator();
-	Matrix hidden = new Matrix(new float[] { 1f, 0f, 1f }, 1);
-	Matrix visible = new Matrix(2, 1);
+	Matrix hidden = TensorFactory.matrix(new float[] { 1f, 0f, 1f }, 1);
+	Matrix visible = TensorFactory.tensor(2, 1);
 	lc.calculateVisibleLayer(rbm, visible, hidden);
 
 	assertEquals(0.332, visible.get(0, 0), 0.001);
@@ -218,7 +219,7 @@ public class RBMTest {
 	cgb2.set(-0.4f, 0, 0);
 	cgb2.set(0.2f, 1, 0);
 
-	AparapiCDTrainer t = TrainerFactory.cdSigmoidTrainer(rbm, new SimpleInputProvider(new Matrix(new float[][] { { 1, 0, 1 } }), null, 1, 1), null, null, null, 1f, 0f, 0f, 0f, 1, true);
+	AparapiCDTrainer t = TrainerFactory.cdSigmoidTrainer(rbm, new SimpleInputProvider(TensorFactory.matrix(new float[][] { { 1, 0, 1 } }), null, 1, 1), null, null, null, 1f, 0f, 0f, 0f, 1, true);
 	t.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
 
 	t.train();

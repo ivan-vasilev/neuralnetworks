@@ -2,6 +2,7 @@ package com.github.neuralnetworks.samples.mnist;
 
 import com.github.neuralnetworks.input.InputConverter;
 import com.github.neuralnetworks.util.Matrix;
+import com.github.neuralnetworks.util.TensorFactory;
 
 public class MnistTargetSingleNeuronOutputConverter implements InputConverter {
 
@@ -9,7 +10,7 @@ public class MnistTargetSingleNeuronOutputConverter implements InputConverter {
 
     @Override
     public Matrix convert(Object[] input) {
-	Matrix m = new Matrix(1, input.length);
+	Matrix m = TensorFactory.tensor(1, input.length);
 
 	for (int i = 0; i < input.length; i++) {
 	    m.set((int) input[i], 0, i);

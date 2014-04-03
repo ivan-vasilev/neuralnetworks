@@ -1,6 +1,5 @@
 package com.github.neuralnetworks.util;
 
-import java.util.stream.IntStream;
 
 /**
  * Simple matrix representation with one-dimensional array. This is required,
@@ -11,34 +10,12 @@ public class Matrix extends Tensor {
 
     private static final long serialVersionUID = 1L;
 
-    public Matrix() {
-	super();
-    }
-
-    /**
-     * simplified constructor
-     */
-    public Matrix(float[][] elements) {
-	super(elements[0].length, elements.length);
-	IntStream.range(0, elements.length).forEach(i -> IntStream.range(0, elements[i].length).forEach(j -> {
-	    set(elements[i][j], j, i);
-	}));
-    }
-
-    public Matrix(float[] elements, int columns) {
-	super(elements, elements.length / columns, columns);
-    }
-
-    public Matrix(int rows, int columns) {
-	super(rows, columns);
-    }
-
-    public Matrix(Matrix copy) {
-	super(copy.getRows(), copy.getColumns());
-    }
-
     public Matrix(Tensor parent, int[][] dimensionsLimit) {
 	super(parent, dimensionsLimit);
+    }
+
+    public Matrix(int startOffset, float[] elements, int[] globalDimensions, int[][] globalDimensionsLimit) {
+	super(startOffset, elements, globalDimensions, globalDimensionsLimit);
     }
 
     public int getColumns() {

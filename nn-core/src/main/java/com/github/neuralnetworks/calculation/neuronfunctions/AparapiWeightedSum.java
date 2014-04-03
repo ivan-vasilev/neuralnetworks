@@ -8,7 +8,7 @@ import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.FullyConnected;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
-import com.github.neuralnetworks.calculation.ValuesProvider;
+import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.Matrix;
 import com.github.neuralnetworks.util.Tensor;
@@ -70,7 +70,6 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
      * because of the Aparapi limitations) It is an array, because of the
      * combined connections
      */
-    @Constant
     protected final float[] weights;
     @Constant
     protected final int[] weightStartPositions;

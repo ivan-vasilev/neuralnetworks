@@ -11,6 +11,7 @@ import com.github.neuralnetworks.training.TrainingInputData;
 import com.github.neuralnetworks.training.TrainingInputDataImpl;
 import com.github.neuralnetworks.training.TrainingInputProviderImpl;
 import com.github.neuralnetworks.util.Matrix;
+import com.github.neuralnetworks.util.TensorFactory;
 
 /**
  * MNIST data set with random order
@@ -104,7 +105,7 @@ public class MnistInputProvider extends TrainingInputProviderImpl {
     private Matrix getImages(int[] indexes) {
 	int size = cols * rows;
 	if (tempImages == null || tempImages.getRows() != indexes.length) {
-	    tempImages = new Matrix(size, indexes.length);
+	    tempImages = TensorFactory.tensor(size, indexes.length);
 	}
 
 	try {

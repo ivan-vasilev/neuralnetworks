@@ -1,6 +1,6 @@
 package com.github.neuralnetworks.training.events;
 
-import com.github.neuralnetworks.calculation.ValuesProvider;
+import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.events.TrainingEvent;
 import com.github.neuralnetworks.training.Trainer;
 import com.github.neuralnetworks.training.TrainingInputData;
