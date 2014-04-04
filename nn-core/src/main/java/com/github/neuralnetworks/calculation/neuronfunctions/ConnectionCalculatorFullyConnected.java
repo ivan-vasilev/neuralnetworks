@@ -13,6 +13,7 @@ import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.events.PropagationEvent;
 import com.github.neuralnetworks.events.PropagationEventListener;
 import com.github.neuralnetworks.util.Matrix;
+import com.github.neuralnetworks.util.Tensor;
 import com.github.neuralnetworks.util.Tensor.TensorIterator;
 import com.github.neuralnetworks.util.UniqueList;
 import com.github.neuralnetworks.util.Util;
@@ -126,9 +127,9 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator,
 
     protected void calculateBias(Connections bias, ValuesProvider valuesProvider) {
 	if (bias != null) {
-	    float[] biasValue = valuesProvider.getValues(bias.getInputLayer(), bias).getElements();
-	    if (biasValue[0] == 0) {
-		Util.fillArray(biasValue, 1);
+	    Tensor biasValue = valuesProvider.getValues(bias.getInputLayer(), bias);
+	    if (biasValue.get(new int[biasValue.getDimensions().length]) == 0) {
+		biasValue.forEach(i -> biasValue.getElements()[i] = 1);
 	    }
 
 	    Matrix weights = ((FullyConnected) bias).getConnectionGraph();;

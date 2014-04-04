@@ -8,6 +8,7 @@ import java.util.Set;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.calculation.OutputError;
+import com.github.neuralnetworks.calculation.memory.SharedMemoryValuesProvider;
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.events.TrainingEvent;
 import com.github.neuralnetworks.events.TrainingEventListener;
@@ -63,7 +64,7 @@ public abstract class Trainer<N extends NeuralNetwork> implements Serializable {
 	    triggerEvent(new TestingStartedEvent(this));
 
 	    Set<Layer> calculatedLayers = new UniqueList<>();
-	    ValuesProvider results = new ValuesProvider();
+	    ValuesProvider results = new SharedMemoryValuesProvider(n);
 	    TrainingInputData input = null;
 
 	    if (getOutputError() != null) {

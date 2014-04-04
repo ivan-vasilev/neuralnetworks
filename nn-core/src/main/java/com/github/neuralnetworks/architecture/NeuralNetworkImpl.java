@@ -154,10 +154,12 @@ public class NeuralNetworkImpl implements NeuralNetwork {
      * 
      * @param connection
      */
-    public void addConnection(Connections connection) {
-	if (connection != null) {
-	    addLayer(connection.getInputLayer());
-	    addLayer(connection.getOutputLayer());
+    public void addConnections(Connections... connections) {
+	if (connections != null) {
+	    for (Connections c : connections) {
+		addLayer(c.getInputLayer());
+		addLayer(c.getOutputLayer());
+	    }
 	}
     }
 }

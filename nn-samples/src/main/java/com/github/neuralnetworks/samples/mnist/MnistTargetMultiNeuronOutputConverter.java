@@ -3,7 +3,6 @@ package com.github.neuralnetworks.samples.mnist;
 import com.github.neuralnetworks.input.InputConverter;
 import com.github.neuralnetworks.util.Matrix;
 import com.github.neuralnetworks.util.TensorFactory;
-import com.github.neuralnetworks.util.Util;
 
 public class MnistTargetMultiNeuronOutputConverter implements InputConverter {
 
@@ -16,7 +15,7 @@ public class MnistTargetMultiNeuronOutputConverter implements InputConverter {
 	if (convertedTarget == null || convertedTarget.getColumns() != input.length) {
 	    convertedTarget = TensorFactory.tensor(10, input.length);
 	} else {
-	    Util.fillArray(convertedTarget.getElements(), 0);
+	    convertedTarget.forEach(i -> convertedTarget.getElements()[i] = 0);
 	}
 
 	for (int i = 0; i < input.length; i++) {

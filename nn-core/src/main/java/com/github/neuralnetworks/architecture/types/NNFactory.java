@@ -353,7 +353,7 @@ public class NNFactory {
     }
     
     public static RBMLayerCalculator rbmWeightedSumWeightedSum(RBM rbm) {
-	RBMLayerCalculator lc = new RBMLayerCalculator();
+	RBMLayerCalculator lc = new RBMLayerCalculator(rbm);
 	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiWeightedSumConnectionCalculator());
 	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiWeightedSumConnectionCalculator());
 	populateBiasLayers(lc, rbm);
@@ -361,7 +361,7 @@ public class NNFactory {
     }
 
     public static RBMLayerCalculator rbmSigmoidSigmoid(RBM rbm) {
-	RBMLayerCalculator lc = new RBMLayerCalculator();
+	RBMLayerCalculator lc = new RBMLayerCalculator(rbm);
 	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiSigmoid());
 	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiSigmoid());
 	populateBiasLayers(lc, rbm);
@@ -369,7 +369,7 @@ public class NNFactory {
     }
 
     public static RBMLayerCalculator rbmSoftReluSoftRelu(RBM rbm) {
-	RBMLayerCalculator lc = new RBMLayerCalculator();
+	RBMLayerCalculator lc = new RBMLayerCalculator(rbm);
 
 	AparapiSoftReLU c1 = new AparapiSoftReLU();
 	c1.addActivationFunction(new SoftmaxFunction());
@@ -386,7 +386,7 @@ public class NNFactory {
     }
     
     public static RBMLayerCalculator rbmReluRelu(RBM rbm) {
-	RBMLayerCalculator lc = new RBMLayerCalculator();
+	RBMLayerCalculator lc = new RBMLayerCalculator(rbm);
 
 	AparapiReLU c1 = new AparapiReLU();
 	c1.addActivationFunction(new SoftmaxFunction());
@@ -402,7 +402,7 @@ public class NNFactory {
     }
 
     public static RBMLayerCalculator rbmTanhTanh(RBM rbm) {
-	RBMLayerCalculator lc = new RBMLayerCalculator();
+	RBMLayerCalculator lc = new RBMLayerCalculator(rbm);
 	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiTanh());
 	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiTanh());
 	populateBiasLayers(lc, rbm);

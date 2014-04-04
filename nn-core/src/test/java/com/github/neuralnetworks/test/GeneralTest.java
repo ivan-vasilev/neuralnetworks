@@ -9,11 +9,14 @@ import java.util.stream.IntStream;
 import org.junit.Test;
 
 import com.amd.aparapi.Kernel.EXECUTION_MODE;
+import com.github.neuralnetworks.architecture.ConnectionFactory;
+import com.github.neuralnetworks.architecture.Conv2DConnection;
+import com.github.neuralnetworks.architecture.FullyConnected;
 import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.architecture.types.NNFactory;
-import com.github.neuralnetworks.calculation.memory.ValuesProvider;
+import com.github.neuralnetworks.calculation.memory.SharedMemoryValuesProvider;
 import com.github.neuralnetworks.calculation.neuronfunctions.SoftmaxFunction;
 import com.github.neuralnetworks.training.random.MersenneTwisterRandomInitializer;
 import com.github.neuralnetworks.training.random.NNRandomInitializer;
@@ -27,9 +30,9 @@ public class GeneralTest {
 
     @Test
     public void testValuesProvider() {
-	ValuesProvider vp = new ValuesProvider();
-
 	NeuralNetworkImpl nn = new NeuralNetworkImpl();
+	SharedMemoryValuesProvider vp = new SharedMemoryValuesProvider(nn);
+
 	Layer i = new Layer();
 	Layer h = new Layer();
 	Layer o = new Layer();
@@ -56,6 +59,88 @@ public class GeneralTest {
 	assertTrue(om == vp.getValues(o, 1, 2));
 	assertTrue(om == vp.getValues(o));
 	assertTrue(2 == vp.getMiniBatchSize());
+    }
+
+    @Test
+    public void testSharedMemoryValuesProvider() {
+	// simple mlp test
+	NeuralNetworkImpl nn = NNFactory.mlp(new int[] { 3, 4, 2 }, true);
+	SharedMemoryValuesProvider vp = new SharedMemoryValuesProvider(nn);
+	vp.addValues(nn.getInputLayer(), TensorFactory.tensor(3, 2));
+
+	Matrix in = vp.getValues(nn.getInputLayer());
+	Matrix hidden = vp.getValues(nn.getLayers().stream().filter(l -> l != nn.getInputLayer() && l != nn.getOutputLayer() && !Util.isBias(l)).findFirst().get());
+	Matrix out = vp.getValues(nn.getOutputLayer());
+
+	assertEquals(6, in.getElements().length, 0);
+	assertEquals(3, in.getRows(), 0);
+	assertEquals(2, in.getColumns(), 0);
+	assertEquals(16, hidden.getElements().length, 0);
+	assertEquals(4, hidden.getRows(), 0);
+	assertEquals(2, hidden.getColumns(), 0);
+	assertEquals(16, out.getElements().length, 0);
+	assertEquals(2, out.getRows(), 0);
+	assertEquals(2, out.getColumns(), 0);
+
+	hidden.set(2, 1, 0);
+	hidden.set(3, 2, 0);
+	hidden.set(4, 2, 1);
+	hidden.set(5, 3, 1);
+	assertEquals(2, hidden.get(1, 0), 0);
+	assertEquals(3, hidden.get(2, 0), 0);
+	assertEquals(4, hidden.get(2, 1), 0);
+	assertEquals(5, hidden.get(3, 1), 0);
+
+	out.set(8, 1, 0);
+	out.set(9, 1, 1);
+	assertEquals(8, out.get(1, 0), 0);
+	assertEquals(9, out.get(1, 1), 0);
+
+	// input and output layer separate
+	vp = new SharedMemoryValuesProvider(nn);
+	vp.addValues(nn.getInputLayer(), TensorFactory.tensor(3, 2));
+	vp.addValues(nn.getOutputLayer(), TensorFactory.tensor(2, 2));
+
+	in = vp.getValues(nn.getInputLayer());
+	hidden = vp.getValues(nn.getLayers().stream().filter(l -> l != nn.getInputLayer() && l != nn.getOutputLayer() && !Util.isBias(l)).findFirst().get());
+	out = vp.getValues(nn.getOutputLayer());
+
+	assertEquals(6, in.getElements().length, 0);
+	assertEquals(3, in.getRows(), 0);
+	assertEquals(2, in.getColumns(), 0);
+	assertEquals(12, hidden.getElements().length, 0);
+	assertEquals(4, hidden.getRows(), 0);
+	assertEquals(2, hidden.getColumns(), 0);
+	assertEquals(4, out.getElements().length, 0);
+	assertEquals(2, out.getRows(), 0);
+	assertEquals(2, out.getColumns(), 0);
+    }
+
+    @Test
+    public void testConnectionFactory() {
+	ConnectionFactory f = new ConnectionFactory(true);
+	FullyConnected fc1 = f.fullyConnected(null, null, 2, 3);
+	FullyConnected fc2 = f.fullyConnected(null, null, 5, 2);
+
+	assertTrue(fc1.getConnectionGraph().getElements() == fc2.getConnectionGraph().getElements());
+	assertEquals(16, fc1.getConnectionGraph().getElements().length, 0);
+	assertEquals(0, fc1.getConnectionGraph().getStartOffset(), 0);
+	assertEquals(3, fc1.getConnectionGraph().getRows(), 0);
+	assertEquals(2, fc1.getConnectionGraph().getColumns(), 0);
+	fc1.getConnectionGraph().set(3, 1, 1);
+	assertEquals(3, fc1.getConnectionGraph().get(1, 1), 0);
+
+	assertEquals(6, fc2.getConnectionGraph().getStartOffset(), 0);
+	assertEquals(2, fc2.getConnectionGraph().getRows(), 0);
+	assertEquals(5, fc2.getConnectionGraph().getColumns(), 0);
+	fc2.getConnectionGraph().set(5, 1, 1);
+	assertEquals(5, fc2.getConnectionGraph().get(1, 1), 0);
+
+	Conv2DConnection c = f.conv2d(null, null, 3, 3, 3, 2, 2, 3, 1);
+	assertEquals(52, c.getWeights().getElements().length, 0);
+	assertEquals(36, c.getWeights().getSize(), 0);
+	assertEquals(16, c.getWeights().getStartOffset(), 0);
+	assertEquals(4, c.getWeights().getDimensions().length, 0);
     }
 
     @Test
@@ -141,7 +226,7 @@ public class GeneralTest {
 	    assertEquals(i + 1, elements[i], 0);
 	    assertEquals(i + 1, elements[it.next()], 0);
 	}
-	
+
 	t = TensorFactory.tensor(5, 5, 5);
 	assertEquals(25, t.getDimensionElementsDistance(0), 0);
 	assertEquals(5, t.getDimensionElementsDistance(1), 0);
@@ -167,7 +252,7 @@ public class GeneralTest {
 	assertEquals(106, t2.get(1, 1, 0), 0);
 	assertEquals(112, t2.get(1, 2, 1), 0);
 
-	Tensor[] tarr = TensorFactory.tensor(new int[] {2, 2, 2}, new int[] {3, 3});
+	Tensor[] tarr = TensorFactory.tensor(new int[] { 2, 2, 2 }, new int[] { 3, 3 });
 	assertEquals(17, tarr[0].getElements().length, 0);
 	assertEquals(0, tarr[0].getStartOffset(), 0);
 	assertEquals(8, tarr[1].getStartOffset(), 0);
@@ -220,19 +305,19 @@ public class GeneralTest {
 	    elements[i] = i + 1;
 	}
 
-	m = TensorFactory.tensor(t, new int[][] { {1, 0, 0}, {1, 4, 4} });
+	m = TensorFactory.tensor(t, new int[][] { { 1, 0, 0 }, { 1, 4, 4 } });
 	assertEquals(26, m.get(0, 0), 0);
 	assertEquals(27, m.get(0, 1), 0);
 	assertEquals(36, m.get(2, 0), 0);
 	assertEquals(38, m.get(2, 2), 0);
 
-	m = TensorFactory.tensor(t, new int[][] { {1, 0, 0}, {1, 4, 4} });
+	m = TensorFactory.tensor(t, new int[][] { { 1, 0, 0 }, { 1, 4, 4 } });
 	assertEquals(26, m.get(0, 0), 0);
 	assertEquals(27, m.get(0, 1), 0);
 	assertEquals(36, m.get(2, 0), 0);
 	assertEquals(38, m.get(2, 2), 0);
 
-	m = TensorFactory.tensor(t, new int[][] { {0, 0, 1}, {4, 4, 1} });
+	m = TensorFactory.tensor(t, new int[][] { { 0, 0, 1 }, { 4, 4, 1 } });
 	assertEquals(2, m.get(0, 0), 0);
 	assertEquals(7, m.get(0, 1), 0);
 	assertEquals(12, m.get(0, 2), 0);
@@ -240,7 +325,7 @@ public class GeneralTest {
 	assertEquals(32, m.get(1, 1), 0);
 	assertEquals(37, m.get(1, 2), 0);
 
-	m = TensorFactory.tensor(t, new int[][] { {2, 2, 1}, {3, 3, 1} });
+	m = TensorFactory.tensor(t, new int[][] { { 2, 2, 1 }, { 3, 3, 1 } });
 	assertEquals(62, m.get(0, 0), 0);
 	assertEquals(67, m.get(0, 1), 0);
 	assertEquals(92, m.get(1, 1), 0);
@@ -251,7 +336,7 @@ public class GeneralTest {
 	it.next();
 	assertEquals(92, m.getElements()[it.next()], 0);
 
-	it = m.iterator(new int[][] { {1, 0}, {1, 1} });
+	it = m.iterator(new int[][] { { 1, 0 }, { 1, 1 } });
 	it.next();
 	assertEquals(92, m.getElements()[it.next()], 0);
 
@@ -260,7 +345,7 @@ public class GeneralTest {
 	    m.getElements()[i] = i + 1;
 	}
 
-	Matrix m2 = TensorFactory.tensor(m, new int[][] { {1,1}, {2, 2} });
+	Matrix m2 = TensorFactory.tensor(m, new int[][] { { 1, 1 }, { 2, 2 } });
 	assertEquals(6, m2.get(0, 0), 0);
 	assertEquals(7, m2.get(0, 1), 0);
 	assertEquals(10, m2.get(1, 0), 0);

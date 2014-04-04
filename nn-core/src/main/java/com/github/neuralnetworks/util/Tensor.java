@@ -2,6 +2,7 @@ package com.github.neuralnetworks.util;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.function.IntConsumer;
 import java.util.stream.IntStream;
 
 /**
@@ -161,6 +162,17 @@ public class Tensor implements Serializable {
      */
     public TensorIterator iterator(int[][] limits) {
 	return new TensorIterator(this, limits);
+    }
+
+    /**
+     * Iterate over all indexes
+     * @param action
+     */
+    public void forEach(IntConsumer action) {
+	TensorIterator it = iterator();
+	while (it.hasNext()) {
+	    action.accept(it.next());
+	}
     }
 
     protected int getIndex(int... d) {

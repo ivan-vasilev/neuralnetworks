@@ -12,20 +12,20 @@ import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
 import com.github.neuralnetworks.architecture.FullyConnected;
 import com.github.neuralnetworks.architecture.Layer;
+import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.architecture.Subsampling2DConnection;
 import com.github.neuralnetworks.util.Tensor;
-import com.github.neuralnetworks.util.TensorFactory;
 
 /**
- * Provides Matrix instances for the layers of the network. It ensures that the
+ * Provides Tensor instances for the layers of the network. It ensures that the
  * instances are reused.
  */
 public class ValuesProvider implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    protected int miniBatchSize;
-    protected Map<Layer, Set<Tensor>> values;
+    private int miniBatchSize;
+    private Map<Layer, Set<Tensor>> values;
 
     public ValuesProvider() {
 	super();
@@ -61,34 +61,15 @@ public class ValuesProvider implements Serializable {
      */
     @SuppressWarnings("unchecked")
     public <T extends Tensor> T getValues(Layer targetLayer, int... dimensions) {
-	if (dimensions == null) {
+	if (dimensions == null || dimensions.length == 0) {
 	    throw new IllegalArgumentException("No dimensions provided");
 	}
 
 	if (!values.containsKey(targetLayer)) {
-	    createValues();
-	    values.put(targetLayer, new HashSet<Tensor>());
+	    createValues(values);
 	}
 
-	Tensor result = values.get(targetLayer).stream().filter(t -> Arrays.equals(t.getDimensions(), dimensions)).findFirst().orElse(null);
-
-	if (result == null) {
-	    result = TensorFactory.tensor(dimensions);
-	    values.get(targetLayer).add(result);
-	} else if (result.getDimensions().length != dimensions.length) {
-	    if (dimensions.length == 2) {
-		result = TensorFactory.matrix(result.getElements(), getMiniBatchSize());
-		values.get(targetLayer).add(result);
-	    }
-	}
-
-	return (T) result;
-    }
-
-    public int[] getUnitCount(Layer targetLayer, Connections c) {
-	Set<Connections> cs = new HashSet<>();
-	cs.add(c);
-	return getDataDimensions(targetLayer, cs);
+	return (T) values.get(targetLayer).stream().filter(t -> Arrays.equals(t.getDimensions(), dimensions)).findFirst().orElse(null);
     }
 
     public void addValues(Layer l, Tensor t) {
@@ -115,7 +96,7 @@ public class ValuesProvider implements Serializable {
 	this.miniBatchSize = miniBatchSize;
     }
 
-    protected void createValues() {
+    protected void createValues(Map<Layer, Set<Tensor>> values) {
     }
 
     private int[] getDataDimensions(Layer targetLayer, Collection<Connections> connections) {
@@ -150,6 +131,59 @@ public class ValuesProvider implements Serializable {
 		result = new int[] { c.getOutputFilters(), c.getOutputFeatureMapRows(), c.getOutputFeatureMapColumns(), getMiniBatchSize() };
 	    } else if (c.getInputLayer() == targetLayer) {
 		result = new int[] { c.getInputFilters(), c.getInputFeatureMapRows(), c.getInputFeatureMapColumns(), getMiniBatchSize() };
+	    }
+	}
+
+	return result;
+    }
+
+    protected Map<Layer, Set<int[]>> getLayerDimensions(NeuralNetwork neuralNetwork) {
+	Map<Layer, Set<int[]>> result = new HashMap<>();
+
+	for (Connections c : neuralNetwork.getConnections()) {
+	    Set<int[]> din = result.get(c.getInputLayer());
+	    if (din == null) {
+		result.put(c.getInputLayer(), din = new HashSet<>());
+	    }
+
+	    Set<int[]> dout = result.get(c.getOutputLayer());
+	    if (dout == null) {
+		result.put(c.getOutputLayer(), dout = new HashSet<>());
+	    }
+
+	    if (c instanceof FullyConnected) {
+		FullyConnected fc = (FullyConnected) c;
+		int[] inputDim = new int[] { fc.getInputUnitCount(), getMiniBatchSize() };
+		int[] outputDim = new int[] { fc.getOutputUnitCount(), getMiniBatchSize() };
+		inputDim[0] = fc.getInputUnitCount();
+		outputDim[0] = fc.getOutputUnitCount();
+
+		if (!din.stream().anyMatch(i -> Arrays.equals(i, inputDim))) {
+		    din.add(inputDim);
+		}
+		if (!dout.stream().anyMatch(i -> Arrays.equals(i, outputDim))) {
+		    dout.add(outputDim);
+		}
+	    } else if (c instanceof Conv2DConnection) {
+		Conv2DConnection cc = (Conv2DConnection) c;
+		int[] inputDim = new int[] { cc.getOutputFilters(), cc.getOutputFeatureMapRows(), cc.getOutputFeatureMapColumns(), getMiniBatchSize() };
+		int[] outputDim = new int[] { cc.getInputFilters(), cc.getInputFeatureMapRows(), cc.getInputFeatureMapColumns(), getMiniBatchSize() };
+		if (!din.stream().anyMatch(i -> Arrays.equals(i, inputDim))) {
+		    din.add(inputDim);
+		}
+		if (!dout.stream().anyMatch(i -> Arrays.equals(i, outputDim))) {
+		    dout.add(outputDim);
+		}
+	    } else if (c instanceof Subsampling2DConnection) {
+		Subsampling2DConnection cc = (Subsampling2DConnection) c;
+		int[] inputDim = new int[] { cc.getFilters(), cc.getOutputFeatureMapRows(), cc.getOutputFeatureMapColumns(), getMiniBatchSize() };
+		int[] outputDim = new int[] { cc.getFilters(), cc.getInputFeatureMapRows(), cc.getInputFeatureMapColumns(), getMiniBatchSize() };
+		if (!din.stream().anyMatch(i -> Arrays.equals(i, inputDim))) {
+		    din.add(inputDim);
+		}
+		if (!dout.stream().anyMatch(i -> Arrays.equals(i, outputDim))) {
+		    dout.add(outputDim);
+		}
 	    }
 	}
 

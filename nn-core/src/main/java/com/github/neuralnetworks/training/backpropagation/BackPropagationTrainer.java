@@ -4,6 +4,7 @@ import java.util.Set;
 
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
+import com.github.neuralnetworks.calculation.memory.SharedMemoryValuesProvider;
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.training.OneStepTrainer;
 import com.github.neuralnetworks.training.TrainingInputData;
@@ -26,16 +27,10 @@ public class BackPropagationTrainer<N extends NeuralNetwork> extends OneStepTrai
     private ValuesProvider activations;
     private ValuesProvider backpropagation;
 
-    public BackPropagationTrainer() {
-	super();
-	activations = new ValuesProvider();
-	backpropagation = new ValuesProvider();
-    }
-
     public BackPropagationTrainer(Properties properties) {
 	super(properties);
-	activations = new ValuesProvider();
-	backpropagation = new ValuesProvider();
+	activations = new SharedMemoryValuesProvider(getNeuralNetwork());
+	backpropagation = new SharedMemoryValuesProvider(getNeuralNetwork());
     }
 
     /* (non-Javadoc)

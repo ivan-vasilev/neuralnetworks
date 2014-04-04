@@ -5,6 +5,7 @@ import java.util.Set;
 
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.types.RBM;
+import com.github.neuralnetworks.calculation.memory.SharedMemoryValuesProvider;
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.util.Matrix;
 import com.github.neuralnetworks.util.TensorFactory;
@@ -21,11 +22,11 @@ public class RBMLayerCalculator extends LayerCalculatorImpl {
     private ValuesProvider results;
     private ValuesProvider intermediateResults;
 
-    public RBMLayerCalculator() {
+    public RBMLayerCalculator(RBM rbm) {
 	super();
 	calculatedLayers = new HashSet<>();
-	results = new ValuesProvider();
-	intermediateResults = new ValuesProvider();
+	results = new SharedMemoryValuesProvider(rbm);
+	intermediateResults = new SharedMemoryValuesProvider(rbm);
     }
 
     public void gibbsSampling(RBM rbm, Matrix posPhaseVisible, Matrix posPhaseHidden, Matrix negPhaseVisible, Matrix negPhaseHidden, int samplingCount, boolean resetNetwork, boolean useIntermediateResults) {

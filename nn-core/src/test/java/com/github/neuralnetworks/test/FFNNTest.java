@@ -11,6 +11,7 @@ import java.util.Set;
 import org.junit.Test;
 
 import com.amd.aparapi.Kernel.EXECUTION_MODE;
+import com.github.neuralnetworks.architecture.ConnectionFactory;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.FullyConnected;
 import com.github.neuralnetworks.architecture.Layer;
@@ -19,6 +20,7 @@ import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.calculation.BreadthFirstOrderStrategy;
 import com.github.neuralnetworks.calculation.LayerOrderStrategy.ConnectionCandidate;
 import com.github.neuralnetworks.calculation.TargetLayerOrderStrategy;
+import com.github.neuralnetworks.calculation.memory.SharedMemoryValuesProvider;
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSumConnectionCalculator;
 import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculatorFullyConnected;
@@ -28,7 +30,6 @@ import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.Matrix;
 import com.github.neuralnetworks.util.Tensor;
 import com.github.neuralnetworks.util.TensorFactory;
-import com.github.neuralnetworks.util.Util;
 
 /**
  * General feedforward neural networks tests
@@ -67,6 +68,10 @@ public class FFNNTest {
 	cg.set(5, 1, 1);
 	cg.set(6, 1, 2);
 
+	Matrix bcg = bc.getConnectionGraph();
+	bcg.set(0.1f, 0, 0);
+	bcg.set(0.2f, 1, 0);
+
 	Tensor t = TensorFactory.tensor(2, 3, 2);
 
 	Matrix i1 = TensorFactory.tensor(t, new int[][] { {0, 0, 0}, {0, 2, 1} });
@@ -85,16 +90,14 @@ public class FFNNTest {
 	i2.set(5, 1, 1);
 	i2.set(6, 2, 1);
 
-	Matrix bcg = bc.getConnectionGraph();
-	bcg.set(0.1f, 0, 0);
-	bcg.set(0.2f, 1, 0);
-
 	ConnectionCalculatorFullyConnected aws = new AparapiWeightedSumConnectionCalculator();
 
 	List<Connections> connections = new ArrayList<>();
 	connections.add(c1);
 
-	ValuesProvider vp = new ValuesProvider();
+	NeuralNetworkImpl nn = new NeuralNetworkImpl();
+	nn.addConnections(connections.toArray(new Connections[connections.size()]));
+	ValuesProvider vp = new SharedMemoryValuesProvider(nn);
 	vp.addValues(c1.getInputLayer(), i1);
 	vp.addValues(ol, o);
 
@@ -105,14 +108,16 @@ public class FFNNTest {
 	assertEquals(32, o.get(0, 1), 0);
 	assertEquals(32, o.get(1, 0), 0);
 	assertEquals(77, o.get(1, 1), 0);
-	Util.fillArray(o.getElements(), 0);
+	o.forEach(i -> o.getElements()[i] = 0);
 
 	// with bias
 	connections = new ArrayList<>();
 	connections.add(c1);
 	connections.add(bc);
 
-	vp = new ValuesProvider();
+	nn = new NeuralNetworkImpl();
+	nn.addConnections(connections.toArray(new Connections[connections.size()]));
+	vp = new SharedMemoryValuesProvider(nn);
 	vp.addValues(c1.getInputLayer(), i1);
 	vp.addValues(ol, o);
 
@@ -123,15 +128,17 @@ public class FFNNTest {
 	assertEquals(32.1, o.get(0, 1), 0.01);
 	assertEquals(32.2, o.get(1, 0), 0.01);
 	assertEquals(77.2, o.get(1, 1), 0.01);
-	Util.fillArray(o.getElements(), 0);
+	o.forEach(i -> o.getElements()[i] = 0);
 
 	// combined layers
 	connections = new ArrayList<>();
 	connections.add(c1);
 	connections.add(c2);
 	connections.add(bc);
+	nn = new NeuralNetworkImpl();
+	nn.addConnections(connections.toArray(new Connections[connections.size()]));
+	vp = new SharedMemoryValuesProvider(nn);
 
-	vp = new ValuesProvider();
 	vp.addValues(c1.getInputLayer(), i1);
 	vp.addValues(c2.getInputLayer(), i2);
 	vp.addValues(ol, o);
@@ -143,7 +150,7 @@ public class FFNNTest {
 	assertEquals(64.1, o.get(0, 1), 0.01);
 	assertEquals(64.2, o.get(1, 0), 0.01);
 	assertEquals(154.2, o.get(1, 1), 0.01);
-	Util.fillArray(o.getElements(), 0);
+	o.forEach(i -> o.getElements()[i] = 0);
     }
 
     @Test
@@ -177,6 +184,10 @@ public class FFNNTest {
 	cg.set(5, 1, 1);
 	cg.set(6, 2, 1);
 
+	Matrix bcg = bc.getConnectionGraph();
+	bcg.set(0.1f, 0, 0);
+	bcg.set(0.2f, 1, 0);
+
 	Tensor t = TensorFactory.tensor(2, 3, 2);
 
 	Matrix i1 = TensorFactory.tensor(t, new int[][] { {0, 0, 0}, {0, 2, 1} });
@@ -195,16 +206,13 @@ public class FFNNTest {
 	i2.set(5, 1, 1);
 	i2.set(6, 2, 1);
 
-	Matrix bcg = bc.getConnectionGraph();
-	bcg.set(0.1f, 0, 0);
-	bcg.set(0.2f, 1, 0);
-
 	ConnectionCalculatorFullyConnected aws = new AparapiWeightedSumConnectionCalculator();
 
 	List<Connections> connections = new ArrayList<>();
 	connections.add(c1);
-
-	ValuesProvider vp = new ValuesProvider();
+	NeuralNetworkImpl nn = new NeuralNetworkImpl();
+	nn.addConnections(connections.toArray(new Connections[connections.size()]));
+	ValuesProvider vp = new SharedMemoryValuesProvider(nn);
 	vp.addValues(c1.getOutputLayer(), i1);
 	vp.addValues(ol, o);
 
@@ -215,14 +223,15 @@ public class FFNNTest {
 	assertEquals(32, o.get(0, 1), 0);
 	assertEquals(32, o.get(1, 0), 0);
 	assertEquals(77, o.get(1, 1), 0);
-	Util.fillArray(o.getElements(), 0);
+	o.forEach(i -> o.getElements()[i] = 0);
 
 	// with bias
 	connections = new ArrayList<>();
 	connections.add(c1);
 	connections.add(bc);
-
-	vp = new ValuesProvider();
+	nn = new NeuralNetworkImpl();
+	nn.addConnections(connections.toArray(new Connections[connections.size()]));
+	vp = new SharedMemoryValuesProvider(nn);
 	vp.addValues(c1.getOutputLayer(), i1);
 	vp.addValues(ol, o);
 
@@ -233,15 +242,16 @@ public class FFNNTest {
 	assertEquals(32.1, o.get(0, 1), 0.01);
 	assertEquals(32.2, o.get(1, 0), 0.01);
 	assertEquals(77.2, o.get(1, 1), 0.01);
-	Util.fillArray(o.getElements(), 0);
+	o.forEach(i -> o.getElements()[i] = 0);
 
 	// combined layers
 	connections = new ArrayList<>();
 	connections.add(c1);
 	connections.add(c2);
 	connections.add(bc);
-
-	vp = new ValuesProvider();
+	nn = new NeuralNetworkImpl();
+	nn.addConnections(connections.toArray(new Connections[connections.size()]));
+	vp = new SharedMemoryValuesProvider(nn);
 	vp.addValues(c1.getOutputLayer(), i1);
 	vp.addValues(c2.getOutputLayer(), i2);
 	vp.addValues(ol, o);
@@ -253,7 +263,7 @@ public class FFNNTest {
 	assertEquals(64.1, o.get(0, 1), 0.01);
 	assertEquals(64.2, o.get(1, 0), 0.01);
 	assertEquals(154.2, o.get(1, 1), 0.01);
-	Util.fillArray(o.getElements(), 0);
+	o.forEach(i -> o.getElements()[i] = 0);
     }
 
     /**
@@ -261,7 +271,7 @@ public class FFNNTest {
      */
     @Test
     public void testSigmoidBP() {
-	//Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 2, 2, 1 }, false);
 
 	FullyConnected c1 = (FullyConnected) mlp.getInputLayer().getConnections().iterator().next();
@@ -340,27 +350,31 @@ public class FFNNTest {
 
     @Test
     public void testParallelNetworks() {
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
+
+	ConnectionFactory cf = new ConnectionFactory(true);
 	NeuralNetworkImpl mlp = new NeuralNetworkImpl();
 	Layer input = new Layer();
+	Layer leaf1 = new Layer();
+	Layer leaf2 = new Layer();
+	Layer output = new Layer();
+
 	mlp.addLayer(input);
 
-	Layer leaf1 = new Layer();
-	FullyConnected fc1 = new FullyConnected(input, leaf1, 2, 3);
-	Util.fillArray(fc1.getConnectionGraph().getElements(), 0.1f);
-	mlp.addConnection(fc1);
+	FullyConnected fc1 = cf.fullyConnected(input, leaf1, 2, 3);
+	fc1.getConnectionGraph().forEach(i -> fc1.getConnectionGraph().getElements()[i] = 0.1f);
+	mlp.addConnections(fc1);
 
-	Layer leaf2 = new Layer();
-	FullyConnected fc2 = new FullyConnected(input, leaf2, 2, 3);
-	Util.fillArray(fc2.getConnectionGraph().getElements(), 0.2f);
-	mlp.addConnection(fc2);
+	FullyConnected fc2 = cf.fullyConnected(input, leaf2, 2, 3);
+	fc2.getConnectionGraph().forEach(i -> fc2.getConnectionGraph().getElements()[i] = 0.2f);
+	mlp.addConnections(fc2);
 
-	Layer output = new Layer();
-	FullyConnected fc3 = new FullyConnected(leaf1, output, 3, 1);
-	Util.fillArray(fc3.getConnectionGraph().getElements(), 0.3f);
-	mlp.addConnection(fc3);
-	FullyConnected fc4 = new FullyConnected(leaf2, output, 3, 1);
-	Util.fillArray(fc4.getConnectionGraph().getElements(), 0.4f);
-	mlp.addConnection(fc4);
+	FullyConnected fc3 = cf.fullyConnected(leaf1, output, 3, 1);
+	fc3.getConnectionGraph().forEach(i -> fc3.getConnectionGraph().getElements()[i] = 0.3f);
+	mlp.addConnections(fc3);
+	FullyConnected fc4 = cf.fullyConnected(leaf2, output, 3, 1);
+	fc4.getConnectionGraph().forEach(i -> fc4.getConnectionGraph().getElements()[i] = 0.4f);
+	mlp.addConnections(fc4);
 
 	mlp.setLayerCalculator(NNFactory.lcWeightedSum(mlp, null));
 
@@ -368,7 +382,7 @@ public class FFNNTest {
 	Set<Layer> calculated = new HashSet<>();
 	calculated.add(mlp.getInputLayer());
 
-	ValuesProvider results = new ValuesProvider();
+	ValuesProvider results = new SharedMemoryValuesProvider(mlp);
 	results.addValues(input, i);
 
 	mlp.getLayerCalculator().calculate(mlp, output, calculated, results);

@@ -13,7 +13,7 @@ import com.github.neuralnetworks.calculation.LayerOrderStrategy.ConnectionCandid
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.events.PropagationEvent;
 import com.github.neuralnetworks.events.PropagationEventListener;
-import com.github.neuralnetworks.util.Util;
+import com.github.neuralnetworks.util.Tensor;
 
 /**
  * Base class for implementations of the LayerCalculator interface
@@ -36,7 +36,8 @@ public class LayerCalculatorBase implements Serializable {
 		if (i == connections.size() - 1 || connections.get(i + 1).target != c.target) {
 		    ConnectionCalculator cc = getConnectionCalculator(c.target);
 		    if (cc != null) {
-			Util.fillArray(valuesProvider.getValues(c.target, chunk).getElements(), 0);
+			Tensor t = valuesProvider.getValues(c.target, chunk);
+			t.forEach(j -> t.getElements()[j] = 0);
 			cc.calculate(chunk, valuesProvider, c.target);
 		    }
 

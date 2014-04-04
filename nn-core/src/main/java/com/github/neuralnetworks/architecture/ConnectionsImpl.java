@@ -28,17 +28,30 @@ public abstract class ConnectionsImpl implements Connections, Comparable<Connect
 	this.inputLayer = inputLayer;
 	this.outputLayer = outputLayer;
 
-	inputLayer.addConnection(this);
-	outputLayer.addConnection(this);
+	if (inputLayer != null) {
+	    inputLayer.addConnection(this);
+	}
+
+	if (outputLayer != null) {
+	    outputLayer.addConnection(this);
+	}
     }
 
     @Override
     public Layer getInputLayer() {
 	return inputLayer;
     }
-    
+
     public void setInputLayer(Layer inputLayer) {
+	if (this.inputLayer != null) {
+	    this.inputLayer.getConnections().remove(this);
+	}
+
 	this.inputLayer = inputLayer;
+
+	if (this.inputLayer != null) {
+	    this.inputLayer.addConnection(this);
+	}
     }
 
     @Override
@@ -47,7 +60,15 @@ public abstract class ConnectionsImpl implements Connections, Comparable<Connect
     }
 
     public void setOutputLayer(Layer outputLayer) {
-        this.outputLayer = outputLayer;
+	if (this.outputLayer != null) {
+	    this.outputLayer.getConnections().remove(this);
+	}
+
+	this.outputLayer = outputLayer;
+
+	if (this.outputLayer != null) {
+	    this.outputLayer.addConnection(this);
+	}
     }
 
     @Override

@@ -44,7 +44,6 @@ import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.Matrix;
 import com.github.neuralnetworks.util.Tensor;
 import com.github.neuralnetworks.util.TensorFactory;
-import com.github.neuralnetworks.util.Util;
 
 /**
  * Tests for convolutional networks
@@ -562,7 +561,7 @@ public class CNNTest {
 	nn.setLayerCalculator(NNFactory.lcWeightedSum(nn, null));
 
 	Conv2DConnection cc = (Conv2DConnection) nn.getInputLayer().getConnections().get(0);
-	Util.fillArray(cc.getWeights().getElements(), 1);
+	cc.getWeights().forEach(i -> cc.getWeights().getElements()[i] = 1);
 
 	ValuesProvider vp = new ValuesProvider();
 	vp.setMiniBatchSize(1);

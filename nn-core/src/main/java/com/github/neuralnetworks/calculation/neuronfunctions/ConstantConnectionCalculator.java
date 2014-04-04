@@ -6,7 +6,7 @@ import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
-import com.github.neuralnetworks.util.Util;
+import com.github.neuralnetworks.util.Tensor;
 
 /**
  * Basic connection calculator that populates the output with a constant (for bias layers)
@@ -29,7 +29,8 @@ public class ConstantConnectionCalculator implements ConnectionCalculator {
 
     @Override
     public void calculate(List<Connections> connections, ValuesProvider valuesProvider, Layer targetLayer) {
-	Util.fillArray(valuesProvider.getValues(targetLayer, connections).getElements(), value);
+	Tensor t = valuesProvider.getValues(targetLayer, connections);
+	t.forEach(i -> t.getElements()[i] = value);
     }
 
     public float getValue() {

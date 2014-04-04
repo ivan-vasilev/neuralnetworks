@@ -5,6 +5,7 @@ import java.util.Set;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.calculation.OutputError;
+import com.github.neuralnetworks.calculation.memory.SharedMemoryValuesProvider;
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.events.TrainingEvent;
 import com.github.neuralnetworks.events.TrainingEventListener;
@@ -68,7 +69,7 @@ public class EarlyStoppingListener implements TrainingEventListener {
 			calculatedLayers.add(n.getInputLayer());
 			ValuesProvider vp = mbe.getResults();
 			if (vp == null) {
-			    vp = new ValuesProvider();
+			    vp = new SharedMemoryValuesProvider(n);
 			}
 
 			vp.addValues(n.getInputLayer(), input.getInput());

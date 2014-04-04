@@ -59,7 +59,7 @@ public class NNRandomInitializer implements Serializable {
 		GraphConnections fc = (GraphConnections) cc.connection;
 		if (Util.isBias(fc.getInputLayer())) {
 		    if (biasDefaultValue != null) {
-			Util.fillArray(fc.getConnectionGraph().getElements(), biasDefaultValue);
+			fc.getConnectionGraph().forEach(i -> fc.getConnectionGraph().getElements()[i] = biasDefaultValue);
 		    } else if (biasRandomInitializer != null) {
 			biasRandomInitializer.initialize(fc.getConnectionGraph().getElements());
 		    } else {
@@ -72,7 +72,7 @@ public class NNRandomInitializer implements Serializable {
 		Conv2DConnection c = (Conv2DConnection) cc.connection;
 		if (Util.isBias(c.getInputLayer())) {
 		    if (biasDefaultValue != null) {
-			Util.fillArray(c.getWeights().getElements(), biasDefaultValue);
+			c.getWeights().forEach(i -> c.getWeights().getElements()[i] = biasDefaultValue);
 		    } else if (biasRandomInitializer != null) {
 			biasRandomInitializer.initialize(c.getWeights().getElements());
 		    } else {

@@ -16,10 +16,6 @@ public class BackPropagationAutoencoder extends BackPropagationTrainer<Autoencod
 
     private AutoencoderTrainingInputData autoencoderTrainingInputData;
 
-    public BackPropagationAutoencoder() {
-	super();
-    }
-
     public BackPropagationAutoencoder(Properties properties) {
 	super(properties);
     }

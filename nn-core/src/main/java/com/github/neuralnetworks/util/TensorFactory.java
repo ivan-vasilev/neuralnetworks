@@ -3,6 +3,8 @@ package com.github.neuralnetworks.util;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
+import com.github.neuralnetworks.util.Tensor.TensorIterator;
+
 public class TensorFactory {
 
     @SuppressWarnings("unchecked")
@@ -22,15 +24,15 @@ public class TensorFactory {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends Tensor> T tensor(float[] elements, int... dimensions) {
+    public static <T extends Tensor> T tensor(float[] elements, int offset, int... dimensions) {
 	int[][] dimensionsLimit = new int[2][dimensions.length];
 	IntStream.range(0, dimensions.length).forEach(i -> dimensionsLimit[1][i] = dimensions[i] - 1);
 
 	T result = null;
 	if (dimensions.length == 2) {
-	    result = (T) new Matrix(0, elements, dimensions, dimensionsLimit);
+	    result = (T) new Matrix(offset, elements, dimensions, dimensionsLimit);
 	} else {
-	    result = (T) new Tensor(0, elements, dimensions, dimensionsLimit);
+	    result = (T) new Tensor(offset, elements, dimensions, dimensionsLimit);
 	}
 
 	return result;
@@ -101,6 +103,13 @@ public class TensorFactory {
     }
 
     public static Matrix matrix(float[] elements, int columns) {
-	return tensor(elements, elements.length / columns, columns);
+	return tensor(elements, 0, elements.length / columns, columns);
+    }
+
+    public static void fill(Tensor t, float value) {
+	TensorIterator it = t.iterator();
+	while (it.hasNext()) {
+	    t.getElements()[it.next()] = value;
+	}
     }
 }

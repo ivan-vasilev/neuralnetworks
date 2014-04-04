@@ -102,7 +102,7 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
 	    }
 
 	    if (weights != ((FullyConnected) c).getConnectionGraph().getElements()) {
-		throw new IllegalArgumentException("Only one input weight array is allowed");
+		throw new IllegalArgumentException("Only one weight array is allowed");
 	    }
 	});
 
@@ -131,7 +131,7 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
 	this.weightsStep = new int[series];
 
 	IntStream.range(0, inputConnections.size()).forEach(i -> {
-	    Matrix w = ((FullyConnected) inputConnections.get(0)).getConnectionGraph();
+	    Matrix w = ((FullyConnected) inputConnections.get(i)).getConnectionGraph();
 	    weightStartPositions[i] = w.getStartIndex();
 	    if (inputConnections.get(0).getOutputLayer() == targetLayer) {
 		weightsSize[i] = w.getColumns();
