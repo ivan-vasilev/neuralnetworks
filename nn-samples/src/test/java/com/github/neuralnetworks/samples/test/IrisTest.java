@@ -1,20 +1,9 @@
 package com.github.neuralnetworks.samples.test;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import org.junit.Test;
-
 import com.amd.aparapi.Kernel.EXECUTION_MODE;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
-import com.github.neuralnetworks.architecture.types.Autoencoder;
-import com.github.neuralnetworks.architecture.types.DBN;
-import com.github.neuralnetworks.architecture.types.NNFactory;
-import com.github.neuralnetworks.architecture.types.RBM;
-import com.github.neuralnetworks.architecture.types.StackedAutoencoder;
+import com.github.neuralnetworks.architecture.types.*;
 import com.github.neuralnetworks.calculation.LayerCalculatorImpl;
 import com.github.neuralnetworks.calculation.OutputError;
 import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculatorFullyConnected;
@@ -35,6 +24,12 @@ import com.github.neuralnetworks.training.random.NNRandomInitializer;
 import com.github.neuralnetworks.training.rbm.AparapiCDTrainer;
 import com.github.neuralnetworks.training.rbm.DBNTrainer;
 import com.github.neuralnetworks.util.Environment;
+import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Iris test
