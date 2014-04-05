@@ -43,8 +43,10 @@ public class BackPropagationSoftReLU extends BackPropagationConnectionCalculator
 	@Override
 	protected void calcDerivative() {
 	    int end = outputStartPosition + getGlobalId() * outputRowStep + miniBatchSize * outputColumnStep;
-	    for (int i = outputStartPosition + getGlobalId() * outputRowStep; i < end; i += outputColumnStep) {
-		output[i] = output[i] * (1 / (1 + exp(-ffActivation[i])));
+	    int outputId = outputStartPosition + getGlobalId() * outputRowStep;
+	    int activationId = activationStartPosition + getGlobalId() * activationRowStep;
+	    for (; outputId < end; outputId += outputColumnStep, activationId += activationColumnStep) {
+		output[outputId] = output[outputId] * (1 / (1 + exp(-ffActivation[activationId])));
 	    }
 	}
     }

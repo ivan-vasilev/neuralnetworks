@@ -43,9 +43,11 @@ public class BackPropagationReLU extends BackPropagationConnectionCalculatorImpl
 	@Override
 	protected void calcDerivative() {
 	    int end = outputStartPosition + getGlobalId() * outputRowStep + miniBatchSize * outputColumnStep;
-	    for (int i = outputStartPosition + getGlobalId() * outputRowStep; i < end; i += outputColumnStep) {
-		if (ffActivation[i] <= 0) {
-		    output[i] = 0;
+	    int outputId = outputStartPosition + getGlobalId() * outputRowStep;
+	    int activationId = activationStartPosition + getGlobalId() * activationRowStep;
+	    for (; outputId < end; outputId += outputColumnStep, activationId += activationColumnStep) {
+		if (ffActivation[activationId] <= 0) {
+		    output[outputId] = 0;
 		}
 	    }
 	}

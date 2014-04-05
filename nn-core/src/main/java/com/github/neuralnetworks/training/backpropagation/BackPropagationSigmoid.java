@@ -44,9 +44,11 @@ public class BackPropagationSigmoid extends BackPropagationConnectionCalculatorI
 	protected void calcDerivative() {
 	    float activation = 0;
 	    int end = outputStartPosition + getGlobalId() * outputRowStep + miniBatchSize * outputColumnStep;
-	    for (int i = outputStartPosition + getGlobalId() * outputRowStep; i < end; i += outputColumnStep) {
-		activation = ffActivation[i];
-		output[i] = output[i] * activation * (1 - activation);
+	    int outputId = outputStartPosition + getGlobalId() * outputRowStep;
+	    int activationId = activationStartPosition + getGlobalId() * activationRowStep;
+	    for (; outputId < end; outputId += outputColumnStep, activationId += activationColumnStep) {
+		activation = ffActivation[activationId];
+		output[outputId] = output[outputId] * activation * (1 - activation);
 	    }
 	}
     }

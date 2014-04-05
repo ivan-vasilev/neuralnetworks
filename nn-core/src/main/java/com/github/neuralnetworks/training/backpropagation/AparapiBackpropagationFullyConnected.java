@@ -22,8 +22,8 @@ public class AparapiBackpropagationFullyConnected extends AparapiWeightedSum imp
     @Constant
     protected float[] ffActivation;
     protected final int activationStartPosition;
-    protected final int activationRowSteps;
-    protected final int activationColumnSteps;
+    protected final int activationRowStep;
+    protected final int activationColumnStep;
 
     /**
      * Weight updates array
@@ -38,11 +38,11 @@ public class AparapiBackpropagationFullyConnected extends AparapiWeightedSum imp
     public AparapiBackpropagationFullyConnected(List<Connections> inputConnections, ValuesProvider valuesProvider, ValuesProvider activations, Layer targetLayer, float learningRate, float momentum, float l1weightDecay, float l2weightDecay) {
 	super(inputConnections, valuesProvider, targetLayer);
 
-	Matrix m = valuesProvider.getValues(targetLayer, inputConnections);
+	Matrix m = activations.getValues(targetLayer, inputConnections);
 	this.ffActivation = m.getElements();
 	this.activationStartPosition = m.getStartIndex();
-	this.activationRowSteps = m.getRowElementsDistance();
-	this.activationColumnSteps = m.getColumnElementsDistance();
+	this.activationRowStep = m.getRowElementsDistance();
+	this.activationColumnStep = m.getColumnElementsDistance();
 
 	this.learningRate = momentum;
 	this.momentum = momentum;
@@ -71,7 +71,7 @@ public class AparapiBackpropagationFullyConnected extends AparapiWeightedSum imp
 	    for (int j = 0; j < dim; j++) {
 		weightUpdate = 0;
 		for (int i = 0; i < miniBatchSize; i++) {
-		    weightUpdate += input[inputStartPosition + j * inputRowsStep + i * inputColumnsStep] * ffActivation[activationStartPosition + id * activationRowSteps + i * activationColumnSteps];
+		    weightUpdate += input[inputStartPosition + j * inputRowsStep + i * inputColumnsStep] * ffActivation[activationStartPosition + id * activationRowStep + i * activationColumnStep];
 		}
 
 		weightIndex = weightStartPosition + j * weightStep;

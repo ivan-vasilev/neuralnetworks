@@ -45,10 +45,12 @@ public class BackPropagationTanh extends BackPropagationConnectionCalculatorImpl
 	    float error = 0, activation = 0;
 
 	    int end = outputStartPosition + getGlobalId() * outputRowStep + miniBatchSize * outputColumnStep;
-	    for (int i = outputStartPosition + getGlobalId() * outputRowStep; i < end; i += outputColumnStep) {
-		error = output[i];
-		activation = ffActivation[i];
-		output[i] = error * -error * activation * activation;
+	    int outputId = outputStartPosition + getGlobalId() * outputRowStep;
+	    int activationId = activationStartPosition + getGlobalId() * activationRowStep;
+	    for (; outputId < end; outputId += outputColumnStep, activationId += activationColumnStep) {
+		error = output[outputId];
+		activation = ffActivation[activationId];
+		output[outputId] = error * -error * activation * activation;
 	    }
 	}
     }
