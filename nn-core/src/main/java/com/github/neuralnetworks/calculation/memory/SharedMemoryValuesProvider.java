@@ -33,7 +33,9 @@ public class SharedMemoryValuesProvider extends ValuesProvider {
 
 	// remove existing
 	values.entrySet().forEach(e -> {
-	    dims.get(e.getKey()).removeIf(d -> e.getValue().stream().anyMatch(t -> Arrays.equals(t.getDimensions(), d)));
+	    dims.get(e.getKey()).removeIf(d -> e.getValue().stream().anyMatch(t -> {
+		return Arrays.equals(t.getDimensions(), d);
+	    }));
 	    if (dims.get(e.getKey()).size() == 0) {
 		dims.remove(e.getKey());
 	    }

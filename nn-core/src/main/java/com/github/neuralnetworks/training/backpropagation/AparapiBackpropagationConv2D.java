@@ -65,9 +65,9 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements BackP
 
 	    // currently works only as a feedforward (including bp)
 	    if (targetLayer == c.getOutputLayer()) {
-		super.calculate(c, valuesProvider.getValues(Util.getOppositeLayer(c, targetLayer), c), valuesProvider.getValues(targetLayer, c));
+		super.calculate(c, valuesProvider, targetLayer);
 	    } else {
-		super.calculate(c, valuesProvider.getValues(targetLayer, c), valuesProvider.getValues(Util.getOppositeLayer(c, targetLayer), c));
+		super.calculate(c, valuesProvider, Util.getOppositeLayer(c, targetLayer));
 	    }
 
 	    updateWeights();

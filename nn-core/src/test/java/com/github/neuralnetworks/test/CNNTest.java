@@ -11,6 +11,7 @@ import java.util.Set;
 import org.junit.Test;
 
 import com.amd.aparapi.Kernel.EXECUTION_MODE;
+import com.github.neuralnetworks.architecture.ConnectionFactory;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
 import com.github.neuralnetworks.architecture.FullyConnected;
@@ -21,6 +22,7 @@ import com.github.neuralnetworks.architecture.Subsampling2DConnection;
 import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.calculation.LayerCalculatorImpl;
+import com.github.neuralnetworks.calculation.memory.SharedMemoryValuesProvider;
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiAveragePooling2D;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2D;
@@ -53,14 +55,15 @@ public class CNNTest {
     @Test
     public void testDimensions() {
 	// convolution dimensions
-	Conv2DConnection conv = new Conv2DConnection(new Layer(), new Layer(), 4, 4, 3, 2, 2, 2, 1);
+	ConnectionFactory cf = new ConnectionFactory(true);
+	Conv2DConnection conv = cf.conv2d(new Layer(), new Layer(), 4, 4, 3, 2, 2, 2, 1);
 
 	assertEquals(3, conv.getOutputFeatureMapColumns(), 0);
 	assertEquals(3, conv.getOutputFeatureMapRows(), 0);
 	assertEquals(2, conv.getOutputFilters(), 0);
 
 	// subsampling dimensions
-	Subsampling2DConnection sub = new Subsampling2DConnection(new Layer(), new Layer(), 5, 5, 2, 2, 3);
+	Subsampling2DConnection sub = cf.subsampling2D(new Layer(), new Layer(), 5, 5, 2, 2, 3);
 
 	assertEquals(2, sub.getOutputFeatureMapColumns(), 0);
 	assertEquals(2, sub.getOutputFeatureMapRows(), 0);
@@ -250,13 +253,12 @@ public class CNNTest {
 
     @Test
     public void testConvolutions() {
-	Conv2DConnection c = new Conv2DConnection(new Layer(), new Layer(), 3, 3, 2, 2, 2, 1, 1);
+	Conv2DConnection c = new ConnectionFactory(true).conv2d(new Layer(), new Layer(), 3, 3, 2, 2, 2, 1, 1);
 
 	c.getWeights().setElements(new float[] {1, 2, 3, 4, 1, 2, 3, 4});
 
-	ValuesProvider vp = new ValuesProvider();
-	vp.setMiniBatchSize(1);
-	vp.getValues(c.getInputLayer()).setElements(new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 });
+	ValuesProvider vp = new SharedMemoryValuesProvider(c);
+	vp.addValues(c.getInputLayer(), TensorFactory.tensor(new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 }, 0, 2, 3, 3, 1));
 
 	AparapiConv2D conv = new AparapiConv2DFF(c, vp, c.getOutputLayer());
 	conv.calculate(c, vp, c.getOutputLayer());
@@ -272,12 +274,11 @@ public class CNNTest {
 
     @Test
     public void testConvolutions2() {
-	Conv2DConnection c = new Conv2DConnection(new Layer(), new Layer(), 3, 3, 2, 2, 2, 2, 1);
+	Conv2DConnection c = new ConnectionFactory(true).conv2d(new Layer(), new Layer(), 3, 3, 2, 2, 2, 2, 1);
 	c.getWeights().setElements(new float[] {1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4});
 
-	ValuesProvider vp = new ValuesProvider();
-	vp.setMiniBatchSize(1);
-	vp.getValues(c.getInputLayer()).setElements(new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 });
+	ValuesProvider vp = new SharedMemoryValuesProvider(c);
+	vp.addValues(c.getInputLayer(), TensorFactory.tensor(new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 }, 0, 2, 3, 3, 1));
 
 	AparapiConv2D conv = new AparapiConv2DFF(c, vp, c.getOutputLayer());
 	conv.calculate(c, vp, c.getOutputLayer());
@@ -303,9 +304,8 @@ public class CNNTest {
 	Conv2DConnection c = (Conv2DConnection) nn.getInputLayer().getConnections().get(0);
 	c.getWeights().setElements(new float[] {1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4});
 
-	ValuesProvider vp = new ValuesProvider();
-	vp.setMiniBatchSize(1);
-	vp.getValues(nn.getInputLayer()).setElements(new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 });
+	ValuesProvider vp = new SharedMemoryValuesProvider(nn);
+	vp.addValues(c.getInputLayer(), TensorFactory.tensor(new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 }, 0, 2, 3, 3, 1));
 
 	Set<Layer> calculatedLayers = new HashSet<>();
 	calculatedLayers.add(nn.getInputLayer());
@@ -325,9 +325,8 @@ public class CNNTest {
 
 	ConnectionCalculator calc = new AparapiMaxPooling2D();
 
-	ValuesProvider vp = new ValuesProvider();
-	vp.setMiniBatchSize(2);
-	vp.getValues(c.getInputLayer()).setElements(new float[] { 0.5f, 1, 1, 2, 1.5f, 3, 2, 4, 2.5f, 5, 3, 6, 3.5f, 7, 4f, 8, 4.5f, 9, 5f, 10, 5.5f, 11, 6f, 12, 6.5f, 13, 7f, 14, 8f, 16, 7.5f, 15, 8.5f, 17, 9f, 18, 9.5f, 19, 10f, 20, 10.5f, 21, 11f, 22, 11.5f, 23, 12f, 24, 12.5f, 25, 13f, 26, 13.5f, 27, 14f, 28, 14.5f, 29, 15f, 30, 16f, 32, 15.5f, 31 });
+	ValuesProvider vp = new SharedMemoryValuesProvider(c);
+	vp.addValues(c.getInputLayer(), TensorFactory.tensor(new float[] { 0.5f, 1, 1, 2, 1.5f, 3, 2, 4, 2.5f, 5, 3, 6, 3.5f, 7, 4f, 8, 4.5f, 9, 5f, 10, 5.5f, 11, 6f, 12, 6.5f, 13, 7f, 14, 8f, 16, 7.5f, 15, 8.5f, 17, 9f, 18, 9.5f, 19, 10f, 20, 10.5f, 21, 11f, 22, 11.5f, 23, 12f, 24, 12.5f, 25, 13f, 26, 13.5f, 27, 14f, 28, 14.5f, 29, 15f, 30, 16f, 32, 15.5f, 31 }, 0, 2, 4, 4, 2));
 
 	calc.calculate(connections, vp, c.getOutputLayer());
 
@@ -360,9 +359,8 @@ public class CNNTest {
 
 	AparapiAveragePooling2D calc = new AparapiAveragePooling2D();
 
-	ValuesProvider vp = new ValuesProvider();
-	vp.setMiniBatchSize(2);
-	vp.getValues(c.getInputLayer()).setElements(new float[] { 0.5f, 1, 1, 2, 1.5f, 3, 2, 4, 2.5f, 5, 3, 6, 3.5f, 7, 4f, 8, 4.5f, 9, 5f, 10, 5.5f, 11, 6f, 12, 6.5f, 13, 7f, 14, 8f, 16, 7.5f, 15, 8.5f, 17, 9f, 18, 9.5f, 19, 10f, 20, 10.5f, 21, 11f, 22, 11.5f, 23, 12f, 24, 12.5f, 25, 13f, 26, 13.5f, 27, 14f, 28, 14.5f, 29, 15f, 30, 16f, 32, 15.5f, 31 });
+	ValuesProvider vp = new SharedMemoryValuesProvider(c);
+	vp.addValues(c.getInputLayer(), TensorFactory.tensor(new float[] { 0.5f, 1, 1, 2, 1.5f, 3, 2, 4, 2.5f, 5, 3, 6, 3.5f, 7, 4f, 8, 4.5f, 9, 5f, 10, 5.5f, 11, 6f, 12, 6.5f, 13, 7f, 14, 8f, 16, 7.5f, 15, 8.5f, 17, 9f, 18, 9.5f, 19, 10f, 20, 10.5f, 21, 11f, 22, 11.5f, 23, 12f, 24, 12.5f, 25, 13f, 26, 13.5f, 27, 14f, 28, 14.5f, 29, 15f, 30, 16f, 32, 15.5f, 31 }, 0, 2, 4, 4, 2));
 
 	calc.calculate(connections, vp, c.getOutputLayer());
 
@@ -393,9 +391,8 @@ public class CNNTest {
 	List<Connections> connections = new ArrayList<Connections>();
 	connections.add(c);
 
-	ValuesProvider vp = new ValuesProvider();
-	vp.setMiniBatchSize(2);
-	vp.getValues(c.getInputLayer()).setElements(new float[] { 1.6f, 1.6f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2.4f, 2.4f });
+	ValuesProvider vp = new SharedMemoryValuesProvider(c);
+	vp.addValues(c.getInputLayer(), TensorFactory.tensor(new float[] { 1.6f, 1.6f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2.4f, 2.4f }, 0, 1, 3, 3, 2));
 
 	AparapiStochasticPooling2D calc = new AparapiStochasticPooling2D();
 	calc.calculate(connections, vp, c.getOutputLayer());
@@ -415,14 +412,13 @@ public class CNNTest {
 	connections.add(c);
 
 	// max pooling
-	ValuesProvider activations = new ValuesProvider();
-	activations.setMiniBatchSize(2);
-	activations.getValues(c.getInputLayer()).setElements(new float[] { 0.5f, 1, 1, 2, 1.5f, 3, 2, 4, 2.5f, 5, 3, 6, 3.5f, 7, 4f, 8, 4.5f, 9, 5f, 10, 5.5f, 11, 6f, 12, 6.5f, 13, 7f, 14, 8f, 16, 7.5f, 15, 8.5f, 17, 9f, 18, 9.5f, 19, 10f, 20, 10.5f, 21, 11f, 22, 11.5f, 23, 12f, 24, 12.5f, 25, 13f, 26, 13.5f, 27, 14f, 28, 14.5f, 29, 15f, 30, 16f, 32, 15.5f, 31 });
+	ValuesProvider activations = new SharedMemoryValuesProvider(c);
+	activations.addValues(c.getInputLayer(), TensorFactory.tensor(new float[] { 0.5f, 1, 1, 2, 1.5f, 3, 2, 4, 2.5f, 5, 3, 6, 3.5f, 7, 4f, 8, 4.5f, 9, 5f, 10, 5.5f, 11, 6f, 12, 6.5f, 13, 7f, 14, 8f, 16, 7.5f, 15, 8.5f, 17, 9f, 18, 9.5f, 19, 10f, 20, 10.5f, 21, 11f, 22, 11.5f, 23, 12f, 24, 12.5f, 25, 13f, 26, 13.5f, 27, 14f, 28, 14.5f, 29, 15f, 30, 16f, 32, 15.5f, 31 }, 0, 2, 4, 4, 2));
 
 	ConnectionCalculator calc = new AparapiMaxPooling2D();
 	calc.calculate(connections, activations, c.getOutputLayer());
 
-	ValuesProvider vp = new ValuesProvider();
+	ValuesProvider vp = new SharedMemoryValuesProvider(c);
 	vp.setMiniBatchSize(2);
 	vp.addValues(c.getOutputLayer(), activations.getValues(c.getOutputLayer()));
 
@@ -461,16 +457,15 @@ public class CNNTest {
 	List<Connections> connections = new ArrayList<Connections>();
 	connections.add(c);
 
-	ValuesProvider activations = new ValuesProvider();
-	activations.setMiniBatchSize(2);
-	activations.getValues(c.getInputLayer()).setElements(new float[] { 0.5f, 1, 1, 2, 1.5f, 3, 2, 4, 2.5f, 5, 3, 6, 3.5f, 7, 4f, 8, 4.5f, 9, 5f, 10, 5.5f, 11, 6f, 12, 6.5f, 13, 7f, 14, 8f, 16, 7.5f, 15, 8.5f, 17, 9f, 18, 9.5f, 19, 10f, 20, 10.5f, 21, 11f, 22, 11.5f, 23, 12f, 24, 12.5f, 25, 13f, 26, 13.5f, 27, 14f, 28, 14.5f, 29, 15f, 30, 16f, 32, 15.5f, 31 });
+	ValuesProvider activations = new SharedMemoryValuesProvider(c);
+	activations.addValues(c.getInputLayer(), TensorFactory.tensor(new float[] { 0.5f, 1, 1, 2, 1.5f, 3, 2, 4, 2.5f, 5, 3, 6, 3.5f, 7, 4f, 8, 4.5f, 9, 5f, 10, 5.5f, 11, 6f, 12, 6.5f, 13, 7f, 14, 8f, 16, 7.5f, 15, 8.5f, 17, 9f, 18, 9.5f, 19, 10f, 20, 10.5f, 21, 11f, 22, 11.5f, 23, 12f, 24, 12.5f, 25, 13f, 26, 13.5f, 27, 14f, 28, 14.5f, 29, 15f, 30, 16f, 32, 15.5f, 31 }, 0, 2, 4, 4, 2));
 
 	calc.calculate(connections, activations, c.getOutputLayer());
 
 	BackpropagationAveragePooling2D bp = new BackpropagationAveragePooling2D();
 	bp.setActivations(activations);
 
-	ValuesProvider vp = new ValuesProvider();
+	ValuesProvider vp = new SharedMemoryValuesProvider(c);
 	vp.setMiniBatchSize(2);
 	vp.addValues(c.getOutputLayer(), activations.getValues(c.getOutputLayer()));
 
@@ -509,7 +504,7 @@ public class CNNTest {
 	Conv2DConnection b = (Conv2DConnection) nn.getOutputLayer().getConnections().get(1);
 	b.getWeights().setElements(new float [] {-3f});
 	
-	SimpleInputProvider ts = new SimpleInputProvider(TensorFactory.matrix(new float[][] { { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1, 1.1f, 1.2f, 1.3f, 1.4f, 1.5f, 1.6f, 1.7f, 1.8f } }), TensorFactory.matrix(new float[][] { { 1, 1, 1, 1 } }), 1, 1);
+	SimpleInputProvider ts = new SimpleInputProvider(TensorFactory.tensor(new float[] { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1, 1.1f, 1.2f, 1.3f, 1.4f, 1.5f, 1.6f, 1.7f, 1.8f }, 0, 2, 3, 3, 1), TensorFactory.tensor(new float[] { 1, 1, 1, 1 }, 0, 1, 2, 2, 1), 1, 1);
 	BackPropagationTrainer<?> t = TrainerFactory.backPropagation(nn, ts, null, null, null, 0.5f, 0f, 0f, 0f);
 	t.train();
 
@@ -563,9 +558,8 @@ public class CNNTest {
 	Conv2DConnection cc = (Conv2DConnection) nn.getInputLayer().getConnections().get(0);
 	cc.getWeights().forEach(i -> cc.getWeights().getElements()[i] = 1);
 
-	ValuesProvider vp = new ValuesProvider();
-	vp.setMiniBatchSize(1);
-	vp.getValues(nn.getInputLayer()).setElements(new float[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25});
+	ValuesProvider vp = new SharedMemoryValuesProvider(nn);
+	vp.addValues(nn.getInputLayer(), TensorFactory.tensor(new float[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25}, 0, 1, 5, 5, 1));
 
 	Set<Layer> calculatedLayers = new HashSet<>();
 	calculatedLayers.add(nn.getInputLayer());

@@ -166,8 +166,8 @@ public class ValuesProvider implements Serializable {
 		}
 	    } else if (c instanceof Conv2DConnection) {
 		Conv2DConnection cc = (Conv2DConnection) c;
-		int[] inputDim = new int[] { cc.getOutputFilters(), cc.getOutputFeatureMapRows(), cc.getOutputFeatureMapColumns(), getMiniBatchSize() };
-		int[] outputDim = new int[] { cc.getInputFilters(), cc.getInputFeatureMapRows(), cc.getInputFeatureMapColumns(), getMiniBatchSize() };
+		int[] inputDim = new int[] { cc.getInputFilters(), cc.getInputFeatureMapRows(), cc.getInputFeatureMapColumns(), getMiniBatchSize() };
+		int[] outputDim = new int[] { cc.getOutputFilters(), cc.getOutputFeatureMapRows(), cc.getOutputFeatureMapColumns(), getMiniBatchSize() };
 		if (!din.stream().anyMatch(i -> Arrays.equals(i, inputDim))) {
 		    din.add(inputDim);
 		}
@@ -176,8 +176,8 @@ public class ValuesProvider implements Serializable {
 		}
 	    } else if (c instanceof Subsampling2DConnection) {
 		Subsampling2DConnection cc = (Subsampling2DConnection) c;
-		int[] inputDim = new int[] { cc.getFilters(), cc.getOutputFeatureMapRows(), cc.getOutputFeatureMapColumns(), getMiniBatchSize() };
-		int[] outputDim = new int[] { cc.getFilters(), cc.getInputFeatureMapRows(), cc.getInputFeatureMapColumns(), getMiniBatchSize() };
+		int[] inputDim = new int[] { cc.getFilters(), cc.getInputFeatureMapRows(), cc.getInputFeatureMapColumns(), getMiniBatchSize() };
+		int[] outputDim = new int[] { cc.getFilters(), cc.getOutputFeatureMapRows(), cc.getOutputFeatureMapColumns(), getMiniBatchSize() };
 		if (!din.stream().anyMatch(i -> Arrays.equals(i, inputDim))) {
 		    din.add(inputDim);
 		}
