@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
@@ -37,17 +38,12 @@ public abstract class BackPropagationConnectionCalculatorImpl implements BackPro
 
     @Override
     public void calculate(List<Connections> connections, ValuesProvider valuesProvider, Layer targetLayer) {
-	List<Connections> chunk = new ArrayList<>();
-	for (Connections c : connections) {
-	    if (!connectionCalculators.containsKey(c) || targetLayer != currentLayer || miniBatchSize != valuesProvider.getMiniBatchSize()) {
-		chunk.add(c);
-	    }
-	}
+	List<Connections> chunk = connections.stream().filter(c -> !connectionCalculators.containsKey(c) || targetLayer != currentLayer || miniBatchSize != valuesProvider.getMiniBatchSize()).collect(Collectors.toList());
 
 	if (chunk.size() > 0) {
 	    miniBatchSize = valuesProvider.getMiniBatchSize();
 	    currentLayer = targetLayer;
-	    addBackpropFunction(chunk, connectionCalculators, valuesProvider, targetLayer);
+	    addBackpropFunction(chunk, connectionCalculators, valuesProvider, activations, targetLayer);
 	    calculators.addAll(connectionCalculators.values());
 	}
 
@@ -75,7 +71,7 @@ public abstract class BackPropagationConnectionCalculatorImpl implements BackPro
 	}
     }
 
-    protected abstract void addBackpropFunction(List<Connections> inputConnections, Map<Connections, BackPropagationConnectionCalculator> connectionCalculators, ValuesProvider valuesProvider, Layer targetLayer);
+    protected abstract void addBackpropFunction(List<Connections> inputConnections, Map<Connections, BackPropagationConnectionCalculator> connectionCalculators, ValuesProvider valuesProvider, ValuesProvider activations, Layer targetLayer);
 
     public int getMiniBatchSize() {
 	return miniBatchSize;

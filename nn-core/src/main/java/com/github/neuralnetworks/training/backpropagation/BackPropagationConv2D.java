@@ -21,7 +21,7 @@ public class BackPropagationConv2D extends BackPropagationConnectionCalculatorIm
     }
 
     @Override
-    protected void addBackpropFunction(List<Connections> inputConnections, Map<Connections, BackPropagationConnectionCalculator> connectionCalculators, ValuesProvider valuesProvider, Layer targetLayer) {
+    protected void addBackpropFunction(List<Connections> inputConnections, Map<Connections, BackPropagationConnectionCalculator> connectionCalculators, ValuesProvider valuesProvider, ValuesProvider activatinos, Layer targetLayer) {
 	Conv2DConnection con = null;
 	for (Connections c : inputConnections) {
 	    if (c instanceof Conv2DConnection) {
@@ -31,7 +31,7 @@ public class BackPropagationConv2D extends BackPropagationConnectionCalculatorIm
 	}
 
 	if (con != null) {
-	    connectionCalculators.put(con, new AparapiBackpropagationConv2D(con, valuesProvider, targetLayer));
+	    connectionCalculators.put(con, new AparapiBackpropagationConv2D(con, valuesProvider, activations, targetLayer));
 	}
     }
 }

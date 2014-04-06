@@ -22,7 +22,7 @@ public class BackPropagationTanh extends BackPropagationConnectionCalculatorImpl
     }
 
     @Override
-    protected void addBackpropFunction(List<Connections> inputConnections, Map<Connections, BackPropagationConnectionCalculator> connectionCalculators, ValuesProvider valuesProvider, Layer targetLayer) {
+    protected void addBackpropFunction(List<Connections> inputConnections, Map<Connections, BackPropagationConnectionCalculator> connectionCalculators, ValuesProvider valuesProvider, ValuesProvider activations, Layer targetLayer) {
 	for (Connections c : inputConnections) {
 	    if (Util.isBias(c.getInputLayer()) && targetLayer != c.getInputLayer()) {
 		connectionCalculators.put(c, new AparapiBackpropTanh(Arrays.asList(new Connections[] {c}), valuesProvider, activations, c.getInputLayer(), getLearningRate(), getMomentum(), getL1weightDecay(), getL2weightDecay()));

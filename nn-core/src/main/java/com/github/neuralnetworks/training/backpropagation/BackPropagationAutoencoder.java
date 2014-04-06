@@ -1,5 +1,7 @@
 package com.github.neuralnetworks.training.backpropagation;
 
+import java.util.Arrays;
+
 import com.github.neuralnetworks.architecture.types.Autoencoder;
 import com.github.neuralnetworks.training.TrainingInputData;
 import com.github.neuralnetworks.util.Properties;
@@ -51,7 +53,7 @@ public class BackPropagationAutoencoder extends BackPropagationTrainer<Autoencod
 
 	public void setInputOutput(Tensor inputOutput) {
 	    this.input = inputOutput;
-	    if (target == null || target.getElements().length != input.getElements().length) {
+	    if (target == null || !Arrays.equals(target.getDimensions(), input.getDimensions())) {
 		target = TensorFactory.tensor(input.getDimensions());
 	    }
 

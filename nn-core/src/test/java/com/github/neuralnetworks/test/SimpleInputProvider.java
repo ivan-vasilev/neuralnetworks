@@ -66,12 +66,12 @@ public class SimpleInputProvider implements TrainingInputProvider {
 
 		    int[][] lmb = new int[2][d.length];
 		    IntStream.range(0, lmb[1].length).forEach(j -> lmb[1][j] = d[j] - 1);
-		    lmb[0][lmb.length - 1] = lmb[1][lmb.length - 1] = i;
+		    lmb[0][d.length - 1] = lmb[1][d.length - 1] = i;
 		    TensorIterator mbIt = data.getInput().iterator(lmb);
 
 		    int[][] li = new int[2][d.length];
 		    IntStream.range(0, li[1].length).forEach(j -> li[1][j] = d[j] - 1);
-		    li[0][li.length - 1] = li[1][li.length - 1] = current % d[d.length - 1];
+		    li[0][d.length - 1] = li[1][d.length - 1] = current % d[d.length - 1];
 		    TensorIterator inputIterator = input.iterator(li);
 
 		    while (mbIt.hasNext()) {

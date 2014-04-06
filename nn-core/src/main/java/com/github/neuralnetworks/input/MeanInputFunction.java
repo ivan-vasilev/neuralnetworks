@@ -20,7 +20,7 @@ public class MeanInputFunction implements TensorFunction {
 	    mean += f;
 	}
 
-	return mean / input.getElements().length;
+	return mean / input.getSize();
     }
 
     @Override

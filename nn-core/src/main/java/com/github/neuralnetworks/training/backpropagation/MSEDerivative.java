@@ -21,7 +21,7 @@ public class MSEDerivative implements OutputErrorDerivative {
 	    throw new IllegalArgumentException("Matrices are not the same");
 	}
 
-	if (result == null || result.getElements().length != activation.getElements().length) {
+	if (result == null || !Arrays.equals(result.getDimensions(), activation.getDimensions())) {
 	    result = TensorFactory.tensor(activation.getDimensions());
 	}
 

@@ -7,6 +7,7 @@ import com.github.neuralnetworks.architecture.Conv2DConnection;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2D;
+import com.github.neuralnetworks.util.Tensor;
 import com.github.neuralnetworks.util.Util;
 
 /**
@@ -20,6 +21,9 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements BackP
      * Activation of the output layer from the feedforward phase
      */
     protected float[] ffActivation;
+    protected final int activationStartIndex;
+    protected final int activationFeatureMapRowsDistance;
+    protected final int activationFeatureMapColumnsDistance;
 
     /**
      * weight updates and momentum
@@ -40,8 +44,15 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements BackP
      */
     protected ValuesProvider activations;
 
-    public AparapiBackpropagationConv2D(Conv2DConnection c, ValuesProvider valuesProvider, Layer targetLayer) {
+    public AparapiBackpropagationConv2D(Conv2DConnection c, ValuesProvider valuesProvider, ValuesProvider activations, Layer targetLayer) {
 	super(c, valuesProvider, targetLayer);
+
+	Tensor t = activations.getValues(targetLayer, c);
+	this.ffActivation = t.getElements();
+	this.activationStartIndex = t.getStartIndex();
+	this.activationFeatureMapRowsDistance = t.getDimensionElementsDistance(1);
+	this.activationFeatureMapColumnsDistance = t.getDimensionElementsDistance(2);
+
 	this.weightUpdates = new float[c.getWeights().getSize()];
 	this.weightUpdatesMomentum = new float[c.getWeights().getSize()];
     }
@@ -59,10 +70,6 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements BackP
 	if (c != null) {
 	    Util.fillArray(weightUpdates, 0);
 
-	    if (ffActivation != activations.getValues(c.getInputLayer(), c).getElements()) {
-		ffActivation = activations.getValues(c.getInputLayer(), c).getElements();
-	    }
-
 	    // currently works only as a feedforward (including bp)
 	    if (targetLayer == c.getOutputLayer()) {
 		super.calculate(c, valuesProvider, targetLayer);
@@ -77,16 +84,15 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements BackP
     @Override
     protected void conv(int weightsStartId, int inputStartId, int outputStartId) {
 	float activationDerivative = 0;
-	int inputId = 0;
+	int activationStartId = activationStartIndex + ((getGlobalId() % outputFeatureMapLength) / outputColumns) * activationFeatureMapRowsDistance * stride + (getGlobalId() % outputColumns) * activationFeatureMapColumnsDistance * stride;
 
 	for (int i = 0; i < miniBatchSize; i++) {
 	    activationDerivative = activationFunctionDerivative(output[outputStartId + i * outputMiniBatchDistance]);
 	    output[outputStartId + i * outputMiniBatchDistance] = activationDerivative;
 
 	    for (int j = 0; j < featureMapWeights; j++) {
-		inputId = inputStartId + featureMapOffsets[i * featureMapWeights + j];
-		weightUpdates[weightsStartId + j] += activationDerivative * ffActivation[inputId];
-		input[inputId] += activationDerivative * weights[weightsStartId + j];
+		weightUpdates[weightsStartId + j] += activationDerivative * ffActivation[activationStartId + featureMapOffsets[i * featureMapWeights + j]];
+		input[inputStartId + featureMapOffsets[i * featureMapWeights + j]] += activationDerivative * weights[weightsStartId + j];
 	    }
 	}
     }
