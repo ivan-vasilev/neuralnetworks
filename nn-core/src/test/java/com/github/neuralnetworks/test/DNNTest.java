@@ -29,7 +29,6 @@ import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.Matrix;
 import com.github.neuralnetworks.util.Tensor;
 import com.github.neuralnetworks.util.TensorFactory;
-import com.github.neuralnetworks.util.Util;
 
 public class DNNTest {
 
@@ -89,18 +88,36 @@ public class DNNTest {
 
     @Test
     public void testDBNCalculation() {
-	DBN dbn = NNFactory.dbn(new int [] {3, 2, 2}, true, false);
+	DBN dbn = NNFactory.dbn(new int [] {3, 2, 2}, true, true);
 	dbn.setLayerCalculator(NNFactory.lcWeightedSum(dbn, null));
 
 	RBM firstRBM = dbn.getFirstNeuralNetwork();
-	Util.fillArray(firstRBM.getMainConnections().getConnectionGraph().getElements(), 0.2f);
-	Util.fillArray(firstRBM.getVisibleBiasConnections().getConnectionGraph().getElements(), 0.1f);
-	Util.fillArray(firstRBM.getHiddenBiasConnections().getConnectionGraph().getElements(), 0.3f);
+
+	Tensor t = firstRBM.getMainConnections().getConnectionGraph();
+	float[] e1 = t.getElements();
+	t.forEach(i -> e1[i] = 0.2f);
+	
+	t = firstRBM.getVisibleBiasConnections().getConnectionGraph();
+	float[] e2 = t.getElements();
+	t.forEach(i -> e2[i] = 0.1f);
+
+	t = firstRBM.getHiddenBiasConnections().getConnectionGraph();
+	float[] e3 = t.getElements();
+	t.forEach(i -> e3[i] = 0.3f);
 
 	RBM secondRBM = dbn.getLastNeuralNetwork();
-	Util.fillArray(secondRBM.getMainConnections().getConnectionGraph().getElements(), 0.4f);
-	Util.fillArray(secondRBM.getVisibleBiasConnections().getConnectionGraph().getElements(), 0.8f);
-	Util.fillArray(secondRBM.getHiddenBiasConnections().getConnectionGraph().getElements(), 0.5f);
+
+	t = secondRBM.getMainConnections().getConnectionGraph();
+	float[] e4 = t.getElements();
+	t.forEach(i -> e4[i] = 0.4f);
+
+	t = secondRBM.getVisibleBiasConnections().getConnectionGraph();
+	float[] e5 = t.getElements();
+	t.forEach(i -> e5[i] = 0.8f);
+
+	t = secondRBM.getHiddenBiasConnections().getConnectionGraph();
+	float[] e6 = t.getElements();
+	t.forEach(i -> e6[i] = 0.5f);
 
 	Set<Layer> calculatedLayers = new HashSet<>();
 	calculatedLayers.add(dbn.getInputLayer());
@@ -167,7 +184,7 @@ public class DNNTest {
 
     @Test
     public void testDNNLayerTrainer() {
-	DBN dbn = NNFactory.dbn(new int [] {3, 2, 2}, true, false);
+	DBN dbn = NNFactory.dbn(new int [] {3, 2, 2}, true, true);
 	dbn.setLayerCalculator(NNFactory.lcSigmoid(dbn, null));
 
 	RBM firstRBM = dbn.getFirstNeuralNetwork();
@@ -223,7 +240,7 @@ public class DNNTest {
 
     @Test
     public void testDNNLayerTrainer2() {
-	DBN dbn = NNFactory.dbn(new int [] {3, 3, 2}, true, false);
+	DBN dbn = NNFactory.dbn(new int [] {3, 3, 2}, true, true);
 	dbn.setLayerCalculator(NNFactory.lcSigmoid(dbn, null));
 
 	LayerCalculatorImpl lc = (LayerCalculatorImpl) dbn.getLayerCalculator();

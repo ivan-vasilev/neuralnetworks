@@ -51,7 +51,7 @@ public class AparapiCDTrainer extends CDTrainerBase {
 	// update visible bias
 	if (rbm.getVisibleBiasConnections() != null) {
 	    if (visibleBiasUpdatesKernel == null || visibleBiasUpdatesKernel.getMiniBatchSize() != mbs) {
-		visibleBiasUpdatesKernel = new CDBiasUpdatesKernel(rbm.getVisibleBiasConnections().getConnectionGraph().getElements(), posPhaseVisible, negPhaseVisible, getLearningRate(), getMomentum());
+		visibleBiasUpdatesKernel = new CDBiasUpdatesKernel(rbm.getVisibleBiasConnections().getConnectionGraph(), posPhaseVisible, negPhaseVisible, getLearningRate(), getMomentum());
 	    }
 
 	    Environment.getInstance().getExecutionStrategy().execute(visibleBiasUpdatesKernel, rbm.getVisibleBiasConnections().getConnectionGraph().getSize());
@@ -60,7 +60,7 @@ public class AparapiCDTrainer extends CDTrainerBase {
 	// update hidden bias
 	if (rbm.getHiddenBiasConnections() != null) {
 	    if (hiddenBiasUpdatesKernel == null || hiddenBiasUpdatesKernel.getMiniBatchSize() != mbs) {
-		hiddenBiasUpdatesKernel = new CDBiasUpdatesKernel(rbm.getHiddenBiasConnections().getConnectionGraph().getElements(), posPhaseHidden, negPhaseHidden, getLearningRate(), getMomentum());
+		hiddenBiasUpdatesKernel = new CDBiasUpdatesKernel(rbm.getHiddenBiasConnections().getConnectionGraph(), posPhaseHidden, negPhaseHidden, getLearningRate(), getMomentum());
 	    }
 
 	    Environment.getInstance().getExecutionStrategy().execute(hiddenBiasUpdatesKernel, rbm.getHiddenBiasConnections().getConnectionGraph().getSize());
