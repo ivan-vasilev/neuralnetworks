@@ -7,6 +7,7 @@ import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.architecture.types.DNN;
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
+import com.github.neuralnetworks.util.Environment;
 
 /**
  * Training Input Provider for deep network trainers
@@ -27,7 +28,7 @@ public class DeepTrainerTrainingInputProvider implements TrainingInputProvider {
 	this.dnn = dnn;
 	this.currentNN = currentNN;
 	this.calculatedLayers = new HashSet<>();
-	this.layerResults = new ValuesProvider();
+	this.layerResults = Environment.getInstance().getValuesProvider(dnn);
     }
 
     @Override
@@ -35,7 +36,7 @@ public class DeepTrainerTrainingInputProvider implements TrainingInputProvider {
 	TrainingInputData input = inputProvider.getNextInput();
 
 	if (input != null && dnn.getFirstNeuralNetwork() != currentNN) {
-	    layerResults.addValues(dnn.getInputLayer(), input.getInput());
+	    layerResults.replace(dnn.getInputLayer(), input.getInput());
 	    calculatedLayers.clear();
 	    calculatedLayers.add(dnn.getInputLayer());
 	    dnn.getLayerCalculator().calculate(dnn, currentNN.getInputLayer(), calculatedLayers, layerResults);
@@ -59,23 +60,11 @@ public class DeepTrainerTrainingInputProvider implements TrainingInputProvider {
         return inputProvider;
     }
 
-    public void setInputProvider(TrainingInputProvider inputProvider) {
-        this.inputProvider = inputProvider;
-    }
-
     public DNN<?> getDnn() {
         return dnn;
     }
 
-    public void setDnn(DNN<?> dnn) {
-        this.dnn = dnn;
-    }
-
     public NeuralNetwork getCurrentNN() {
         return currentNN;
-    }
-
-    public void setCurrentNN(NeuralNetwork currentNN) {
-        this.currentNN = currentNN;
     }
 }

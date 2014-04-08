@@ -17,6 +17,7 @@ import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.calculation.memory.SharedMemoryValuesProvider;
+import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.calculation.neuronfunctions.SoftmaxFunction;
 import com.github.neuralnetworks.training.random.MersenneTwisterRandomInitializer;
 import com.github.neuralnetworks.training.random.NNRandomInitializer;
@@ -43,10 +44,10 @@ public class GeneralTest {
 	NNFactory.addFullyConnectedLayer(nn, o, 4, 1, true);
 
 	Matrix im = TensorFactory.tensor(2, 2);
-	vp.addValues(i, im);
+	vp.replace(i, im);
 	Matrix hm1 = vp.getValues(h, 3, 2);
 	Matrix hm2 = TensorFactory.tensor(4, 2);
-	vp.addValues(h, hm2);
+	vp.replace(h, hm2);
 
 	Tensor om = vp.getValues(o);
 
@@ -65,8 +66,8 @@ public class GeneralTest {
     public void testSharedMemoryValuesProvider() {
 	// simple mlp test
 	NeuralNetworkImpl nn = NNFactory.mlp(new int[] { 3, 4, 2 }, true);
-	SharedMemoryValuesProvider vp = new SharedMemoryValuesProvider(nn);
-	vp.addValues(nn.getInputLayer(), TensorFactory.tensor(3, 2));
+	ValuesProvider vp = Environment.getInstance().getValuesProvider(nn);
+	vp.replace(nn.getInputLayer(), TensorFactory.tensor(3, 2));
 
 	Matrix in = vp.getValues(nn.getInputLayer());
 	Matrix hidden = vp.getValues(nn.getLayers().stream().filter(l -> l != nn.getInputLayer() && l != nn.getOutputLayer() && !Util.isBias(l)).findFirst().get());
@@ -98,8 +99,8 @@ public class GeneralTest {
 
 	// input and output layer separate
 	vp = new SharedMemoryValuesProvider(nn);
-	vp.addValues(nn.getInputLayer(), TensorFactory.tensor(3, 2));
-	vp.addValues(nn.getOutputLayer(), TensorFactory.tensor(2, 2));
+	vp.replace(nn.getInputLayer(), TensorFactory.tensor(3, 2));
+	vp.replace(nn.getOutputLayer(), TensorFactory.tensor(2, 2));
 
 	in = vp.getValues(nn.getInputLayer());
 	hidden = vp.getValues(nn.getLayers().stream().filter(l -> l != nn.getInputLayer() && l != nn.getOutputLayer() && !Util.isBias(l)).findFirst().get());

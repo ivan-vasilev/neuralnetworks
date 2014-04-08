@@ -4,11 +4,11 @@ import java.util.Set;
 
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
-import com.github.neuralnetworks.calculation.memory.SharedMemoryValuesProvider;
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.training.OneStepTrainer;
 import com.github.neuralnetworks.training.TrainingInputData;
 import com.github.neuralnetworks.util.Constants;
+import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.Properties;
 import com.github.neuralnetworks.util.Tensor;
 import com.github.neuralnetworks.util.UniqueList;
@@ -29,8 +29,8 @@ public class BackPropagationTrainer<N extends NeuralNetwork> extends OneStepTrai
 
     public BackPropagationTrainer(Properties properties) {
 	super(properties);
-	activations = new SharedMemoryValuesProvider(getNeuralNetwork());
-	backpropagation = new SharedMemoryValuesProvider(getNeuralNetwork());
+	activations = Environment.getInstance().getValuesProvider(getNeuralNetwork());
+	backpropagation = Environment.getInstance().getValuesProvider(getNeuralNetwork());
     }
 
     /* (non-Javadoc)
@@ -48,7 +48,7 @@ public class BackPropagationTrainer<N extends NeuralNetwork> extends OneStepTrai
 	NeuralNetwork nn = getNeuralNetwork();
 	Set<Layer> calculatedLayers = new UniqueList<Layer>();
 	calculatedLayers.add(nn.getInputLayer());
-	activations.addValues(nn.getInputLayer(), input);
+	activations.replace(nn.getInputLayer(), input);
 	nn.getLayerCalculator().calculate(nn, nn.getOutputLayer(), calculatedLayers, activations);
     }
 
@@ -57,7 +57,7 @@ public class BackPropagationTrainer<N extends NeuralNetwork> extends OneStepTrai
 
 	OutputErrorDerivative d = getProperties().getParameter(Constants.OUTPUT_ERROR_DERIVATIVE);
 	Tensor outputErrorDerivative = d.getOutputErrorDerivative(activations.getValues(nn.getOutputLayer()), target);
-	backpropagation.addValues(nn.getOutputLayer(), outputErrorDerivative);
+	backpropagation.replace(nn.getOutputLayer(), outputErrorDerivative);
 	Set<Layer> calculatedLayers = new UniqueList<Layer>();
 	calculatedLayers.add(nn.getOutputLayer());
 	BackPropagationLayerCalculator blc = getBPLayerCalculator();

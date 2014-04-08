@@ -26,6 +26,8 @@ public class RBMTest {
      */
     @Test
     public void testContrastiveDivergence() {
+	//Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
+
 	// RBM with 6 visible, 2 hidden units and a bias
 	RBM rbm = NNFactory.rbm(6, 2, true);
 
@@ -65,6 +67,8 @@ public class RBMTest {
      */
     @Test
     public void testPersistentContrastiveDivergence() {
+	//Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
+
 	// RBM with 6 visible, 2 hidden units and bias
 	RBM rbm = NNFactory.rbm(6, 2, true);
 	
@@ -89,8 +93,6 @@ public class RBMTest {
 
 	// log data
 	t.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName(), true, false));
-
-	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 
 	// training
 	t.train();

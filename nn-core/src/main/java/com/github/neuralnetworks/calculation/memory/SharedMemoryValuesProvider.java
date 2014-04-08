@@ -2,7 +2,6 @@ package com.github.neuralnetworks.calculation.memory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -11,6 +10,7 @@ import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.util.Tensor;
 import com.github.neuralnetworks.util.TensorFactory;
+import com.github.neuralnetworks.util.UniqueList;
 
 /**
  * Values provider that users separate arrays for each layer and combines the
@@ -28,7 +28,7 @@ public class SharedMemoryValuesProvider extends ValuesProvider {
     }
 
     @Override
-    protected void createValues(Map<Layer, Set<Tensor>> values) {
+    protected void createValues(Map<Layer, List<Tensor>> values) {
 	Map<Layer, Set<int[]>> dims = getLayerDimensions(neuralNetwork);
 
 	// remove existing
@@ -50,7 +50,7 @@ public class SharedMemoryValuesProvider extends ValuesProvider {
 	    Layer l = layers.get(i);
 	    for (int[] d : dims.get(l)) {
 		if (!values.containsKey(l)) {
-		    values.put(l, new HashSet<>());
+		    values.put(l, new UniqueList<>());
 		}
 		values.get(l).add(TensorFactory.tensor(elements, offset, d));
 	    }

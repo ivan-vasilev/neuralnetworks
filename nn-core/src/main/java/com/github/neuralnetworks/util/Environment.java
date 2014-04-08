@@ -1,6 +1,9 @@
 package com.github.neuralnetworks.util;
 
 import com.amd.aparapi.Kernel.EXECUTION_MODE;
+import com.github.neuralnetworks.architecture.NeuralNetwork;
+import com.github.neuralnetworks.calculation.memory.SharedMemoryValuesProvider;
+import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.util.KernelExecutionStrategy.CPUKernelExecution;
 import com.github.neuralnetworks.util.KernelExecutionStrategy.DefaultKernelExecution;
 import com.github.neuralnetworks.util.KernelExecutionStrategy.GPUKernelExecution;
@@ -62,5 +65,9 @@ public class Environment {
 
     public void setDebug(boolean debug) {
 	this.debug = debug;
+    }
+
+    public ValuesProvider getValuesProvider(NeuralNetwork neuralNetwork) {
+	return new SharedMemoryValuesProvider(neuralNetwork);
     }
 }

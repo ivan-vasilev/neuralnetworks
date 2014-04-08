@@ -24,6 +24,7 @@ import com.github.neuralnetworks.training.DNNLayerTrainer;
 import com.github.neuralnetworks.training.OneStepTrainer;
 import com.github.neuralnetworks.training.TrainerFactory;
 import com.github.neuralnetworks.training.rbm.AparapiCDTrainer;
+import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.Matrix;
 import com.github.neuralnetworks.util.TensorFactory;
 import com.github.neuralnetworks.util.Util;
@@ -102,9 +103,9 @@ public class DNNTest {
 	Set<Layer> calculatedLayers = new HashSet<>();
 	calculatedLayers.add(dbn.getInputLayer());
 
-	ValuesProvider results = new ValuesProvider();
+	ValuesProvider results = Environment.getInstance().getValuesProvider(dbn);
 
-	results.addValues(dbn.getInputLayer(), TensorFactory.matrix(new float[] {1, 0, 1}, 1));
+	results.replace(dbn.getInputLayer(), TensorFactory.matrix(new float[] {1, 0, 1}, 1));
 	dbn.getLayerCalculator().calculate(dbn, dbn.getOutputLayer(), calculatedLayers, results);
 
 	assertEquals(1.06, results.getValues(dbn.getOutputLayer()).get(0, 0), 0.00001);
@@ -131,8 +132,8 @@ public class DNNTest {
 	Set<Layer> calculatedLayers = new HashSet<>();
 	calculatedLayers.add(sae.getInputLayer());
 
-	ValuesProvider results = new ValuesProvider();
-	results.addValues(sae.getInputLayer(), TensorFactory.matrix(new float[] {1, 0, 1}, 1));
+	ValuesProvider results = Environment.getInstance().getValuesProvider(sae);
+	results.replace(sae.getInputLayer(), TensorFactory.matrix(new float[] {1, 0, 1}, 1));
 	sae.getLayerCalculator().calculate(sae, sae.getOutputLayer(), calculatedLayers, results);
 
 	assertEquals(1.06, results.getValues(sae.getOutputLayer()).get(0, 0), 0.00001);

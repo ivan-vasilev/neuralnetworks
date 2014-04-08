@@ -97,9 +97,9 @@ public class FFNNTest {
 
 	NeuralNetworkImpl nn = new NeuralNetworkImpl();
 	nn.addConnections(connections.toArray(new Connections[connections.size()]));
-	ValuesProvider vp = new SharedMemoryValuesProvider(nn);
-	vp.addValues(c1.getInputLayer(), i1);
-	vp.addValues(ol, o);
+	ValuesProvider vp = Environment.getInstance().getValuesProvider(nn);
+	vp.replace(c1.getInputLayer(), i1);
+	vp.replace(ol, o);
 
 	aws.calculate(connections, vp, ol);
 
@@ -117,9 +117,9 @@ public class FFNNTest {
 
 	nn = new NeuralNetworkImpl();
 	nn.addConnections(connections.toArray(new Connections[connections.size()]));
-	vp = new SharedMemoryValuesProvider(nn);
-	vp.addValues(c1.getInputLayer(), i1);
-	vp.addValues(ol, o);
+	vp = Environment.getInstance().getValuesProvider(nn);
+	vp.replace(c1.getInputLayer(), i1);
+	vp.replace(ol, o);
 
 	aws = new AparapiWeightedSumConnectionCalculator();
 	aws.calculate(connections, vp, ol);
@@ -139,9 +139,9 @@ public class FFNNTest {
 	nn.addConnections(connections.toArray(new Connections[connections.size()]));
 	vp = new SharedMemoryValuesProvider(nn);
 
-	vp.addValues(c1.getInputLayer(), i1);
-	vp.addValues(c2.getInputLayer(), i2);
-	vp.addValues(ol, o);
+	vp.replace(c1.getInputLayer(), i1);
+	vp.replace(c2.getInputLayer(), i2);
+	vp.replace(ol, o);
 
 	aws = new AparapiWeightedSumConnectionCalculator();
 	aws.calculate(connections, vp, ol);
@@ -212,9 +212,9 @@ public class FFNNTest {
 	connections.add(c1);
 	NeuralNetworkImpl nn = new NeuralNetworkImpl();
 	nn.addConnections(connections.toArray(new Connections[connections.size()]));
-	ValuesProvider vp = new SharedMemoryValuesProvider(nn);
-	vp.addValues(c1.getOutputLayer(), i1);
-	vp.addValues(ol, o);
+	ValuesProvider vp = Environment.getInstance().getValuesProvider(nn);
+	vp.replace(c1.getOutputLayer(), i1);
+	vp.replace(ol, o);
 
 	aws.calculate(connections, vp, ol);
 
@@ -231,9 +231,9 @@ public class FFNNTest {
 	connections.add(bc);
 	nn = new NeuralNetworkImpl();
 	nn.addConnections(connections.toArray(new Connections[connections.size()]));
-	vp = new SharedMemoryValuesProvider(nn);
-	vp.addValues(c1.getOutputLayer(), i1);
-	vp.addValues(ol, o);
+	vp = Environment.getInstance().getValuesProvider(nn);
+	vp.replace(c1.getOutputLayer(), i1);
+	vp.replace(ol, o);
 
 	aws = new AparapiWeightedSumConnectionCalculator();
 	aws.calculate(connections, vp, ol);
@@ -251,10 +251,10 @@ public class FFNNTest {
 	connections.add(bc);
 	nn = new NeuralNetworkImpl();
 	nn.addConnections(connections.toArray(new Connections[connections.size()]));
-	vp = new SharedMemoryValuesProvider(nn);
-	vp.addValues(c1.getOutputLayer(), i1);
-	vp.addValues(c2.getOutputLayer(), i2);
-	vp.addValues(ol, o);
+	vp = Environment.getInstance().getValuesProvider(nn);
+	vp.replace(c1.getOutputLayer(), i1);
+	vp.replace(c2.getOutputLayer(), i2);
+	vp.replace(ol, o);
 
 	aws = new AparapiWeightedSumConnectionCalculator();
 	aws.calculate(connections, vp, ol);
@@ -382,8 +382,8 @@ public class FFNNTest {
 	Set<Layer> calculated = new HashSet<>();
 	calculated.add(mlp.getInputLayer());
 
-	ValuesProvider results = new SharedMemoryValuesProvider(mlp);
-	results.addValues(input, i);
+	ValuesProvider results = Environment.getInstance().getValuesProvider(mlp);
+	results.replace(input, i);
 
 	mlp.getLayerCalculator().calculate(mlp, output, calculated, results);
 

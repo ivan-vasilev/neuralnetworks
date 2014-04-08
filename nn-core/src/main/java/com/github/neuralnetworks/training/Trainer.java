@@ -8,7 +8,6 @@ import java.util.Set;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.calculation.OutputError;
-import com.github.neuralnetworks.calculation.memory.SharedMemoryValuesProvider;
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.events.TrainingEvent;
 import com.github.neuralnetworks.events.TrainingEventListener;
@@ -17,6 +16,7 @@ import com.github.neuralnetworks.training.events.TestingFinishedEvent;
 import com.github.neuralnetworks.training.events.TestingStartedEvent;
 import com.github.neuralnetworks.training.random.NNRandomInitializer;
 import com.github.neuralnetworks.util.Constants;
+import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.Properties;
 import com.github.neuralnetworks.util.UniqueList;
 
@@ -64,7 +64,7 @@ public abstract class Trainer<N extends NeuralNetwork> implements Serializable {
 	    triggerEvent(new TestingStartedEvent(this));
 
 	    Set<Layer> calculatedLayers = new UniqueList<>();
-	    ValuesProvider results = new SharedMemoryValuesProvider(n);
+	    ValuesProvider results = Environment.getInstance().getValuesProvider(n);
 	    TrainingInputData input = null;
 
 	    if (getOutputError() != null) {
@@ -74,7 +74,7 @@ public abstract class Trainer<N extends NeuralNetwork> implements Serializable {
 	    while ((input = ip.getNextInput()) != null) {
 		calculatedLayers.clear();
 		calculatedLayers.add(n.getInputLayer());
-		results.addValues(n.getInputLayer(), input.getInput());
+		results.replace(n.getInputLayer(), input.getInput());
 		n.getLayerCalculator().calculate(n, n.getOutputLayer(), calculatedLayers, results);
 
 		if (getOutputError() != null) {

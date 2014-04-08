@@ -20,13 +20,11 @@ public class RBMLayerCalculator extends LayerCalculatorImpl {
 
     private Set<Layer> calculatedLayers;
     private ValuesProvider results;
-    private ValuesProvider intermediateResults;
 
     public RBMLayerCalculator(RBM rbm) {
 	super();
 	calculatedLayers = new HashSet<>();
 	results = new SharedMemoryValuesProvider(rbm);
-	intermediateResults = new SharedMemoryValuesProvider(rbm);
     }
 
     public void gibbsSampling(RBM rbm, Matrix posPhaseVisible, Matrix posPhaseHidden, Matrix negPhaseVisible, Matrix negPhaseHidden, int samplingCount, boolean resetNetwork, boolean useIntermediateResults) {
@@ -54,8 +52,8 @@ public class RBMLayerCalculator extends LayerCalculatorImpl {
 	calculatedLayers.clear();
 	calculatedLayers.add(hiddenLayer);
 
-	results.addValues(visibleLayer, visibleLayerResults);
-	results.addValues(hiddenLayer, hiddenLayerResults);
+	results.replace(visibleLayer, visibleLayerResults);
+	results.replace(hiddenLayer, hiddenLayerResults);
 
 	super.calculate(rbm, visibleLayer, calculatedLayers, results);
     }
@@ -67,8 +65,8 @@ public class RBMLayerCalculator extends LayerCalculatorImpl {
 	calculatedLayers.clear();
 	calculatedLayers.add(visibleLayer);
 
-	results.addValues(visibleLayer, visibleLayerResults);
-	results.addValues(hiddenLayer, hiddenLayerResults);
+	results.replace(visibleLayer, visibleLayerResults);
+	results.replace(hiddenLayer, hiddenLayerResults);
 
 	super.calculate(rbm, hiddenLayer, calculatedLayers, results);
     }
@@ -76,11 +74,11 @@ public class RBMLayerCalculator extends LayerCalculatorImpl {
     private Matrix getLayerResult(Layer layer, Matrix realResult, boolean useIntermediateResults) {
 	Matrix result = realResult;
 	if (useIntermediateResults) {
-	    intermediateResults.setMiniBatchSize(realResult.getColumns());
-	    result = intermediateResults.getValues(layer, realResult.getRows(), realResult.getColumns());
-	    if (result == null) {
-		intermediateResults.addValues(layer, result = TensorFactory.tensor(realResult));
+	    if (results.getAllValues(layer, realResult.getRows(), realResult.getColumns()).size() < 2) {
+		results.add(layer, TensorFactory.tensor(realResult));
 	    }
+
+	    result = (Matrix) results.getAllValues(layer, realResult.getRows(), realResult.getColumns()).get(1);
 
 	    System.arraycopy(realResult.getElements(), 0, result.getElements(), 0, result.getElements().length);
 	}

@@ -5,8 +5,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
@@ -15,6 +17,7 @@ import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.architecture.Subsampling2DConnection;
 import com.github.neuralnetworks.util.Tensor;
+import com.github.neuralnetworks.util.UniqueList;
 
 /**
  * Provides Tensor instances for the layers of the network. It ensures that the
@@ -25,7 +28,7 @@ public class ValuesProvider implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private int miniBatchSize;
-    private Map<Layer, Set<Tensor>> values;
+    private Map<Layer, List<Tensor>> values;
 
     public ValuesProvider() {
 	super();
@@ -54,7 +57,7 @@ public class ValuesProvider implements Serializable {
     }
 
     /**
-     * Get values for layer based on provided dimensions (excluding the minibatch size dimension)
+     * Get values for layer based on provided dimensions
      * @param targetLayer
      * @param unitCount
      * @return
@@ -72,15 +75,78 @@ public class ValuesProvider implements Serializable {
 	return (T) values.get(targetLayer).stream().filter(t -> Arrays.equals(t.getDimensions(), dimensions)).findFirst().orElse(null);
     }
 
-    public void addValues(Layer l, Tensor t) {
-	Set<Tensor> set = values.get(l);
+    /**
+     * @return all Tensors for connections. The connections must have a common layer and they must have the same dimensions.
+     */
+    public <T extends Tensor> List<T> getAllValues(Layer targetLayer, Collection<Connections> connections) {
+	return getAllValues(targetLayer, getDataDimensions(targetLayer, connections));
+    }
+
+    /**
+     * @return all Tensors for connections. The connections must have a common layer and they must have the same dimensions.
+     */
+    public <T extends Tensor> List<T> getAllValues(Layer targetLayer, Connections c) {
+	return getAllValues(targetLayer, Arrays.asList(new Connections[] {c}));
+    }
+
+    /**
+     * @return all Tensors for a layer.
+     */
+    public <T extends Tensor> List<T> getAllValues(Layer targetLayer) {
+	return getAllValues(targetLayer, targetLayer.getConnections());
+    }
+
+    /**
+     * Get values for layer based on provided dimensions and index
+     * @param targetLayer
+     * @param unitCount
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public <T extends Tensor> List<T> getAllValues(Layer targetLayer, int... dimensions) {
+	if (dimensions == null || dimensions.length == 0) {
+	    throw new IllegalArgumentException("No dimensions provided");
+	}
+
+	if (!values.containsKey(targetLayer)) {
+	    createValues(values);
+	}
+
+	return (List<T>) values.get(targetLayer).stream().filter(t -> Arrays.equals(t.getDimensions(), dimensions)).collect(Collectors.toList());
+    }
+
+    /**
+     * Replace tensor t for layer l
+     * @param l
+     * @param t
+     */
+    public void replace(Layer l, Tensor t) {
+	List<Tensor> set = values.get(l);
 	if (set == null) {
-	    values.put(l, set = new HashSet<Tensor>());
+	    values.put(l, set = new UniqueList<Tensor>());
 	} else {
-	    set.removeIf(o -> o.getSize() == t.getSize());
+	    set.removeIf(o -> Arrays.equals(o.getDimensions(), t.getDimensions()));
 	}
 
 	setMiniBatchSize(t.getDimensions()[t.getDimensions().length - 1]);
+	set.add(t);
+    }
+
+    /**
+     * Add tensor t for layer l
+     * @param l
+     * @param t
+     */
+    public void add(Layer l, Tensor t) {
+	List<Tensor> set = values.get(l);
+	if (set == null) {
+	    values.put(l, set = new UniqueList<Tensor>());
+	}
+
+	if (miniBatchSize == 0) {
+	    setMiniBatchSize(t.getDimensions()[t.getDimensions().length - 1]);
+	}
+
 	set.add(t);
     }
 
@@ -96,7 +162,7 @@ public class ValuesProvider implements Serializable {
 	this.miniBatchSize = miniBatchSize;
     }
 
-    protected void createValues(Map<Layer, Set<Tensor>> values) {
+    protected void createValues(Map<Layer, List<Tensor>> values) {
     }
 
     private int[] getDataDimensions(Layer targetLayer, Collection<Connections> connections) {
