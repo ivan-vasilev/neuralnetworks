@@ -29,7 +29,7 @@ public class RBMTest {
 	//Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 
 	// RBM with 6 visible, 2 hidden units and a bias
-	RBM rbm = NNFactory.rbm(6, 2, true);
+	RBM rbm = NNFactory.rbm(6, 2, true, true);
 
 	// We'll use a simple dataset of symptoms of a flu illness. There are 6
 	// input features and the first three are symptoms of the illness - for
@@ -70,7 +70,7 @@ public class RBMTest {
 	//Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 
 	// RBM with 6 visible, 2 hidden units and bias
-	RBM rbm = NNFactory.rbm(6, 2, true);
+	RBM rbm = NNFactory.rbm(6, 2, true, true);
 	
 	// We'll use a simple dataset of symptoms of a flu illness. There are 6
 	// input features and the first three are symptoms of the illness - for
@@ -105,7 +105,7 @@ public class RBMTest {
 
     @Test
     public void testRBMLayerCalculator1() {
-	RBM rbm = NNFactory.rbm(2, 2, false);
+	RBM rbm = NNFactory.rbm(2, 2, false, true);
 	rbm.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
 
 	Matrix cg1 = rbm.getMainConnections().getConnectionGraph();
@@ -126,7 +126,7 @@ public class RBMTest {
 
     @Test
     public void testRBMLayerCalculator2() {
-	RBM rbm = NNFactory.rbm(2, 2, false);
+	RBM rbm = NNFactory.rbm(2, 2, false, true);
 	rbm.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
 
 	Matrix cg1 = rbm.getMainConnections().getConnectionGraph();
@@ -148,7 +148,7 @@ public class RBMTest {
 
     @Test
     public void testRBMLayerCalculator3() {
-	RBM rbm = NNFactory.rbm(3, 2, true);
+	RBM rbm = NNFactory.rbm(3, 2, true, true);
 	rbm.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
 
 	Matrix cg1 = rbm.getMainConnections().getConnectionGraph();
@@ -174,7 +174,7 @@ public class RBMTest {
 
     @Test
     public void testRBMLayerCalculator4() {
-	RBM rbm = NNFactory.rbm(2, 3, true);
+	RBM rbm = NNFactory.rbm(2, 3, true, true);
 	rbm.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
 
 	Matrix cg1 = rbm.getMainConnections().getConnectionGraph();
@@ -202,7 +202,7 @@ public class RBMTest {
     public void testOneStepContrastiveDivergence() {
 	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 
-	RBM rbm = NNFactory.rbm(3, 2, true);
+	RBM rbm = NNFactory.rbm(3, 2, true, true);
 
 	Matrix cg1 = rbm.getMainConnections().getConnectionGraph();
 	cg1.set(0.2f, 0, 0);

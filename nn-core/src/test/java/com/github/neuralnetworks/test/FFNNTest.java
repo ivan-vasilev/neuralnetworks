@@ -272,7 +272,7 @@ public class FFNNTest {
     @Test
     public void testSigmoidBP() {
 	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
-	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 2, 2, 1 }, false);
+	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 2, 2, 1 }, false, true);
 
 	FullyConnected c1 = (FullyConnected) mlp.getInputLayer().getConnections().iterator().next();
 	Matrix cg1 = c1.getConnectionGraph();
@@ -303,7 +303,7 @@ public class FFNNTest {
     @Test
     public void testSigmoidBP2() {
 	//Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
-	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 3, 2, 1 }, true);
+	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 3, 2, 1 }, true, true);
 
 	List<Connections> c = mlp.getConnections();
 	FullyConnected c1 = (FullyConnected) c.get(0);
@@ -392,7 +392,7 @@ public class FFNNTest {
 
     @Test
     public void testRemoveLayer() {
-	NeuralNetworkImpl mlp = NNFactory.mlp(new int[] {3, 4, 5}, true);
+	NeuralNetworkImpl mlp = NNFactory.mlp(new int[] {3, 4, 5}, true, true);
 	assertEquals(5, mlp.getLayers().size(), 0);
 	Layer currentOutput = mlp.getOutputLayer();
 	mlp.removeLayer(mlp.getOutputLayer());
@@ -403,7 +403,7 @@ public class FFNNTest {
     @Test
     public void testLayerOrderStrategy() {
 	// MLP
-	NeuralNetworkImpl mlp = NNFactory.mlp(new int[] {3, 4, 5}, true);
+	NeuralNetworkImpl mlp = NNFactory.mlp(new int[] {3, 4, 5}, true, true);
 	
 	Set<Layer> calculated = new HashSet<Layer>();
 	calculated.add(mlp.getInputLayer());
@@ -428,7 +428,7 @@ public class FFNNTest {
 	assertTrue(ccc.get(3).connection == l.getConnections().get(1));
 
 	// Simple MLP
-	mlp = NNFactory.mlp(new int[] {3, 4}, true);
+	mlp = NNFactory.mlp(new int[] {3, 4}, true, true);
 
 	calculated = new HashSet<Layer>();
 	calculated.add(mlp.getInputLayer());
@@ -445,7 +445,7 @@ public class FFNNTest {
 	assertTrue(ccc.get(1).connection == l.getConnections().get(1));
 
 	// CNN
-	NeuralNetworkImpl cnn = NNFactory.convNN(new int[][] { { 3, 3, 2 }, { 2, 2, 1, 1 } }, true);
+	NeuralNetworkImpl cnn = NNFactory.convNN(new int[][] { { 3, 3, 2 }, { 2, 2, 1, 1 } }, true, true);
 
 	calculated = new HashSet<Layer>();
 	calculated.add(cnn.getInputLayer());

@@ -30,7 +30,7 @@ public class MnistTest {
 
     @Test
     public void testSigmoidBP() {
-	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 784, 10 }, true);
+	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 784, 10 }, true, true);
 
 	MnistInputProvider trainInputProvider = new MnistInputProvider("train-images.idx3-ubyte", "train-labels.idx1-ubyte", 1, 1, new MnistTargetMultiNeuronOutputConverter());
 	trainInputProvider.addInputModifier(new ScalingInputFunction(255));
@@ -52,7 +52,7 @@ public class MnistTest {
     @Ignore
     @Test
     public void testSigmoidHiddenBP() {
-	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 784, 300, 100, 10 }, true);
+	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 784, 300, 100, 10 }, true, true);
 
 	MnistInputProvider trainInputProvider = new MnistInputProvider("train-images.idx3-ubyte", "train-labels.idx1-ubyte", 1, 2, new MnistTargetMultiNeuronOutputConverter());
 	trainInputProvider.addInputModifier(new ScalingInputFunction(255));
@@ -73,7 +73,7 @@ public class MnistTest {
 
     @Test
     public void testRBM() {
-	RBM rbm = NNFactory.rbm(784, 10, false);
+	RBM rbm = NNFactory.rbm(784, 10, false, true);
 	MnistInputProvider trainInputProvider = new MnistInputProvider("train-images.idx3-ubyte", "train-labels.idx1-ubyte", 1, 1, new MnistTargetMultiNeuronOutputConverter());
 	trainInputProvider.addInputModifier(new ScalingInputFunction(255));
 	MnistInputProvider testInputProvider = new MnistInputProvider("t10k-images.idx3-ubyte", "t10k-labels.idx1-ubyte", 1000, 1, new MnistTargetMultiNeuronOutputConverter());
@@ -92,7 +92,7 @@ public class MnistTest {
 
     @Test
     public void testAE() {
-	Autoencoder nn = NNFactory.autoencoderSigmoid(784, 10, true);
+	Autoencoder nn = NNFactory.autoencoderSigmoid(784, 10, true, true);
 
 	MnistInputProvider trainInputProvider = new MnistInputProvider("train-images.idx3-ubyte", "train-labels.idx1-ubyte", 1, 1, new MnistTargetMultiNeuronOutputConverter());
 	trainInputProvider.addInputModifier(new ScalingInputFunction(255));
@@ -113,7 +113,7 @@ public class MnistTest {
     @Test
     public void testLeNetSmall() {
 	// Convolutional network
-	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 28, 28, 1 }, { 5, 5, 20, 1 }, { 2, 2 }, { 5, 5, 50, 1 }, { 2, 2 }, {512}, {10} }, true);
+	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 28, 28, 1 }, { 5, 5, 20, 1 }, { 2, 2 }, { 5, 5, 50, 1 }, { 2, 2 }, {512}, {10} }, true, true);
 	nn.setLayerCalculator(NNFactory.lcSigmoid(nn, null));
 	NNFactory.lcMaxPooling(nn);
 
@@ -144,7 +144,7 @@ public class MnistTest {
     @Test
     public void testLeNetTiny() {
 	// very simple convolutional network with a single 2x2 max pooling layer
-	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 28, 28, 1 }, { 2, 2 }, {10} }, true);
+	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 28, 28, 1 }, { 2, 2 }, {10} }, true, true);
 	nn.setLayerCalculator(NNFactory.lcSigmoid(nn, null));
 	NNFactory.lcMaxPooling(nn);
 
@@ -179,7 +179,7 @@ public class MnistTest {
     @Test
     public void testLeNetTiny2() {
 	// very simple convolutional network with a single convolutional layer with 6 5x5 filters and a single 2x2 max pooling layer
-	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 28, 28, 1 }, { 5, 5, 6, 1 }, {2, 2}, {10} }, true);
+	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 28, 28, 1 }, { 5, 5, 6, 1 }, {2, 2}, {10} }, true, true);
 	nn.setLayerCalculator(NNFactory.lcSigmoid(nn, null));
 	NNFactory.lcMaxPooling(nn);
 

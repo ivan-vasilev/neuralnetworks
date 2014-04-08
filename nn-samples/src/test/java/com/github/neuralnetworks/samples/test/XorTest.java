@@ -23,7 +23,7 @@ public class XorTest {
     @Test
     public void testMLPSigmoidBP() {
 	// create multi layer perceptron with one hidden layer and bias
-	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 2, 8, 1 }, true);
+	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 2, 8, 1 }, true, true);
 
 	// create training and testing input providers
 	XorInputProvider trainingInput = new XorInputProvider(10000);

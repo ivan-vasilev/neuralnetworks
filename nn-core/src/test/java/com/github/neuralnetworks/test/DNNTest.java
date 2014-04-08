@@ -9,6 +9,7 @@ import java.util.Set;
 
 import org.junit.Test;
 
+import com.github.neuralnetworks.architecture.FullyConnected;
 import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
@@ -26,6 +27,7 @@ import com.github.neuralnetworks.training.TrainerFactory;
 import com.github.neuralnetworks.training.rbm.AparapiCDTrainer;
 import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.Matrix;
+import com.github.neuralnetworks.util.Tensor;
 import com.github.neuralnetworks.util.TensorFactory;
 import com.github.neuralnetworks.util.Util;
 
@@ -66,13 +68,13 @@ public class DNNTest {
 
     @Test
     public void testStackedAutoencoderConstruction() {
-	StackedAutoencoder sae = NNFactory.sae(new int[] { 5, 4, 3 }, false);
+	StackedAutoencoder sae = NNFactory.sae(new int[] { 5, 4, 3 }, false, true);
 	assertEquals(3, sae.getLayers().size(), 0);
 	assertEquals(2, sae.getNeuralNetworks().size(), 0);
 	assertEquals(3, sae.getFirstNeuralNetwork().getLayers().size(), 0);
 	assertEquals(3, sae.getLastNeuralNetwork().getLayers().size(), 0);
 
-	sae = NNFactory.sae(new int[] { 5, 4, 3 }, true);
+	sae = NNFactory.sae(new int[] { 5, 4, 3 }, true, true);
 	assertEquals(5, sae.getLayers().size(), 0);
 	assertEquals(2, sae.getNeuralNetworks().size(), 0);
 	assertEquals(5, sae.getFirstNeuralNetwork().getLayers().size(), 0);
@@ -114,20 +116,43 @@ public class DNNTest {
 
     @Test
     public void testSAECalculation() {
-	StackedAutoencoder sae = NNFactory.sae(new int [] {3, 2, 2}, true);
+	StackedAutoencoder sae = NNFactory.sae(new int [] {3, 2, 2}, true, true);
 	sae.setLayerCalculator(NNFactory.lcWeightedSum(sae, null));
 
 	Autoencoder firstAE = sae.getFirstNeuralNetwork();
-	Util.fillArray(((GraphConnections) firstAE.getConnection(firstAE.getInputLayer(), firstAE.getHiddenLayer())).getConnectionGraph().getElements(), 0.2f);
-	Util.fillArray(((GraphConnections) firstAE.getConnection(firstAE.getHiddenBiasLayer(), firstAE.getHiddenLayer())).getConnectionGraph().getElements(), 0.3f);
-	Util.fillArray(((GraphConnections) firstAE.getConnection(firstAE.getHiddenLayer(), firstAE.getOutputLayer())).getConnectionGraph().getElements(), 0.8f);
-	Util.fillArray(((GraphConnections) firstAE.getConnection(firstAE.getOutputBiasLayer(), firstAE.getOutputLayer())).getConnectionGraph().getElements(), 0.9f);
+	Tensor t = ((FullyConnected) firstAE.getConnection(firstAE.getInputLayer(), firstAE.getHiddenLayer())).getConnectionGraph();
+	float[] e1 = t.getElements();
+	t.forEach(i -> e1[i] = 0.2f);
+
+	t = ((FullyConnected) firstAE.getConnection(firstAE.getHiddenBiasLayer(), firstAE.getHiddenLayer())).getConnectionGraph();
+	float[] e2 = t.getElements();
+	t.forEach(i -> e2[i] = 0.3f);
+
+	t = ((FullyConnected) firstAE.getConnection(firstAE.getHiddenLayer(), firstAE.getOutputLayer())).getConnectionGraph();
+	float[] e3 = t.getElements();
+	t.forEach(i -> e3[i] = 0.8f);
+
+	t = ((FullyConnected) firstAE.getConnection(firstAE.getOutputBiasLayer(), firstAE.getOutputLayer())).getConnectionGraph();
+	float[] e4 = t.getElements();
+	t.forEach(i -> e4[i] = 0.9f);
 
 	Autoencoder secondAE = sae.getLastNeuralNetwork();
-	Util.fillArray(((GraphConnections) secondAE.getConnection(secondAE.getInputLayer(), secondAE.getHiddenLayer())).getConnectionGraph().getElements(), 0.4f);
-	Util.fillArray(((GraphConnections) secondAE.getConnection(secondAE.getHiddenBiasLayer(), secondAE.getHiddenLayer())).getConnectionGraph().getElements(), 0.5f);
-	Util.fillArray(((GraphConnections) secondAE.getConnection(secondAE.getHiddenLayer(), secondAE.getOutputLayer())).getConnectionGraph().getElements(), 0.7f);
-	Util.fillArray(((GraphConnections) secondAE.getConnection(secondAE.getOutputBiasLayer(), secondAE.getOutputLayer())).getConnectionGraph().getElements(), 0.9f);
+
+	t = ((FullyConnected) secondAE.getConnection(secondAE.getInputLayer(), secondAE.getHiddenLayer())).getConnectionGraph();
+	float[] e5 = t.getElements();
+	t.forEach(i -> e5[i] = 0.4f);
+	
+	t = ((GraphConnections) secondAE.getConnection(secondAE.getHiddenBiasLayer(), secondAE.getHiddenLayer())).getConnectionGraph();
+	float[] e6 = t.getElements();
+	t.forEach(i -> e6[i] = 0.5f);
+
+	t = ((GraphConnections) secondAE.getConnection(secondAE.getHiddenLayer(), secondAE.getOutputLayer())).getConnectionGraph();
+	float[] e7 = t.getElements();
+	t.forEach(i -> e7[i] = 0.7f);
+
+	t = ((GraphConnections) secondAE.getConnection(secondAE.getOutputBiasLayer(), secondAE.getOutputLayer())).getConnectionGraph();
+	float[] e8 = t.getElements();
+	t.forEach(i -> e8[i] = 0.9f);
 
 	Set<Layer> calculatedLayers = new HashSet<>();
 	calculatedLayers.add(sae.getInputLayer());

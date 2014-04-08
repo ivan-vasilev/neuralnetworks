@@ -25,7 +25,7 @@ public class AETest {
     @Test
     public void testAEBackpropagation() {
 	// autoencoder with 6 input/output and 2 hidden units
-	Autoencoder ae = NNFactory.autoencoderSigmoid(6, 2, true);
+	Autoencoder ae = NNFactory.autoencoderSigmoid(6, 2, true, true);
 
 	// We'll use a simple dataset of symptoms of a flu illness. There are 6
 	// input features and the first three are symptoms of the illness - for

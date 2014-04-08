@@ -71,7 +71,7 @@ public class CNNTest {
 
     @Test
     public void testCNNConstruction() {
-	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 32, 32, 1 }, { 5, 5, 6, 1 }, { 2, 2 }, { 5, 5, 16, 1 }, { 2, 2 }, { 5, 5, 120, 1 }, {84}, {10} }, true);
+	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 32, 32, 1 }, { 5, 5, 6, 1 }, { 2, 2 }, { 5, 5, 16, 1 }, { 2, 2 }, { 5, 5, 120, 1 }, {84}, {10} }, true, true);
 	assertEquals(13, nn.getLayers().size(), 0);
 
 	Layer l = nn.getInputLayer().getConnections().get(0).getOutputLayer();
@@ -113,7 +113,7 @@ public class CNNTest {
 
     @Test
     public void testCNNConstruction2() {
-	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 28, 28, 1 }, { 5, 5, 20, 1 }, { 2, 2 }, { 5, 5, 50, 1 }, { 2, 2 }, {500}, {10} }, true);
+	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 28, 28, 1 }, { 5, 5, 20, 1 }, { 2, 2 }, { 5, 5, 50, 1 }, { 2, 2 }, {500}, {10} }, true, true);
 	assertEquals(11, nn.getLayers().size(), 0);
 
 	Conv2DConnection cc = (Conv2DConnection) nn.getInputLayer().getConnections().get(0);
@@ -151,7 +151,7 @@ public class CNNTest {
 
     @Test
     public void testCNNConstruction3() {
-	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 6, 6, 1 }, { 3, 3, 2, 2 }, { 2, 2 } }, true);
+	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 6, 6, 1 }, { 3, 3, 2, 2 }, { 2, 2 } }, true, true);
 	assertEquals(4, nn.getLayers().size(), 0);
 
 	Conv2DConnection cc = (Conv2DConnection) nn.getInputLayer().getConnections().get(0);
@@ -168,7 +168,7 @@ public class CNNTest {
     }
 
     public void testCNNLayerCalculatorConstruction() {
-	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 28, 28, 1 }, { 5, 5, 20, 1 }, { 2, 2 }, { 5, 5, 50, 1 }, { 2, 2 }, {500}, {10} }, true);
+	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 28, 28, 1 }, { 5, 5, 20, 1 }, { 2, 2 }, { 5, 5, 50, 1 }, { 2, 2 }, {500}, {10} }, true, true);
 	nn.setLayerCalculator(NNFactory.lcSigmoid(nn, null));
 	NNFactory.lcMaxPooling(nn);
 
@@ -227,7 +227,7 @@ public class CNNTest {
 	assertTrue(bplc.getConnectionCalculator(l) == null);
 
 	// simple convolutional network
-	nn = NNFactory.convNN(new int[][] { { 28, 28, 1 }, { 1, 1 }, {10} }, false);
+	nn = NNFactory.convNN(new int[][] { { 28, 28, 1 }, { 1, 1 }, {10} }, false, true);
 	nn.setLayerCalculator(NNFactory.lcSigmoid(nn, null));
 	NNFactory.lcMaxPooling(nn);
 
@@ -296,7 +296,7 @@ public class CNNTest {
 
     @Test
     public void testSimpleCNN() {
-	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] {{3, 3, 2}, {2, 2, 2, 1}, {2, 2}}, false);
+	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] {{3, 3, 2}, {2, 2, 2, 1}, {2, 2}}, false, true);
 	nn.setLayerCalculator(NNFactory.lcWeightedSum(nn, null));
 	NNFactory.lcMaxPooling(nn);
 
@@ -494,7 +494,7 @@ public class CNNTest {
     public void testCNNBackpropagation() {
 	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 
-	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 3, 3, 2 }, { 2, 2, 1, 1 } }, true);
+	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 3, 3, 2 }, { 2, 2, 1, 1 } }, true, true);
 	nn.setLayerCalculator(NNFactory.lcSigmoid(nn, null));
 
 	Conv2DConnection c = (Conv2DConnection) nn.getInputLayer().getConnections().get(0);
@@ -520,7 +520,7 @@ public class CNNTest {
 
     @Test
     public void testCNNBackpropagation2() {
-	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { {2, 1, 1}, {1, 1}, {2}, {2}, {1} }, false);
+	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { {2, 1, 1}, {1, 1}, {2}, {2}, {1} }, false, true);
 	nn.setLayerCalculator(NNFactory.lcSigmoid(nn, null));
 	NNFactory.lcMaxPooling(nn);
 
@@ -551,7 +551,7 @@ public class CNNTest {
     public void testCNNStride() {
 	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 
-	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 5, 5, 1 }, { 2, 2, 1, 2 } }, false);
+	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 5, 5, 1 }, { 2, 2, 1, 2 } }, false, true);
 	nn.setLayerCalculator(NNFactory.lcWeightedSum(nn, null));
 
 	Conv2DConnection cc = (Conv2DConnection) nn.getInputLayer().getConnections().get(0);

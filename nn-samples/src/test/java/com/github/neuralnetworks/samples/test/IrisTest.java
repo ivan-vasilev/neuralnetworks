@@ -43,7 +43,7 @@ public class IrisTest {
     @Test
     public void testMLPSigmoidBP() {
 	// create the network
-	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 4, 2, 3 }, true);
+	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 4, 2, 3 }, true, true);
 
 	// training and testing data providers
 	IrisInputProvider trainInputProvider = new IrisInputProvider(150, 300000, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
@@ -82,7 +82,7 @@ public class IrisTest {
     @Test
     public void testRBMCDSigmoidBP() {
 	// RBM with 4 visible and 3 hidden units
-	RBM rbm = NNFactory.rbm(4, 3, true);
+	RBM rbm = NNFactory.rbm(4, 3, true, true);
 
 	// training and testing input providers
 	TrainingInputProvider trainInputProvider = new IrisInputProvider(1, 150000, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
@@ -156,7 +156,7 @@ public class IrisTest {
     @Test
     public void testAE() {
 	// create autoencoder with visible layer with 4 neurons and hidden layer with 3 neurons
-    	Autoencoder ae = NNFactory.autoencoderSigmoid(4, 3, true);
+    	Autoencoder ae = NNFactory.autoencoderSigmoid(4, 3, true, true);
 
     	// training, testing and error
     	TrainingInputProvider trainInputProvider = new IrisInputProvider(1, 15000, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
@@ -186,7 +186,7 @@ public class IrisTest {
     @Test
     public void testSAE() {
 	// create stacked autoencoder with input layer of size 4, hidden layer of the first AE with size 4 and hidden layer of the second AE with size 3
-	StackedAutoencoder sae = NNFactory.saeSigmoid(new int[] { 4, 4, 3 }, true);
+	StackedAutoencoder sae = NNFactory.saeSigmoid(new int[] { 4, 4, 3 }, true, true);
 
 	// stacked networks
 	Autoencoder firstNN = sae.getFirstNeuralNetwork();
