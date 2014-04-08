@@ -1,7 +1,5 @@
 package com.github.neuralnetworks.architecture.types;
 
-import java.util.List;
-
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.util.Util;
@@ -15,10 +13,6 @@ public class Autoencoder extends NeuralNetworkImpl {
 
     public Autoencoder() {
 	super();
-    }
-
-    public Autoencoder(List<Layer> layers) {
-	super(layers);
     }
 
     public Layer getHiddenBiasLayer() {

@@ -202,7 +202,7 @@ public class RBMTest {
     public void testOneStepContrastiveDivergence() {
 	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 
-	RBM rbm = NNFactory.rbm(3, 2, true, true);
+	RBM rbm = NNFactory.rbm(3, 2, true, false);
 
 	Matrix cg1 = rbm.getMainConnections().getConnectionGraph();
 	cg1.set(0.2f, 0, 0);

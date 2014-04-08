@@ -356,9 +356,18 @@ public class NNFactory {
     }
 
     public static RBM rbm(int visibleCount, int hiddenCount, boolean addBias, boolean useSharedMemory) {
-	return new RBM(visibleCount, hiddenCount, addBias, addBias);
+	RBM result = new RBM();
+	ConnectionFactory cf = new ConnectionFactory(useSharedMemory);
+	result.addConnections(cf.fullyConnected(new Layer(), new Layer(), visibleCount, hiddenCount));
+
+	if (addBias) {
+	    result.addConnections(cf.fullyConnected(new Layer(), result.getVisibleLayer(), 1, visibleCount));
+	    result.addConnections(cf.fullyConnected(new Layer(), result.getHiddenLayer(), 1, hiddenCount));
+	}
+
+	return result;
     }
-    
+
     public static RBMLayerCalculator rbmWeightedSumWeightedSum(RBM rbm) {
 	RBMLayerCalculator lc = new RBMLayerCalculator(rbm);
 	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiWeightedSumConnectionCalculator());
@@ -417,40 +426,49 @@ public class NNFactory {
 	return lc;
     }
 
-    public static DBN dbn(int[] layers, boolean addBias) {
+    public static DBN dbn(int[] layers, boolean addBias, boolean useSharedMemory) {
 	if (layers.length <= 1) {
 	    throw new IllegalArgumentException("more than one layer is required");
 	}
 
 	DBN result = new DBN();
+	ConnectionFactory cf = new ConnectionFactory(useSharedMemory);
 	result.addLayer(new Layer());
 	for (int i = 1; i < layers.length; i++) {
-	    result.addLevel(new Layer(), layers[i - 1], layers[i], addBias);
+	    RBM rbm = new RBM();
+	    rbm.addConnections(cf.fullyConnected(result.getOutputLayer(), new Layer(), layers[i - 1], layers[i]));
+
+	    if (addBias) {
+		rbm.addConnections(cf.fullyConnected(new Layer(), rbm.getVisibleLayer(), 1, layers[i - 1]));
+		rbm.addConnections(cf.fullyConnected(new Layer(), rbm.getHiddenLayer(), 1, layers[i]));
+	    }
+
+	    result.addNeuralNetwork(rbm);
 	}
 
 	return result;
     }
 
-    public static DBN dbnSigmoid(int[] layers, boolean addBias) {
-	DBN result = dbn(layers, addBias);
+    public static DBN dbnSigmoid(int[] layers, boolean addBias, boolean useSharedMemory) {
+	DBN result = dbn(layers, addBias, useSharedMemory);
 	result.setLayerCalculator(lcSigmoid(result, null));
 	return result;
     }
     
-    public static DBN dbnSoftReLU(int[] layers, boolean addBias) {
-	DBN result = dbn(layers, addBias);
+    public static DBN dbnSoftReLU(int[] layers, boolean addBias, boolean useSharedMemory) {
+	DBN result = dbn(layers, addBias, useSharedMemory);
 	result.setLayerCalculator(lcSoftRelu(result, null));
 	return result;
     }
     
-    public static DBN dbnReLU(int[] layers, boolean addBias) {
-	DBN result = dbn(layers, addBias);
+    public static DBN dbnReLU(int[] layers, boolean addBias, boolean useSharedMemory) {
+	DBN result = dbn(layers, addBias, useSharedMemory);
 	result.setLayerCalculator(lcRelu(result, null));
 	return result;
     }
 
-    public static DBN dbnTanh(int[] layers, boolean addBias) {
-	DBN result = dbn(layers, addBias);
+    public static DBN dbnTanh(int[] layers, boolean addBias, boolean useSharedMemory) {
+	DBN result = dbn(layers, addBias, useSharedMemory);
 	result.setLayerCalculator(lcTanh(result, null));
 	return result;
     }

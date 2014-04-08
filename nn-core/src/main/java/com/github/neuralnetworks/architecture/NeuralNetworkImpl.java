@@ -25,11 +25,6 @@ public class NeuralNetworkImpl implements NeuralNetwork {
 	this.layers = new UniqueList<Layer>();
     }
 
-    public NeuralNetworkImpl(List<Layer> layers) {
-	super();
-	this.layers = new UniqueList<Layer>(layers);
-    }
-
     @Override
     public LayerCalculator getLayerCalculator() {
 	return layerCalculator;

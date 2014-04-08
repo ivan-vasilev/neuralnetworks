@@ -114,7 +114,7 @@ public class IrisTest {
     @Test
     public void testDBN() {
 	// deep belief network with two rbms - 4-16 and 16-3 with biases
-	DBN dbn = NNFactory.dbn(new int[] {4, 4, 3}, true);
+	DBN dbn = NNFactory.dbn(new int[] {4, 4, 3}, true, true);
 	assertEquals(2, dbn.getNeuralNetworks().size(), 0);
 
 	dbn.setLayerCalculator(NNFactory.lcSigmoid(dbn, null));

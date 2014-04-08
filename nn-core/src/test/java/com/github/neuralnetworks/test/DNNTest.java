@@ -35,14 +35,14 @@ public class DNNTest {
 
     @Test
     public void testDBNConstruction() {
-	DBN dbn = NNFactory.dbn(new int[] { 4, 4, 4, 4}, false);
+	DBN dbn = NNFactory.dbn(new int[] { 4, 4, 4, 4}, false, true);
 	assertEquals(4, dbn.getLayers().size(), 0);
 	assertEquals(3, dbn.getNeuralNetworks().size(), 0);
 	assertEquals(2, dbn.getFirstNeuralNetwork().getLayers().size(), 0);
 	assertEquals(2, dbn.getNeuralNetwork(1).getLayers().size(), 0);
 	assertEquals(2, dbn.getLastNeuralNetwork().getLayers().size(), 0);
 
-	dbn = NNFactory.dbn(new int[] { 4, 4, 4, 4 }, true);
+	dbn = NNFactory.dbn(new int[] { 4, 4, 4, 4 }, true, true);
 	assertEquals(7, dbn.getLayers().size(), 0);
 	assertEquals(3, dbn.getNeuralNetworks().size(), 0);
 	assertEquals(4, dbn.getFirstNeuralNetwork().getLayers().size(), 0);
@@ -89,7 +89,7 @@ public class DNNTest {
 
     @Test
     public void testDBNCalculation() {
-	DBN dbn = NNFactory.dbn(new int [] {3, 2, 2}, true);
+	DBN dbn = NNFactory.dbn(new int [] {3, 2, 2}, true, false);
 	dbn.setLayerCalculator(NNFactory.lcWeightedSum(dbn, null));
 
 	RBM firstRBM = dbn.getFirstNeuralNetwork();
@@ -167,7 +167,7 @@ public class DNNTest {
 
     @Test
     public void testDNNLayerTrainer() {
-	DBN dbn = NNFactory.dbn(new int [] {3, 2, 2}, true);
+	DBN dbn = NNFactory.dbn(new int [] {3, 2, 2}, true, false);
 	dbn.setLayerCalculator(NNFactory.lcSigmoid(dbn, null));
 
 	RBM firstRBM = dbn.getFirstNeuralNetwork();
@@ -223,7 +223,7 @@ public class DNNTest {
 
     @Test
     public void testDNNLayerTrainer2() {
-	DBN dbn = NNFactory.dbn(new int [] {3, 3, 2}, true);
+	DBN dbn = NNFactory.dbn(new int [] {3, 3, 2}, true, false);
 	dbn.setLayerCalculator(NNFactory.lcSigmoid(dbn, null));
 
 	LayerCalculatorImpl lc = (LayerCalculatorImpl) dbn.getLayerCalculator();

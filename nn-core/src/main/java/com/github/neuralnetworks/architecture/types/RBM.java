@@ -1,9 +1,9 @@
 package com.github.neuralnetworks.architecture.types;
 
 import com.github.neuralnetworks.architecture.FullyConnected;
-import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
+import com.github.neuralnetworks.util.Util;
 
 /**
  * 
@@ -14,25 +14,8 @@ public class RBM extends NeuralNetworkImpl {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Weights between the visible and hidden layer
-     */
-    private GraphConnections mainConnections;
-
-    /**
-     * Weights between visible bias layer and visible layer
-     */
-    private FullyConnected visibleBiasConnections;
-
-    /**
-     * Weights between hidden bias layer and hidden layer
-     */
-    private FullyConnected hiddenBiasConnections;
-
-
-    public RBM(int visibleUnitCount, int hiddenUnitCount, boolean addVisibleBias, boolean addHiddenBias) {
+    public RBM() {
 	super();
-	init(new Layer(), new Layer(), visibleUnitCount, hiddenUnitCount, addVisibleBias, addHiddenBias);
     }
 
     public RBM(Layer visibleLayer, Layer hiddenLayer, int visibleUnitCount, int hiddenUnitCount, boolean addVisibleBias, boolean addHiddenBias) {
@@ -44,38 +27,38 @@ public class RBM extends NeuralNetworkImpl {
 	addLayer(visibleLayer);
 	addLayer(hiddenLayer);
 
-	mainConnections = new FullyConnected(visibleLayer, hiddenLayer, visibleUnitCount, hiddenUnitCount);
+	new FullyConnected(visibleLayer, hiddenLayer, visibleUnitCount, hiddenUnitCount);
 
 	if (addVisibleBias) {
 	    Layer visibleBiasLayer = new Layer();
 	    addLayer(visibleBiasLayer);
-	    visibleBiasConnections = new FullyConnected(visibleBiasLayer, visibleLayer, 1, visibleUnitCount);
+	    new FullyConnected(visibleBiasLayer, visibleLayer, 1, visibleUnitCount);
 	}
 
 	if (addHiddenBias) {
 	    Layer hiddenBiasLayer = new Layer();
 	    addLayer(hiddenBiasLayer);
-	    hiddenBiasConnections = new FullyConnected(hiddenBiasLayer, hiddenLayer, 1, hiddenUnitCount);
+	    new FullyConnected(hiddenBiasLayer, hiddenLayer, 1, hiddenUnitCount);
 	}
     }
 
-    public GraphConnections getMainConnections() {
-	return mainConnections;
+    public FullyConnected getMainConnections() {
+	return (FullyConnected) getConnections().stream().filter(c -> c.getInputLayer() == getInputLayer() && c.getOutputLayer() == getOutputLayer()).findFirst().orElse(null);
     }
 
-    public GraphConnections getVisibleBiasConnections() {
-	return visibleBiasConnections;
+    public FullyConnected getVisibleBiasConnections() {
+	return (FullyConnected) getConnections().stream().filter(c -> c.getOutputLayer() == getInputLayer() && Util.isBias(c.getInputLayer())).findFirst().orElse(null);
     }
 
-    public GraphConnections getHiddenBiasConnections() {
-	return hiddenBiasConnections;
+    public FullyConnected getHiddenBiasConnections() {
+	return (FullyConnected) getConnections().stream().filter(c -> c.getOutputLayer() == getOutputLayer() && Util.isBias(c.getInputLayer())).findFirst().orElse(null);
     }
 
     public Layer getVisibleLayer() {
-	return mainConnections.getInputLayer();
+	return getInputLayer();
     }
 
     public Layer getHiddenLayer() {
-	return mainConnections.getOutputLayer();
+	return getOutputLayer();
     }
 }

@@ -17,23 +17,6 @@ public class DBN extends DNN<RBM> {
 	super();
     }
 
-    /**
-     * For each added layer a new RBM is created with visible layer - the hidden layer of the previous network and hidden layer - the new layer
-     * @param layer
-     * @param addBias
-     * @return this
-     */
-    public DBN addLevel(Layer layer, int visibleUnitCount, int hiddenUnitCount, boolean addBias) {
-	Layer currentOutputLayer = getOutputLayer();
-	if (currentOutputLayer != null) {
-	    addNeuralNetwork(new RBM(currentOutputLayer, layer, visibleUnitCount, hiddenUnitCount, addBias, addBias));
-	} else {
-	    addLayer(layer);
-	}
-
-	return this;
-    }
-
     @Override
     protected Collection<Layer> getRelevantLayers(RBM nn) {
 	List<Layer> result = new UniqueList<Layer>();
