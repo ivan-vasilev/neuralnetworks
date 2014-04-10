@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import com.github.neuralnetworks.architecture.Conv2DConnection;
-import com.github.neuralnetworks.architecture.GraphConnections;
+import com.github.neuralnetworks.architecture.FullyConnected;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.calculation.BreadthFirstOrderStrategy;
 import com.github.neuralnetworks.calculation.LayerOrderStrategy.ConnectionCandidate;
@@ -55,18 +55,18 @@ public class NNRandomInitializer implements Serializable {
     public void initialize(NeuralNetwork nn) {
 	List<ConnectionCandidate> ccs = new BreadthFirstOrderStrategy(nn, nn.getInputLayer()).order();
 	for (ConnectionCandidate cc : ccs) {
-	    if (cc.connection instanceof GraphConnections) {
-		GraphConnections fc = (GraphConnections) cc.connection;
+	    if (cc.connection instanceof FullyConnected) {
+		FullyConnected fc = (FullyConnected) cc.connection;
 		if (Util.isBias(fc.getInputLayer())) {
 		    if (biasDefaultValue != null) {
-			fc.getConnectionGraph().forEach(i -> fc.getConnectionGraph().getElements()[i] = biasDefaultValue);
+			fc.getWeights().forEach(i -> fc.getWeights().getElements()[i] = biasDefaultValue);
 		    } else if (biasRandomInitializer != null) {
-			biasRandomInitializer.initialize(fc.getConnectionGraph().getElements());
+			biasRandomInitializer.initialize(fc.getWeights().getElements());
 		    } else {
-			randomInitializer.initialize(fc.getConnectionGraph().getElements());
+			randomInitializer.initialize(fc.getWeights().getElements());
 		    }
 		} else {
-		    randomInitializer.initialize(fc.getConnectionGraph().getElements());
+		    randomInitializer.initialize(fc.getWeights().getElements());
 		}
 	    } else if (cc.connection instanceof Conv2DConnection) {
 		Conv2DConnection c = (Conv2DConnection) cc.connection;

@@ -108,7 +108,7 @@ public class RBMTest {
 	RBM rbm = NNFactory.rbm(2, 2, false, true);
 	rbm.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
 
-	Matrix cg1 = rbm.getMainConnections().getConnectionGraph();
+	Matrix cg1 = rbm.getMainConnections().getWeights();
 	cg1.set(0.1f, 0, 0);
 	cg1.set(0.8f, 0, 1);
 	cg1.set(0.4f, 1, 0);
@@ -129,7 +129,7 @@ public class RBMTest {
 	RBM rbm = NNFactory.rbm(2, 2, false, true);
 	rbm.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
 
-	Matrix cg1 = rbm.getMainConnections().getConnectionGraph();
+	Matrix cg1 = rbm.getMainConnections().getWeights();
 	cg1.set(0.1f, 0, 0);
 	cg1.set(0.8f, 1, 0);
 	cg1.set(0.4f, 0, 1);
@@ -151,7 +151,7 @@ public class RBMTest {
 	RBM rbm = NNFactory.rbm(3, 2, true, true);
 	rbm.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
 
-	Matrix cg1 = rbm.getMainConnections().getConnectionGraph();
+	Matrix cg1 = rbm.getMainConnections().getWeights();
 	cg1.set(0.2f, 0, 0);
 	cg1.set(0.4f, 0, 1);
 	cg1.set(-0.5f, 0, 2);
@@ -159,7 +159,7 @@ public class RBMTest {
 	cg1.set(0.1f, 1, 1);
 	cg1.set(0.2f, 1, 2);
 
-	Matrix cgb1 = rbm.getHiddenBiasConnections().getConnectionGraph();
+	Matrix cgb1 = rbm.getHiddenBiasConnections().getWeights();
 	cgb1.set(-0.4f, 0, 0);
 	cgb1.set(0.2f, 1, 0);
 
@@ -177,7 +177,7 @@ public class RBMTest {
 	RBM rbm = NNFactory.rbm(2, 3, true, true);
 	rbm.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
 
-	Matrix cg1 = rbm.getMainConnections().getConnectionGraph();
+	Matrix cg1 = rbm.getMainConnections().getWeights();
 	cg1.set(0.2f, 0, 0);
 	cg1.set(0.4f, 1, 0);
 	cg1.set(-0.5f, 2, 0);
@@ -185,7 +185,7 @@ public class RBMTest {
 	cg1.set(0.1f, 1, 1);
 	cg1.set(0.2f, 2, 1);
 
-	Matrix cgb1 = rbm.getVisibleBiasConnections().getConnectionGraph();
+	Matrix cgb1 = rbm.getVisibleBiasConnections().getWeights();
 	cgb1.set(-0.4f, 0, 0);
 	cgb1.set(0.2f, 1, 0);
 
@@ -204,7 +204,7 @@ public class RBMTest {
 
 	RBM rbm = NNFactory.rbm(3, 2, true, true);
 
-	Matrix cg1 = rbm.getMainConnections().getConnectionGraph();
+	Matrix cg1 = rbm.getMainConnections().getWeights();
 	cg1.set(0.2f, 0, 0);
 	cg1.set(0.4f, 0, 1);
 	cg1.set(-0.5f, 0, 2);
@@ -212,12 +212,12 @@ public class RBMTest {
 	cg1.set(0.1f, 1, 1);
 	cg1.set(0.2f, 1, 2);
 
-	Matrix cgb1 = rbm.getVisibleBiasConnections().getConnectionGraph();
+	Matrix cgb1 = rbm.getVisibleBiasConnections().getWeights();
 	cgb1.set(0f, 0, 0);
 	cgb1.set(0f, 1, 0);
 	cgb1.set(0f, 2, 0);
 
-	Matrix cgb2 = rbm.getHiddenBiasConnections().getConnectionGraph();
+	Matrix cgb2 = rbm.getHiddenBiasConnections().getWeights();
 	cgb2.set(-0.4f, 0, 0);
 	cgb2.set(0.2f, 1, 0);
 

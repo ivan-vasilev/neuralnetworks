@@ -48,8 +48,8 @@ public abstract class CDTrainerBase extends OneStepTrainer<RBM> {
 	posPhaseVisible = (Matrix) data.getInput();
 	if (negPhaseVisible == null || negPhaseVisible.getColumns() != posPhaseVisible.getColumns()) {
 	    negPhaseVisible = TensorFactory.tensor(posPhaseVisible.getRows(), posPhaseVisible.getColumns());
-	    posPhaseHidden = TensorFactory.tensor(nn.getMainConnections().getConnectionGraph().getRows(), posPhaseVisible.getColumns());
-	    negPhaseHidden = TensorFactory.tensor(nn.getMainConnections().getConnectionGraph().getRows(), posPhaseVisible.getColumns());
+	    posPhaseHidden = TensorFactory.tensor(nn.getMainConnections().getWeights().getRows(), posPhaseVisible.getColumns());
+	    negPhaseHidden = TensorFactory.tensor(nn.getMainConnections().getWeights().getRows(), posPhaseVisible.getColumns());
 	}
 
 	getLayerCalculator().gibbsSampling(nn, posPhaseVisible, posPhaseHidden, negPhaseVisible, negPhaseHidden, getGibbsSamplingCount(), batch == 0 ? true : getResetRBM(), true);

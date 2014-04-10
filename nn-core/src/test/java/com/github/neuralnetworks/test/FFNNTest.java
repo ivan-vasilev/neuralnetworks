@@ -52,7 +52,7 @@ public class FFNNTest {
 	FullyConnected c2 = new FullyConnected(il2, ol, TensorFactory.tensor(weights, new int[][]{{1, 0, 0}, {1, 1, 2}}));
 	FullyConnected bc = new FullyConnected(new Layer(), ol, 1, 2);
 
-	Matrix cg = c1.getConnectionGraph();
+	Matrix cg = c1.getWeights();
 	cg.set(1, 0, 0);
 	cg.set(2, 0, 1);
 	cg.set(3, 0, 2);
@@ -60,7 +60,7 @@ public class FFNNTest {
 	cg.set(5, 1, 1);
 	cg.set(6, 1, 2);
 
-	cg = c2.getConnectionGraph();
+	cg = c2.getWeights();
 	cg.set(1, 0, 0);
 	cg.set(2, 0, 1);
 	cg.set(3, 0, 2);
@@ -68,7 +68,7 @@ public class FFNNTest {
 	cg.set(5, 1, 1);
 	cg.set(6, 1, 2);
 
-	Matrix bcg = bc.getConnectionGraph();
+	Matrix bcg = bc.getWeights();
 	bcg.set(0.1f, 0, 0);
 	bcg.set(0.2f, 1, 0);
 
@@ -168,7 +168,7 @@ public class FFNNTest {
 	FullyConnected c2 = new FullyConnected(ol, il2, TensorFactory.tensor(weights, new int[][]{{1, 0, 0}, {1, 2, 1}}));
 	FullyConnected bc = new FullyConnected(new Layer(), ol, 1, 2);
 
-	Matrix cg = c1.getConnectionGraph();
+	Matrix cg = c1.getWeights();
 	cg.set(1, 0, 0);
 	cg.set(2, 1, 0);
 	cg.set(3, 2, 0);
@@ -176,7 +176,7 @@ public class FFNNTest {
 	cg.set(5, 1, 1);
 	cg.set(6, 2, 1);
 
-	cg = c2.getConnectionGraph();
+	cg = c2.getWeights();
 	cg.set(1, 0, 0);
 	cg.set(2, 1, 0);
 	cg.set(3, 2, 0);
@@ -184,7 +184,7 @@ public class FFNNTest {
 	cg.set(5, 1, 1);
 	cg.set(6, 2, 1);
 
-	Matrix bcg = bc.getConnectionGraph();
+	Matrix bcg = bc.getWeights();
 	bcg.set(0.1f, 0, 0);
 	bcg.set(0.2f, 1, 0);
 
@@ -275,14 +275,14 @@ public class FFNNTest {
 	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 2, 2, 1 }, false, true);
 
 	FullyConnected c1 = (FullyConnected) mlp.getInputLayer().getConnections().iterator().next();
-	Matrix cg1 = c1.getConnectionGraph();
+	Matrix cg1 = c1.getWeights();
 	cg1.set(0.1f, 0, 0);
 	cg1.set(0.8f, 0, 1);
 	cg1.set(0.4f, 1, 0);
 	cg1.set(0.6f, 1, 1);
 
 	FullyConnected c2 = (FullyConnected) mlp.getOutputLayer().getConnections().iterator().next();
-	Matrix cg2 = c2.getConnectionGraph();
+	Matrix cg2 = c2.getWeights();
 	cg2.set(0.3f, 0, 0);
 	cg2.set(0.9f, 0, 1);
 
@@ -307,7 +307,7 @@ public class FFNNTest {
 
 	List<Connections> c = mlp.getConnections();
 	FullyConnected c1 = (FullyConnected) c.get(0);
-	Matrix cg1 = c1.getConnectionGraph();
+	Matrix cg1 = c1.getWeights();
 	cg1.set(0.2f, 0, 0);
 	cg1.set(0.4f, 0, 1);
 	cg1.set(-0.5f, 0, 2);
@@ -316,17 +316,17 @@ public class FFNNTest {
 	cg1.set(0.2f, 1, 2);
 
 	FullyConnected cb1 = (FullyConnected) c.get(1);
-	Matrix cgb1 = cb1.getConnectionGraph();
+	Matrix cgb1 = cb1.getWeights();
 	cgb1.set(-0.4f, 0, 0);
 	cgb1.set(0.2f, 1, 0);
 
 	FullyConnected c2 = (FullyConnected) c.get(2);
-	Matrix cg2 = c2.getConnectionGraph();
+	Matrix cg2 = c2.getWeights();
 	cg2.set(-0.3f, 0, 0);
 	cg2.set(-0.2f, 0, 1);
 
 	FullyConnected cb2 = (FullyConnected) c.get(3);
-	Matrix cgb2 = cb2.getConnectionGraph();
+	Matrix cgb2 = cb2.getWeights();
 	cgb2.set(0.1f, 0, 0);
 
 	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(mlp, new SimpleInputProvider(TensorFactory.matrix(new float[][] { { 1, 0, 1 } }), TensorFactory.matrix(new float[][] { { 1 } }), 1, 1), new SimpleInputProvider(TensorFactory.matrix(new float[][] { { 1, 0, 1 } }), TensorFactory.matrix(new float[][] { { 1 } }), 1, 1), null, null, 0.9f, 0f, 0f, 0f);
@@ -362,18 +362,18 @@ public class FFNNTest {
 	mlp.addLayer(input);
 
 	FullyConnected fc1 = cf.fullyConnected(input, leaf1, 2, 3);
-	fc1.getConnectionGraph().forEach(i -> fc1.getConnectionGraph().getElements()[i] = 0.1f);
+	fc1.getWeights().forEach(i -> fc1.getWeights().getElements()[i] = 0.1f);
 	mlp.addConnections(fc1);
 
 	FullyConnected fc2 = cf.fullyConnected(input, leaf2, 2, 3);
-	fc2.getConnectionGraph().forEach(i -> fc2.getConnectionGraph().getElements()[i] = 0.2f);
+	fc2.getWeights().forEach(i -> fc2.getWeights().getElements()[i] = 0.2f);
 	mlp.addConnections(fc2);
 
 	FullyConnected fc3 = cf.fullyConnected(leaf1, output, 3, 1);
-	fc3.getConnectionGraph().forEach(i -> fc3.getConnectionGraph().getElements()[i] = 0.3f);
+	fc3.getWeights().forEach(i -> fc3.getWeights().getElements()[i] = 0.3f);
 	mlp.addConnections(fc3);
 	FullyConnected fc4 = cf.fullyConnected(leaf2, output, 3, 1);
-	fc4.getConnectionGraph().forEach(i -> fc4.getConnectionGraph().getElements()[i] = 0.4f);
+	fc4.getWeights().forEach(i -> fc4.getWeights().getElements()[i] = 0.4f);
 	mlp.addConnections(fc4);
 
 	mlp.setLayerCalculator(NNFactory.lcWeightedSum(mlp, null));

@@ -8,6 +8,7 @@ import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.util.Properties;
+import com.github.neuralnetworks.util.Tensor;
 import com.github.neuralnetworks.util.Util;
 
 /**
@@ -25,9 +26,9 @@ public class BackPropagationReLU extends BackPropagationConnectionCalculatorImpl
     protected void addBackpropFunction(List<Connections> inputConnections, Map<Connections, BackPropagationConnectionCalculator> connectionCalculators, ValuesProvider valuesProvider, ValuesProvider activations, Layer targetLayer) {
 	for (Connections c : inputConnections) {
 	    if (Util.isBias(c.getInputLayer()) && targetLayer != c.getInputLayer()) {
-		connectionCalculators.put(c, new AparapiBackpropReLU(Arrays.asList(new Connections[] {c}), valuesProvider, activations, c.getInputLayer(), getLearningRate(), getMomentum(), getL1weightDecay(), getL2weightDecay()));
+		connectionCalculators.put(c, new AparapiBackpropReLU(Arrays.asList(c), valuesProvider, activations, Arrays.asList(getWeightUpdates().get(c)), c.getInputLayer(), getLearningRate(), getMomentum(), getL1weightDecay(), getL2weightDecay()));
 	    } else {
-		connectionCalculators.put(c, new AparapiBackpropReLU(Arrays.asList(new Connections[] {c}), valuesProvider, activations, targetLayer, getLearningRate(), getMomentum(), getL1weightDecay(), getL2weightDecay()));
+		connectionCalculators.put(c, new AparapiBackpropReLU(Arrays.asList(c), valuesProvider, activations, Arrays.asList(getWeightUpdates().get(c)), targetLayer, getLearningRate(), getMomentum(), getL1weightDecay(), getL2weightDecay()));
 	    }
 	}
     }
@@ -36,8 +37,8 @@ public class BackPropagationReLU extends BackPropagationConnectionCalculatorImpl
 
 	private static final long serialVersionUID = -3580345016542506932L;
 
-	public AparapiBackpropReLU(List<Connections> inputConnections, ValuesProvider valuesProvider, ValuesProvider activations, Layer targetLayer, float learningRate, float momentum, float l1weightDecay, float l2weightDecay) {
-	    super(inputConnections, valuesProvider, activations, targetLayer, learningRate, momentum, l1weightDecay, l2weightDecay);
+	public AparapiBackpropReLU(List<Connections> inputConnections, ValuesProvider valuesProvider, ValuesProvider activations, List<Tensor> weightUpdates, Layer targetLayer, float learningRate, float momentum, float l1weightDecay, float l2weightDecay) {
+	    super(inputConnections, valuesProvider, activations, weightUpdates, targetLayer, learningRate, momentum, l1weightDecay, l2weightDecay);
 	}
 	
 	@Override

@@ -7,6 +7,7 @@ import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSum;
 import com.github.neuralnetworks.util.Matrix;
+import com.github.neuralnetworks.util.Tensor;
 
 /**
  * Aparapi Backpropagation base weighted sum Supports learning rate, momentum
@@ -35,7 +36,7 @@ public class AparapiBackpropagationFullyConnected extends AparapiWeightedSum imp
     protected final float l1weightDecay;
     protected final float l2weightDecay;
 
-    public AparapiBackpropagationFullyConnected(List<Connections> inputConnections, ValuesProvider valuesProvider, ValuesProvider activations, Layer targetLayer, float learningRate, float momentum, float l1weightDecay, float l2weightDecay) {
+    public AparapiBackpropagationFullyConnected(List<Connections> inputConnections, ValuesProvider valuesProvider, ValuesProvider activations, List<Tensor> weightUpdates, Layer targetLayer, float learningRate, float momentum, float l1weightDecay, float l2weightDecay) {
 	super(inputConnections, valuesProvider, targetLayer);
 
 	Matrix m = activations.getValues(targetLayer, inputConnections);
@@ -48,7 +49,7 @@ public class AparapiBackpropagationFullyConnected extends AparapiWeightedSum imp
 	this.momentum = momentum;
 	this.l1weightDecay = l1weightDecay;
 	this.l2weightDecay = l2weightDecay;
-	this.weightUpdates = new float[weights.length];
+	this.weightUpdates = weightUpdates.get(0).getElements();
     }
 
     @Override

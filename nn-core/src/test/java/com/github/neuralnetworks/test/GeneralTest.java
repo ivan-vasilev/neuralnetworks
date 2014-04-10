@@ -12,7 +12,6 @@ import com.amd.aparapi.Kernel.EXECUTION_MODE;
 import com.github.neuralnetworks.architecture.ConnectionFactory;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
 import com.github.neuralnetworks.architecture.FullyConnected;
-import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.architecture.types.NNFactory;
@@ -124,19 +123,19 @@ public class GeneralTest {
 	FullyConnected fc1 = f.fullyConnected(null, null, 2, 3);
 	FullyConnected fc2 = f.fullyConnected(null, null, 5, 2);
 
-	assertTrue(fc1.getConnectionGraph().getElements() == fc2.getConnectionGraph().getElements());
-	assertEquals(16, fc1.getConnectionGraph().getElements().length, 0);
-	assertEquals(0, fc1.getConnectionGraph().getStartOffset(), 0);
-	assertEquals(3, fc1.getConnectionGraph().getRows(), 0);
-	assertEquals(2, fc1.getConnectionGraph().getColumns(), 0);
-	fc1.getConnectionGraph().set(3, 1, 1);
-	assertEquals(3, fc1.getConnectionGraph().get(1, 1), 0);
+	assertTrue(fc1.getWeights().getElements() == fc2.getWeights().getElements());
+	assertEquals(16, fc1.getWeights().getElements().length, 0);
+	assertEquals(0, fc1.getWeights().getStartOffset(), 0);
+	assertEquals(3, fc1.getWeights().getRows(), 0);
+	assertEquals(2, fc1.getWeights().getColumns(), 0);
+	fc1.getWeights().set(3, 1, 1);
+	assertEquals(3, fc1.getWeights().get(1, 1), 0);
 
-	assertEquals(6, fc2.getConnectionGraph().getStartOffset(), 0);
-	assertEquals(2, fc2.getConnectionGraph().getRows(), 0);
-	assertEquals(5, fc2.getConnectionGraph().getColumns(), 0);
-	fc2.getConnectionGraph().set(5, 1, 1);
-	assertEquals(5, fc2.getConnectionGraph().get(1, 1), 0);
+	assertEquals(6, fc2.getWeights().getStartOffset(), 0);
+	assertEquals(2, fc2.getWeights().getRows(), 0);
+	assertEquals(5, fc2.getWeights().getColumns(), 0);
+	fc2.getWeights().set(5, 1, 1);
+	assertEquals(5, fc2.getWeights().get(1, 1), 0);
 
 	Conv2DConnection c = f.conv2d(null, null, 3, 3, 3, 2, 2, 3, 1);
 	assertEquals(52, c.getWeights().getElements().length, 0);
@@ -153,13 +152,13 @@ public class GeneralTest {
 
 	for (Layer l : nn.getLayers()) {
 	    if (Util.isBias(l)) {
-		GraphConnections gc = (GraphConnections) l.getConnections().get(0);
-		for (float v : gc.getConnectionGraph().getElements()) {
+		FullyConnected gc = (FullyConnected) l.getConnections().get(0);
+		for (float v : gc.getWeights().getElements()) {
 		    assertEquals(0.5, v, 0f);
 		}
 	    } else {
-		GraphConnections gc = (GraphConnections) l.getConnections().get(0);
-		for (float v : gc.getConnectionGraph().getElements()) {
+		FullyConnected gc = (FullyConnected) l.getConnections().get(0);
+		for (float v : gc.getWeights().getElements()) {
 		    assertTrue(v >= -0.1f && v <= 0.1f && v != 0);
 		}
 	    }
@@ -170,13 +169,13 @@ public class GeneralTest {
 
 	for (Layer l : nn.getLayers()) {
 	    if (Util.isBias(l)) {
-		GraphConnections gc = (GraphConnections) l.getConnections().get(0);
-		for (float v : gc.getConnectionGraph().getElements()) {
+		FullyConnected gc = (FullyConnected) l.getConnections().get(0);
+		for (float v : gc.getWeights().getElements()) {
 		    assertTrue(v >= -2f && v <= -1f);
 		}
 	    } else {
-		GraphConnections gc = (GraphConnections) l.getConnections().get(0);
-		for (float v : gc.getConnectionGraph().getElements()) {
+		FullyConnected gc = (FullyConnected) l.getConnections().get(0);
+		for (float v : gc.getWeights().getElements()) {
 		    assertTrue(v >= 2f && v <= 3f);
 		}
 	    }

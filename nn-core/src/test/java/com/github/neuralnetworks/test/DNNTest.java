@@ -10,7 +10,6 @@ import java.util.Set;
 import org.junit.Test;
 
 import com.github.neuralnetworks.architecture.FullyConnected;
-import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.architecture.types.Autoencoder;
@@ -93,29 +92,29 @@ public class DNNTest {
 
 	RBM firstRBM = dbn.getFirstNeuralNetwork();
 
-	Tensor t = firstRBM.getMainConnections().getConnectionGraph();
+	Tensor t = firstRBM.getMainConnections().getWeights();
 	float[] e1 = t.getElements();
 	t.forEach(i -> e1[i] = 0.2f);
 	
-	t = firstRBM.getVisibleBiasConnections().getConnectionGraph();
+	t = firstRBM.getVisibleBiasConnections().getWeights();
 	float[] e2 = t.getElements();
 	t.forEach(i -> e2[i] = 0.1f);
 
-	t = firstRBM.getHiddenBiasConnections().getConnectionGraph();
+	t = firstRBM.getHiddenBiasConnections().getWeights();
 	float[] e3 = t.getElements();
 	t.forEach(i -> e3[i] = 0.3f);
 
 	RBM secondRBM = dbn.getLastNeuralNetwork();
 
-	t = secondRBM.getMainConnections().getConnectionGraph();
+	t = secondRBM.getMainConnections().getWeights();
 	float[] e4 = t.getElements();
 	t.forEach(i -> e4[i] = 0.4f);
 
-	t = secondRBM.getVisibleBiasConnections().getConnectionGraph();
+	t = secondRBM.getVisibleBiasConnections().getWeights();
 	float[] e5 = t.getElements();
 	t.forEach(i -> e5[i] = 0.8f);
 
-	t = secondRBM.getHiddenBiasConnections().getConnectionGraph();
+	t = secondRBM.getHiddenBiasConnections().getWeights();
 	float[] e6 = t.getElements();
 	t.forEach(i -> e6[i] = 0.5f);
 
@@ -137,37 +136,37 @@ public class DNNTest {
 	sae.setLayerCalculator(NNFactory.lcWeightedSum(sae, null));
 
 	Autoencoder firstAE = sae.getFirstNeuralNetwork();
-	Tensor t = ((FullyConnected) firstAE.getConnection(firstAE.getInputLayer(), firstAE.getHiddenLayer())).getConnectionGraph();
+	Tensor t = ((FullyConnected) firstAE.getConnection(firstAE.getInputLayer(), firstAE.getHiddenLayer())).getWeights();
 	float[] e1 = t.getElements();
 	t.forEach(i -> e1[i] = 0.2f);
 
-	t = ((FullyConnected) firstAE.getConnection(firstAE.getHiddenBiasLayer(), firstAE.getHiddenLayer())).getConnectionGraph();
+	t = ((FullyConnected) firstAE.getConnection(firstAE.getHiddenBiasLayer(), firstAE.getHiddenLayer())).getWeights();
 	float[] e2 = t.getElements();
 	t.forEach(i -> e2[i] = 0.3f);
 
-	t = ((FullyConnected) firstAE.getConnection(firstAE.getHiddenLayer(), firstAE.getOutputLayer())).getConnectionGraph();
+	t = ((FullyConnected) firstAE.getConnection(firstAE.getHiddenLayer(), firstAE.getOutputLayer())).getWeights();
 	float[] e3 = t.getElements();
 	t.forEach(i -> e3[i] = 0.8f);
 
-	t = ((FullyConnected) firstAE.getConnection(firstAE.getOutputBiasLayer(), firstAE.getOutputLayer())).getConnectionGraph();
+	t = ((FullyConnected) firstAE.getConnection(firstAE.getOutputBiasLayer(), firstAE.getOutputLayer())).getWeights();
 	float[] e4 = t.getElements();
 	t.forEach(i -> e4[i] = 0.9f);
 
 	Autoencoder secondAE = sae.getLastNeuralNetwork();
 
-	t = ((FullyConnected) secondAE.getConnection(secondAE.getInputLayer(), secondAE.getHiddenLayer())).getConnectionGraph();
+	t = ((FullyConnected) secondAE.getConnection(secondAE.getInputLayer(), secondAE.getHiddenLayer())).getWeights();
 	float[] e5 = t.getElements();
 	t.forEach(i -> e5[i] = 0.4f);
 	
-	t = ((GraphConnections) secondAE.getConnection(secondAE.getHiddenBiasLayer(), secondAE.getHiddenLayer())).getConnectionGraph();
+	t = ((FullyConnected) secondAE.getConnection(secondAE.getHiddenBiasLayer(), secondAE.getHiddenLayer())).getWeights();
 	float[] e6 = t.getElements();
 	t.forEach(i -> e6[i] = 0.5f);
 
-	t = ((GraphConnections) secondAE.getConnection(secondAE.getHiddenLayer(), secondAE.getOutputLayer())).getConnectionGraph();
+	t = ((FullyConnected) secondAE.getConnection(secondAE.getHiddenLayer(), secondAE.getOutputLayer())).getWeights();
 	float[] e7 = t.getElements();
 	t.forEach(i -> e7[i] = 0.7f);
 
-	t = ((GraphConnections) secondAE.getConnection(secondAE.getOutputBiasLayer(), secondAE.getOutputLayer())).getConnectionGraph();
+	t = ((FullyConnected) secondAE.getConnection(secondAE.getOutputBiasLayer(), secondAE.getOutputLayer())).getWeights();
 	float[] e8 = t.getElements();
 	t.forEach(i -> e8[i] = 0.9f);
 
@@ -189,7 +188,7 @@ public class DNNTest {
 
 	RBM firstRBM = dbn.getFirstNeuralNetwork();
 
-	Matrix cg1 = firstRBM.getMainConnections().getConnectionGraph();
+	Matrix cg1 = firstRBM.getMainConnections().getWeights();
 	cg1.set(0.2f, 0, 0);
 	cg1.set(0.4f, 0, 1);
 	cg1.set(-0.5f, 0, 2);
@@ -197,12 +196,12 @@ public class DNNTest {
 	cg1.set(0.1f, 1, 1);
 	cg1.set(0.2f, 1, 2);
 
-	Matrix cgb1 = firstRBM.getVisibleBiasConnections().getConnectionGraph();
+	Matrix cgb1 = firstRBM.getVisibleBiasConnections().getWeights();
 	cgb1.set(0f, 0, 0);
 	cgb1.set(0f, 1, 0);
 	cgb1.set(0f, 2, 0);
 
-	Matrix cgb2 = firstRBM.getHiddenBiasConnections().getConnectionGraph();
+	Matrix cgb2 = firstRBM.getHiddenBiasConnections().getWeights();
 	cgb2.set(-0.4f, 0, 0);
 	cgb2.set(0.2f, 1, 0);
 
@@ -247,7 +246,7 @@ public class DNNTest {
 	RBM firstRBM = dbn.getFirstNeuralNetwork();
 	lc.addConnectionCalculator(firstRBM.getHiddenLayer(), new AparapiWeightedSumConnectionCalculator());
 
-	Matrix m1 = firstRBM.getMainConnections().getConnectionGraph();
+	Matrix m1 = firstRBM.getMainConnections().getWeights();
 	m1.set(1, 0, 0);
 	m1.set(0, 0, 1);
 	m1.set(0, 0, 2);
@@ -260,7 +259,7 @@ public class DNNTest {
 
 	RBM secondRBM = dbn.getLastNeuralNetwork();
 	
-	Matrix cg1 = secondRBM.getMainConnections().getConnectionGraph();
+	Matrix cg1 = secondRBM.getMainConnections().getWeights();
 	cg1.set(0.2f, 0, 0);
 	cg1.set(0.4f, 0, 1);
 	cg1.set(-0.5f, 0, 2);
@@ -268,12 +267,12 @@ public class DNNTest {
 	cg1.set(0.1f, 1, 1);
 	cg1.set(0.2f, 1, 2);
 	
-	Matrix cgb1 = secondRBM.getVisibleBiasConnections().getConnectionGraph();
+	Matrix cgb1 = secondRBM.getVisibleBiasConnections().getWeights();
 	cgb1.set(0f, 0, 0);
 	cgb1.set(0f, 1, 0);
 	cgb1.set(0f, 2, 0);
 	
-	Matrix cgb2 = secondRBM.getHiddenBiasConnections().getConnectionGraph();
+	Matrix cgb2 = secondRBM.getHiddenBiasConnections().getWeights();
 	cgb2.set(-0.4f, 0, 0);
 	cgb2.set(0.2f, 1, 0);
 	

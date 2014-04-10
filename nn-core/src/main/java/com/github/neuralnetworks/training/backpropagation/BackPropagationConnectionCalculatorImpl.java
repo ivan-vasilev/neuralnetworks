@@ -10,9 +10,11 @@ import java.util.stream.Collectors;
 
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
+import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
+import com.github.neuralnetworks.util.Tensor;
 import com.github.neuralnetworks.util.Util;
 
 /**
@@ -77,6 +79,10 @@ public abstract class BackPropagationConnectionCalculatorImpl implements BackPro
 	return miniBatchSize;
     }
 
+    public NeuralNetwork getNeuralNetwork() {
+	return properties.getParameter(Constants.NEURAL_NETWORK);
+    }
+
     @Override
     public float getLearningRate() {
 	return properties.getParameter(Constants.LEARNING_RATE);
@@ -125,5 +131,9 @@ public abstract class BackPropagationConnectionCalculatorImpl implements BackPro
     @Override
     public void setActivations(ValuesProvider activations) {
 	this.activations = activations;
+    }
+
+    protected Map<Connections, Tensor> getWeightUpdates() {
+	return properties.getParameter(Constants.WEIGHT_UDPATES);
     }
 }

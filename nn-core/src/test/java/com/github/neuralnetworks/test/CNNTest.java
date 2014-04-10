@@ -15,7 +15,6 @@ import com.github.neuralnetworks.architecture.ConnectionFactory;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
 import com.github.neuralnetworks.architecture.FullyConnected;
-import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.architecture.Subsampling2DConnection;
@@ -104,11 +103,11 @@ public class CNNTest {
 	assertEquals(1, cc.getOutputFeatureMapColumns(), 0);
 	assertEquals(120, cc.getOutputFilters(), 0);
 
-	GraphConnections cg = (GraphConnections) l.getConnections().get(2);
-	assertEquals(84, cg.getConnectionGraph().getRows(), 0);
+	FullyConnected cg = (FullyConnected) l.getConnections().get(2);
+	assertEquals(84, cg.getWeights().getRows(), 0);
 
-	GraphConnections cg2 = (GraphConnections) cg.getOutputLayer().getConnections().get(2);
-	assertEquals(10, cg2.getConnectionGraph().getRows(), 0);
+	FullyConnected cg2 = (FullyConnected) cg.getOutputLayer().getConnections().get(2);
+	assertEquals(10, cg2.getWeights().getRows(), 0);
     }
 
     @Test
@@ -525,14 +524,14 @@ public class CNNTest {
 	NNFactory.lcMaxPooling(nn);
 
 	FullyConnected c1 = (FullyConnected) nn.getInputLayer().getConnections().get(0).getOutputLayer().getConnections().get(1).getOutputLayer().getConnections().get(1);
-	Matrix cg1 = c1.getConnectionGraph();
+	Matrix cg1 = c1.getWeights();
 	cg1.set(0.1f, 0, 0);
 	cg1.set(0.8f, 0, 1);
 	cg1.set(0.4f, 1, 0);
 	cg1.set(0.6f, 1, 1);
 
 	FullyConnected c2 = (FullyConnected) nn.getOutputLayer().getConnections().iterator().next();
-	Matrix cg2 = c2.getConnectionGraph();
+	Matrix cg2 = c2.getWeights();
 	cg2.set(0.3f, 0, 0);
 	cg2.set(0.9f, 0, 1);
 

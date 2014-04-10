@@ -7,7 +7,7 @@ import java.util.stream.IntStream;
 
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
-import com.github.neuralnetworks.architecture.GraphConnections;
+import com.github.neuralnetworks.architecture.FullyConnected;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Subsampling2DConnection;
 
@@ -53,9 +53,9 @@ public class Util {
 		if (c instanceof Conv2DConnection) {
 		    Conv2DConnection cc = (Conv2DConnection) c;
 		    return cc.getInputFilters() == 1 && cc.getInputFeatureMapRows() == cc.getOutputFeatureMapRows() && cc.getInputFeatureMapColumns() == cc.getOutputFeatureMapColumns();
-		} else if (c instanceof GraphConnections) {
-		    GraphConnections cg = (GraphConnections) c;
-		    return cg.getConnectionGraph().getColumns() == 1;
+		} else if (c instanceof FullyConnected) {
+		    FullyConnected cg = (FullyConnected) c;
+		    return cg.getWeights().getColumns() == 1;
 		}
 	    }
 	}

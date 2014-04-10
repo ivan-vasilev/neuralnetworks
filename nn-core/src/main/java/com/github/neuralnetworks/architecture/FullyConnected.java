@@ -6,7 +6,7 @@ import com.github.neuralnetworks.util.TensorFactory;
 /**
  * Fully connected weight matrix between two layers of neurons
  */
-public class FullyConnected extends ConnectionsImpl implements GraphConnections {
+public class FullyConnected extends ConnectionsImpl implements WeightsConnections {
 
     private static final long serialVersionUID = 1L;
 
@@ -25,7 +25,7 @@ public class FullyConnected extends ConnectionsImpl implements GraphConnections 
     }
 
     @Override
-    public Matrix getConnectionGraph() {
+    public Matrix getWeights() {
 	return connectionGraph;
     }
 

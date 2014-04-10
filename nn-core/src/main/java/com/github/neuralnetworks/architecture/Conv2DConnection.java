@@ -6,7 +6,7 @@ import com.github.neuralnetworks.util.TensorFactory;
 /**
  * Convolutional connection between layers (for 2d input data)
  */
-public class Conv2DConnection extends ConnectionsImpl {
+public class Conv2DConnection extends ConnectionsImpl implements WeightsConnections {
 
     private static final long serialVersionUID = 1L;
 
@@ -34,6 +34,7 @@ public class Conv2DConnection extends ConnectionsImpl {
 	this.wights = weights;
     }
 
+    @Override
     public Tensor getWeights() {
 	return wights;
     }

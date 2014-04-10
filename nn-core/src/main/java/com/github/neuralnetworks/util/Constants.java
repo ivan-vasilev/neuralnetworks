@@ -31,4 +31,5 @@ public class Constants {
     public static final String CORRUPTOR = "corruptionInitializer";
     public static final String INACTIVE_CORRUPTED_VALUE = "inactiveCorruptedValue";
     public static final String ACTIVE_CORRUPTED_VALUE = "activeCorruptedValue";
+    public static final String WEIGHT_UDPATES = "weightUpdates";
 }

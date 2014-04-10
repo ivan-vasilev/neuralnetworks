@@ -90,7 +90,7 @@ public class ConnectionFactory implements Serializable {
 	for (Connections c : connections) {
 	    Tensor weights = null;
 	    if (c instanceof FullyConnected) {
-		weights = ((FullyConnected) c).getConnectionGraph();
+		weights = ((FullyConnected) c).getWeights();
 	    } else if (c instanceof Conv2DConnection) {
 		weights = ((Conv2DConnection) c).getWeights();
 	    }

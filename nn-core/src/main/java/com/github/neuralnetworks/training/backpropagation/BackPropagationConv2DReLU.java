@@ -8,6 +8,7 @@ import com.github.neuralnetworks.architecture.Conv2DConnection;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.util.Properties;
+import com.github.neuralnetworks.util.Tensor;
 import com.github.neuralnetworks.util.Util;
 
 /**
@@ -32,7 +33,7 @@ public class BackPropagationConv2DReLU extends BackPropagationConnectionCalculat
 	}
 
 	if (con != null) {
-	    connectionCalculators.put(con, new AparapiBackpropConv2DReLU(con, valuesProvider, activations, targetLayer));
+	    connectionCalculators.put(con, new AparapiBackpropConv2DReLU(con, valuesProvider, activations, getWeightUpdates().get(con), targetLayer));
 	}
     }
 
@@ -40,8 +41,8 @@ public class BackPropagationConv2DReLU extends BackPropagationConnectionCalculat
 
 	private static final long serialVersionUID = -3580345016542506932L;
 
-	public AparapiBackpropConv2DReLU(Conv2DConnection c, ValuesProvider valuesProvider, ValuesProvider activations, Layer targetLayer) {
-	    super(c, valuesProvider, activations, targetLayer);
+	public AparapiBackpropConv2DReLU(Conv2DConnection c, ValuesProvider valuesProvider, ValuesProvider activations, Tensor weightUpdates, Layer targetLayer) {
+	    super(c, valuesProvider, activations, weightUpdates, targetLayer);
 	}
 
 	@Override

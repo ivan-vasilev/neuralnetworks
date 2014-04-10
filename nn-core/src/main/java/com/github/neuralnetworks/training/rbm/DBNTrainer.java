@@ -31,16 +31,16 @@ public class DBNTrainer extends DNNLayerTrainer implements TrainingEventListener
 
 	    if (list.indexOf(current) < list.size() - 1) {
 		RBM next = (RBM) list.get(list.indexOf(current) + 1);
-		if (current.getMainConnections().getConnectionGraph().getElements().length == next.getMainConnections().getConnectionGraph().getElements().length) {
-		    System.arraycopy(current.getMainConnections().getConnectionGraph().getElements(), 0, next.getMainConnections().getConnectionGraph().getElements(), 0, next.getMainConnections().getConnectionGraph().getElements().length);
+		if (current.getMainConnections().getWeights().getElements().length == next.getMainConnections().getWeights().getElements().length) {
+		    System.arraycopy(current.getMainConnections().getWeights().getElements(), 0, next.getMainConnections().getWeights().getElements(), 0, next.getMainConnections().getWeights().getElements().length);
 		}
 
-		if (current.getVisibleBiasConnections() != null && next.getVisibleBiasConnections() != null && current.getVisibleBiasConnections().getConnectionGraph().getElements().length == next.getVisibleBiasConnections().getConnectionGraph().getElements().length) {
-		    System.arraycopy(current.getVisibleBiasConnections().getConnectionGraph().getElements(), 0, next.getVisibleBiasConnections().getConnectionGraph().getElements(), 0, next.getVisibleBiasConnections().getConnectionGraph().getElements().length);
+		if (current.getVisibleBiasConnections() != null && next.getVisibleBiasConnections() != null && current.getVisibleBiasConnections().getWeights().getElements().length == next.getVisibleBiasConnections().getWeights().getElements().length) {
+		    System.arraycopy(current.getVisibleBiasConnections().getWeights().getElements(), 0, next.getVisibleBiasConnections().getWeights().getElements(), 0, next.getVisibleBiasConnections().getWeights().getElements().length);
 		}
 		
-		if (current.getHiddenBiasConnections() != null && next.getHiddenBiasConnections() != null && current.getHiddenBiasConnections().getConnectionGraph().getElements().length == next.getHiddenBiasConnections().getConnectionGraph().getElements().length) {
-		    System.arraycopy(current.getHiddenBiasConnections().getConnectionGraph().getElements(), 0, next.getHiddenBiasConnections().getConnectionGraph().getElements(), 0, next.getHiddenBiasConnections().getConnectionGraph().getElements().length);
+		if (current.getHiddenBiasConnections() != null && next.getHiddenBiasConnections() != null && current.getHiddenBiasConnections().getWeights().getElements().length == next.getHiddenBiasConnections().getWeights().getElements().length) {
+		    System.arraycopy(current.getHiddenBiasConnections().getWeights().getElements(), 0, next.getHiddenBiasConnections().getWeights().getElements(), 0, next.getHiddenBiasConnections().getWeights().getElements().length);
 		}
 	    }
 	}

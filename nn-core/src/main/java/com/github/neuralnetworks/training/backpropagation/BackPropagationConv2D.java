@@ -31,7 +31,7 @@ public class BackPropagationConv2D extends BackPropagationConnectionCalculatorIm
 	}
 
 	if (con != null) {
-	    connectionCalculators.put(con, new AparapiBackpropagationConv2D(con, valuesProvider, activations, targetLayer));
+	    connectionCalculators.put(con, new AparapiBackpropagationConv2D(con, valuesProvider, activations, getWeightUpdates().get(con), targetLayer));
 	}
     }
 }

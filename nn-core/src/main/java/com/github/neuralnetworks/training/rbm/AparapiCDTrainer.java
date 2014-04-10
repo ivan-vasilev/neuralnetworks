@@ -44,26 +44,26 @@ public class AparapiCDTrainer extends CDTrainerBase {
 	int mbs = posPhaseHidden.getColumns();
 
 	if (weightUpdatesKernel == null || weightUpdatesKernel.getMiniBatchSize() != mbs) {
-	    weightUpdatesKernel = new CDWeightUpdatesKernel(posPhaseVisible, posPhaseHidden, negPhaseVisible, negPhaseHidden, rbm.getMainConnections().getConnectionGraph(), getLearningRate(), getMomentum(), getl1weightDecay(), getl2weightDecay());
+	    weightUpdatesKernel = new CDWeightUpdatesKernel(posPhaseVisible, posPhaseHidden, negPhaseVisible, negPhaseHidden, rbm.getMainConnections().getWeights(), getLearningRate(), getMomentum(), getl1weightDecay(), getl2weightDecay());
 	}
-	Environment.getInstance().getExecutionStrategy().execute(weightUpdatesKernel, rbm.getMainConnections().getConnectionGraph().getRows());
+	Environment.getInstance().getExecutionStrategy().execute(weightUpdatesKernel, rbm.getMainConnections().getWeights().getRows());
 
 	// update visible bias
 	if (rbm.getVisibleBiasConnections() != null) {
 	    if (visibleBiasUpdatesKernel == null || visibleBiasUpdatesKernel.getMiniBatchSize() != mbs) {
-		visibleBiasUpdatesKernel = new CDBiasUpdatesKernel(rbm.getVisibleBiasConnections().getConnectionGraph(), posPhaseVisible, negPhaseVisible, getLearningRate(), getMomentum());
+		visibleBiasUpdatesKernel = new CDBiasUpdatesKernel(rbm.getVisibleBiasConnections().getWeights(), posPhaseVisible, negPhaseVisible, getLearningRate(), getMomentum());
 	    }
 
-	    Environment.getInstance().getExecutionStrategy().execute(visibleBiasUpdatesKernel, rbm.getVisibleBiasConnections().getConnectionGraph().getSize());
+	    Environment.getInstance().getExecutionStrategy().execute(visibleBiasUpdatesKernel, rbm.getVisibleBiasConnections().getWeights().getSize());
 	}
 
 	// update hidden bias
 	if (rbm.getHiddenBiasConnections() != null) {
 	    if (hiddenBiasUpdatesKernel == null || hiddenBiasUpdatesKernel.getMiniBatchSize() != mbs) {
-		hiddenBiasUpdatesKernel = new CDBiasUpdatesKernel(rbm.getHiddenBiasConnections().getConnectionGraph(), posPhaseHidden, negPhaseHidden, getLearningRate(), getMomentum());
+		hiddenBiasUpdatesKernel = new CDBiasUpdatesKernel(rbm.getHiddenBiasConnections().getWeights(), posPhaseHidden, negPhaseHidden, getLearningRate(), getMomentum());
 	    }
 
-	    Environment.getInstance().getExecutionStrategy().execute(hiddenBiasUpdatesKernel, rbm.getHiddenBiasConnections().getConnectionGraph().getSize());
+	    Environment.getInstance().getExecutionStrategy().execute(hiddenBiasUpdatesKernel, rbm.getHiddenBiasConnections().getWeights().getSize());
 	}
     }
 

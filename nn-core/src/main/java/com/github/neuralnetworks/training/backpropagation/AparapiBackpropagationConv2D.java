@@ -44,7 +44,7 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements BackP
      */
     protected ValuesProvider activations;
 
-    public AparapiBackpropagationConv2D(Conv2DConnection c, ValuesProvider valuesProvider, ValuesProvider activations, Layer targetLayer) {
+    public AparapiBackpropagationConv2D(Conv2DConnection c, ValuesProvider valuesProvider, ValuesProvider activations, Tensor weightUpdates, Layer targetLayer) {
 	super(c, valuesProvider, targetLayer);
 
 	Tensor t = activations.getValues(targetLayer, c);
@@ -53,7 +53,7 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements BackP
 	this.activationFeatureMapRowsDistance = t.getDimensionElementsDistance(1);
 	this.activationFeatureMapColumnsDistance = t.getDimensionElementsDistance(2);
 
-	this.weightUpdates = new float[c.getWeights().getSize()];
+	this.weightUpdates = weightUpdates.getElements();
 	this.weightUpdatesMomentum = new float[c.getWeights().getSize()];
     }
 

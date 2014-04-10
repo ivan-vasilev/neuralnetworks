@@ -1,15 +1,19 @@
 package com.github.neuralnetworks.training;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
+import com.github.neuralnetworks.architecture.WeightsConnections;
 import com.github.neuralnetworks.architecture.types.DNN;
 import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.architecture.types.RBM;
@@ -53,6 +57,8 @@ import com.github.neuralnetworks.training.rbm.AparapiCDTrainer;
 import com.github.neuralnetworks.training.rbm.DBNTrainer;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
+import com.github.neuralnetworks.util.Tensor;
+import com.github.neuralnetworks.util.TensorFactory;
 import com.github.neuralnetworks.util.Util;
 
 /**
@@ -183,6 +189,7 @@ public class TrainerFactory {
 	p.setParameter(Constants.L1_WEIGHT_DECAY, l1weightDecay);
 	p.setParameter(Constants.L2_WEIGHT_DECAY, l2weightDecay);
 	p.setParameter(Constants.OUTPUT_ERROR_DERIVATIVE, new MSEDerivative());
+	p.setParameter(Constants.WEIGHT_UDPATES, weightUpdates(nn));
 	p.setParameter(Constants.OUTPUT_ERROR, error);
 	p.setParameter(Constants.RANDOM_INITIALIZER, rand);
 
@@ -233,6 +240,30 @@ public class TrainerFactory {
 
     public static DBNTrainer dbnTrainer(DNN<?> dnn, Map<NeuralNetwork, OneStepTrainer<?>> layerTrainers, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error) {
 	return new DBNTrainer(layerTrainerProperties(dnn, layerTrainers, trainingSet, testingSet, error));
+    }
+
+    /**
+     * @param nn
+     * @return Weight update tensors
+     */
+    public static Map<Connections, Tensor> weightUpdates(NeuralNetwork nn) {
+	Map<Connections, Tensor> result = new HashMap<>();
+	List<Connections> cs = nn.getConnections().stream().filter(c -> c instanceof WeightsConnections).collect(Collectors.toList());
+	cs.sort((c1, c2) ->  Integer.valueOf(((WeightsConnections) c1).getWeights().getStartIndex()).compareTo(((WeightsConnections) c1).getWeights().getStartIndex()));
+
+	if (cs.size() > 0) {
+	    List<int[]> ts = cs.stream().map(c -> ((WeightsConnections) c).getWeights().getDimensions()).collect(Collectors.toList());
+	    boolean useSharedMemory = cs.stream().map(c -> ((WeightsConnections) c).getWeights().getElements()).distinct().count() == 1;
+
+	    if (useSharedMemory) {
+		Tensor[] tensors = TensorFactory.tensor(ts.toArray(new int[ts.size()][]));
+		IntStream.range(0, cs.size()).forEach(i -> result.put(cs.get(i), tensors[i]));
+	    } else {
+		IntStream.range(0, cs.size()).forEach(i -> result.put(cs.get(i), TensorFactory.tensor(ts.get(i))));
+	    }
+	}
+
+	return result;
     }
 
     protected static Properties layerTrainerProperties(DNN<?> dnn, Map<NeuralNetwork, OneStepTrainer<?>> layerTrainers, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error) {
