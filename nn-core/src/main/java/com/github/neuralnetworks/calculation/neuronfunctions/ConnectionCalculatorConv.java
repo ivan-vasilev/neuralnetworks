@@ -62,7 +62,7 @@ public class ConnectionCalculatorConv implements ConnectionCalculator {
     protected void calculateBias(Conv2DConnection bias, ValuesProvider vp) {
 	if (bias != null) {
 	    Tensor biasValue = vp.getValues(bias.getInputLayer(), bias);
-	    if (biasValue.get(new int[biasValue.getDimensions().length]) == 0) {
+	    if (biasValue.getElements()[biasValue.getStartIndex()] == 0) {
 		biasValue.forEach(i -> biasValue.getElements()[i] = 1);
 	    }
 

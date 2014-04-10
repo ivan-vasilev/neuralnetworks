@@ -8,6 +8,7 @@ import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2D;
 import com.github.neuralnetworks.util.Tensor;
+import com.github.neuralnetworks.util.Tensor.TensorIterator;
 import com.github.neuralnetworks.util.Util;
 
 /**
@@ -28,6 +29,7 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements BackP
     /**
      * weight updates and momentum
      */
+    protected final Tensor weightUpdatesTensor;
     protected final float[] weightUpdates;
     protected final float[] weightUpdatesMomentum;
 
@@ -53,6 +55,7 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements BackP
 	this.activationFeatureMapRowsDistance = t.getDimensionElementsDistance(1);
 	this.activationFeatureMapColumnsDistance = t.getDimensionElementsDistance(2);
 
+	this.weightUpdatesTensor = weightUpdates;
 	this.weightUpdates = weightUpdates.getElements();
 	this.weightUpdatesMomentum = new float[c.getWeights().getSize()];
     }
@@ -68,7 +71,7 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements BackP
 	}
 
 	if (c != null) {
-	    Util.fillArray(weightUpdates, 0);
+	    weightUpdatesTensor.forEach(i -> weightUpdates[i] = 0);
 
 	    // currently works only as a feedforward (including bp)
 	    if (targetLayer == c.getOutputLayer()) {
@@ -102,10 +105,12 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements BackP
      */
     protected void updateWeights() {
 	float weightUpdate = 0;
-	for (int i = 0; i < weights.length; i++) {
-	    weightUpdate = learningRate * weightUpdates[i] + momentum * weightUpdatesMomentum[i] - l1weightDecay * Math.abs(weights[i]) - l2weightDecay * weights[i] * weights[i] / 2;
+	TensorIterator it = weightUpdatesTensor.iterator();
+	for (int i = 0, j = 0; it.hasNext(); j++) {
+	    i = it.next();
+	    weightUpdate = learningRate * weightUpdates[i] + momentum * weightUpdatesMomentum[j] - l1weightDecay * Math.abs(weights[i]) - l2weightDecay * weights[i] * weights[i] / 2;
 	    weights[i] += weightUpdate;
-	    weightUpdatesMomentum[i] = weightUpdates[i];
+	    weightUpdatesMomentum[j] = weightUpdates[i];
 	    weightUpdates[i] = weightUpdate;
 	}
     }

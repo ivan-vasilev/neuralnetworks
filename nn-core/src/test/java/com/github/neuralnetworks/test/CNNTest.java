@@ -10,7 +10,6 @@ import java.util.Set;
 
 import org.junit.Test;
 
-import com.amd.aparapi.Kernel.EXECUTION_MODE;
 import com.github.neuralnetworks.architecture.ConnectionFactory;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
@@ -43,6 +42,7 @@ import com.github.neuralnetworks.training.backpropagation.BackpropagationMaxPool
 import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.Matrix;
 import com.github.neuralnetworks.util.Tensor;
+import com.github.neuralnetworks.util.Tensor.TensorIterator;
 import com.github.neuralnetworks.util.TensorFactory;
 
 /**
@@ -403,7 +403,7 @@ public class CNNTest {
 
     @Test
     public void testMaxPoolingBackpropagation() {
-	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
+	//Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 	Subsampling2DConnection c = new Subsampling2DConnection(new Layer(), new Layer(), 4, 4, 2, 2, 2);
 
 	List<Connections> connections = new ArrayList<Connections>();
@@ -491,30 +491,36 @@ public class CNNTest {
 
     @Test
     public void testCNNBackpropagation() {
-	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
+	//Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 
 	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 3, 3, 2 }, { 2, 2, 1, 1 } }, true, true);
 	nn.setLayerCalculator(NNFactory.lcSigmoid(nn, null));
 
 	Conv2DConnection c = (Conv2DConnection) nn.getInputLayer().getConnections().get(0);
-	c.getWeights().setElements(new float [] {0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f});
+	TensorIterator it = c.getWeights().iterator();
+	float x = 0.1f;
+	while (it.hasNext()) {
+	    c.getWeights().getElements()[it.next()] = x;
+	    x += 0.1f;
+	}
 
 	Conv2DConnection b = (Conv2DConnection) nn.getOutputLayer().getConnections().get(1);
-	b.getWeights().setElements(new float [] {-3f});
+	b.getWeights().getElements()[b.getWeights().getStartIndex()] = -3f;
 
 	SimpleInputProvider ts = new SimpleInputProvider(TensorFactory.tensor(new float[] { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1, 1.1f, 1.2f, 1.3f, 1.4f, 1.5f, 1.6f, 1.7f, 1.8f }, 0, 2, 3, 3, 1), TensorFactory.tensor(new float[] { 1, 1, 1, 1 }, 0, 1, 2, 2, 1), 1, 1);
 	BackPropagationTrainer<?> t = TrainerFactory.backPropagation(nn, ts, null, null, null, 0.5f, 0f, 0f, 0f);
 	t.train();
 
-	assertEquals(0.11756, c.getWeights().getElements()[0], 0.00001);
-	assertEquals(0.22640, c.getWeights().getElements()[1], 0.00001);
-	assertEquals(0.34408, c.getWeights().getElements()[2], 0.00001);
-	assertEquals(0.45292, c.getWeights().getElements()[3], 0.00001);
-	assertEquals(0.59712, c.getWeights().getElements()[4], 0.00001);
-	assertEquals(0.70596, c.getWeights().getElements()[5], 0.00001);
-	assertEquals(0.82364, c.getWeights().getElements()[6], 0.00001);
-	assertEquals(0.93248, c.getWeights().getElements()[7], 0.00001);
-	assertEquals(-2.911599, b.getWeights().getElements()[0], 0.00001);
+	it = c.getWeights().iterator();
+	assertEquals(0.11756, c.getWeights().getElements()[it.next()], 0.00001);
+	assertEquals(0.22640, c.getWeights().getElements()[it.next()], 0.00001);
+	assertEquals(0.34408, c.getWeights().getElements()[it.next()], 0.00001);
+	assertEquals(0.45292, c.getWeights().getElements()[it.next()], 0.00001);
+	assertEquals(0.59712, c.getWeights().getElements()[it.next()], 0.00001);
+	assertEquals(0.70596, c.getWeights().getElements()[it.next()], 0.00001);
+	assertEquals(0.82364, c.getWeights().getElements()[it.next()], 0.00001);
+	assertEquals(0.93248, c.getWeights().getElements()[it.next()], 0.00001);
+	assertEquals(-2.911599, b.getWeights().getElements()[b.getWeights().getStartIndex()], 0.00001);
     }
 
     @Test
@@ -548,7 +554,7 @@ public class CNNTest {
 
     @Test
     public void testCNNStride() {
-	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
+	//Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 
 	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 5, 5, 1 }, { 2, 2, 1, 2 } }, false, true);
 	nn.setLayerCalculator(NNFactory.lcWeightedSum(nn, null));
