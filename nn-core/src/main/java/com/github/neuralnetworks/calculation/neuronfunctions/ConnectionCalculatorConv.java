@@ -9,6 +9,7 @@ import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.util.Tensor;
 import com.github.neuralnetworks.util.Tensor.TensorIterator;
+import com.github.neuralnetworks.util.TensorFactory;
 import com.github.neuralnetworks.util.Util;
 
 /**
@@ -40,8 +41,8 @@ public class ConnectionCalculatorConv implements ConnectionCalculator {
 
 	if (c != null) {
 	    // currently works only as a feedforward (including bp)
-	    if (inputFunction == null || miniBatchSize != valuesProvider.getMiniBatchSize()) {
-		miniBatchSize = valuesProvider.getMiniBatchSize();
+	    if (inputFunction == null || miniBatchSize != TensorFactory.batchSize(valuesProvider)) {
+		miniBatchSize = TensorFactory.batchSize(valuesProvider);
 		inputFunction = createInputFunction(c, valuesProvider, targetLayer);
 	    }
 
@@ -61,12 +62,12 @@ public class ConnectionCalculatorConv implements ConnectionCalculator {
 
     protected void calculateBias(Conv2DConnection bias, ValuesProvider vp) {
 	if (bias != null) {
-	    Tensor biasValue = vp.getValues(bias.getInputLayer(), bias);
+	    Tensor biasValue = TensorFactory.tensor(bias.getInputLayer(), bias, vp);
 	    if (biasValue.getElements()[biasValue.getStartIndex()] == 0) {
 		biasValue.forEach(i -> biasValue.getElements()[i] = 1);
 	    }
 
-	    Tensor v = vp.getValues(bias.getOutputLayer(), bias);
+	    Tensor v = TensorFactory.tensor(bias.getOutputLayer(), bias, vp);
 	    Tensor w = bias.getWeights();
 	    TensorIterator it = v.iterator();
 

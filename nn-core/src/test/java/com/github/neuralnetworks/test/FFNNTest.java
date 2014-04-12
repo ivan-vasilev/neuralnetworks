@@ -20,7 +20,6 @@ import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.calculation.BreadthFirstOrderStrategy;
 import com.github.neuralnetworks.calculation.LayerOrderStrategy.ConnectionCandidate;
 import com.github.neuralnetworks.calculation.TargetLayerOrderStrategy;
-import com.github.neuralnetworks.calculation.memory.SharedMemoryValuesProvider;
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSumConnectionCalculator;
 import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculatorFullyConnected;
@@ -39,8 +38,6 @@ public class FFNNTest {
     @Test
     public void testWeightedSumFF() {
 	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
-
-	Matrix o = TensorFactory.tensor(2, 2);
 
 	Layer il1 = new Layer();
 	Layer ol = new Layer();
@@ -72,9 +69,15 @@ public class FFNNTest {
 	bcg.set(0.1f, 0, 0);
 	bcg.set(0.2f, 1, 0);
 
-	Tensor t = TensorFactory.tensor(2, 3, 2);
+	List<Connections> connections = new ArrayList<>();
+	connections.add(c1);
 
-	Matrix i1 = TensorFactory.tensor(t, new int[][] { {0, 0, 0}, {0, 2, 1} });
+	NeuralNetworkImpl nn = new NeuralNetworkImpl();
+	nn.addConnections(connections.toArray(new Connections[connections.size()]));
+
+	ValuesProvider vp = TensorFactory.tensorProvider(nn, 2, true);
+
+	Matrix i1 = vp.get(nn.getInputLayer());
 	i1.set(1, 0, 0);
 	i1.set(2, 1, 0);
 	i1.set(3, 2, 0);
@@ -82,33 +85,15 @@ public class FFNNTest {
 	i1.set(5, 1, 1);
 	i1.set(6, 2, 1);
 
-	Matrix i2 = TensorFactory.tensor(t, new int[][] { {1, 0, 0}, {1, 2, 1} });
-	i2.set(1, 0, 0);
-	i2.set(2, 1, 0);
-	i2.set(3, 2, 0);
-	i2.set(4, 0, 1);
-	i2.set(5, 1, 1);
-	i2.set(6, 2, 1);
-
 	ConnectionCalculatorFullyConnected aws = new AparapiWeightedSumConnectionCalculator();
-
-	List<Connections> connections = new ArrayList<>();
-	connections.add(c1);
-
-	NeuralNetworkImpl nn = new NeuralNetworkImpl();
-	nn.addConnections(connections.toArray(new Connections[connections.size()]));
-	ValuesProvider vp = Environment.getInstance().getValuesProvider(nn);
-	vp.replace(c1.getInputLayer(), i1);
-	vp.replace(ol, o);
-
 	aws.calculate(connections, vp, ol);
 
 	// most simple case
+	Matrix o = vp.get(nn.getOutputLayer());
 	assertEquals(14, o.get(0, 0), 0);
 	assertEquals(32, o.get(0, 1), 0);
 	assertEquals(32, o.get(1, 0), 0);
 	assertEquals(77, o.get(1, 1), 0);
-	o.forEach(i -> o.getElements()[i] = 0);
 
 	// with bias
 	connections = new ArrayList<>();
@@ -117,18 +102,24 @@ public class FFNNTest {
 
 	nn = new NeuralNetworkImpl();
 	nn.addConnections(connections.toArray(new Connections[connections.size()]));
-	vp = Environment.getInstance().getValuesProvider(nn);
-	vp.replace(c1.getInputLayer(), i1);
-	vp.replace(ol, o);
+	vp = TensorFactory.tensorProvider(nn, 2, true);
+
+	i1 = vp.get(nn.getInputLayer());
+	i1.set(1, 0, 0);
+	i1.set(2, 1, 0);
+	i1.set(3, 2, 0);
+	i1.set(4, 0, 1);
+	i1.set(5, 1, 1);
+	i1.set(6, 2, 1);
 
 	aws = new AparapiWeightedSumConnectionCalculator();
 	aws.calculate(connections, vp, ol);
 
+	o = vp.get(nn.getOutputLayer());
 	assertEquals(14.1, o.get(0, 0), 0.01);
 	assertEquals(32.1, o.get(0, 1), 0.01);
 	assertEquals(32.2, o.get(1, 0), 0.01);
 	assertEquals(77.2, o.get(1, 1), 0.01);
-	o.forEach(i -> o.getElements()[i] = 0);
 
 	// combined layers
 	connections = new ArrayList<>();
@@ -137,27 +128,37 @@ public class FFNNTest {
 	connections.add(bc);
 	nn = new NeuralNetworkImpl();
 	nn.addConnections(connections.toArray(new Connections[connections.size()]));
-	vp = new SharedMemoryValuesProvider(nn);
+	vp = TensorFactory.tensorProvider(nn, 2, true);
 
-	vp.replace(c1.getInputLayer(), i1);
-	vp.replace(c2.getInputLayer(), i2);
-	vp.replace(ol, o);
+	i1 = vp.get(il1);
+	i1.set(1, 0, 0);
+	i1.set(2, 1, 0);
+	i1.set(3, 2, 0);
+	i1.set(4, 0, 1);
+	i1.set(5, 1, 1);
+	i1.set(6, 2, 1);
+
+	Matrix i2 = vp.get(il2);
+	i2.set(1, 0, 0);
+	i2.set(2, 1, 0);
+	i2.set(3, 2, 0);
+	i2.set(4, 0, 1);
+	i2.set(5, 1, 1);
+	i2.set(6, 2, 1);
 
 	aws = new AparapiWeightedSumConnectionCalculator();
 	aws.calculate(connections, vp, ol);
 
+	o = vp.get(nn.getOutputLayer());
 	assertEquals(28.1, o.get(0, 0), 0.01);
 	assertEquals(64.1, o.get(0, 1), 0.01);
 	assertEquals(64.2, o.get(1, 0), 0.01);
 	assertEquals(154.2, o.get(1, 1), 0.01);
-	o.forEach(i -> o.getElements()[i] = 0);
     }
 
     @Test
     public void testWeightedSumBP() {
 	Environment.getInstance().setExecutionMode(EXECUTION_MODE.GPU);
-
-	Matrix o = TensorFactory.tensor(2, 2);
 
 	Layer il1 = new Layer();
 	Layer ol = new Layer();
@@ -188,9 +189,15 @@ public class FFNNTest {
 	bcg.set(0.1f, 0, 0);
 	bcg.set(0.2f, 1, 0);
 
-	Tensor t = TensorFactory.tensor(2, 3, 2);
+	ConnectionCalculatorFullyConnected aws = new AparapiWeightedSumConnectionCalculator();
 
-	Matrix i1 = TensorFactory.tensor(t, new int[][] { {0, 0, 0}, {0, 2, 1} });
+	List<Connections> connections = new ArrayList<>();
+	connections.add(c1);
+	NeuralNetworkImpl nn = new NeuralNetworkImpl();
+	nn.addConnections(connections.toArray(new Connections[connections.size()]));
+	ValuesProvider vp = TensorFactory.tensorProvider(nn, 2, true);
+
+	Matrix i1 = vp.get(il1);
 	i1.set(1, 0, 0);
 	i1.set(2, 1, 0);
 	i1.set(3, 2, 0);
@@ -198,32 +205,14 @@ public class FFNNTest {
 	i1.set(5, 1, 1);
 	i1.set(6, 2, 1);
 
-	Matrix i2 = TensorFactory.tensor(t, new int[][] { {1, 0, 0}, {1, 2, 1} });
-	i2.set(1, 0, 0);
-	i2.set(2, 1, 0);
-	i2.set(3, 2, 0);
-	i2.set(4, 0, 1);
-	i2.set(5, 1, 1);
-	i2.set(6, 2, 1);
-
-	ConnectionCalculatorFullyConnected aws = new AparapiWeightedSumConnectionCalculator();
-
-	List<Connections> connections = new ArrayList<>();
-	connections.add(c1);
-	NeuralNetworkImpl nn = new NeuralNetworkImpl();
-	nn.addConnections(connections.toArray(new Connections[connections.size()]));
-	ValuesProvider vp = Environment.getInstance().getValuesProvider(nn);
-	vp.replace(c1.getOutputLayer(), i1);
-	vp.replace(ol, o);
-
 	aws.calculate(connections, vp, ol);
 
 	// most simple case
+	Matrix o = vp.get(ol);
 	assertEquals(14, o.get(0, 0), 0);
 	assertEquals(32, o.get(0, 1), 0);
 	assertEquals(32, o.get(1, 0), 0);
 	assertEquals(77, o.get(1, 1), 0);
-	o.forEach(i -> o.getElements()[i] = 0);
 
 	// with bias
 	connections = new ArrayList<>();
@@ -231,18 +220,23 @@ public class FFNNTest {
 	connections.add(bc);
 	nn = new NeuralNetworkImpl();
 	nn.addConnections(connections.toArray(new Connections[connections.size()]));
-	vp = Environment.getInstance().getValuesProvider(nn);
-	vp.replace(c1.getOutputLayer(), i1);
-	vp.replace(ol, o);
+	vp = TensorFactory.tensorProvider(nn, 2, true);
+	i1 = vp.get(il1);
+	i1.set(1, 0, 0);
+	i1.set(2, 1, 0);
+	i1.set(3, 2, 0);
+	i1.set(4, 0, 1);
+	i1.set(5, 1, 1);
+	i1.set(6, 2, 1);
 
 	aws = new AparapiWeightedSumConnectionCalculator();
 	aws.calculate(connections, vp, ol);
 
+	o = vp.get(ol);
 	assertEquals(14.1, o.get(0, 0), 0.01);
 	assertEquals(32.1, o.get(0, 1), 0.01);
 	assertEquals(32.2, o.get(1, 0), 0.01);
 	assertEquals(77.2, o.get(1, 1), 0.01);
-	o.forEach(i -> o.getElements()[i] = 0);
 
 	// combined layers
 	connections = new ArrayList<>();
@@ -251,19 +245,32 @@ public class FFNNTest {
 	connections.add(bc);
 	nn = new NeuralNetworkImpl();
 	nn.addConnections(connections.toArray(new Connections[connections.size()]));
-	vp = Environment.getInstance().getValuesProvider(nn);
-	vp.replace(c1.getOutputLayer(), i1);
-	vp.replace(c2.getOutputLayer(), i2);
-	vp.replace(ol, o);
+	vp = TensorFactory.tensorProvider(nn, 2, true);
+
+	i1 = vp.get(il1);
+	i1.set(1, 0, 0);
+	i1.set(2, 1, 0);
+	i1.set(3, 2, 0);
+	i1.set(4, 0, 1);
+	i1.set(5, 1, 1);
+	i1.set(6, 2, 1);
+
+	Matrix i2 = vp.get(il2);
+	i2.set(1, 0, 0);
+	i2.set(2, 1, 0);
+	i2.set(3, 2, 0);
+	i2.set(4, 0, 1);
+	i2.set(5, 1, 1);
+	i2.set(6, 2, 1);
 
 	aws = new AparapiWeightedSumConnectionCalculator();
 	aws.calculate(connections, vp, ol);
 
+	o = vp.get(ol);
 	assertEquals(28.1, o.get(0, 0), 0.01);
 	assertEquals(64.1, o.get(0, 1), 0.01);
 	assertEquals(64.2, o.get(1, 0), 0.01);
 	assertEquals(154.2, o.get(1, 1), 0.01);
-	o.forEach(i -> o.getElements()[i] = 0);
     }
 
     /**
@@ -378,16 +385,16 @@ public class FFNNTest {
 
 	mlp.setLayerCalculator(NNFactory.lcWeightedSum(mlp, null));
 
-	Matrix i = TensorFactory.matrix(new float [] {2, 2}, 1);
 	Set<Layer> calculated = new HashSet<>();
 	calculated.add(mlp.getInputLayer());
 
-	ValuesProvider results = Environment.getInstance().getValuesProvider(mlp);
-	results.replace(input, i);
+	ValuesProvider results = TensorFactory.tensorProvider(mlp, 1, true);
+	results.get(mlp.getInputLayer()).set(2, 0, 0);
+	results.get(mlp.getInputLayer()).set(2, 1, 0);
 
 	mlp.getLayerCalculator().calculate(mlp, output, calculated, results);
 
-	assertEquals(1.32, results.getValues(output).get(0, 0), 0.000001);
+	assertEquals(1.32, results.get(output).get(0, 0), 0.000001);
     }
 
     @Test

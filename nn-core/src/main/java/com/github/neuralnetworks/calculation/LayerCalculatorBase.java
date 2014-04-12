@@ -14,6 +14,7 @@ import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.events.PropagationEvent;
 import com.github.neuralnetworks.events.PropagationEventListener;
 import com.github.neuralnetworks.util.Tensor;
+import com.github.neuralnetworks.util.TensorFactory;
 
 /**
  * Base class for implementations of the LayerCalculator interface
@@ -36,7 +37,7 @@ public class LayerCalculatorBase implements Serializable {
 		if (i == connections.size() - 1 || connections.get(i + 1).target != c.target) {
 		    ConnectionCalculator cc = getConnectionCalculator(c.target);
 		    if (cc != null) {
-			Tensor t = valuesProvider.getValues(c.target, chunk);
+			Tensor t = TensorFactory.tensor(c.target, chunk, valuesProvider);
 			t.forEach(j -> t.getElements()[j] = 0);
 			cc.calculate(chunk, valuesProvider, c.target);
 		    }

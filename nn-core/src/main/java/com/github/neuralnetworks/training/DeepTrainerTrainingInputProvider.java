@@ -40,7 +40,7 @@ public class DeepTrainerTrainingInputProvider implements TrainingInputProvider {
 	    calculatedLayers.clear();
 	    calculatedLayers.add(dnn.getInputLayer());
 	    dnn.getLayerCalculator().calculate(dnn, currentNN.getInputLayer(), calculatedLayers, layerResults);
-	    input = new TrainingInputDataImpl(layerResults.getValues(currentNN.getInputLayer()), input.getTarget());
+	    input = new TrainingInputDataImpl(layerResults.get(currentNN.getInputLayer()), input.getTarget());
 	}
 
 	return input;

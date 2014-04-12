@@ -7,6 +7,7 @@ import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Subsampling2DConnection;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
+import com.github.neuralnetworks.util.TensorFactory;
 
 /**
  * Stochastic pooling
@@ -19,7 +20,7 @@ public class AparapiStochasticPooling2D implements ConnectionCalculator {
 
     @Override
     public void calculate(List<Connections> connections, ValuesProvider valuesProvider, Layer targetLayer) {
-	if (cc == null || cc.getMiniBatchSize() != valuesProvider.getMiniBatchSize()) {
+	if (cc == null || cc.getMiniBatchSize() != TensorFactory.batchSize(valuesProvider)) {
 	    cc = new AparapiStochasticPooling2DCC((Subsampling2DConnection) connections.get(0), valuesProvider, targetLayer);
 	}
 

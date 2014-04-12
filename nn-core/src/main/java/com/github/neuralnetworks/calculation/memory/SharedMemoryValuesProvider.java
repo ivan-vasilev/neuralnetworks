@@ -16,7 +16,7 @@ import com.github.neuralnetworks.util.UniqueList;
  * Values provider that users separate arrays for each layer and combines the
  * layers with common connections
  */
-public class SharedMemoryValuesProvider extends ValuesProvider {
+public class SharedMemoryValuesProvider extends ValuesProviderOld {
 
     private static final long serialVersionUID = 1L;
 

@@ -24,7 +24,6 @@ import com.github.neuralnetworks.training.DNNLayerTrainer;
 import com.github.neuralnetworks.training.OneStepTrainer;
 import com.github.neuralnetworks.training.TrainerFactory;
 import com.github.neuralnetworks.training.rbm.AparapiCDTrainer;
-import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.Matrix;
 import com.github.neuralnetworks.util.Tensor;
 import com.github.neuralnetworks.util.TensorFactory;
@@ -121,13 +120,14 @@ public class DNNTest {
 	Set<Layer> calculatedLayers = new HashSet<>();
 	calculatedLayers.add(dbn.getInputLayer());
 
-	ValuesProvider results = Environment.getInstance().getValuesProvider(dbn);
-
-	results.replace(dbn.getInputLayer(), TensorFactory.matrix(new float[] {1, 0, 1}, 1));
+	ValuesProvider results = TensorFactory.tensorProvider(dbn, 1, true);
+	// Environment.getInstance().getValuesProvider(dbn)
+	results.get(dbn.getInputLayer()).setElements(new float[] {1, 0, 1});
+	//results.replace(dbn.getInputLayer(), TensorFactory.matrix(new float[] {1, 0, 1}, 1));
 	dbn.getLayerCalculator().calculate(dbn, dbn.getOutputLayer(), calculatedLayers, results);
 
-	assertEquals(1.06, results.getValues(dbn.getOutputLayer()).get(0, 0), 0.00001);
-	assertEquals(1.06, results.getValues(dbn.getOutputLayer()).get(1, 0), 0.00001);
+	assertEquals(1.06, results.get(dbn.getOutputLayer()).get(0, 0), 0.00001);
+	assertEquals(1.06, results.get(dbn.getOutputLayer()).get(1, 0), 0.00001);
     }
 
     @Test
@@ -173,12 +173,14 @@ public class DNNTest {
 	Set<Layer> calculatedLayers = new HashSet<>();
 	calculatedLayers.add(sae.getInputLayer());
 
-	ValuesProvider results = Environment.getInstance().getValuesProvider(sae);
-	results.replace(sae.getInputLayer(), TensorFactory.matrix(new float[] {1, 0, 1}, 1));
+	ValuesProvider results = TensorFactory.tensorProvider(sae, 1, true);
+	// Environment.getInstance().getValuesProvider(sae)
+	results.get(sae.getInputLayer()).setElements(new float[] {1, 0, 1});
+	//results.replace(dbn.getInputLayer(), TensorFactory.matrix(new float[] {1, 0, 1}, 1));
 	sae.getLayerCalculator().calculate(sae, sae.getOutputLayer(), calculatedLayers, results);
 
-	assertEquals(1.06, results.getValues(sae.getOutputLayer()).get(0, 0), 0.00001);
-	assertEquals(1.06, results.getValues(sae.getOutputLayer()).get(1, 0), 0.00001);
+	assertEquals(1.06, results.get(sae.getOutputLayer()).get(0, 0), 0.00001);
+	assertEquals(1.06, results.get(sae.getOutputLayer()).get(1, 0), 0.00001);
     }
 
     @Test

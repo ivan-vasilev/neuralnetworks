@@ -11,6 +11,7 @@ import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.Properties;
 import com.github.neuralnetworks.util.Tensor;
+import com.github.neuralnetworks.util.TensorFactory;
 import com.github.neuralnetworks.util.UniqueList;
 
 /**
@@ -29,8 +30,8 @@ public class BackPropagationTrainer<N extends NeuralNetwork> extends OneStepTrai
 
     public BackPropagationTrainer(Properties properties) {
 	super(properties);
-	activations = Environment.getInstance().getValuesProvider(getNeuralNetwork());
-	backpropagation = Environment.getInstance().getValuesProvider(getNeuralNetwork());
+	activations = TensorFactory.tensorProvider(getNeuralNetwork(), getBatchSize(), Environment.getInstance().getUseSharedMemory());
+	backpropagation = TensorFactory.tensorProvider(getNeuralNetwork(), getBatchSize(), Environment.getInstance().getUseSharedMemory());
     }
 
     /* (non-Javadoc)
@@ -48,16 +49,14 @@ public class BackPropagationTrainer<N extends NeuralNetwork> extends OneStepTrai
 	NeuralNetwork nn = getNeuralNetwork();
 	Set<Layer> calculatedLayers = new UniqueList<Layer>();
 	calculatedLayers.add(nn.getInputLayer());
-	activations.replace(nn.getInputLayer(), input);
 	nn.getLayerCalculator().calculate(nn, nn.getOutputLayer(), calculatedLayers, activations);
     }
 
     public void propagateBackward(Tensor target) {
 	NeuralNetwork nn = getNeuralNetwork();
 
-	backpropagation.setMiniBatchSize(target.getDimensionElementsDistance(target.getDimensions().length - 1));
 	OutputErrorDerivative d = getProperties().getParameter(Constants.OUTPUT_ERROR_DERIVATIVE);
-	d.getOutputErrorDerivative(activations.getValues(nn.getOutputLayer()), target, backpropagation.getValues(nn.getOutputLayer()));
+	d.getOutputErrorDerivative(activations.get(nn.getOutputLayer()), target, backpropagation.get(nn.getOutputLayer()));
 	Set<Layer> calculatedLayers = new UniqueList<Layer>();
 	calculatedLayers.add(nn.getOutputLayer());
 	BackPropagationLayerCalculator blc = getBPLayerCalculator();

@@ -15,7 +15,7 @@ import com.github.neuralnetworks.architecture.FullyConnected;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.architecture.types.NNFactory;
-import com.github.neuralnetworks.calculation.memory.TensorProvider;
+import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.calculation.neuronfunctions.SoftmaxFunction;
 import com.github.neuralnetworks.training.random.MersenneTwisterRandomInitializer;
 import com.github.neuralnetworks.training.random.NNRandomInitializer;
@@ -29,7 +29,7 @@ public class GeneralTest {
 
     @Test
     public void testTensorProvider() {
-	TensorProvider tp = new TensorProvider(true);
+	ValuesProvider tp = new ValuesProvider(true);
 	String s1 = "1";
 	tp.add(s1, 2, 3);
 	String s2 = "2";
@@ -41,7 +41,7 @@ public class GeneralTest {
 	assertEquals(12, tp.get(s2).getElements().length, 0);
 	assertEquals(6, tp.get(s2).getStartIndex(), 0);
 
-	TensorProvider tp2 = new TensorProvider(tp.getTensors());
+	ValuesProvider tp2 = new ValuesProvider(tp.getTensors());
 	tp2.add(s1, 2, 3);
 	tp2.add(s2, 2, 3);
 
@@ -65,7 +65,7 @@ public class GeneralTest {
 	NNFactory.addFullyConnectedLayer(nn, h, cf, 2, 3, true);
 	NNFactory.addFullyConnectedLayer(nn, o, cf, 4, 1, true);
 
-	TensorProvider tp = TensorFactory.tensorProvider(nn, 2, true);
+	ValuesProvider tp = TensorFactory.tensorProvider(nn, 2, true);
 
 	Matrix im = tp.get(nn.getInputLayer());
 	Matrix hm1 = tp.get(h, 3, 2);
@@ -87,7 +87,7 @@ public class GeneralTest {
     public void testTensorProvider3() {
 	// simple mlp test
 	NeuralNetworkImpl nn = NNFactory.mlp(new int[] { 3, 4, 2 }, true, true);
-	TensorProvider tp = TensorFactory.tensorProvider(nn, 2, false);
+	ValuesProvider tp = TensorFactory.tensorProvider(nn, 2, false);
 
 	Matrix in = tp.get(nn.getInputLayer());
 	Matrix hidden = tp.get(nn.getLayers().stream().filter(l -> l != nn.getInputLayer() && l != nn.getOutputLayer() && !Util.isBias(l)).findFirst().get());

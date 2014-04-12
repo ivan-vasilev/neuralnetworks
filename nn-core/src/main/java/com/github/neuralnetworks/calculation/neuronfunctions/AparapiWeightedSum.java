@@ -12,6 +12,7 @@ import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.Matrix;
 import com.github.neuralnetworks.util.Tensor;
+import com.github.neuralnetworks.util.TensorFactory;
 import com.github.neuralnetworks.util.Util;
 
 /**
@@ -82,13 +83,13 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
 
     public AparapiWeightedSum(List<Connections> inputConnections, ValuesProvider valuesProvider, Layer targetLayer) {
 	super();
-	this.miniBatchSize = valuesProvider.getMiniBatchSize();
+	this.miniBatchSize = TensorFactory.batchSize(valuesProvider);
 
 	// input
-	input = valuesProvider.getValues(Util.getOppositeLayer(inputConnections.get(0), targetLayer), inputConnections.get(0)).getElements();
+	input = TensorFactory.tensor(Util.getOppositeLayer(inputConnections.get(0), targetLayer), inputConnections.get(0), valuesProvider).getElements();
 	weights = ((FullyConnected) inputConnections.get(0)).getWeights().getElements();
 	inputConnections.forEach(c -> {
-	    Tensor t = valuesProvider.getValues(Util.getOppositeLayer(c, targetLayer), c);
+	    Tensor t = TensorFactory.tensor(Util.getOppositeLayer(c, targetLayer), c, valuesProvider);
 	    if (!(c instanceof FullyConnected)) {
 		throw new IllegalArgumentException("Only FullyConnected connections are supported");
 	    }
@@ -111,14 +112,14 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
 	this.inputRowSteps = new int[series];
 	this.inputColumnSteps = new int[series];
 	IntStream.range(0, inputConnections.size()).forEach(i -> {
-	    Matrix m = valuesProvider.getValues(Util.getOppositeLayer(inputConnections.get(i), targetLayer), inputConnections.get(i));
+	    Matrix m = TensorFactory.tensor(Util.getOppositeLayer(inputConnections.get(i), targetLayer), inputConnections.get(i), valuesProvider);
 	    inputStartPositions[i] = m.getStartIndex();
 	    inputRowSteps[i] = m.getRowElementsDistance();
 	    inputColumnSteps[i] = m.getColumnElementsDistance();
 	});
 
 	// output
-	Matrix o = valuesProvider.getValues(targetLayer, inputConnections);
+	Matrix o = TensorFactory.tensor(targetLayer, inputConnections, valuesProvider);
 	this.output = o.getElements();
 	this.outputStartPosition = o.getStartIndex();
 	this.outputRowStep = o.getRowElementsDistance();
@@ -155,11 +156,11 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
     }
 
     public boolean accept(List<Connections> connections, ValuesProvider valuesProvider, Layer targetLayer) {
-	if (valuesProvider.getMiniBatchSize() != miniBatchSize) {
+	if (TensorFactory.batchSize(valuesProvider) != miniBatchSize) {
 	    return false;
 	}
 
-	if (valuesProvider.getValues(targetLayer, connections).getElements() != output) {
+	if (TensorFactory.tensor(targetLayer, connections, valuesProvider).getElements() != output) {
 	    return false;
 	}
 
@@ -167,7 +168,7 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
 	    return false;
 	}
 
-	if (connections.stream().filter(c -> (valuesProvider.getValues(Util.getOppositeLayer(c, targetLayer), c).getElements() != input)).findAny().isPresent()) {
+	if (connections.stream().filter(c -> TensorFactory.tensor(Util.getOppositeLayer(c, targetLayer), c, valuesProvider).getElements() != input).findAny().isPresent()) {
 	    return false;
 	}
 

@@ -4,6 +4,7 @@ import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.training.events.MiniBatchFinishedEvent;
 import com.github.neuralnetworks.training.events.TrainingFinishedEvent;
 import com.github.neuralnetworks.training.events.TrainingStartedEvent;
+import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
 
 /**
@@ -55,4 +56,12 @@ public abstract class OneStepTrainer<N extends NeuralNetwork> extends Trainer<N>
      * Learning of one batch of examples
      */
     protected abstract void learnInput(TrainingInputData data, int batch);
+
+    public Integer getBatchSize() {
+	return properties.getParameter(Constants.BATCH_SIZE);
+    }
+
+    public void setBatchSize(int batchSize) {
+	properties.setParameter(Constants.BATCH_SIZE, batchSize);
+    }
 }

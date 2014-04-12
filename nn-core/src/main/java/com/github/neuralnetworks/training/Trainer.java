@@ -78,7 +78,7 @@ public abstract class Trainer<N extends NeuralNetwork> implements Serializable {
 		n.getLayerCalculator().calculate(n, n.getOutputLayer(), calculatedLayers, results);
 
 		if (getOutputError() != null) {
-		    getOutputError().addItem(results.getValues(n.getOutputLayer()), input.getTarget());
+		    getOutputError().addItem(results.get(n.getOutputLayer()), input.getTarget());
 		}
 
 		triggerEvent(new MiniBatchFinishedEvent(this, input, results, null));

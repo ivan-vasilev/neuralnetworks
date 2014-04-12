@@ -16,7 +16,7 @@ import com.github.neuralnetworks.architecture.FullyConnected;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.architecture.Subsampling2DConnection;
-import com.github.neuralnetworks.calculation.memory.TensorProvider;
+import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.util.Tensor.TensorIterator;
 
 public class TensorFactory {
@@ -133,10 +133,10 @@ public class TensorFactory {
      * @param useSharedMemory
      * @return Tensor provider based on neural network
      */
-    public static TensorProvider tensorProvider(NeuralNetwork nn, int miniBatchSize, boolean useSharedMemory) {
+    public static ValuesProvider tensorProvider(NeuralNetwork nn, int miniBatchSize, boolean useSharedMemory) {
 	Map<Layer, Set<int[]>> dims = getLayersDimensions(nn, miniBatchSize);
 
-	TensorProvider result = new TensorProvider(useSharedMemory);
+	ValuesProvider result = new ValuesProvider(useSharedMemory);
 
 	// create tensors
 	List<Layer> layers = new ArrayList<>(dims.keySet());
@@ -150,10 +150,47 @@ public class TensorFactory {
 	return result;
     }
 
+
+    /**
+     * @param sibling
+     * @param nn
+     * @param miniBatchSize
+     * @param useSharedMemory
+     * @return Tensor provider based on neural network
+     */
+    public static ValuesProvider tensorProvider(ValuesProvider sibling, NeuralNetwork nn, int miniBatchSize, boolean useSharedMemory) {
+	Map<Layer, Set<int[]>> dims = getLayersDimensions(nn, miniBatchSize);
+
+	ValuesProvider result = new ValuesProvider(sibling.getTensors());
+
+	// create tensors
+	List<Layer> layers = new ArrayList<>(dims.keySet());
+	for (int i = 0; i < layers.size(); i++) {
+	    Layer l = layers.get(i);
+	    for (int[] d : dims.get(l)) {
+		result.add(l, d);
+	    }
+	}
+
+	return result;
+    }
+
+    public static void copy(Tensor src, Tensor dest) {
+	if (!Arrays.equals(src.getDimensions(), dest.getDimensions())) {
+	    throw new IllegalArgumentException("Dimensions don't match");
+	}
+
+	TensorIterator srcIt = src.iterator();
+	TensorIterator destIt = dest.iterator();
+	while (srcIt.hasNext() && destIt.hasNext()) {
+	    dest.getElements()[destIt.next()] = src.getElements()[srcIt.next()];
+	}
+    }
+
     /**
      * @return mini batch size for TensorProvider
      */
-    public static int batchSize(TensorProvider tp) {
+    public static int batchSize(ValuesProvider tp) {
 	Tensor t = tp.getTensors().iterator().next();
 	return t.getDimensions()[t.getDimensions().length - 1];
     }
@@ -161,14 +198,14 @@ public class TensorFactory {
     /**
      * @return Tensor for connections. The connections must have a common layer and they must have the same dimensions.
      */
-    public static <T extends Tensor> T tensor(Layer targetLayer, Collection<Connections> connections, TensorProvider tp) {
+    public static <T extends Tensor> T tensor(Layer targetLayer, Collection<Connections> connections, ValuesProvider tp) {
 	return tp.get(targetLayer, getLayerDimensions(targetLayer, connections, batchSize(tp)));
     }
 
     /**
      * @return Tensor for connections. The connections must have a common layer and they must have the same dimensions.
      */
-    public static <T extends Tensor> T tensor(Layer targetLayer, Connections c, TensorProvider tp) {
+    public static <T extends Tensor> T tensor(Layer targetLayer, Connections c, ValuesProvider tp) {
 	return tp.get(targetLayer, getLayerDimensions(targetLayer, Arrays.asList(new Connections[] {c}), batchSize(tp)));
     }
 

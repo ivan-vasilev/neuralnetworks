@@ -10,6 +10,7 @@ import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.Tensor;
+import com.github.neuralnetworks.util.TensorFactory;
 import com.github.neuralnetworks.util.Util;
 
 /**
@@ -82,11 +83,11 @@ public abstract class AparapiSubsampling2D extends Kernel implements ConnectionC
     public AparapiSubsampling2D(Subsampling2DConnection c, ValuesProvider valuesProvider, Layer targetLayer) {
 	Tensor input = null, output = null;
 	if (targetLayer == c.getOutputLayer()) {
-	    input = valuesProvider.getValues(Util.getOppositeLayer(c, targetLayer), c);
-	    output = valuesProvider.getValues(targetLayer, c);
+	    input = TensorFactory.tensor(Util.getOppositeLayer(c, targetLayer), c, valuesProvider);
+	    output = TensorFactory.tensor(targetLayer, c, valuesProvider);
 	} else {
-	    input = valuesProvider.getValues(targetLayer, c);
-	    output = valuesProvider.getValues(Util.getOppositeLayer(c, targetLayer), c);
+	    input = TensorFactory.tensor(targetLayer, c, valuesProvider);
+	    output = TensorFactory.tensor(Util.getOppositeLayer(c, targetLayer), c,  valuesProvider);
 	}
 
 	this.input = input.getElements();

@@ -4,6 +4,7 @@ import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Subsampling2DConnection;
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSubsampling2D;
+import com.github.neuralnetworks.util.TensorFactory;
 
 /**
  * BackPropagation base function for subsampling layers
@@ -12,15 +13,15 @@ public class AparapiBackpropagationSubsampling2D extends AparapiSubsampling2D im
 
     private static final long serialVersionUID = -345286029645674230L;
 
-    public AparapiBackpropagationSubsampling2D(Subsampling2DConnection c, ValuesProvider valuesProvider, ValuesProvider activations, Layer targetLayer) {
-	super(c, valuesProvider, targetLayer);
-	ffActivation = activations.getValues(c.getInputLayer(), c).getElements();
-    }
-
     /**
      * Activation of the output layer from the feedforward phase
      */
     protected float[] ffActivation;
+
+    public AparapiBackpropagationSubsampling2D(Subsampling2DConnection c, ValuesProvider valuesProvider, ValuesProvider activations, Layer targetLayer) {
+	super(c, valuesProvider, targetLayer);
+	ffActivation = TensorFactory.tensor(c.getInputLayer(), c, activations).getElements();
+    }
 
     @Override
     public float getLearningRate() {

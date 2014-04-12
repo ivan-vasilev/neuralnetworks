@@ -15,6 +15,7 @@ import com.github.neuralnetworks.events.PropagationEventListener;
 import com.github.neuralnetworks.util.Matrix;
 import com.github.neuralnetworks.util.Tensor;
 import com.github.neuralnetworks.util.Tensor.TensorIterator;
+import com.github.neuralnetworks.util.TensorFactory;
 import com.github.neuralnetworks.util.UniqueList;
 import com.github.neuralnetworks.util.Util;
 
@@ -72,7 +73,7 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator,
 
 	    if (notBias.size() > 0) {
 		if (preTransferFunctions != null && preTransferFunctions.size() > 0) {
-		    preTransferFunctions.forEach(f -> notBias.stream().filter(c -> !Util.isBias(c.getInputLayer())).forEach(c -> f.value(valuesProvider.getValues(Util.getOppositeLayer(c, targetLayer), c))));
+		    preTransferFunctions.forEach(f -> notBias.stream().filter(c -> !Util.isBias(c.getInputLayer())).forEach(c -> f.value(TensorFactory.tensor(Util.getOppositeLayer(c, targetLayer), c, valuesProvider))));
 		}
 
 		calculateBias(bias, valuesProvider);
@@ -80,7 +81,7 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator,
 		getConnectionCalculator(notBias, valuesProvider, targetLayer).calculate(notBias, valuesProvider, targetLayer);
 
 		if (activationFunctions != null) {
-		    activationFunctions.forEach(f -> f.value(valuesProvider.getValues(targetLayer, notBias)));
+		    activationFunctions.forEach(f -> f.value(TensorFactory.tensor(targetLayer, notBias, valuesProvider)));
 		}
 	    }
 	}
@@ -127,13 +128,13 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator,
 
     protected void calculateBias(Connections bias, ValuesProvider valuesProvider) {
 	if (bias != null) {
-	    Tensor biasValue = valuesProvider.getValues(bias.getInputLayer(), bias);
+	    Tensor biasValue = TensorFactory.tensor(bias.getInputLayer(), bias, valuesProvider);
 	    if (biasValue.get(new int[biasValue.getDimensions().length]) == 0) {
 		biasValue.forEach(i -> biasValue.getElements()[i] = 1);
 	    }
 
 	    Matrix weights = ((FullyConnected) bias).getWeights();;
-	    Matrix output = valuesProvider.getValues(bias.getOutputLayer(), bias);
+	    Matrix output = TensorFactory.tensor(bias.getOutputLayer(), bias, valuesProvider);
 	    TensorIterator it = output.iterator();
 
 	    while (it.hasNext()) {

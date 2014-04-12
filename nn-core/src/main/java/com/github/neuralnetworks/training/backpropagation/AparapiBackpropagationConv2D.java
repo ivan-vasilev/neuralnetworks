@@ -9,6 +9,7 @@ import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2D;
 import com.github.neuralnetworks.util.Tensor;
 import com.github.neuralnetworks.util.Tensor.TensorIterator;
+import com.github.neuralnetworks.util.TensorFactory;
 import com.github.neuralnetworks.util.Util;
 
 /**
@@ -49,7 +50,7 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements BackP
     public AparapiBackpropagationConv2D(Conv2DConnection c, ValuesProvider valuesProvider, ValuesProvider activations, Tensor weightUpdates, Layer targetLayer) {
 	super(c, valuesProvider, targetLayer);
 
-	Tensor t = activations.getValues(targetLayer, c);
+	Tensor t = TensorFactory.tensor(targetLayer, c, activations);
 	this.ffActivation = t.getElements();
 	this.activationStartIndex = t.getStartIndex();
 	this.activationFeatureMapRowsDistance = t.getDimensionElementsDistance(1);

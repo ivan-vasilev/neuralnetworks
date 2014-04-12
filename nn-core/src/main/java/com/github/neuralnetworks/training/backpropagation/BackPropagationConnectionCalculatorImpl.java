@@ -15,6 +15,7 @@ import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
 import com.github.neuralnetworks.util.Tensor;
+import com.github.neuralnetworks.util.TensorFactory;
 import com.github.neuralnetworks.util.Util;
 
 /**
@@ -40,10 +41,10 @@ public abstract class BackPropagationConnectionCalculatorImpl implements BackPro
 
     @Override
     public void calculate(List<Connections> connections, ValuesProvider valuesProvider, Layer targetLayer) {
-	List<Connections> chunk = connections.stream().filter(c -> !connectionCalculators.containsKey(c) || targetLayer != currentLayer || miniBatchSize != valuesProvider.getMiniBatchSize()).collect(Collectors.toList());
+	List<Connections> chunk = connections.stream().filter(c -> !connectionCalculators.containsKey(c) || targetLayer != currentLayer || miniBatchSize != TensorFactory.batchSize(valuesProvider)).collect(Collectors.toList());
 
 	if (chunk.size() > 0) {
-	    miniBatchSize = valuesProvider.getMiniBatchSize();
+	    miniBatchSize = TensorFactory.batchSize(valuesProvider);
 	    currentLayer = targetLayer;
 	    addBackpropFunction(chunk, connectionCalculators, valuesProvider, activations, targetLayer);
 	    calculators.addAll(connectionCalculators.values());

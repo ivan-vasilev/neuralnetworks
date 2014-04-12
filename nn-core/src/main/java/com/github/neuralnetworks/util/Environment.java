@@ -27,9 +27,15 @@ public class Environment {
      */
     private boolean debug;
 
+    /**
+     * Shared memory
+     */
+    private boolean useSharedMemory;
+
     private Environment() {
 	executionStrategy = new DefaultKernelExecution();
 	debug = true;
+	useSharedMemory = true;
     }
 
     public KernelExecutionStrategy getExecutionStrategy() {
@@ -65,6 +71,14 @@ public class Environment {
 
     public void setDebug(boolean debug) {
 	this.debug = debug;
+    }
+
+    public boolean getUseSharedMemory() {
+        return useSharedMemory;
+    }
+
+    public void setUseSharedMemory(boolean useSharedMemory) {
+        this.useSharedMemory = useSharedMemory;
     }
 
     public ValuesProvider getValuesProvider(NeuralNetwork neuralNetwork) {

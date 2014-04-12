@@ -75,7 +75,7 @@ public class EarlyStoppingListener implements TrainingEventListener {
 			vp.replace(n.getInputLayer(), input.getInput());
 			n.getLayerCalculator().calculate(n, n.getOutputLayer(), calculatedLayers, vp);
 
-			outputError.addItem(vp.getValues(n.getOutputLayer()), input.getTarget());
+			outputError.addItem(vp.get(n.getOutputLayer()), input.getTarget());
 		    }
 
 		    float e = outputError.getTotalNetworkError();
