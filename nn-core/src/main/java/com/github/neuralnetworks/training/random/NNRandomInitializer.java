@@ -61,12 +61,12 @@ public class NNRandomInitializer implements Serializable {
 		    if (biasDefaultValue != null) {
 			fc.getWeights().forEach(i -> fc.getWeights().getElements()[i] = biasDefaultValue);
 		    } else if (biasRandomInitializer != null) {
-			biasRandomInitializer.initialize(fc.getWeights().getElements());
+			biasRandomInitializer.initialize(fc.getWeights());
 		    } else {
-			randomInitializer.initialize(fc.getWeights().getElements());
+			randomInitializer.initialize(fc.getWeights());
 		    }
 		} else {
-		    randomInitializer.initialize(fc.getWeights().getElements());
+		    randomInitializer.initialize(fc.getWeights());
 		}
 	    } else if (cc.connection instanceof Conv2DConnection) {
 		Conv2DConnection c = (Conv2DConnection) cc.connection;
@@ -74,12 +74,12 @@ public class NNRandomInitializer implements Serializable {
 		    if (biasDefaultValue != null) {
 			c.getWeights().forEach(i -> c.getWeights().getElements()[i] = biasDefaultValue);
 		    } else if (biasRandomInitializer != null) {
-			biasRandomInitializer.initialize(c.getWeights().getElements());
+			biasRandomInitializer.initialize(c.getWeights());
 		    } else {
-			randomInitializer.initialize(c.getWeights().getElements());
+			randomInitializer.initialize(c.getWeights());
 		    }
 		} else {
-		    randomInitializer.initialize(c.getWeights().getElements());
+		    randomInitializer.initialize(c.getWeights());
 		}
 	    }
 	}

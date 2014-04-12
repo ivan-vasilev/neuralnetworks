@@ -29,7 +29,6 @@ public class ConnectionFactory implements Serializable {
 	    this.connections = new ArrayList<>();
 	    this.sharedWeights = new float[0];
 	}
-
     }
 
     public FullyConnected fullyConnected(Layer inputLayer, Layer outputLayer, int inputUnitCount, int outputUnitCount) {

@@ -55,9 +55,9 @@ public class BackPropagationTrainer<N extends NeuralNetwork> extends OneStepTrai
     public void propagateBackward(Tensor target) {
 	NeuralNetwork nn = getNeuralNetwork();
 
+	backpropagation.setMiniBatchSize(target.getDimensionElementsDistance(target.getDimensions().length - 1));
 	OutputErrorDerivative d = getProperties().getParameter(Constants.OUTPUT_ERROR_DERIVATIVE);
-	Tensor outputErrorDerivative = d.getOutputErrorDerivative(activations.getValues(nn.getOutputLayer()), target);
-	backpropagation.replace(nn.getOutputLayer(), outputErrorDerivative);
+	d.getOutputErrorDerivative(activations.getValues(nn.getOutputLayer()), target, backpropagation.getValues(nn.getOutputLayer()));
 	Set<Layer> calculatedLayers = new UniqueList<Layer>();
 	calculatedLayers.add(nn.getOutputLayer());
 	BackPropagationLayerCalculator blc = getBPLayerCalculator();

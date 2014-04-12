@@ -8,5 +8,5 @@ import com.github.neuralnetworks.util.Tensor;
  * Implementations provide output error derivative
  */
 public interface OutputErrorDerivative extends Serializable {
-    public Tensor getOutputErrorDerivative(Tensor activation, Tensor target);
+    public void getOutputErrorDerivative(Tensor activation, Tensor target, Tensor result);
 }

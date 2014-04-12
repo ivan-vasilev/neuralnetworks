@@ -76,27 +76,6 @@ public class ValuesProvider implements Serializable {
     }
 
     /**
-     * @return all Tensors for connections. The connections must have a common layer and they must have the same dimensions.
-     */
-    public <T extends Tensor> List<T> getAllValues(Layer targetLayer, Collection<Connections> connections) {
-	return getAllValues(targetLayer, getDataDimensions(targetLayer, connections));
-    }
-
-    /**
-     * @return all Tensors for connections. The connections must have a common layer and they must have the same dimensions.
-     */
-    public <T extends Tensor> List<T> getAllValues(Layer targetLayer, Connections c) {
-	return getAllValues(targetLayer, Arrays.asList(new Connections[] {c}));
-    }
-
-    /**
-     * @return all Tensors for a layer.
-     */
-    public <T extends Tensor> List<T> getAllValues(Layer targetLayer) {
-	return getAllValues(targetLayer, targetLayer.getConnections());
-    }
-
-    /**
      * Get values for layer based on provided dimensions and index
      * @param targetLayer
      * @param unitCount

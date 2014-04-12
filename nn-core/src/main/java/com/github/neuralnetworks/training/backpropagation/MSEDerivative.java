@@ -13,10 +13,8 @@ public class MSEDerivative implements OutputErrorDerivative {
 
     private static final long serialVersionUID = 1L;
 
-    private Tensor result;
-
     @Override
-    public Tensor getOutputErrorDerivative(Tensor activation, Tensor target) {
+    public void getOutputErrorDerivative(Tensor activation, Tensor target, Tensor result) {
 	if (!Arrays.equals(activation.getDimensions(), target.getDimensions())) {
 	    throw new IllegalArgumentException("Matrices are not the same");
 	}
@@ -33,7 +31,5 @@ public class MSEDerivative implements OutputErrorDerivative {
 	    int activationId = activationIt.next();
 	    result.getElements()[resultIt.next()] = (target.getElements()[targetIt.next()] - activation.getElements()[activationId]) * activation.getElements()[activationId] * (1 - activation.getElements()[activationId]);
 	}
-
-	return result;
     }
 }

@@ -15,8 +15,7 @@ import com.github.neuralnetworks.architecture.FullyConnected;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.architecture.types.NNFactory;
-import com.github.neuralnetworks.calculation.memory.SharedMemoryValuesProvider;
-import com.github.neuralnetworks.calculation.memory.ValuesProvider;
+import com.github.neuralnetworks.calculation.memory.TensorProvider;
 import com.github.neuralnetworks.calculation.neuronfunctions.SoftmaxFunction;
 import com.github.neuralnetworks.training.random.MersenneTwisterRandomInitializer;
 import com.github.neuralnetworks.training.random.NNRandomInitializer;
@@ -29,9 +28,32 @@ import com.github.neuralnetworks.util.Util;
 public class GeneralTest {
 
     @Test
-    public void testValuesProvider() {
+    public void testTensorProvider() {
+	TensorProvider tp = new TensorProvider(true);
+	String s1 = "1";
+	tp.add(s1, 2, 3);
+	String s2 = "2";
+	tp.add(s2, 2, 3);
+
+	assertTrue(tp.get(s1).getElements() == tp.get(s2).getElements());
+	assertEquals(12, tp.get(s1).getElements().length, 0);
+	assertEquals(0, tp.get(s1).getStartIndex(), 0);
+	assertEquals(12, tp.get(s2).getElements().length, 0);
+	assertEquals(6, tp.get(s2).getStartIndex(), 0);
+
+	TensorProvider tp2 = new TensorProvider(tp.getTensors());
+	tp2.add(s1, 2, 3);
+	tp2.add(s2, 2, 3);
+
+	assertTrue(tp2.get(s1).getElements() == tp.get(s2).getElements());
+	assertEquals(24, tp2.get(s1).getElements().length, 0);
+	assertEquals(12, tp2.get(s1).getStartIndex(), 0);
+	assertEquals(18, tp2.get(s2).getStartIndex(), 0);
+    }
+
+    @Test
+    public void testTensorProvider2() {
 	NeuralNetworkImpl nn = new NeuralNetworkImpl();
-	SharedMemoryValuesProvider vp = new SharedMemoryValuesProvider(nn);
 
 	Layer i = new Layer();
 	Layer h = new Layer();
@@ -43,43 +65,41 @@ public class GeneralTest {
 	NNFactory.addFullyConnectedLayer(nn, h, cf, 2, 3, true);
 	NNFactory.addFullyConnectedLayer(nn, o, cf, 4, 1, true);
 
-	Matrix im = TensorFactory.tensor(2, 2);
-	vp.replace(i, im);
-	Matrix hm1 = vp.getValues(h, 3, 2);
-	Matrix hm2 = TensorFactory.tensor(4, 2);
-	vp.replace(h, hm2);
+	TensorProvider tp = TensorFactory.tensorProvider(nn, 2, true);
 
-	Tensor om = vp.getValues(o);
+	Matrix im = tp.get(nn.getInputLayer());
+	Matrix hm1 = tp.get(h, 3, 2);
+	Matrix hm2 = tp.get(h, 4, 2);
 
-	assertTrue(im == vp.getValues(i, 2, 2));
-	assertTrue(im == vp.getValues(i));
-	assertTrue(hm1 == vp.getValues(h, 3, 2));
-	assertTrue(hm2 == vp.getValues(h, 4, 2));
-	assertTrue(hm1 == vp.getValues(h, nn.getConnection(i, h)));
-	assertTrue(hm2 == vp.getValues(h, nn.getConnection(h, o)));
-	assertTrue(om == vp.getValues(o, 1, 2));
-	assertTrue(om == vp.getValues(o));
-	assertTrue(2 == vp.getMiniBatchSize());
+	Tensor om = tp.get(o);
+
+	assertTrue(im == tp.get(i, 2, 2));
+	assertTrue(im == tp.get(i));
+	assertTrue(hm1 == tp.get(h, 3, 2));
+	assertTrue(hm2 == tp.get(h, 4, 2));
+	assertTrue(hm1 == TensorFactory.tensor(h, nn.getConnection(i, h), tp));
+	assertTrue(hm2 == TensorFactory.tensor(h, nn.getConnection(h, o), tp));
+	assertTrue(om == tp.get(o, 1, 2));
+	assertTrue(om == tp.get(o));
     }
 
     @Test
-    public void testSharedMemoryValuesProvider() {
+    public void testTensorProvider3() {
 	// simple mlp test
 	NeuralNetworkImpl nn = NNFactory.mlp(new int[] { 3, 4, 2 }, true, true);
-	ValuesProvider vp = Environment.getInstance().getValuesProvider(nn);
-	vp.replace(nn.getInputLayer(), TensorFactory.tensor(3, 2));
+	TensorProvider tp = TensorFactory.tensorProvider(nn, 2, false);
 
-	Matrix in = vp.getValues(nn.getInputLayer());
-	Matrix hidden = vp.getValues(nn.getLayers().stream().filter(l -> l != nn.getInputLayer() && l != nn.getOutputLayer() && !Util.isBias(l)).findFirst().get());
-	Matrix out = vp.getValues(nn.getOutputLayer());
+	Matrix in = tp.get(nn.getInputLayer());
+	Matrix hidden = tp.get(nn.getLayers().stream().filter(l -> l != nn.getInputLayer() && l != nn.getOutputLayer() && !Util.isBias(l)).findFirst().get());
+	Matrix out = tp.get(nn.getOutputLayer());
 
 	assertEquals(6, in.getElements().length, 0);
 	assertEquals(3, in.getRows(), 0);
 	assertEquals(2, in.getColumns(), 0);
-	assertEquals(16, hidden.getElements().length, 0);
+	assertEquals(8, hidden.getElements().length, 0);
 	assertEquals(4, hidden.getRows(), 0);
 	assertEquals(2, hidden.getColumns(), 0);
-	assertEquals(16, out.getElements().length, 0);
+	assertEquals(4, out.getElements().length, 0);
 	assertEquals(2, out.getRows(), 0);
 	assertEquals(2, out.getColumns(), 0);
 
@@ -96,25 +116,6 @@ public class GeneralTest {
 	out.set(9, 1, 1);
 	assertEquals(8, out.get(1, 0), 0);
 	assertEquals(9, out.get(1, 1), 0);
-
-	// input and output layer separate
-	vp = new SharedMemoryValuesProvider(nn);
-	vp.replace(nn.getInputLayer(), TensorFactory.tensor(3, 2));
-	vp.replace(nn.getOutputLayer(), TensorFactory.tensor(2, 2));
-
-	in = vp.getValues(nn.getInputLayer());
-	hidden = vp.getValues(nn.getLayers().stream().filter(l -> l != nn.getInputLayer() && l != nn.getOutputLayer() && !Util.isBias(l)).findFirst().get());
-	out = vp.getValues(nn.getOutputLayer());
-
-	assertEquals(6, in.getElements().length, 0);
-	assertEquals(3, in.getRows(), 0);
-	assertEquals(2, in.getColumns(), 0);
-	assertEquals(12, hidden.getElements().length, 0);
-	assertEquals(4, hidden.getRows(), 0);
-	assertEquals(2, hidden.getColumns(), 0);
-	assertEquals(4, out.getElements().length, 0);
-	assertEquals(2, out.getRows(), 0);
-	assertEquals(2, out.getColumns(), 0);
     }
 
     @Test
@@ -152,15 +153,13 @@ public class GeneralTest {
 
 	for (Layer l : nn.getLayers()) {
 	    if (Util.isBias(l)) {
-		FullyConnected gc = (FullyConnected) l.getConnections().get(0);
-		for (float v : gc.getWeights().getElements()) {
-		    assertEquals(0.5, v, 0f);
-		}
+		Tensor t = ((FullyConnected) l.getConnections().get(0)).getWeights();
+		float[] elements = t.getElements();
+		t.forEach(i -> assertEquals(0.5, elements[i], 0f));
 	    } else {
-		FullyConnected gc = (FullyConnected) l.getConnections().get(0);
-		for (float v : gc.getWeights().getElements()) {
-		    assertTrue(v >= -0.1f && v <= 0.1f && v != 0);
-		}
+		Tensor t = ((FullyConnected) l.getConnections().get(0)).getWeights();
+		float[] elements = t.getElements();
+		t.forEach(i -> assertTrue(elements[i] >= -0.1f && elements[i] <= 0.1f && elements[i] != 0));
 	    }
 	}
 
@@ -169,15 +168,13 @@ public class GeneralTest {
 
 	for (Layer l : nn.getLayers()) {
 	    if (Util.isBias(l)) {
-		FullyConnected gc = (FullyConnected) l.getConnections().get(0);
-		for (float v : gc.getWeights().getElements()) {
-		    assertTrue(v >= -2f && v <= -1f);
-		}
+		Tensor t = ((FullyConnected) l.getConnections().get(0)).getWeights();
+		float[] elements = t.getElements();
+		t.forEach(i -> assertTrue(elements[i] >= -2f && elements[i] <= -1f));
 	    } else {
-		FullyConnected gc = (FullyConnected) l.getConnections().get(0);
-		for (float v : gc.getWeights().getElements()) {
-		    assertTrue(v >= 2f && v <= 3f);
-		}
+		Tensor t = ((FullyConnected) l.getConnections().get(0)).getWeights();
+		float[] elements = t.getElements();
+		t.forEach(i -> assertTrue(elements[i] >= 2f && elements[i] <= 3f));
 	    }
 	}
     }
