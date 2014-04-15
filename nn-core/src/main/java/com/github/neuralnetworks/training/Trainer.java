@@ -65,7 +65,7 @@ public abstract class Trainer<N extends NeuralNetwork> implements Serializable {
 	    triggerEvent(new TestingStartedEvent(this));
 
 	    Set<Layer> calculatedLayers = new UniqueList<>();
-	    ValuesProvider results = TensorFactory.tensorProvider(n, getTestingBatchSize(), Environment.getInstance().getUseSharedMemory());
+	    ValuesProvider results = TensorFactory.tensorProvider(n, getTestBatchSize(), Environment.getInstance().getUseSharedMemory());
 
 	    OutputError oe = getOutputError();
 	    if (oe != null) {
@@ -74,7 +74,7 @@ public abstract class Trainer<N extends NeuralNetwork> implements Serializable {
 	    }
 
 	    TrainingInputData input = new TrainingInputDataImpl(results.get(n.getInputLayer()), results.get(oe));
-	    for (int i = 0; i < ip.getInputSize(); i += getTestingBatchSize()) {
+	    for (int i = 0; i < ip.getInputSize(); i += getTestBatchSize()) {
 		ip.populateNext(input);
 		calculatedLayers.clear();
 		calculatedLayers.add(n.getInputLayer());
@@ -147,16 +147,16 @@ public abstract class Trainer<N extends NeuralNetwork> implements Serializable {
 	properties.setParameter(Constants.TRAINING_BATCH_SIZE, batchSize);
     }
     
-    public Integer getTestingBatchSize() {
-	return properties.getParameter(Constants.TEST_BATCH_SIZE);
+    public Integer getTestBatchSize() {
+	return properties.getParameter(Constants.TEST_BATCH_SIZE) != null ? properties.getParameter(Constants.TEST_BATCH_SIZE) : 1;
     }
     
-    public void setTestingBatchSize(int batchSize) {
+    public void setTestBatchSize(int batchSize) {
 	properties.setParameter(Constants.TEST_BATCH_SIZE, batchSize);
     }
     
     public Integer getEpochs() {
-	return properties.getParameter(Constants.EPOCHS);
+	return properties.getParameter(Constants.EPOCHS) != null ? properties.getParameter(Constants.EPOCHS) : 1;
     }
     
     public void setEpochs(int epochs) {

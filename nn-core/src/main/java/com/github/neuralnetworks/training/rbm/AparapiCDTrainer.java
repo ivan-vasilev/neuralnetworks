@@ -1,9 +1,9 @@
 package com.github.neuralnetworks.training.rbm;
 
 import com.github.neuralnetworks.architecture.types.RBM;
+import com.github.neuralnetworks.calculation.RBMLayerCalculator;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Environment;
-import com.github.neuralnetworks.util.Matrix;
 import com.github.neuralnetworks.util.Properties;
 
 /**
@@ -38,20 +38,21 @@ public class AparapiCDTrainer extends CDTrainerBase {
      * before each update the kernel update parameters are refreshed
      */
     @Override
-    protected void updateWeights(Matrix posPhaseVisible, Matrix posPhaseHidden, Matrix negPhaseVisible, Matrix negPhaseHidden) {
+    protected void updateWeights(/*Matrix posPhaseVisible, Matrix posPhaseHidden, Matrix negPhaseVisible, Matrix negPhaseHidden*/) {
 	RBM rbm = getNeuralNetwork();
 
-	int mbs = posPhaseHidden.getColumns();
+	RBMLayerCalculator lc = getLayerCalculator();
+	int mbs = lc.getPositivePhaseVisible().getDimensions()[lc.getPositivePhaseVisible().getDimensions().length - 1];
 
 	if (weightUpdatesKernel == null || weightUpdatesKernel.getMiniBatchSize() != mbs) {
-	    weightUpdatesKernel = new CDWeightUpdatesKernel(posPhaseVisible, posPhaseHidden, negPhaseVisible, negPhaseHidden, rbm.getMainConnections().getWeights(), getLearningRate(), getMomentum(), getl1weightDecay(), getl2weightDecay());
+	    weightUpdatesKernel = new CDWeightUpdatesKernel(lc.getPositivePhaseVisible(), lc.getPositivePhaseHidden(), lc.getNegativePhaseVisible(), lc.getNegativePhaseHidden(), rbm.getMainConnections().getWeights(), getLearningRate(), getMomentum(), getl1weightDecay(), getl2weightDecay());
 	}
 	Environment.getInstance().getExecutionStrategy().execute(weightUpdatesKernel, rbm.getMainConnections().getWeights().getRows());
 
 	// update visible bias
 	if (rbm.getVisibleBiasConnections() != null) {
 	    if (visibleBiasUpdatesKernel == null || visibleBiasUpdatesKernel.getMiniBatchSize() != mbs) {
-		visibleBiasUpdatesKernel = new CDBiasUpdatesKernel(rbm.getVisibleBiasConnections().getWeights(), posPhaseVisible, negPhaseVisible, getLearningRate(), getMomentum());
+		visibleBiasUpdatesKernel = new CDBiasUpdatesKernel(rbm.getVisibleBiasConnections().getWeights(), lc.getPositivePhaseVisible(), lc.getNegativePhaseVisible(), getLearningRate(), getMomentum());
 	    }
 
 	    Environment.getInstance().getExecutionStrategy().execute(visibleBiasUpdatesKernel, rbm.getVisibleBiasConnections().getWeights().getSize());
@@ -60,7 +61,7 @@ public class AparapiCDTrainer extends CDTrainerBase {
 	// update hidden bias
 	if (rbm.getHiddenBiasConnections() != null) {
 	    if (hiddenBiasUpdatesKernel == null || hiddenBiasUpdatesKernel.getMiniBatchSize() != mbs) {
-		hiddenBiasUpdatesKernel = new CDBiasUpdatesKernel(rbm.getHiddenBiasConnections().getWeights(), posPhaseHidden, negPhaseHidden, getLearningRate(), getMomentum());
+		hiddenBiasUpdatesKernel = new CDBiasUpdatesKernel(rbm.getHiddenBiasConnections().getWeights(), lc.getPositivePhaseHidden(), lc.getNegativePhaseHidden(), getLearningRate(), getMomentum());
 	    }
 
 	    Environment.getInstance().getExecutionStrategy().execute(hiddenBiasUpdatesKernel, rbm.getHiddenBiasConnections().getWeights().getSize());

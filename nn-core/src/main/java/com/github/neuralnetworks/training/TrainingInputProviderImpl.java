@@ -62,6 +62,10 @@ public abstract class TrainingInputProviderImpl implements TrainingInputProvider
     }
 
     @Override
+    public void before(TrainingInputData ti) {
+    }
+
+    @Override
     public void after(TrainingInputData ti) {
 	if (ti.getInput() != null) {
 	    currentInput += ti.getInput().getDimensions()[ti.getInput().getDimensions().length - 1];

@@ -46,12 +46,12 @@ public class IrisTest {
 	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 4, 2, 3 }, true, true);
 
 	// training and testing data providers
-	IrisInputProvider trainInputProvider = new IrisInputProvider(150, 300000, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
-	IrisInputProvider testInputProvider = new IrisInputProvider(1, 150, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
+	IrisInputProvider trainInputProvider = new IrisInputProvider(new IrisTargetMultiNeuronOutputConverter(), false, true, false);
+	IrisInputProvider testInputProvider = new IrisInputProvider(new IrisTargetMultiNeuronOutputConverter(), false, true, false);
 	OutputError outputError = new MultipleNeuronsOutputError();
 
 	// trainer
-	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(mlp, trainInputProvider, testInputProvider, outputError, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.5f), 0.02f, 0.7f, 0f, 0f, 150);
+	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(mlp, trainInputProvider, testInputProvider, outputError, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.5f), 0.02f, 0.7f, 0f, 0f, 150, 1, 2000);
 
 	// log data
 	bpt.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
@@ -85,12 +85,12 @@ public class IrisTest {
 	RBM rbm = NNFactory.rbm(4, 3, true, true);
 
 	// training and testing input providers
-	TrainingInputProvider trainInputProvider = new IrisInputProvider(1, 150000, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
-	TrainingInputProvider testInputProvider = new IrisInputProvider(1, 150, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
+	TrainingInputProvider trainInputProvider = new IrisInputProvider(new IrisTargetMultiNeuronOutputConverter(), false, true, false);
+	TrainingInputProvider testInputProvider = new IrisInputProvider(new IrisTargetMultiNeuronOutputConverter(), false, true, false);
 	MultipleNeuronsOutputError error = new MultipleNeuronsOutputError();
 
 	// trainers
-	AparapiCDTrainer t = TrainerFactory.cdSigmoidBinaryTrainer(rbm, trainInputProvider, testInputProvider, error, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.01f, 0.5f, 0f, 0f, 1, 1, true);
+	AparapiCDTrainer t = TrainerFactory.cdSigmoidBinaryTrainer(rbm, trainInputProvider, testInputProvider, error, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.01f, 0.5f, 0f, 0f, 1, 1, 150000, true);
 
 	// log data
 	t.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
@@ -119,12 +119,12 @@ public class IrisTest {
 
 	dbn.setLayerCalculator(NNFactory.lcSigmoid(dbn, null));
 
-	TrainingInputProvider trainInputProvider = new IrisInputProvider(150, 150000, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
-	TrainingInputProvider testInputProvider = new IrisInputProvider(1, 150, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
+	TrainingInputProvider trainInputProvider = new IrisInputProvider(new IrisTargetMultiNeuronOutputConverter(), false, true, false);
+	TrainingInputProvider testInputProvider = new IrisInputProvider(new IrisTargetMultiNeuronOutputConverter(), false, true, false);
  
 	// rbm trainers for each layer
-	AparapiCDTrainer firstTrainer = TrainerFactory.cdSigmoidBinaryTrainer(dbn.getFirstNeuralNetwork(), null, null, null, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.01f, 0.5f, 0f, 0f, 150, 1, true);
-	AparapiCDTrainer lastTrainer = TrainerFactory.cdSigmoidBinaryTrainer(dbn.getLastNeuralNetwork(), null, null, null, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.01f, 0.5f, 0f, 0f, 150, 1, true);
+	AparapiCDTrainer firstTrainer = TrainerFactory.cdSigmoidBinaryTrainer(dbn.getFirstNeuralNetwork(), null, null, null, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.01f, 0.5f, 0f, 0f, 1, 150, 1000, true);
+	AparapiCDTrainer lastTrainer = TrainerFactory.cdSigmoidBinaryTrainer(dbn.getLastNeuralNetwork(), null, null, null, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.01f, 0.5f, 0f, 0f, 1, 150, 1000, true);
 
 	Map<NeuralNetwork, OneStepTrainer<?>> map = new HashMap<>();
 	map.put(dbn.getFirstNeuralNetwork(), firstTrainer);
@@ -139,7 +139,7 @@ public class IrisTest {
 	deepTrainer.train();
 
 	// fine tuning backpropagation
-	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(dbn, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.01f, 0.5f, 0f, 0f, 150);
+	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(dbn, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.01f, 0.5f, 0f, 0f, 150, 150, 1000);
 
 	// log data
 	bpt.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
@@ -159,12 +159,12 @@ public class IrisTest {
     	Autoencoder ae = NNFactory.autoencoderSigmoid(4, 3, true, true);
 
     	// training, testing and error
-    	TrainingInputProvider trainInputProvider = new IrisInputProvider(1, 15000, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
-    	TrainingInputProvider testInputProvider = new IrisInputProvider(1, 150, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
+    	TrainingInputProvider trainInputProvider = new IrisInputProvider(new IrisTargetMultiNeuronOutputConverter(), false, true, false);
+    	TrainingInputProvider testInputProvider = new IrisInputProvider(new IrisTargetMultiNeuronOutputConverter(), false, true, false);
     	MultipleNeuronsOutputError error = new MultipleNeuronsOutputError();
 
     	// backpropagation autoencoder training
-    	BackPropagationAutoencoder bae = TrainerFactory.backPropagationAutoencoder(ae, trainInputProvider, testInputProvider, error, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.25f, 0.5f, 0f, 0f, 0f, 1);
+    	BackPropagationAutoencoder bae = TrainerFactory.backPropagationAutoencoder(ae, trainInputProvider, testInputProvider, error, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.25f, 0.5f, 0f, 0f, 0f, 1, 150, 100);
 
     	// log data to console
     	bae.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
@@ -196,16 +196,16 @@ public class IrisTest {
 	lastNN.setLayerCalculator(NNFactory.lcSigmoid(lastNN, null));
 
 	// trainers for each of the stacked networks
-	BackPropagationAutoencoder firstTrainer = TrainerFactory.backPropagationAutoencoder(firstNN, null, null, null, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.001f, 0.5f, 0f, 0f, 0f, 150);
-	BackPropagationAutoencoder secondTrainer = TrainerFactory.backPropagationAutoencoder(lastNN, null, null, null, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.001f, 0.5f, 0f, 0f, 0f, 150);
+	BackPropagationAutoencoder firstTrainer = TrainerFactory.backPropagationAutoencoder(firstNN, null, null, null, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.001f, 0.5f, 0f, 0f, 0f, 150, 1, 10000);
+	BackPropagationAutoencoder secondTrainer = TrainerFactory.backPropagationAutoencoder(lastNN, null, null, null, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.001f, 0.5f, 0f, 0f, 0f, 150, 1, 10000);
 
 	Map<NeuralNetwork, OneStepTrainer<?>> map = new HashMap<>();
 	map.put(firstNN, firstTrainer);
 	map.put(lastNN, secondTrainer);
 
 	// data and error providers
-	TrainingInputProvider trainInputProvider = new IrisInputProvider(150, 1500000, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
-	TrainingInputProvider testInputProvider = new IrisInputProvider(1, 150, new IrisTargetMultiNeuronOutputConverter(), false, true, false);
+	TrainingInputProvider trainInputProvider = new IrisInputProvider(new IrisTargetMultiNeuronOutputConverter(), false, true, false);
+	TrainingInputProvider testInputProvider = new IrisInputProvider(new IrisTargetMultiNeuronOutputConverter(), false, true, false);
 	MultipleNeuronsOutputError error = new MultipleNeuronsOutputError();
 
 	// deep trainer
@@ -218,7 +218,7 @@ public class IrisTest {
 	deepTrainer.train();
 
 	// fine tuning backpropagation
-	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(sae, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.01f, 0.5f, 0f, 0f, 150);
+	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(sae, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.01f, 0.5f, 0f, 0f, 150, 1, 10000);
 
 	// log data
 	bpt.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));

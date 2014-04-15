@@ -4,10 +4,9 @@ import com.github.neuralnetworks.architecture.types.RBM;
 import com.github.neuralnetworks.calculation.RBMLayerCalculator;
 import com.github.neuralnetworks.training.OneStepTrainer;
 import com.github.neuralnetworks.training.TrainingInputData;
+import com.github.neuralnetworks.training.TrainingInputDataImpl;
 import com.github.neuralnetworks.util.Constants;
-import com.github.neuralnetworks.util.Matrix;
 import com.github.neuralnetworks.util.Properties;
-import com.github.neuralnetworks.util.TensorFactory;
 
 /**
  * Base class for Contrastive Divergence
@@ -17,61 +16,35 @@ public abstract class CDTrainerBase extends OneStepTrainer<RBM> {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * positive phase visible layer results
-     */
-    private Matrix posPhaseVisible;
-
-    /**
-     * negative phase visible layer results
-     */
-    private Matrix negPhaseVisible;
-
-    /**
-     * positive phase hidden layer results
-     */
-    private Matrix posPhaseHidden;
-
-    /**
-     * negative phase hidden layer results
-     */
-    private Matrix negPhaseHidden;
-
+    private TrainingInputData input;
     public CDTrainerBase(Properties properties) {
 	super(properties);
     }
 
     @Override
-    protected void learnInput(TrainingInputData data, int batch) {
-	RBM nn = getNeuralNetwork();
-
-	posPhaseVisible = (Matrix) data.getInput();
-	if (negPhaseVisible == null || negPhaseVisible.getColumns() != posPhaseVisible.getColumns()) {
-	    negPhaseVisible = TensorFactory.tensor(posPhaseVisible.getRows(), posPhaseVisible.getColumns());
-	    posPhaseHidden = TensorFactory.tensor(nn.getMainConnections().getWeights().getRows(), posPhaseVisible.getColumns());
-	    negPhaseHidden = TensorFactory.tensor(nn.getMainConnections().getWeights().getRows(), posPhaseVisible.getColumns());
+    protected TrainingInputData getInput() {
+	if (input == null) {
+	    input = new TrainingInputDataImpl(getLayerCalculator().getPositivePhaseVisible());
 	}
 
-	getLayerCalculator().gibbsSampling(nn, posPhaseVisible, posPhaseHidden, negPhaseVisible, negPhaseHidden, getGibbsSamplingCount(), batch == 0 ? true : getResetRBM(), true);
+	return input;
+    }
+
+    @Override
+    protected void learnInput(int batch) {
+	RBM nn = getNeuralNetwork();
+
+//	posPhaseVisible = (Matrix) data.getInput();
+//	if (negPhaseVisible == null || negPhaseVisible.getColumns() != posPhaseVisible.getColumns()) {
+//	    negPhaseVisible = TensorFactory.tensor(posPhaseVisible.getRows(), posPhaseVisible.getColumns());
+//	    posPhaseHidden = TensorFactory.tensor(nn.getMainConnections().getWeights().getRows(), posPhaseVisible.getColumns());
+//	    negPhaseHidden = TensorFactory.tensor(nn.getMainConnections().getWeights().getRows(), posPhaseVisible.getColumns());
+//	}
+
+	getLayerCalculator().gibbsSampling(nn, /*posPhaseVisible, posPhaseHidden, negPhaseVisible, negPhaseHidden,*/ getGibbsSamplingCount(), batch == 0 ? true : getResetRBM());
 
 	// update weights
-	updateWeights(posPhaseVisible, posPhaseHidden, negPhaseVisible, negPhaseHidden);
-    }
-
-    public Matrix getPosPhaseVisible() {
-        return posPhaseVisible;
-    }
-
-    public Matrix getNegPhaseVisible() {
-        return negPhaseVisible;
-    }
-
-    public Matrix getPosPhaseHidden() {
-        return posPhaseHidden;
-    }
-
-    public Matrix getNegPhaseHidden() {
-        return negPhaseHidden;
+	updateWeights(/*posPhaseVisible, posPhaseHidden, negPhaseVisible, negPhaseHidden*/);
     }
 
     public RBMLayerCalculator getLayerCalculator() {
@@ -94,5 +67,5 @@ public abstract class CDTrainerBase extends OneStepTrainer<RBM> {
 	return properties.containsKey(Constants.GIBBS_SAMPLING_COUNT) ? (int) properties.get(Constants.GIBBS_SAMPLING_COUNT) : 1;
     }
 
-    protected abstract void updateWeights(Matrix posPhaseVisible, Matrix posPhaseHidden, Matrix negPhaseVisible, Matrix negPhaseHidden);
+    protected abstract void updateWeights(/*Matrix posPhaseVisible, Matrix posPhaseHidden, Matrix negPhaseVisible, Matrix negPhaseHidden*/);
 }

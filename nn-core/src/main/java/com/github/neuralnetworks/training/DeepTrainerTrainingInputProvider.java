@@ -13,11 +13,13 @@ import com.github.neuralnetworks.util.TensorFactory;
 /**
  * Training Input Provider for deep network trainers
  */
-public class DeepTrainerTrainingInputProvider implements TrainingInputProvider {
+public class DeepTrainerTrainingInputProvider extends TrainingInputProviderImpl {
 
     private static final long serialVersionUID = 1L;
 
     private TrainingInputProvider inputProvider;
+    private TrainingInputData inputDataBase;
+    private TrainingInputData inputData;
     private DNN<?> dnn;
     private NeuralNetwork currentNN;
     private Set<Layer> calculatedLayers;
@@ -32,19 +34,39 @@ public class DeepTrainerTrainingInputProvider implements TrainingInputProvider {
 	this.layerResults = TensorFactory.tensorProvider(dnn, batchSize, Environment.getInstance().getUseSharedMemory());
     }
 
-    @Override
-    public TrainingInputData getNextInput() {
-	TrainingInputData input = inputProvider.getNextInput();
+//    @Override
+//    public TrainingInputData getNextInput() {
+//	TrainingInputData input = inputProvider.getNextInput();
+//
+//	if (input != null && dnn.getFirstNeuralNetwork() != currentNN) {
+//	    layerResults.replace(dnn.getInputLayer(), input.getInput());
+//	    calculatedLayers.clear();
+//	    calculatedLayers.add(dnn.getInputLayer());
+//	    dnn.getLayerCalculator().calculate(dnn, currentNN.getInputLayer(), calculatedLayers, layerResults);
+//	    input = new TrainingInputDataImpl(layerResults.get(currentNN.getInputLayer()), input.getTarget());
+//	}
+//
+//	return input;
+//    }
 
-	if (input != null && dnn.getFirstNeuralNetwork() != currentNN) {
-	    layerResults.replace(dnn.getInputLayer(), input.getInput());
+    @Override
+    public float[] getNextInput() {
+	inputProvider.populateNext(inputDataBase);
+	if (inputDataBase != null && dnn.getFirstNeuralNetwork() != currentNN) {
 	    calculatedLayers.clear();
 	    calculatedLayers.add(dnn.getInputLayer());
 	    dnn.getLayerCalculator().calculate(dnn, currentNN.getInputLayer(), calculatedLayers, layerResults);
-	    input = new TrainingInputDataImpl(layerResults.get(currentNN.getInputLayer()), input.getTarget());
+	    if (inputData == null) {
+		//inputData = new TrainingInputDataImpl(layerResults.get(currentNN.getInputLayer()), inputDataBase input.getTarget());
+	    }
 	}
 
-	return input;
+	return null;
+    }
+
+    @Override
+    public float[] getNextTarget() {
+	return inputProvider.getNextTarget();
     }
 
     @Override

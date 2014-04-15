@@ -36,7 +36,7 @@ public class RBMLayerCalculator implements Serializable {
 	this.negPhaseVP = TensorFactory.tensorProvider(posPhaseVP, rbm);
     }
 
-    public void gibbsSampling(RBM rbm, Matrix posPhaseVisible, Matrix posPhaseHidden, Matrix negPhaseVisible, Matrix negPhaseHidden, int samplingCount, boolean resetNetwork, boolean useIntermediateResults) {
+    public void gibbsSampling(RBM rbm, /*Matrix posPhaseVisible, Matrix posPhaseHidden, Matrix negPhaseVisible, Matrix negPhaseHidden,*/ int samplingCount, boolean resetNetwork) {
 	List<Connections> connections = new ArrayList<>();
 	connections.add(rbm.getMainConnections());
 	if (rbm.getHiddenBiasConnections() != null) {

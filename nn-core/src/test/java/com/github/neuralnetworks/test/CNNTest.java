@@ -198,7 +198,7 @@ public class CNNTest {
 	assertTrue(lc.getConnectionCalculator(l) instanceof ConnectionCalculatorFullyConnected);
 
 	// backpropagation cc
-	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(nn, null, null, null, null, 0.01f, 0.5f, 0f, 0f, 1);
+	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(nn, null, null, null, null, 0.01f, 0.5f, 0f, 0f, 1, 1, 1);
 	BackPropagationLayerCalculatorImpl bplc = (BackPropagationLayerCalculatorImpl) bpt.getBPLayerCalculator();
 
 	l = nn.getInputLayer();
@@ -240,7 +240,7 @@ public class CNNTest {
 	l = l.getConnections().get(0).getOutputLayer();
 	assertTrue(lc.getConnectionCalculator(l) instanceof AparapiSigmoid);
 
-	bpt = TrainerFactory.backPropagation(nn, null, null, new MultipleNeuronsOutputError(), null, 0.02f, 0.5f, 0f, 0f, 1);
+	bpt = TrainerFactory.backPropagation(nn, null, null, new MultipleNeuronsOutputError(), null, 0.02f, 0.5f, 0f, 0f, 1, 1, 1);
 	bplc = (BackPropagationLayerCalculatorImpl) bpt.getBPLayerCalculator();
 
 	l = nn.getInputLayer();
@@ -520,8 +520,8 @@ public class CNNTest {
 	Conv2DConnection b = (Conv2DConnection) nn.getOutputLayer().getConnections().get(1);
 	b.getWeights().getElements()[b.getWeights().getStartIndex()] = -3f;
 
-	SimpleInputProvider ts = new SimpleInputProvider(TensorFactory.tensor(new float[] { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1, 1.1f, 1.2f, 1.3f, 1.4f, 1.5f, 1.6f, 1.7f, 1.8f }, 0, 2, 3, 3, 1), TensorFactory.tensor(new float[] { 1, 1, 1, 1 }, 0, 1, 2, 2, 1), 1, 1);
-	BackPropagationTrainer<?> t = TrainerFactory.backPropagation(nn, ts, null, null, null, 0.5f, 0f, 0f, 0f, 1);
+	SimpleInputProvider ts = new SimpleInputProvider(new float[][] { { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1, 1.1f, 1.2f, 1.3f, 1.4f, 1.5f, 1.6f, 1.7f, 1.8f } }, new float[][] { { 1, 1, 1, 1 } });
+	BackPropagationTrainer<?> t = TrainerFactory.backPropagation(nn, ts, null, null, null, 0.5f, 0f, 0f, 0f, 1, 1, 1);
 	t.train();
 
 	it = c.getWeights().iterator();
@@ -554,7 +554,7 @@ public class CNNTest {
 	cg2.set(0.3f, 0, 0);
 	cg2.set(0.9f, 0, 1);
 
-	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(nn, new SimpleInputProvider(TensorFactory.matrix(new float[][] { { 0.35f, 0.9f } }), TensorFactory.matrix(new float[][] { { 0.5f } }), 1, 1), new SimpleInputProvider(TensorFactory.matrix(new float[][] { { 0.35f, 0.9f } }), TensorFactory.matrix(new float[][] { { 0.5f } }), 1, 1), null, null, 1f, 0f, 0f, 0f, 1);
+	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(nn, new SimpleInputProvider(new float[][] { { 0.35f, 0.9f } }, new float[][] { { 0.5f } }), new SimpleInputProvider(new float[][] { { 0.35f, 0.9f } }, new float[][] { { 0.5f } }), null, null, 1f, 0f, 0f, 0f, 1, 1, 1);
 	bpt.train();
 
 	assertEquals(0.09916, cg1.get(0, 0), 0.001);

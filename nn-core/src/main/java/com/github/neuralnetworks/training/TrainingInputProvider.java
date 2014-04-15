@@ -18,8 +18,11 @@ public interface TrainingInputProvider extends Serializable {
     float[] getNextTarget();
     List<TensorFunction> getInputModifiers();
     void after(TrainingInputData ti);
+    void before(TrainingInputData ti);
 
     public default void populateNext(TrainingInputData ti) {
+	before(ti);
+
 	// input
 	if (ti.getInput() != null) {
 	    int[] inputDims = ti.getInput().getDimensions();
