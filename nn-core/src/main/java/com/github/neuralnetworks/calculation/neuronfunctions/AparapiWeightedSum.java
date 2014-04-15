@@ -48,8 +48,7 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
      * because of the Aparapi limitations) It is an array, because of the
      * combined connections
      */
-    @Constant
-    protected final float[] input;
+    protected float[] input;
     @Constant
     protected final int[] inputStartPositions;
     @Constant
@@ -60,7 +59,7 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
     /**
      * output values
      */
-    protected final float[] output;
+    protected float[] output;
     protected final int outputStartPosition;
     protected final int outputRowStep;
     protected final int outputColumnStep;
@@ -207,5 +206,21 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
     }
 
     protected void after() {
+    }
+
+    public float[] getInput() {
+        return input;
+    }
+
+    public void setInput(float[] input) {
+        this.input = input;
+    }
+
+    public float[] getOutput() {
+        return output;
+    }
+
+    public void setOutput(float[] output) {
+        this.output = output;
     }
 }

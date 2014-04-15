@@ -8,6 +8,7 @@ import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.architecture.types.DNN;
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.util.Environment;
+import com.github.neuralnetworks.util.TensorFactory;
 
 /**
  * Training Input Provider for deep network trainers
@@ -22,13 +23,13 @@ public class DeepTrainerTrainingInputProvider implements TrainingInputProvider {
     private Set<Layer> calculatedLayers;
     private ValuesProvider layerResults;
 
-    public DeepTrainerTrainingInputProvider(TrainingInputProvider inputProvider, DNN<?> dnn, NeuralNetwork currentNN) {
+    public DeepTrainerTrainingInputProvider(TrainingInputProvider inputProvider, DNN<?> dnn, NeuralNetwork currentNN, int batchSize) {
 	super();
 	this.inputProvider = inputProvider;
 	this.dnn = dnn;
 	this.currentNN = currentNN;
 	this.calculatedLayers = new HashSet<>();
-	this.layerResults = Environment.getInstance().getValuesProvider(dnn);
+	this.layerResults = TensorFactory.tensorProvider(dnn, batchSize, Environment.getInstance().getUseSharedMemory());
     }
 
     @Override

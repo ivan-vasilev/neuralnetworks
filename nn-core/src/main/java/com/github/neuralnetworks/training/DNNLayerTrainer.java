@@ -32,7 +32,7 @@ public class DNNLayerTrainer extends Trainer<DNN<? extends NeuralNetwork>> {
 	DNN<?> dnn = getNeuralNetwork();
 
 	for (NeuralNetwork nn : dnn.getNeuralNetworks()) {
-	    DeepTrainerTrainingInputProvider inputProvider = new DeepTrainerTrainingInputProvider(getTrainingInputProvider(), dnn, nn);
+	    DeepTrainerTrainingInputProvider inputProvider = new DeepTrainerTrainingInputProvider(getTrainingInputProvider(), dnn, nn, getTrainingBatchSize());
 	    inputProvider.reset();
 	    OneStepTrainer<?> trainer = getTrainers().get(nn);
 	    trainer.setTrainingInputProvider(inputProvider);

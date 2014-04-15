@@ -10,8 +10,10 @@ import com.github.neuralnetworks.events.TrainingEvent;
 import com.github.neuralnetworks.events.TrainingEventListener;
 import com.github.neuralnetworks.training.OneStepTrainer;
 import com.github.neuralnetworks.training.TrainingInputData;
+import com.github.neuralnetworks.training.TrainingInputDataImpl;
 import com.github.neuralnetworks.training.TrainingInputProvider;
 import com.github.neuralnetworks.util.Environment;
+import com.github.neuralnetworks.util.TensorFactory;
 import com.github.neuralnetworks.util.UniqueList;
 
 /**
@@ -58,21 +60,25 @@ public class EarlyStoppingListener implements TrainingEventListener {
 		NeuralNetwork n = t.getNeuralNetwork();
 
 		if (n.getLayerCalculator() != null) {
-		    Set<Layer> calculatedLayers = new UniqueList<>();
-		    TrainingInputData input = null;
 		    OutputError outputError = t.getOutputError();
 		    outputError.reset();
 		    inputProvider.reset();
 
-		    while ((input = inputProvider.getNextInput()) != null) {
+		    ValuesProvider vp = mbe.getResults();
+		    if (vp == null) {
+			vp = TensorFactory.tensorProvider(n, 1, Environment.getInstance().getUseSharedMemory());
+		    }
+		    if (vp.get(outputError) == null) {
+			vp.add(outputError, vp.get(n.getInputLayer()).getDimensions());
+		    }
+		    TrainingInputData input = new TrainingInputDataImpl(vp.get(n.getInputLayer()), vp.get(outputError));
+
+		    Set<Layer> calculatedLayers = new UniqueList<>();
+		    for (int i = 0; i < inputProvider.getInputSize(); i ++) {
+			inputProvider.populateNext(input);
 			calculatedLayers.clear();
 			calculatedLayers.add(n.getInputLayer());
-			ValuesProvider vp = mbe.getResults();
-			if (vp == null) {
-			    vp = Environment.getInstance().getValuesProvider(n);
-			}
 
-			vp.replace(n.getInputLayer(), input.getInput());
 			n.getLayerCalculator().calculate(n, n.getOutputLayer(), calculatedLayers, vp);
 
 			outputError.addItem(vp.get(n.getOutputLayer()), input.getTarget());

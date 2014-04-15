@@ -18,6 +18,7 @@ import com.github.neuralnetworks.training.random.NNRandomInitializer;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.Properties;
+import com.github.neuralnetworks.util.TensorFactory;
 import com.github.neuralnetworks.util.UniqueList;
 
 /**
@@ -64,23 +65,25 @@ public abstract class Trainer<N extends NeuralNetwork> implements Serializable {
 	    triggerEvent(new TestingStartedEvent(this));
 
 	    Set<Layer> calculatedLayers = new UniqueList<>();
-	    ValuesProvider results = Environment.getInstance().getValuesProvider(n);
-	    TrainingInputData input = null;
+	    ValuesProvider results = TensorFactory.tensorProvider(n, getTestingBatchSize(), Environment.getInstance().getUseSharedMemory());
 
-	    if (getOutputError() != null) {
+	    OutputError oe = getOutputError();
+	    if (oe != null) {
 		getOutputError().reset();
+		results.add(oe, results.get(n.getInputLayer()).getDimensions());
 	    }
 
-	    while ((input = ip.getNextInput()) != null) {
+	    TrainingInputData input = new TrainingInputDataImpl(results.get(n.getInputLayer()), results.get(oe));
+	    for (int i = 0; i < ip.getInputSize(); i += getTestingBatchSize()) {
+		ip.populateNext(input);
 		calculatedLayers.clear();
 		calculatedLayers.add(n.getInputLayer());
-		results.replace(n.getInputLayer(), input.getInput());
 		n.getLayerCalculator().calculate(n, n.getOutputLayer(), calculatedLayers, results);
-
-		if (getOutputError() != null) {
-		    getOutputError().addItem(results.get(n.getOutputLayer()), input.getTarget());
+		
+		if (oe != null) {
+		    oe.addItem(results.get(n.getOutputLayer()), input.getTarget());
 		}
-
+		
 		triggerEvent(new MiniBatchFinishedEvent(this, input, results, null));
 	    }
 	    
@@ -134,6 +137,30 @@ public abstract class Trainer<N extends NeuralNetwork> implements Serializable {
     
     public void setRandomInitializer(NNRandomInitializer randomInitializer) {
 	properties.setParameter(Constants.RANDOM_INITIALIZER, randomInitializer);
+    }
+
+    public Integer getTrainingBatchSize() {
+	return properties.getParameter(Constants.TRAINING_BATCH_SIZE);
+    }
+
+    public void setTrainingBatchSize(int batchSize) {
+	properties.setParameter(Constants.TRAINING_BATCH_SIZE, batchSize);
+    }
+    
+    public Integer getTestingBatchSize() {
+	return properties.getParameter(Constants.TEST_BATCH_SIZE);
+    }
+    
+    public void setTestingBatchSize(int batchSize) {
+	properties.setParameter(Constants.TEST_BATCH_SIZE, batchSize);
+    }
+    
+    public Integer getEpochs() {
+	return properties.getParameter(Constants.EPOCHS);
+    }
+    
+    public void setEpochs(int epochs) {
+	properties.setParameter(Constants.EPOCHS, epochs);
     }
 
     public void addEventListener(TrainingEventListener listener) {

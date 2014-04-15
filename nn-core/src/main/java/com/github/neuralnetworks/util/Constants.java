@@ -32,5 +32,7 @@ public class Constants {
     public static final String INACTIVE_CORRUPTED_VALUE = "inactiveCorruptedValue";
     public static final String ACTIVE_CORRUPTED_VALUE = "activeCorruptedValue";
     public static final String WEIGHT_UDPATES = "weightUpdates";
-    public static final String BATCH_SIZE = "batchSize";
+    public static final String TRAINING_BATCH_SIZE = "batchSize";
+    public static final String TEST_BATCH_SIZE = "testBatchSize";
+    public static final String EPOCHS = "epochs";
 }

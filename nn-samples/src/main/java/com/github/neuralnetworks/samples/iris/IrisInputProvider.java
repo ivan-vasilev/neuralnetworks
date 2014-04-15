@@ -3,79 +3,88 @@ package com.github.neuralnetworks.samples.iris;
 import java.util.Random;
 
 import com.github.neuralnetworks.input.InputConverter;
-import com.github.neuralnetworks.training.TrainingInputData;
-import com.github.neuralnetworks.training.TrainingInputDataImpl;
-import com.github.neuralnetworks.training.TrainingInputProvider;
+import com.github.neuralnetworks.training.TrainingInputProviderImpl;
 import com.github.neuralnetworks.util.Matrix;
 import com.github.neuralnetworks.util.TensorFactory;
 
 /**
  * Iris dataset (http://archive.ics.uci.edu/ml/datasets/Iris) with random order
  */
-public class IrisInputProvider implements TrainingInputProvider {
+public class IrisInputProvider extends TrainingInputProviderImpl {
 
     private static final long serialVersionUID = 1L;
 
     private Matrix dataset;
-    private TrainingInputDataImpl currentExample;
-    private Integer[] target;
-    private InputConverter inputConverter;
-    private int currentInputCount;
-    private int totalInputSize;
-    private int batchSize;
+    private float[] input;
+    private float[] target;
+    private InputConverter targetConverter;
     private Random random;
     private boolean useRandom;
     private boolean scale;
     private boolean attachTargetToInput;
 
-    public IrisInputProvider(int batchSize, int totalInputSize, InputConverter inputConverter, boolean useRandom, boolean scale, boolean attachTargetToInput) {
+    public IrisInputProvider(InputConverter targetConverter, boolean useRandom, boolean scale, boolean attachTargetToInput) {
 	super();
-	this.batchSize = batchSize;
-	this.totalInputSize = totalInputSize;
-	this.inputConverter = inputConverter;
-	this.target = new Integer[batchSize];
+	this.targetConverter = targetConverter;
 	this.random = new Random();
 	this.useRandom = useRandom;
 	this.scale = scale;
 	this.attachTargetToInput = attachTargetToInput;
 	this.dataset = createDataset();
-	this.currentExample = new TrainingInputDataImpl(TensorFactory.tensor(dataset.getRows() - 1 + (attachTargetToInput == true ? 1 : 0), batchSize));
+	this.input = new float[dataset.getRows() + (attachTargetToInput == false ? 1 : 0)];
+	this.target = new float[3];
 	reset();
     }
 
+//    @Override
+//    public TrainingInputData getNextInput() {
+//	if (currentInputCount < totalInputSize) {
+//	    for (int i = 0; i < batchSize; i++, currentInputCount++) {
+//		int k = useRandom ? random.nextInt(150) : currentInputCount % 150;
+//		for (int j = 0; j < dataset.getRows() - 1; j++) {
+//		    currentExample.getInput().set(dataset.get(j, k), j, i);
+//		}
+//
+//		if (attachTargetToInput) {
+//		    Matrix input = (Matrix) currentExample.getInput();
+//		    input.set(dataset.get(dataset.getRows() - 1, k), input.getRows() - 1, i);
+//		}
+//
+//		target[i] = (int) dataset.get(dataset.getRows() - 1, k);
+//	    }
+//
+//	    currentExample.setTarget(inputConverter.convert(target));
+//
+//	    return currentExample;
+//	}
+//
+//	return null;
+//    }
+
     @Override
-    public TrainingInputData getNextInput() {
-	if (currentInputCount < totalInputSize) {
-	    for (int i = 0; i < batchSize; i++, currentInputCount++) {
-		int k = useRandom ? random.nextInt(150) : currentInputCount % 150;
-		for (int j = 0; j < dataset.getRows() - 1; j++) {
-		    currentExample.getInput().set(dataset.get(j, k), j, i);
-		}
-
-		if (attachTargetToInput) {
-		    Matrix input = (Matrix) currentExample.getInput();
-		    input.set(dataset.get(dataset.getRows() - 1, k), input.getRows() - 1, i);
-		}
-
-		target[i] = (int) dataset.get(dataset.getRows() - 1, k);
-	    }
-
-	    currentExample.setTarget(inputConverter.convert(target));
-
-	    return currentExample;
+    public float[] getNextInput() {
+	int k = useRandom ? random.nextInt(150) : currentInput % 150;
+	for (int j = 0; j < dataset.getRows() - 1; j++) {
+	    input[j] = dataset.get(j, k);
 	}
 
-	return null;
+	if (attachTargetToInput) {
+	    input[input.length - 1] = dataset.get(dataset.getRows() - 1, k);
+	}
+
+	return input;
+    }
+
+    @Override
+    public float[] getNextTarget() {
+	int k = useRandom ? random.nextInt(150) : currentInput % 150;
+	targetConverter.convert(dataset.get(dataset.getRows() - 1, k), target);
+	return target;
     }
 
     @Override
     public int getInputSize() {
-	return totalInputSize;
-    }
-
-    @Override
-    public void reset() {
-	currentInputCount = 0;
+	return 150;
     }
 
     protected Matrix createDataset() {
@@ -251,6 +260,7 @@ public class IrisInputProvider implements TrainingInputProvider {
 		}
 	    }
 	}
+
 	return result;
     }
 }

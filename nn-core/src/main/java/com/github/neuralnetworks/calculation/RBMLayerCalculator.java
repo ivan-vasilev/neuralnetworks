@@ -1,12 +1,13 @@
 package com.github.neuralnetworks.calculation;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-import com.github.neuralnetworks.architecture.Layer;
+import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.types.RBM;
-import com.github.neuralnetworks.calculation.memory.SharedMemoryValuesProvider;
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
+import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.Matrix;
 import com.github.neuralnetworks.util.TensorFactory;
 
@@ -14,75 +15,83 @@ import com.github.neuralnetworks.util.TensorFactory;
  * Implementation of LayerCalculatorImpl for RBMs
  * Contains some helper methods like calculateVisibleLayer and calculateHiddenLayer and also takes gibbs sampling into account
  */
-public class RBMLayerCalculator extends LayerCalculatorImpl {
+public class RBMLayerCalculator implements Serializable {
 
-    private static final long serialVersionUID = -7524966192939615856L;
+    private static final long serialVersionUID = 1L;
 
-    private Set<Layer> calculatedLayers;
-    private ValuesProvider results;
+    private RBM rbm;
+    private ValuesProvider posPhaseVP;
+    private ValuesProvider negPhaseVP;
+    private ConnectionCalculator posPhaseCC;
+    private ConnectionCalculator negPhaseVisibleToHiddenCC;
+    private ConnectionCalculator negPhaseHiddenToVisibleCC;
 
-    public RBMLayerCalculator(RBM rbm) {
+    public RBMLayerCalculator(RBM rbm, int miniBatchSize, ConnectionCalculator posPhaseCC, ConnectionCalculator negPhaseVisibleToHiddenCC, ConnectionCalculator negPhaseHiddenToVisibleCC) {
 	super();
-	calculatedLayers = new HashSet<>();
-	results = new SharedMemoryValuesProvider(rbm);
+	this.rbm = rbm;
+	this.posPhaseCC = posPhaseCC;
+	this.negPhaseVisibleToHiddenCC = negPhaseVisibleToHiddenCC;
+	this.negPhaseHiddenToVisibleCC = negPhaseHiddenToVisibleCC;
+	this.posPhaseVP = TensorFactory.tensorProvider(rbm, miniBatchSize, Environment.getInstance().getUseSharedMemory());
+	this.negPhaseVP = TensorFactory.tensorProvider(posPhaseVP, rbm);
     }
 
     public void gibbsSampling(RBM rbm, Matrix posPhaseVisible, Matrix posPhaseHidden, Matrix negPhaseVisible, Matrix negPhaseHidden, int samplingCount, boolean resetNetwork, boolean useIntermediateResults) {
-	Matrix hidden, visible;
-	calculateHiddenLayer(rbm, posPhaseVisible, posPhaseHidden);
+	List<Connections> connections = new ArrayList<>();
+	connections.add(rbm.getMainConnections());
+	if (rbm.getHiddenBiasConnections() != null) {
+	    connections.add(rbm.getHiddenBiasConnections());
+	}
+	posPhaseCC.calculate(connections, posPhaseVP, rbm.getHiddenLayer());
 
 	if (resetNetwork) {
-	    System.arraycopy(posPhaseHidden.getElements(), 0, negPhaseHidden.getElements(), 0, negPhaseHidden.getElements().length);
+	    TensorFactory.copy(posPhaseVP.get(rbm.getHiddenLayer()), negPhaseVP.get(rbm.getHiddenLayer()));
+	    //System.arraycopy(posPhaseHidden.getElements(), 0, negPhaseHidden.getElements(), 0, negPhaseHidden.getElements().length);
 	}
 
 	// Gibbs sampling
 	for (int i = 1; i <= samplingCount; i++) {
-	    hidden = getLayerResult(rbm.getHiddenLayer(), negPhaseHidden, useIntermediateResults);
-	    calculateVisibleLayer(rbm, negPhaseVisible, hidden);
-
-	    visible = getLayerResult(rbm.getVisibleLayer(), negPhaseVisible, useIntermediateResults);
-	    calculateHiddenLayer(rbm, visible, negPhaseHidden);
-	}
-    }
-
-    public void calculateVisibleLayer(RBM rbm, Matrix visibleLayerResults, Matrix hiddenLayerResults) {
-	Layer visibleLayer = rbm.getVisibleLayer();
-	Layer hiddenLayer = rbm.getHiddenLayer();
-
-	calculatedLayers.clear();
-	calculatedLayers.add(hiddenLayer);
-
-	results.replace(visibleLayer, visibleLayerResults);
-	results.replace(hiddenLayer, hiddenLayerResults);
-
-	super.calculate(rbm, visibleLayer, calculatedLayers, results);
-    }
-
-    public void calculateHiddenLayer(RBM rbm, Matrix visibleLayerResults, Matrix hiddenLayerResults) {
-	Layer visibleLayer = rbm.getVisibleLayer();
-	Layer hiddenLayer = rbm.getHiddenLayer();
-
-	calculatedLayers.clear();
-	calculatedLayers.add(visibleLayer);
-
-	results.replace(visibleLayer, visibleLayerResults);
-	results.replace(hiddenLayer, hiddenLayerResults);
-
-	super.calculate(rbm, hiddenLayer, calculatedLayers, results);
-    }
-
-    private Matrix getLayerResult(Layer layer, Matrix realResult, boolean useIntermediateResults) {
-	Matrix result = realResult;
-	if (useIntermediateResults) {
-	    if (results.getAllValues(layer, realResult.getRows(), realResult.getColumns()).size() < 2) {
-		results.add(layer, TensorFactory.tensor(realResult));
+	    connections.clear();
+	    connections.add(rbm.getMainConnections());
+	    if (rbm.getHiddenBiasConnections() != null) {
+		connections.add(rbm.getHiddenBiasConnections());
 	    }
+	    negPhaseHiddenToVisibleCC.calculate(connections, negPhaseVP, rbm.getVisibleLayer());
 
-	    result = (Matrix) results.getAllValues(layer, realResult.getRows(), realResult.getColumns()).get(1);
-
-	    System.arraycopy(realResult.getElements(), 0, result.getElements(), 0, result.getElements().length);
+	    connections.clear();
+	    connections.add(rbm.getMainConnections());
+	    if (rbm.getVisibleBiasConnections() != null) {
+		connections.add(rbm.getVisibleBiasConnections());
+	    }
+	    negPhaseVisibleToHiddenCC.calculate(connections, negPhaseVP, rbm.getHiddenLayer());
 	}
+    }
 
-	return result;
+    public Matrix getPositivePhaseVisible() {
+	return (Matrix) posPhaseVP.get(rbm.getVisibleLayer());
+    }
+
+    public Matrix getPositivePhaseHidden() {
+	return (Matrix) posPhaseVP.get(rbm.getHiddenLayer());
+    }
+
+    public Matrix getNegativePhaseVisible() {
+	return (Matrix) negPhaseVP.get(rbm.getVisibleLayer());
+    }
+
+    public Matrix getNegativePhaseHidden() {
+	return (Matrix) negPhaseVP.get(rbm.getHiddenLayer());
+    }
+
+    public ConnectionCalculator getPosPhaseCC() {
+        return posPhaseCC;
+    }
+
+    public ConnectionCalculator getNegPhaseVisibleToHiddenCC() {
+        return negPhaseVisibleToHiddenCC;
+    }
+
+    public ConnectionCalculator getNegPhaseHiddenToVisibleCC() {
+        return negPhaseHiddenToVisibleCC;
     }
 }

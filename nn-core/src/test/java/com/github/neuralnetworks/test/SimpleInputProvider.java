@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.stream.IntStream;
 
 import com.github.neuralnetworks.training.TrainingInputData;
-import com.github.neuralnetworks.training.TrainingInputProvider;
+import com.github.neuralnetworks.training.TrainingInputProviderImpl;
 import com.github.neuralnetworks.util.Tensor;
 import com.github.neuralnetworks.util.Tensor.TensorIterator;
 import com.github.neuralnetworks.util.TensorFactory;
@@ -13,7 +13,7 @@ import com.github.neuralnetworks.util.TensorFactory;
  * Simple input provider for testing purposes.
  * Training and target data are two dimensional float arrays
  */
-public class SimpleInputProvider implements TrainingInputProvider {
+public class SimpleInputProvider extends TrainingInputProviderImpl {
 
     private static final long serialVersionUID = 1L;
 
@@ -55,6 +55,19 @@ public class SimpleInputProvider implements TrainingInputProvider {
     @Override
     public void reset() {
 	current = 0;
+    }
+
+
+    @Override
+    public float[] getNextInput() {
+	// TODO Auto-generated method stub
+	return null;
+    }
+
+    @Override
+    public float[] getNextTarget() {
+	// TODO Auto-generated method stub
+	return null;
     }
 
     @Override

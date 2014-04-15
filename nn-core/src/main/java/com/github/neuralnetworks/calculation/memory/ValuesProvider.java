@@ -48,15 +48,19 @@ public class ValuesProvider implements Serializable {
      */
     @SuppressWarnings("unchecked")
     public <T extends Tensor> T get(Object key, int... dimensions) {
-	if (dimensions == null || dimensions.length == 0) {
-	    if (values.get(key) != null && values.get(key).size() == 1) {
-		return (T) values.get(key).iterator().next();
-	    } else {
-		throw new IllegalArgumentException("No dimensions provided");
+	if (key != null) {
+	    if (dimensions == null || dimensions.length == 0) {
+		if (values.get(key) != null && values.get(key).size() == 1) {
+		    return (T) values.get(key).iterator().next();
+		} else {
+		    throw new IllegalArgumentException("No dimensions provided");
+		}
 	    }
+	    
+	    return (T) values.get(key).stream().filter(t -> Arrays.equals(t.getDimensions(), dimensions)).findFirst().orElse(null);
 	}
 
-	return (T) values.get(key).stream().filter(t -> Arrays.equals(t.getDimensions(), dimensions)).findFirst().orElse(null);
+	return null;
     }
 
     /**
@@ -70,7 +74,7 @@ public class ValuesProvider implements Serializable {
 	    values.put(key, set = new UniqueList<Tensor>());
 	}
 
-	if (useSharedWeights()) {
+	if (useSharedMemory()) {
 	    float[] elements = getElements();
 	    if (elements == null) {
 		elements = new float[0];
@@ -87,11 +91,30 @@ public class ValuesProvider implements Serializable {
 	}
     }
 
+
+    /**
+     * Add tensor t
+     * @param key
+     * @param t
+     */
+    public void add(Object key, Tensor t) {
+	if (useSharedMemory() && t.getElements() != getElements()) {
+	    throw new IllegalArgumentException("Tensor doesn't use the same base array");
+	}
+
+	List<Tensor> set = values.get(key);
+	if (set == null) {
+	    values.put(key, set = new UniqueList<Tensor>());
+	}
+
+	set.add(t);
+    }
+
     public Set<Tensor> getTensors() {
         return tensors;
     }
 
-    private boolean useSharedWeights() {
+    public boolean useSharedMemory() {
 	return tensors != null;
     }
 

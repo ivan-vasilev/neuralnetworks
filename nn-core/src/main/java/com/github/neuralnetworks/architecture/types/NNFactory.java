@@ -368,62 +368,42 @@ public class NNFactory {
 	return result;
     }
 
-    public static RBMLayerCalculator rbmWeightedSumWeightedSum(RBM rbm) {
-	RBMLayerCalculator lc = new RBMLayerCalculator(rbm);
-	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiWeightedSumConnectionCalculator());
-	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiWeightedSumConnectionCalculator());
-	populateBiasLayers(lc, rbm);
-	return lc;
+    public static RBMLayerCalculator rbmWeightedSumWeightedSum(RBM rbm, int batchSize) {
+	return new RBMLayerCalculator(rbm, batchSize, new AparapiWeightedSumConnectionCalculator(), new AparapiWeightedSumConnectionCalculator(), new AparapiWeightedSumConnectionCalculator());
     }
 
-    public static RBMLayerCalculator rbmSigmoidSigmoid(RBM rbm) {
-	RBMLayerCalculator lc = new RBMLayerCalculator(rbm);
-	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiSigmoid());
-	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiSigmoid());
-	populateBiasLayers(lc, rbm);
-	return lc;
+    public static RBMLayerCalculator rbmSigmoidSigmoid(RBM rbm, int batchSize) {
+	return new RBMLayerCalculator(rbm, batchSize, new AparapiSigmoid(), new AparapiSigmoid(), new AparapiSigmoid());
     }
 
-    public static RBMLayerCalculator rbmSoftReluSoftRelu(RBM rbm) {
-	RBMLayerCalculator lc = new RBMLayerCalculator(rbm);
-
+    public static RBMLayerCalculator rbmSoftReluSoftRelu(RBM rbm, int batchSize) {
 	AparapiSoftReLU c1 = new AparapiSoftReLU();
 	c1.addActivationFunction(new SoftmaxFunction());
-	lc.addConnectionCalculator(rbm.getVisibleLayer(), c1);
-
 
 	AparapiSoftReLU c2 = new AparapiSoftReLU();
 	c2.addActivationFunction(new SoftmaxFunction());
-	lc.addConnectionCalculator(rbm.getHiddenLayer(), c2);
 
-	populateBiasLayers(lc, rbm);
+	AparapiSoftReLU c3 = new AparapiSoftReLU();
+	c3.addActivationFunction(new SoftmaxFunction());
 
-	return lc;
+	return new RBMLayerCalculator(rbm, batchSize, c1, c2, c3);
     }
     
-    public static RBMLayerCalculator rbmReluRelu(RBM rbm) {
-	RBMLayerCalculator lc = new RBMLayerCalculator(rbm);
-
+    public static RBMLayerCalculator rbmReluRelu(RBM rbm, int batchSize) {
 	AparapiReLU c1 = new AparapiReLU();
 	c1.addActivationFunction(new SoftmaxFunction());
-	lc.addConnectionCalculator(rbm.getVisibleLayer(), c1);
 
 	AparapiReLU c2 = new AparapiReLU();
 	c2.addActivationFunction(new SoftmaxFunction());
-	lc.addConnectionCalculator(rbm.getHiddenLayer(), c2);
 
-	populateBiasLayers(lc, rbm);
+	AparapiReLU c3 = new AparapiReLU();
+	c3.addActivationFunction(new SoftmaxFunction());
 
-	return lc;
+	return new RBMLayerCalculator(rbm, batchSize, c1, c2, c3);
     }
 
-    public static RBMLayerCalculator rbmTanhTanh(RBM rbm) {
-	RBMLayerCalculator lc = new RBMLayerCalculator(rbm);
-	lc.addConnectionCalculator(rbm.getVisibleLayer(), new AparapiTanh());
-	lc.addConnectionCalculator(rbm.getHiddenLayer(), new AparapiTanh());
-	populateBiasLayers(lc, rbm);
-
-	return lc;
+    public static RBMLayerCalculator rbmTanhTanh(RBM rbm, int batchSize) {
+	return new RBMLayerCalculator(rbm, batchSize, new AparapiTanh(), new AparapiTanh(), new AparapiTanh());
     }
 
     public static DBN dbn(int[] layers, boolean addBias, boolean useSharedMemory) {

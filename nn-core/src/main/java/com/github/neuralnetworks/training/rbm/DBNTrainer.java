@@ -8,6 +8,7 @@ import com.github.neuralnetworks.events.TrainingEvent;
 import com.github.neuralnetworks.events.TrainingEventListener;
 import com.github.neuralnetworks.training.DNNLayerTrainer;
 import com.github.neuralnetworks.util.Properties;
+import com.github.neuralnetworks.util.TensorFactory;
 
 /**
  * Default implementation for training of Deep Belief Networks
@@ -31,16 +32,16 @@ public class DBNTrainer extends DNNLayerTrainer implements TrainingEventListener
 
 	    if (list.indexOf(current) < list.size() - 1) {
 		RBM next = (RBM) list.get(list.indexOf(current) + 1);
-		if (current.getMainConnections().getWeights().getElements().length == next.getMainConnections().getWeights().getElements().length) {
-		    System.arraycopy(current.getMainConnections().getWeights().getElements(), 0, next.getMainConnections().getWeights().getElements(), 0, next.getMainConnections().getWeights().getElements().length);
+		if (current.getMainConnections().getWeights().getSize() == next.getMainConnections().getWeights().getSize()) {
+		    TensorFactory.copy(current.getMainConnections().getWeights(), next.getMainConnections().getWeights());
 		}
 
-		if (current.getVisibleBiasConnections() != null && next.getVisibleBiasConnections() != null && current.getVisibleBiasConnections().getWeights().getElements().length == next.getVisibleBiasConnections().getWeights().getElements().length) {
-		    System.arraycopy(current.getVisibleBiasConnections().getWeights().getElements(), 0, next.getVisibleBiasConnections().getWeights().getElements(), 0, next.getVisibleBiasConnections().getWeights().getElements().length);
+		if (current.getVisibleBiasConnections() != null && next.getVisibleBiasConnections() != null && current.getVisibleBiasConnections().getWeights().getSize() == next.getVisibleBiasConnections().getWeights().getSize()) {
+		    TensorFactory.copy(current.getVisibleBiasConnections().getWeights(), next.getVisibleBiasConnections().getWeights());
 		}
 		
-		if (current.getHiddenBiasConnections() != null && next.getHiddenBiasConnections() != null && current.getHiddenBiasConnections().getWeights().getElements().length == next.getHiddenBiasConnections().getWeights().getElements().length) {
-		    System.arraycopy(current.getHiddenBiasConnections().getWeights().getElements(), 0, next.getHiddenBiasConnections().getWeights().getElements(), 0, next.getHiddenBiasConnections().getWeights().getElements().length);
+		if (current.getHiddenBiasConnections() != null && next.getHiddenBiasConnections() != null && current.getHiddenBiasConnections().getWeights().getSize() == next.getHiddenBiasConnections().getWeights().getSize()) {
+		    TensorFactory.copy(current.getHiddenBiasConnections().getWeights(), next.getHiddenBiasConnections().getWeights());
 		}
 	    }
 	}

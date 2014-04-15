@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.github.neuralnetworks.calculation.neuronfunctions.TensorFunction;
+import com.github.neuralnetworks.input.InputConverter;
 
 public abstract class TrainingInputProviderImpl implements TrainingInputProvider {
 
@@ -14,14 +15,28 @@ public abstract class TrainingInputProviderImpl implements TrainingInputProvider
      */
     private List<TensorFunction> inputModifiers;
 
-    @Override
-    public TrainingInputData getNextInput() {
-	TrainingInputData result = getNextUnmodifiedInput();
-	if (result != null && inputModifiers != null) {
-	    inputModifiers.forEach(m -> m.value(result.getInput()));
-	}
+    /**
+     * Converter for the target
+     */
+    private InputConverter inputConverter;
 
-	return result;
+    /**
+     * Counter
+     */
+    protected int currentInput;
+
+    public TrainingInputProviderImpl() {
+	super();
+    }
+
+    public TrainingInputProviderImpl(InputConverter inputConverter) {
+	super();
+	this.inputConverter = inputConverter;
+    }
+
+    @Override
+    public List<TensorFunction> getInputModifiers() {
+        return inputModifiers;
     }
 
     public void addInputModifier(TensorFunction modifier) {
@@ -38,8 +53,25 @@ public abstract class TrainingInputProviderImpl implements TrainingInputProvider
 	}
     }
 
-    /**
-     * @return base input without any input modifiers
-     */
-    protected abstract TrainingInputData getNextUnmodifiedInput();
+    public InputConverter getInputConverter() {
+        return inputConverter;
+    }
+
+    public void setInputConverter(InputConverter inputConverter) {
+        this.inputConverter = inputConverter;
+    }
+
+    @Override
+    public void after(TrainingInputData ti) {
+	if (ti.getInput() != null) {
+	    currentInput += ti.getInput().getDimensions()[ti.getInput().getDimensions().length - 1];
+	} else if (ti.getTarget() != null) {
+	    currentInput += ti.getTarget().getDimensions()[ti.getTarget().getDimensions().length - 1];
+	}
+    }
+
+    @Override
+    public void reset() {
+	currentInput = 0;
+    }
 }

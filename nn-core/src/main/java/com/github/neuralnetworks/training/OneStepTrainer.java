@@ -4,7 +4,6 @@ import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.training.events.MiniBatchFinishedEvent;
 import com.github.neuralnetworks.training.events.TrainingFinishedEvent;
 import com.github.neuralnetworks.training.events.TrainingStartedEvent;
-import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
 
 /**
@@ -33,15 +32,15 @@ public abstract class OneStepTrainer<N extends NeuralNetwork> extends Trainer<N>
 	stopTraining = false;
 
 	if (getRandomInitializer() != null) {
-	    getRandomInitializer().initialize(getNeuralNetwork());;
+	    getRandomInitializer().initialize(getNeuralNetwork());
 	}
 
 	getTrainingInputProvider().reset();
 
-	int batch = 0;
-	TrainingInputData input = null;
-	while ((input = getTrainingInputProvider().getNextInput()) != null && !stopTraining) {
-	    learnInput(input, batch++);
+	for (int i = 0, batch = 0; i < getEpochs() * getTrainingInputProvider().getInputSize() || stopTraining; i += getTrainingBatchSize(), batch++) {
+	    TrainingInputData input = getInput();
+	    getTrainingInputProvider().populateNext(input);
+	    learnInput(batch);
 	    triggerEvent(new MiniBatchFinishedEvent(this, input, null, batch));
 	}
 
@@ -55,13 +54,10 @@ public abstract class OneStepTrainer<N extends NeuralNetwork> extends Trainer<N>
     /**
      * Learning of one batch of examples
      */
-    protected abstract void learnInput(TrainingInputData data, int batch);
+    protected abstract void learnInput(int batch);
 
-    public Integer getBatchSize() {
-	return properties.getParameter(Constants.BATCH_SIZE);
-    }
-
-    public void setBatchSize(int batchSize) {
-	properties.setParameter(Constants.BATCH_SIZE, batchSize);
-    }
+    /**
+     * @return the input data to be populated
+     */
+    protected abstract TrainingInputData getInput();
 }

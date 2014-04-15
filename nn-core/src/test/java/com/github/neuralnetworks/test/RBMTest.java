@@ -2,12 +2,16 @@ package com.github.neuralnetworks.test;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.junit.Test;
 
 import com.amd.aparapi.Kernel.EXECUTION_MODE;
+import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.architecture.types.RBM;
-import com.github.neuralnetworks.calculation.RBMLayerCalculator;
+import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.input.MultipleNeuronsOutputError;
 import com.github.neuralnetworks.training.TrainerFactory;
 import com.github.neuralnetworks.training.TrainingInputProvider;
@@ -47,8 +51,7 @@ public class RBMTest {
 	MultipleNeuronsOutputError error = new MultipleNeuronsOutputError();
 
 	// Contrastive divergence training
-	AparapiCDTrainer t = TrainerFactory.cdSigmoidTrainer(rbm, trainInputProvider, testInputProvider, error, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.02f, 0.5f, 0f, 0f, 1, false);
-	t.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
+	AparapiCDTrainer t = TrainerFactory.cdSigmoidTrainer(rbm, trainInputProvider, testInputProvider, error, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.02f, 0.5f, 0f, 0f, 1, 1, false);
 
 	// log data
 	t.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName(), true, false));
@@ -88,8 +91,7 @@ public class RBMTest {
 	MultipleNeuronsOutputError error = new MultipleNeuronsOutputError();
 
 	// Persistent Contrastive divergence trainer
-	AparapiCDTrainer t = TrainerFactory.cdSigmoidTrainer(rbm, trainInputProvider, testInputProvider, error, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.02f, 0.5f, 0f, 0f, 1, true);
-	t.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
+	AparapiCDTrainer t = TrainerFactory.cdSigmoidTrainer(rbm, trainInputProvider, testInputProvider, error, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.02f, 0.5f, 0f, 0f, 1, 1, true);
 
 	// log data
 	t.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName(), true, false));
@@ -106,7 +108,7 @@ public class RBMTest {
     @Test
     public void testRBMLayerCalculator1() {
 	RBM rbm = NNFactory.rbm(2, 2, false, true);
-	rbm.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
+	rbm.setLayerCalculator(NNFactory.lcSigmoid(rbm, null));
 
 	Matrix cg1 = rbm.getMainConnections().getWeights();
 	cg1.set(0.1f, 0, 0);
@@ -114,34 +116,42 @@ public class RBMTest {
 	cg1.set(0.4f, 1, 0);
 	cg1.set(0.6f, 1, 1);
 
-	RBMLayerCalculator lc = (RBMLayerCalculator) rbm.getLayerCalculator();
 
-	Matrix visible = TensorFactory.matrix(new float[] { 0.35f, 0.9f }, 1);
-	Matrix hidden = TensorFactory.tensor(2, 1);
-	lc.calculateHiddenLayer(rbm, visible, hidden);
+	ValuesProvider vp = TensorFactory.tensorProvider(rbm, 1, true);
+	Matrix visible = vp.get(rbm.getVisibleLayer());
+	visible.set(0.35f, 0, 0);
+	visible.set(0.9f, 1, 0);
 
+	Set<Layer> calculated = new HashSet<Layer>();
+	calculated.add(rbm.getVisibleLayer());
+	rbm.getLayerCalculator().calculate(rbm, rbm.getHiddenLayer(), calculated, vp);
+
+	Matrix hidden = vp.get(rbm.getHiddenLayer());
 	assertEquals(0.68, hidden.get(0, 0), 0.01);
 	assertEquals(0.6637, hidden.get(1, 0), 0.01);
     }
-
+    
     @Test
     public void testRBMLayerCalculator2() {
 	RBM rbm = NNFactory.rbm(2, 2, false, true);
-	rbm.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
-
+	rbm.setLayerCalculator(NNFactory.lcSigmoid(rbm, null));
+	
 	Matrix cg1 = rbm.getMainConnections().getWeights();
 	cg1.set(0.1f, 0, 0);
 	cg1.set(0.8f, 1, 0);
 	cg1.set(0.4f, 0, 1);
 	cg1.set(0.6f, 1, 1);
-
-	RBMLayerCalculator lc = (RBMLayerCalculator) rbm.getLayerCalculator();
-
-	Matrix visible = TensorFactory.tensor(2, 1);
-	Matrix hidden = TensorFactory.matrix(new float[] { 0.35f, 0.9f }, 1);
-
-	lc.calculateVisibleLayer(rbm, visible, hidden);
-
+	
+	ValuesProvider vp = TensorFactory.tensorProvider(rbm, 1, true);
+	Matrix hidden = vp.get(rbm.getHiddenLayer());
+	hidden.set(0.35f, 0, 0);
+	hidden.set(0.9f, 1, 0);
+	
+	Set<Layer> calculated = new HashSet<Layer>();
+	calculated.add(rbm.getHiddenLayer());
+	rbm.getLayerCalculator().calculate(rbm, rbm.getVisibleLayer(), calculated, vp);
+	
+	Matrix visible = vp.get(rbm.getVisibleLayer());
 	assertEquals(0.68, visible.get(0, 0), 0.01);
 	assertEquals(0.6637, visible.get(1, 0), 0.01);
     }
@@ -149,7 +159,7 @@ public class RBMTest {
     @Test
     public void testRBMLayerCalculator3() {
 	RBM rbm = NNFactory.rbm(3, 2, true, true);
-	rbm.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
+	rbm.setLayerCalculator(NNFactory.lcSigmoid(rbm, null));
 
 	Matrix cg1 = rbm.getMainConnections().getWeights();
 	cg1.set(0.2f, 0, 0);
@@ -163,11 +173,17 @@ public class RBMTest {
 	cgb1.set(-0.4f, 0, 0);
 	cgb1.set(0.2f, 1, 0);
 
-	RBMLayerCalculator lc = (RBMLayerCalculator) rbm.getLayerCalculator();
-	Matrix visible = TensorFactory.matrix(new float[] { 1f, 0f, 1f }, 1);
-	Matrix hidden = TensorFactory.tensor(2, 1);
-	lc.calculateHiddenLayer(rbm, visible, hidden);
+	ValuesProvider vp = TensorFactory.tensorProvider(rbm, 1, true);
+	Matrix visible = vp.get(rbm.getVisibleLayer());
+	visible.set(1f, 0, 0);
+	visible.set(0f, 1, 0);
+	visible.set(1f, 2, 0);
 
+	Set<Layer> calculated = new HashSet<Layer>();
+	calculated.add(rbm.getVisibleLayer());
+	rbm.getLayerCalculator().calculate(rbm, rbm.getHiddenLayer(), calculated, vp);
+
+	Matrix hidden = vp.get(rbm.getHiddenLayer());
 	assertEquals(0.332, hidden.get(0, 0), 0.001);
 	assertEquals(0.525, hidden.get(1, 0), 0.001);
     }
@@ -175,7 +191,7 @@ public class RBMTest {
     @Test
     public void testRBMLayerCalculator4() {
 	RBM rbm = NNFactory.rbm(2, 3, true, true);
-	rbm.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
+	rbm.setLayerCalculator(NNFactory.lcSigmoid(rbm, null));
 
 	Matrix cg1 = rbm.getMainConnections().getWeights();
 	cg1.set(0.2f, 0, 0);
@@ -189,11 +205,17 @@ public class RBMTest {
 	cgb1.set(-0.4f, 0, 0);
 	cgb1.set(0.2f, 1, 0);
 
-	RBMLayerCalculator lc = (RBMLayerCalculator) rbm.getLayerCalculator();
-	Matrix hidden = TensorFactory.matrix(new float[] { 1f, 0f, 1f }, 1);
-	Matrix visible = TensorFactory.tensor(2, 1);
-	lc.calculateVisibleLayer(rbm, visible, hidden);
+	ValuesProvider vp = TensorFactory.tensorProvider(rbm, 1, true);
+	Matrix hidden = vp.get(rbm.getHiddenLayer());
+	hidden.set(1f, 0, 0);
+	hidden.set(0f, 1, 0);
+	hidden.set(1f, 2, 0);
 
+	Set<Layer> calculated = new HashSet<Layer>();
+	calculated.add(rbm.getHiddenLayer());
+	rbm.getLayerCalculator().calculate(rbm, rbm.getVisibleLayer(), calculated, vp);
+
+	Matrix visible = vp.get(rbm.getVisibleLayer());
 	assertEquals(0.332, visible.get(0, 0), 0.001);
 	assertEquals(0.525, visible.get(1, 0), 0.001);
     }
@@ -221,8 +243,7 @@ public class RBMTest {
 	cgb2.set(-0.4f, 0, 0);
 	cgb2.set(0.2f, 1, 0);
 
-	AparapiCDTrainer t = TrainerFactory.cdSigmoidTrainer(rbm, new SimpleInputProvider(TensorFactory.matrix(new float[][] { { 1, 0, 1 } }), null, 1, 1), null, null, null, 1f, 0f, 0f, 0f, 1, true);
-	t.setLayerCalculator(NNFactory.rbmSigmoidSigmoid(rbm));
+	AparapiCDTrainer t = TrainerFactory.cdSigmoidTrainer(rbm, new SimpleInputProvider(TensorFactory.matrix(new float[][] { { 1, 0, 1 } }), null, 1, 1), null, null, null, 1f, 0f, 0f, 0f, 1, 1, true);
 
 	t.train();
 

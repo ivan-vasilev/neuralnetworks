@@ -30,8 +30,8 @@ public class BackPropagationTrainer<N extends NeuralNetwork> extends OneStepTrai
 
     public BackPropagationTrainer(Properties properties) {
 	super(properties);
-	activations = TensorFactory.tensorProvider(getNeuralNetwork(), getBatchSize(), Environment.getInstance().getUseSharedMemory());
-	backpropagation = TensorFactory.tensorProvider(getNeuralNetwork(), getBatchSize(), Environment.getInstance().getUseSharedMemory());
+	activations = TensorFactory.tensorProvider(getNeuralNetwork(), getTrainingBatchSize(), Environment.getInstance().getUseSharedMemory());
+	backpropagation = TensorFactory.tensorProvider(getNeuralNetwork(), getTrainingBatchSize(), Environment.getInstance().getUseSharedMemory());
     }
 
     /* (non-Javadoc)

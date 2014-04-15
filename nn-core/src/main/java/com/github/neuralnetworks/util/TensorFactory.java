@@ -149,19 +149,16 @@ public class TensorFactory {
 
 	return result;
     }
-
-
+    
     /**
      * @param sibling
      * @param nn
-     * @param miniBatchSize
-     * @param useSharedMemory
      * @return Tensor provider based on neural network
      */
-    public static ValuesProvider tensorProvider(ValuesProvider sibling, NeuralNetwork nn, int miniBatchSize, boolean useSharedMemory) {
-	Map<Layer, Set<int[]>> dims = getLayersDimensions(nn, miniBatchSize);
-
-	ValuesProvider result = new ValuesProvider(sibling.getTensors());
+    public static ValuesProvider tensorProvider(ValuesProvider sibling, NeuralNetwork nn) {
+	Map<Layer, Set<int[]>> dims = getLayersDimensions(nn, batchSize(sibling));
+	
+	ValuesProvider result = new ValuesProvider(sibling.useSharedMemory());
 
 	// create tensors
 	List<Layer> layers = new ArrayList<>(dims.keySet());
@@ -171,7 +168,7 @@ public class TensorFactory {
 		result.add(l, d);
 	    }
 	}
-
+	
 	return result;
     }
 
