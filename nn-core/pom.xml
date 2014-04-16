@@ -19,7 +19,6 @@
 		<dependency>
 			<groupId>com.amd</groupId>
 			<artifactId>aparapi</artifactId>
-			<version>2013_01_23</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/aparapi.jar</systemPath>
         </dependency>
@@ -27,13 +26,12 @@
 		<dependency>
 			<groupId>org.uncommons.maths</groupId>
 			<artifactId>uncommons-maths</artifactId>
-			<version>1.2.2a</version>
 		</dependency>
 
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.11</version>
-		</dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
 	</dependencies>
 </project>
