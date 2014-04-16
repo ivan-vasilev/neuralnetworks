@@ -1,10 +1,10 @@
 package com.github.neuralnetworks.input;
 
-import com.github.neuralnetworks.architecture.Matrix;
+import java.io.Serializable;
 
 /**
  * Converts input values to matrices
  */
-public interface InputConverter {
-    public abstract Matrix convert(Object[] input);
+public interface InputConverter extends Serializable {
+    public void convert(Object input, float[] output);
 }

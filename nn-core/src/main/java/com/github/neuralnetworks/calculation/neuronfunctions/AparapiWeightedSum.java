@@ -1,16 +1,19 @@
 package com.github.neuralnetworks.calculation.neuronfunctions;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.SortedMap;
+import java.util.List;
+import java.util.stream.IntStream;
 
 import com.amd.aparapi.Kernel;
 import com.github.neuralnetworks.architecture.Connections;
-import com.github.neuralnetworks.architecture.GraphConnections;
+import com.github.neuralnetworks.architecture.FullyConnected;
 import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
+import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.util.Environment;
+import com.github.neuralnetworks.util.Matrix;
+import com.github.neuralnetworks.util.Tensor;
+import com.github.neuralnetworks.util.TensorFactory;
+import com.github.neuralnetworks.util.Util;
 
 /**
  * Base Aparapi connection calculator for weighted sum functions (matrix
@@ -40,203 +43,184 @@ public class AparapiWeightedSum extends Kernel implements ConnectionCalculator {
     protected final int series;
 
     /**
-     * input values
+     * This is combined with the other properties to represent the
+     * FullyConnected connection (the FullyConnected class itself cannot be used
+     * because of the Aparapi limitations) It is an array, because of the
+     * combined connections
      */
     protected float[] input;
-
-    /**
-     * this is the weight matrix
-     */
-    protected float[] weights;
+    @Constant
+    protected final int[] inputStartPositions;
+    @Constant
+    protected final int[] inputRowSteps;
+    @Constant
+    protected final int[] inputColumnSteps;
 
     /**
      * output values
      */
     protected float[] output;
+    protected final int outputStartPosition;
+    protected final int outputRowStep;
+    protected final int outputColumnStep;
 
     /**
-     * This is combined with the "weights" to represent the weight matrix (the
-     * Matrix class itself cannot be used because of the Aparapi limitations).
-     * It is an array, because of the combined connections
+     * This is combined with the other properties to represent the
+     * FullyConnected connection (the FullyConnected class itself cannot be used
+     * because of the Aparapi limitations) It is an array, because of the
+     * combined connections
      */
-    //@Local TODO
-    protected final int[] weightsDimension;
-
-    /**
-     * For optimization reasons
-     */
-    //@Local TODO
+    protected final float[] weights;
+    @Constant
+    protected final int[] weightStartPositions;
+    @Constant
+    protected final int[] weightsSize;
+    @Constant
     protected final int[] weightsInitialStep;
-
-    /**
-     * For optimization reasons
-     */
-    //@Local TODO
+    @Constant
     protected final int[] weightsStep;
 
-    /**
-     * This is combined with the other properties to represent the
-     * FullyConnected connection (the FullyConnected class itself cannot be used
-     * because of the Aparapi limitations) It is an array, because of the
-     * combined connections
-     */
-    //@Local TODO
-    protected final int[] inputStartPositions;
-
-    /**
-     * This is combined with the other properties to represent the
-     * FullyConnected connection (the FullyConnected class itself cannot be used
-     * because of the Aparapi limitations) It is an array, because of the
-     * combined connections
-     */
-    //@Local TODO
-    protected final int[] weightStartPositions;
-
-    /**
-     * helper map to reuse existing arrays for inputs
-     */
-    protected Map<Integer, float[]> storedInputs = new HashMap<>();
-
-    /**
-     * helper map to reuse existing arrays for outputs
-     */
-    protected Map<Integer, float[]> storedWeights = new HashMap<>();
-
-    /**
-     * Will determine whether initialization is needed
-     */
-    protected Layer currentLayer;
-
-    public AparapiWeightedSum(SortedMap<GraphConnections, Integer> inputConnections, int miniBatchSize, Layer targetLayer) {
+    public AparapiWeightedSum(List<Connections> inputConnections, ValuesProvider valuesProvider, Layer targetLayer) {
 	super();
+	this.miniBatchSize = TensorFactory.batchSize(valuesProvider);
 
-	this.currentLayer = targetLayer;
-	this.miniBatchSize = miniBatchSize;
+	// input
+	input = TensorFactory.tensor(Util.getOppositeLayer(inputConnections.get(0), targetLayer), inputConnections.get(0), valuesProvider).getElements();
+	weights = ((FullyConnected) inputConnections.get(0)).getWeights().getElements();
+	inputConnections.forEach(c -> {
+	    Tensor t = TensorFactory.tensor(Util.getOppositeLayer(c, targetLayer), c, valuesProvider);
+	    if (!(c instanceof FullyConnected)) {
+		throw new IllegalArgumentException("Only FullyConnected connections are supported");
+	    }
+
+	    if (!(t instanceof Matrix)) {
+		throw new IllegalArgumentException("Only matrices are supported as input");
+	    }
+
+	    if (input != t.getElements()) {
+		throw new IllegalArgumentException("Only one input array is allowed");
+	    }
+
+	    if (weights != ((FullyConnected) c).getWeights().getElements()) {
+		throw new IllegalArgumentException("Only one weight array is allowed");
+	    }
+	});
+
 	this.series = inputConnections.size();
-	this.weightsDimension = new int[series];
 	this.inputStartPositions = new int[series];
+	this.inputRowSteps = new int[series];
+	this.inputColumnSteps = new int[series];
+	IntStream.range(0, inputConnections.size()).forEach(i -> {
+	    Matrix m = TensorFactory.tensor(Util.getOppositeLayer(inputConnections.get(i), targetLayer), inputConnections.get(i), valuesProvider);
+	    inputStartPositions[i] = m.getStartIndex();
+	    inputRowSteps[i] = m.getRowElementsDistance();
+	    inputColumnSteps[i] = m.getColumnElementsDistance();
+	});
+
+	// output
+	Matrix o = TensorFactory.tensor(targetLayer, inputConnections, valuesProvider);
+	this.output = o.getElements();
+	this.outputStartPosition = o.getStartIndex();
+	this.outputRowStep = o.getRowElementsDistance();
+	this.outputColumnStep = o.getColumnElementsDistance();
+
+	// weights
 	this.weightStartPositions = new int[series];
+	this.weightsSize = new int[series];
 	this.weightsInitialStep = new int[series];
 	this.weightsStep = new int[series];
 
-	int totalInputSize = 0, totalWeightSize = 0, i = 0;
-	for (java.util.Map.Entry<GraphConnections, Integer> e : inputConnections.entrySet()) {
-	    Matrix cg = e.getKey().getConnectionGraph();
-
-	    inputStartPositions[i] = totalInputSize;
-	    totalInputSize += e.getValue();
-	    weightStartPositions[i] = totalWeightSize;
-	    totalWeightSize += e.getKey().getConnectionGraph().getElements().length;
-
-	    // depending on the direction of the calculation
-	    if (e.getKey().getOutputLayer() == targetLayer) {
-		weightsDimension[i] = cg.getColumns();
-		weightsInitialStep[i] = cg.getColumns();
-		weightsStep[i] = 1;
+	IntStream.range(0, inputConnections.size()).forEach(i -> {
+	    Matrix w = ((FullyConnected) inputConnections.get(i)).getWeights();
+	    weightStartPositions[i] = w.getStartIndex();
+	    if (inputConnections.get(0).getOutputLayer() == targetLayer) {
+		weightsSize[i] = w.getColumns();
+		weightsInitialStep[i] = w.getRowElementsDistance();
+		weightsStep[i] = w.getColumnElementsDistance();
 	    } else {
-		weightsDimension[i] = cg.getRows();
-		weightsInitialStep[i] = 1;
-		weightsStep[i] = cg.getColumns();
+		weightsSize[i] = w.getRows();
+		weightsInitialStep[i] = w.getColumnElementsDistance();
+		weightsStep[i] = w.getRowElementsDistance();
 	    }
-
-	    i++;
-	}
-
-	if (inputConnections.size() == 1) {
-	    java.util.Map.Entry<GraphConnections, Integer> e = inputConnections.entrySet().iterator().next();
-	    this.weights = e.getKey().getConnectionGraph().getElements();
-	} else {
-	    this.weights = storedWeights.get(totalWeightSize);
-	    if (weights == null) {
-		this.weights = new float[totalWeightSize];
-		storedWeights.put(totalWeightSize, this.weights);
-	    }
-
-	    i = 0;
-	    for (java.util.Map.Entry<GraphConnections, Integer> e : inputConnections.entrySet()) {
-		System.arraycopy(e.getKey().getConnectionGraph().getElements(), 0, weights, weightStartPositions[i], e.getKey().getConnectionGraph().getElements().length);
-		i++;
-	    }
-	}
+	});
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public void calculate(SortedMap<Connections, Matrix> input, Matrix outputMatrix, Layer targetLayer) {
-	if (input.size() > 0) {
-	    init((SortedMap<GraphConnections, Matrix>) ((SortedMap<?, ?>) input), outputMatrix, targetLayer);
-	    // depending on the number of processors an execution mode is selected
-	    if (outputMatrix.getRows() <= Runtime.getRuntime().availableProcessors() * 5) {
-		setExecutionMode(EXECUTION_MODE.GPU);
-	    } else {
-		setExecutionMode(Environment.getInstance().getExecutionMode());
-	    }
-	    setExecutionMode(EXECUTION_MODE.GPU);
-	    execute(outputMatrix.getRows());
+    public void calculate(List<Connections> connections, ValuesProvider valuesProvider, Layer targetLayer) {
+	if (accept(connections, valuesProvider, targetLayer)) {
+	    Environment.getInstance().getExecutionStrategy().execute(this, targetLayer.getUnitCount(connections));
+	} else {
+	    throw new IllegalArgumentException("A parameter does not match");
 	}
     }
 
-    /**
-     * Combines all the inputConnections and initializes all the arrays based on
-     * the connections
-     */
-    protected void init(SortedMap<GraphConnections, Matrix> inputConnections, Matrix outputMatrix, Layer targetLayer) {
-	this.output = outputMatrix.getElements();
-
-	if (inputConnections.size() == 1) {
-	    java.util.Map.Entry<GraphConnections, Matrix> e = inputConnections.entrySet().iterator().next();
-	    this.input = e.getValue().getElements();
-	} else {
-	    int totalInputSize = 0;
-	    for (java.util.Map.Entry<GraphConnections, Matrix> e : inputConnections.entrySet()) {
-		totalInputSize += e.getValue().getElements().length;
-	    }
-
-	    this.input = storedInputs.get(totalInputSize);
-	    if (this.input == null) {
-		this.input = new float[totalInputSize];
-		storedInputs.put(totalInputSize, this.input);
-	    }
-
-	    int offset = 0;
-	    for (java.util.Map.Entry<GraphConnections, Matrix> e : inputConnections.entrySet()) {
-		System.arraycopy(e.getValue().getElements(), 0, input, offset, e.getValue().getElements().length);
-		offset += e.getValue().getElements().length;
-	    }
+    public boolean accept(List<Connections> connections, ValuesProvider valuesProvider, Layer targetLayer) {
+	if (TensorFactory.batchSize(valuesProvider) != miniBatchSize) {
+	    return false;
 	}
-    };
+
+	if (TensorFactory.tensor(targetLayer, connections, valuesProvider).getElements() != output) {
+	    return false;
+	}
+
+	if (connections.size() != series || connections.size() == 0) {
+	    return false;
+	}
+
+	if (connections.stream().filter(c -> TensorFactory.tensor(Util.getOppositeLayer(c, targetLayer), c, valuesProvider).getElements() != input).findAny().isPresent()) {
+	    return false;
+	}
+
+	return true;
+    }
 
     @Override
     public void run() {
 	int id = getGlobalId();
 
-	int miniBatch = miniBatchSize;
-	int s = series;
-	int inputStartPosition = 0, initialWeightIndex = 0, weightStep = 0, dim = 0;
+	int inputStartPosition = 0, inputRowsStep = 0, inputColumnsStep = 0, weightStartPosition = 0, weightStep = 0, dim = 0;
 	float value = 0;
 
 	// each input example
-	for (int i = 0; i < miniBatch; i++) {
+	for (int i = 0; i < miniBatchSize; i++) {
 	    // each connection (of the combined connections)
-	    value = output[id * miniBatch + i];
-	    for (int k = 0; k < s; k++) {
+	    value = output[outputStartPosition + id * outputRowStep + i * outputColumnStep];
+	    for (int k = 0; k < series; k++) {
 		// each element in the row/column
 		inputStartPosition = inputStartPositions[k];
-		initialWeightIndex = weightStartPositions[k] + weightsInitialStep[k] * id;
+		inputRowsStep = inputRowSteps[k];
+		inputColumnsStep = inputColumnSteps[k];
+		weightStartPosition = weightStartPositions[k] + weightsInitialStep[k] * id;
 		weightStep = weightsStep[k];
-		dim = weightsDimension[k];
+		dim = weightsSize[k];
 
 		for (int j = 0; j < dim; j++) {
-		    value += input[inputStartPosition + j * miniBatch + i] * weights[initialWeightIndex + j * weightStep];
+		    value += input[inputStartPosition + j * inputRowsStep + i * inputColumnsStep] * weights[weightStartPosition + j * weightStep];
 		}
 	    }
 
-	    output[id * miniBatch + i] = value;
+	    output[outputStartPosition + id * outputRowStep + i * outputColumnStep] = value;
 	}
 
 	after();
     }
 
     protected void after() {
+    }
+
+    public float[] getInput() {
+        return input;
+    }
+
+    public void setInput(float[] input) {
+        this.input = input;
+    }
+
+    public float[] getOutput() {
+        return output;
+    }
+
+    public void setOutput(float[] output) {
+        this.output = output;
     }
 }

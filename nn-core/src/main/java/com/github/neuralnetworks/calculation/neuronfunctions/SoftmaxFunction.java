@@ -1,28 +1,51 @@
 package com.github.neuralnetworks.calculation.neuronfunctions;
 
-import com.github.neuralnetworks.architecture.Matrix;
+import com.amd.aparapi.Kernel;
+import com.github.neuralnetworks.util.Environment;
+import com.github.neuralnetworks.util.Matrix;
+import com.github.neuralnetworks.util.Tensor;
 
 /**
  * Softmax activation function
  */
-public class SoftmaxFunction implements ActivationFunction {
+public class SoftmaxFunction extends Kernel implements TensorFunction {
+
+    private static final long serialVersionUID = 1L;
+
+    private float[] values;
+    private int startIndex;
+    private int nextRowStep;
+    private int nextColumnStep;
+    private int rows;
 
     @Override
-    public void value(Matrix inputOutput) {
-	int rows = inputOutput.getRows();
-	int columns = inputOutput.getColumns();
+    public void value(Tensor inputOutput) {
+	Matrix io = (Matrix) inputOutput;
+
+	this.values = io.getElements();
+	this.startIndex = io.getStartIndex();
+	this.nextRowStep = io.getRowElementsDistance();
+	this.nextColumnStep = io.getColumnElementsDistance();
+	this.rows = io.getRows();
+
+	Environment.getInstance().getExecutionStrategy().execute(this, io.getColumns());
+    }
+
+    @Override
+    public void run() {
 	float sum = 0;
+	int start = startIndex;
+	int r = rows;
+	int nr = nextRowStep;
+	int nc = nextColumnStep;
+	int id = getGlobalId();
 
-	for (int i = 0; i < columns; i++) {
-	    sum = 0;
+	for (int i = 0; i < r; i++) {
+	    sum += values[start + i * nr + id * nc];
+	}
 
-	    for (int j = 0; j < rows; j++) {
-		sum += inputOutput.get(j, i);
-	    }
-
-	    for (int j = 0; j < rows; j++) {
-		inputOutput.set(j, i, sum != 0 ? inputOutput.get(j,  i) / sum : 0);
-	    }
+	for (int i = 0; i < r; i++) {
+	    values[start + i * nr + id * nc] /= sum;
 	}
     }
 }

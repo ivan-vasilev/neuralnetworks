@@ -1,15 +1,16 @@
 package com.github.neuralnetworks.training.backpropagation;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
-import com.github.neuralnetworks.architecture.BiasLayer;
 import com.github.neuralnetworks.architecture.Connections;
-import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
+import com.github.neuralnetworks.calculation.memory.ValuesProvider;
+import com.github.neuralnetworks.training.TrainerFactory;
 import com.github.neuralnetworks.util.Properties;
+import com.github.neuralnetworks.util.Tensor;
+import com.github.neuralnetworks.util.Util;
 
 /**
  * Backpropagation connection calculator for fully connected input layers
@@ -18,20 +19,20 @@ public class BackPropagationFullyConnected extends BackPropagationConnectionCalc
 
     private static final long serialVersionUID = 1178188233641224762L;
 
+    protected Map<Connections, Tensor> weightUpdates;
+
     public BackPropagationFullyConnected(Properties properties) {
 	super(properties);
+	weightUpdates = TrainerFactory.weightUpdates(getNeuralNetwork());
     }
 
     @Override
-    protected void addBackpropFunction(SortedMap<Connections, Integer> inputConnections, Map<Connections, BackpropagationConnectionCalculator> connectionCalculators, Layer targetLayer) {
-	for (Entry<Connections, Integer> e : inputConnections.entrySet()) {
-	    SortedMap<GraphConnections, Integer> m = new TreeMap<>();
-	    if (e.getKey().getInputLayer() instanceof BiasLayer && targetLayer != e.getKey().getInputLayer()) {
-		m.put((GraphConnections) e.getKey(), miniBatchSize);
-		connectionCalculators.put(e.getKey(), new AparapiBackpropagationFullyConnected(m, miniBatchSize, e.getKey().getInputLayer()));
+    protected void addBackpropFunction(List<Connections> inputConnections, Map<Connections, BackPropagationConnectionCalculator> connectionCalculators, ValuesProvider valuesProvider, ValuesProvider activations, Layer targetLayer) {
+	for (Connections c : inputConnections) {
+	    if (Util.isBias(c.getInputLayer()) && targetLayer != c.getInputLayer()) {
+		connectionCalculators.put(c, new AparapiBackpropagationFullyConnected(Arrays.asList(c), valuesProvider, activations, Arrays.asList(weightUpdates.get(c)), c.getInputLayer(), getLearningRate(), getMomentum(), getL1weightDecay(), getL2weightDecay()));
 	    } else {
-		m.put((GraphConnections) e.getKey(), e.getValue());
-		connectionCalculators.put(e.getKey(), new AparapiBackpropagationFullyConnected(m, miniBatchSize, targetLayer));
+		connectionCalculators.put(c, new AparapiBackpropagationFullyConnected(Arrays.asList(c), valuesProvider, activations, Arrays.asList(weightUpdates.get(c)), targetLayer, getLearningRate(), getMomentum(), getL1weightDecay(), getL2weightDecay()));
 	    }
 	}
     }

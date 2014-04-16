@@ -1,106 +1,118 @@
 package com.github.neuralnetworks.calculation.neuronfunctions;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
-import com.github.neuralnetworks.architecture.BiasLayer;
 import com.github.neuralnetworks.architecture.Connections;
-import com.github.neuralnetworks.architecture.GraphConnections;
+import com.github.neuralnetworks.architecture.FullyConnected;
 import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
+import com.github.neuralnetworks.calculation.memory.ValuesProvider;
+import com.github.neuralnetworks.events.PropagationEvent;
+import com.github.neuralnetworks.events.PropagationEventListener;
+import com.github.neuralnetworks.util.Matrix;
+import com.github.neuralnetworks.util.Tensor;
+import com.github.neuralnetworks.util.Tensor.TensorIterator;
+import com.github.neuralnetworks.util.TensorFactory;
 import com.github.neuralnetworks.util.UniqueList;
+import com.github.neuralnetworks.util.Util;
 
 /**
  * Default implementation of Connection calculator for fully connected layers
- * Biases are also added
- * After all the input functions are calculated there is a list of activation functions that can be applied to the result
- * This class differs from LayerCalculatorImpl in the fact that LayerCalculatorImpl traverses the graph of layers, where ConnectionCalculatorImpl only deals with the connections passed as parameter
+ * Biases are also added After all the input functions are calculated there is a
+ * list of activation functions that can be applied to the result This class
+ * differs from LayerCalculatorImpl in the fact that LayerCalculatorImpl
+ * traverses the graph of layers, where ConnectionCalculatorImpl only deals with
+ * the connections passed as parameter
  * 
- * !!! Important !!!
- * The results of the calculations are represented as matrices (Matrix).
- * This is done, because it is assumed that implementations will provide a way for calculating many input results at once.
- * Each column of the matrix represents a single input. For example if the network is trained to classify MNIST images, each column of the input matrix will represent single MNIST image.
+ * !!! Important !!! The results of the calculations are represented as tensors
+ * (Tensor). This is done, because it is assumed that implementations will
+ * provide a way for calculating many input results at once. Each column of the
+ * matrix represents a single input. For example if the network is trained to
+ * classify MNIST images, each column of the input matrix will represent single
+ * MNIST image.
  */
-public abstract class ConnectionCalculatorFullyConnected implements ConnectionCalculator {
+public class ConnectionCalculatorFullyConnected implements ConnectionCalculator, PropagationEventListener {
 
     private static final long serialVersionUID = -5405654469496055017L;
 
-    protected ConnectionCalculator inputFunction;
-    protected Layer currentLayer;
+    protected Set<ConnectionCalculator> inputFunctions;
     protected int miniBatchSize;
 
     /**
-     * Activation functions
+     * Activation functions that are executed before the transfer function
      */
-    protected List<ActivationFunction> activationFunctions;
+    protected List<TensorFunction> preTransferFunctions;
 
-    
+    /**
+     * Activation functions that are called after the transfer function
+     */
+    protected List<TensorFunction> activationFunctions;
+
     public ConnectionCalculatorFullyConnected() {
 	super();
+	inputFunctions = new HashSet<>();
     }
 
     @Override
-    public void calculate(SortedMap<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
+    public void calculate(List<Connections> connections, ValuesProvider valuesProvider, Layer targetLayer) {
 	if (connections.size() > 0) {
-	    SortedMap<Connections, Matrix> notBias = new TreeMap<>();
-	    Set<GraphConnections> bias = new HashSet<>();
+	    List<Connections> notBias = new ArrayList<>();
+	    Connections bias = null;
 
-	    for (Entry<Connections, Matrix> e : connections.entrySet()) {
-		Connections c = e.getKey();
-		Matrix input = e.getValue();
+	    for (Connections c : connections) {
 		// bias layer scenarios
-		if (c.getInputLayer() instanceof BiasLayer) {
-		    bias.add((GraphConnections) c);
+		if (Util.isBias(c.getInputLayer())) {
+		    bias = c;
 		} else {
-		    notBias.put(c, input);
+		    notBias.add(c);
 		}
 	    }
-	    
-	    calculateBias(bias, output);
-	    
+
 	    if (notBias.size() > 0) {
-		// new input function is required
-		if (inputFunction == null || targetLayer != currentLayer || miniBatchSize != output.getColumns()) {
-		    currentLayer = targetLayer;
-		    miniBatchSize = output.getColumns();
-		    SortedMap<GraphConnections, Integer> map = new TreeMap<>();
-		    for (Entry<Connections, Matrix> e : notBias.entrySet()) {
-			map.put((GraphConnections) e.getKey(), e.getValue().getElements().length);
-		    }
-
-		    inputFunction = createInputFunction(map, targetLayer);
+		if (preTransferFunctions != null && preTransferFunctions.size() > 0) {
+		    preTransferFunctions.forEach(f -> notBias.stream().filter(c -> !Util.isBias(c.getInputLayer())).forEach(c -> f.value(TensorFactory.tensor(Util.getOppositeLayer(c, targetLayer), c, valuesProvider))));
 		}
 
-		inputFunction.calculate(notBias, output, targetLayer);
-	    }
-	    
-	    if (activationFunctions != null) {
-		for (ActivationFunction f : activationFunctions) {
-		    f.value(output);
+		calculateBias(bias, valuesProvider);
+
+		getConnectionCalculator(notBias, valuesProvider, targetLayer).calculate(notBias, valuesProvider, targetLayer);
+
+		if (activationFunctions != null) {
+		    activationFunctions.forEach(f -> f.value(TensorFactory.tensor(targetLayer, notBias, valuesProvider)));
 		}
 	    }
 	}
     }
 
-    protected void calculateBias(Set<GraphConnections> bias, Matrix output) {
-	if (bias.size() > 0) {
-	    float[] out = output.getElements();
-	    for (int i = 0; i < out.length; i++) {
-		for (GraphConnections c : bias) {
-		    out[i] += c.getConnectionGraph().getElements()[i / output.getColumns()];
-		}
-	    }
+    @Override
+    public void handleEvent(PropagationEvent event) {
+	if (preTransferFunctions != null) {
+	    preTransferFunctions.stream().filter(f -> f instanceof PropagationEventListener).forEach(f -> ((PropagationEventListener) f).handleEvent(event));
+	}
+
+	if (activationFunctions != null) {
+	    activationFunctions.stream().filter(f -> f instanceof PropagationEventListener).forEach(f -> ((PropagationEventListener) f).handleEvent(event));
 	}
     }
 
-    protected abstract ConnectionCalculator createInputFunction(SortedMap<GraphConnections, Integer> inputConnections, Layer targetLayer);
+    public void addPreTransferFunction(TensorFunction function) {
+	if (preTransferFunctions == null) {
+	    preTransferFunctions = new UniqueList<>();
+	}
 
-    public void addActivationFunction(ActivationFunction activationFunction) {
+	preTransferFunctions.add(function);
+    }
+
+    public void removePreTransfer(TensorFunction function) {
+	if (preTransferFunctions != null) {
+	    preTransferFunctions.remove(function);
+	}
+    }
+
+    public void addActivationFunction(TensorFunction activationFunction) {
 	if (activationFunctions == null) {
 	    activationFunctions = new UniqueList<>();
 	}
@@ -108,17 +120,40 @@ public abstract class ConnectionCalculatorFullyConnected implements ConnectionCa
 	activationFunctions.add(activationFunction);
     }
 
-    public void removeActivationFunction(ActivationFunction activationFunction) {
+    public void removeActivationFunction(TensorFunction activationFunction) {
 	if (activationFunctions != null) {
 	    activationFunctions.remove(activationFunction);
 	}
     }
 
-    public ConnectionCalculator getInputFunction() {
-        return inputFunction;
+    protected void calculateBias(Connections bias, ValuesProvider valuesProvider) {
+	if (bias != null) {
+	    Tensor biasValue = TensorFactory.tensor(bias.getInputLayer(), bias, valuesProvider);
+	    if (biasValue.get(new int[biasValue.getDimensions().length]) == 0) {
+		biasValue.forEach(i -> biasValue.getElements()[i] = 1);
+	    }
+
+	    Matrix weights = ((FullyConnected) bias).getWeights();;
+	    Matrix output = TensorFactory.tensor(bias.getOutputLayer(), bias, valuesProvider);
+	    TensorIterator it = output.iterator();
+
+	    while (it.hasNext()) {
+		int i = it.next();
+		output.getElements()[i] = weights.get(it.getCurrentPosition()[0], 0);
+	    }
+	}
     }
 
-    public void setInputFunction(ConnectionCalculator inputFunction) {
-        this.inputFunction = inputFunction;
+    protected ConnectionCalculator createInputFunction(List<Connections> inputConnections, ValuesProvider valuesProvider, Layer targetLayer) {
+	return new AparapiWeightedSum(inputConnections, valuesProvider, targetLayer);
+    }
+
+    private ConnectionCalculator getConnectionCalculator(List<Connections> connections, ValuesProvider valuesProvider, Layer targetLayer) {
+	ConnectionCalculator result = inputFunctions.stream().filter(c -> {
+	    return !(c instanceof AparapiWeightedSum) || ((AparapiWeightedSum) c).accept(connections, valuesProvider, targetLayer);
+	}).findFirst().orElse(createInputFunction(connections, valuesProvider, targetLayer));
+	inputFunctions.add(result);
+
+	return result;
     }
 }

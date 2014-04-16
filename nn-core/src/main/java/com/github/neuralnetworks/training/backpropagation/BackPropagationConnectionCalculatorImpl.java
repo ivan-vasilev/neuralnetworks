@@ -1,33 +1,35 @@
 package com.github.neuralnetworks.training.backpropagation;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.stream.Collectors;
 
-import com.github.neuralnetworks.architecture.BiasLayer;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.architecture.Matrix;
-import com.github.neuralnetworks.calculation.ConnectionCalculator;
+import com.github.neuralnetworks.architecture.NeuralNetwork;
+import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
+import com.github.neuralnetworks.util.Tensor;
+import com.github.neuralnetworks.util.TensorFactory;
+import com.github.neuralnetworks.util.Util;
 
 /**
  * Connection calculator for the backpropagation phase of the algorithm
  * The difference with the regular ConnectionCalculatorImpl is that forwardBackprop's and backwardBackprop's properties (learing rate, momentum, weight decay) are updated before each propagation
  */
-public abstract class BackPropagationConnectionCalculatorImpl implements ConnectionCalculator {
+public abstract class BackPropagationConnectionCalculatorImpl implements BackPropagationConnectionCalculator {
 
     private static final long serialVersionUID = -8854054073444883314L;
 
     private Properties properties;
-    protected Map<Connections, BackpropagationConnectionCalculator> connectionCalculators;
-    protected Set<BackpropagationConnectionCalculator> calculators;
-    protected Map<Layer, Matrix> activations;
+    protected Map<Connections, BackPropagationConnectionCalculator> connectionCalculators;
+    protected Set<BackPropagationConnectionCalculator> calculators;
+    protected ValuesProvider activations;
     protected Layer currentLayer;
     protected int miniBatchSize;
 
@@ -38,35 +40,26 @@ public abstract class BackPropagationConnectionCalculatorImpl implements Connect
     }
 
     @Override
-    public void calculate(SortedMap<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
-	SortedMap<Connections, Integer> chunk = new TreeMap<>();
-	for (Entry<Connections, Matrix> e : connections.entrySet()) {
-	    if (!connectionCalculators.containsKey(e.getKey()) || targetLayer != currentLayer || miniBatchSize != output.getColumns()) {
-		chunk.put(e.getKey(), e.getValue().getElements().length);
-	    }
-	}
+    public void calculate(List<Connections> connections, ValuesProvider valuesProvider, Layer targetLayer) {
+	List<Connections> chunk = connections.stream().filter(c -> !connectionCalculators.containsKey(c) || targetLayer != currentLayer || miniBatchSize != TensorFactory.batchSize(valuesProvider)).collect(Collectors.toList());
 
 	if (chunk.size() > 0) {
-	    miniBatchSize = output.getColumns();
+	    miniBatchSize = TensorFactory.batchSize(valuesProvider);
 	    currentLayer = targetLayer;
-	    addBackpropFunction(chunk, connectionCalculators, targetLayer);
+	    addBackpropFunction(chunk, connectionCalculators, valuesProvider, activations, targetLayer);
 	    calculators.addAll(connectionCalculators.values());
 	}
 
-	SortedMap<Connections, Matrix> chunkCalc = new TreeMap<>();
-	for (BackpropagationConnectionCalculator bc : calculators) {
+	List<Connections> chunkCalc = new ArrayList<>();
+	for (BackPropagationConnectionCalculator bc : calculators) {
 	    chunkCalc.clear();
 
 	    Layer target = targetLayer;
-	    Matrix out = output;
-	    for (Entry<Connections, Matrix> e : connections.entrySet()) {
-		if (connectionCalculators.get(e.getKey()) == bc) {
-		    if (e.getKey().getInputLayer() instanceof BiasLayer && e.getKey().getInputLayer() != targetLayer) {
-			chunkCalc.put(e.getKey(), output);
-			target = e.getKey().getInputLayer();
-			out = e.getValue();
-		    } else {
-			chunkCalc.put(e.getKey(), e.getValue());
+	    for (Connections c : connections) {
+		if (connectionCalculators.get(c) == bc) {
+		    chunkCalc.add(c);
+		    if (Util.isBias(c.getInputLayer()) && c.getInputLayer() != targetLayer) {
+			target = c.getInputLayer();
 		    }
 		}
 	    }
@@ -74,36 +67,74 @@ public abstract class BackPropagationConnectionCalculatorImpl implements Connect
 	    if (chunkCalc.size() > 0) {
 		bc.setLearningRate(getLearningRate());
 		bc.setMomentum(getMomentum());
-		bc.setWeightDecay(getWeightDecay());
+		bc.setL1weightDecay(getL1weightDecay());
 		bc.setActivations(getActivations());
-		bc.calculate(chunkCalc, out, target);
+		bc.calculate(chunkCalc, valuesProvider, target);
 	    }
 	}
     }
 
-    protected abstract void addBackpropFunction(SortedMap<Connections, Integer> inputConnections, Map<Connections, BackpropagationConnectionCalculator> connectionCalculators, Layer targetLayer);
-
-    public float getLearningRate() {
-	return properties.getParameter(Constants.LEARNING_RATE);
-    }
+    protected abstract void addBackpropFunction(List<Connections> inputConnections, Map<Connections, BackPropagationConnectionCalculator> connectionCalculators, ValuesProvider valuesProvider, ValuesProvider activations, Layer targetLayer);
 
     public int getMiniBatchSize() {
 	return miniBatchSize;
     }
 
+    public NeuralNetwork getNeuralNetwork() {
+	return properties.getParameter(Constants.NEURAL_NETWORK);
+    }
+
+    @Override
+    public float getLearningRate() {
+	return properties.getParameter(Constants.LEARNING_RATE);
+    }
+
+    @Override
+    public void setLearningRate(float learningRate) {
+	properties.setParameter(Constants.LEARNING_RATE, learningRate);
+    }
+
+    @Override
     public float getMomentum() {
 	return properties.getParameter(Constants.MOMENTUM);
     }
 
-    public float getWeightDecay() {
-	return properties.getParameter(Constants.WEIGHT_DECAY);
+    @Override
+    public void setMomentum(float momentum) {
+	properties.setParameter(Constants.MOMENTUM, momentum);
     }
 
-    public Map<Layer, Matrix> getActivations() {
-	return activations;
+    @Override
+    public float getL1weightDecay() {
+	return properties.getParameter(Constants.L1_WEIGHT_DECAY);
+    }
+
+    @Override
+    public void setL1weightDecay(float weightDecay) {
+	properties.setParameter(Constants.L1_WEIGHT_DECAY, weightDecay);
     }
     
-    public void setActivations(Map<Layer, Matrix> activations) {
+    @Override
+    public float getL2weightDecay() {
+	return properties.getParameter(Constants.L2_WEIGHT_DECAY);
+    }
+    
+    @Override
+    public void setL2weightDecay(float weightDecay) {
+	properties.setParameter(Constants.L2_WEIGHT_DECAY, weightDecay);
+    }
+
+    @Override
+    public ValuesProvider getActivations() {
+	return activations;
+    }
+
+    @Override
+    public void setActivations(ValuesProvider activations) {
 	this.activations = activations;
+    }
+
+    protected Map<Connections, Tensor> getWeightUpdates() {
+	return properties.getParameter(Constants.WEIGHT_UDPATES);
     }
 }

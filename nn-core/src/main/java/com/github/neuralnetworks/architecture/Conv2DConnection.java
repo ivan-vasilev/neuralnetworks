@@ -1,61 +1,95 @@
 package com.github.neuralnetworks.architecture;
 
+import com.github.neuralnetworks.util.Tensor;
+import com.github.neuralnetworks.util.TensorFactory;
+
 /**
  * Convolutional connection between layers (for 2d input data)
  */
-public class Conv2DConnection extends ConnectionsImpl {
+public class Conv2DConnection extends ConnectionsImpl implements WeightsConnections {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * The list of filters to be used in the connection
      */
-    protected float[] weights;
-    
-    public Conv2DConnection(ConvGridLayer inputLayer, int kernelColumns, int kernelRows, int filters) {
-	super(inputLayer, new ConvGridLayer());
-	setDimensions(kernelRows, kernelColumns, filters);
-	updateDimensions();
-    }
+    protected Tensor wights;
+    protected int inputFeatureMapColumns;
+    protected int inputFeatureMapRows;
+    protected int stride;
 
-    public Conv2DConnection(ConvGridLayer inputLayer, ConvGridLayer outputLayer) {
+    public Conv2DConnection(Layer inputLayer, Layer outputLayer, int inputFeatureMapColumns, int inputFeatureMapRows, int inputFilters, int kernelRows, int kernelColumns, int outputFilters, int stride) {
 	super(inputLayer, outputLayer);
-	updateDimensions();
+	this.inputFeatureMapColumns = inputFeatureMapColumns;
+	this.inputFeatureMapRows = inputFeatureMapRows;
+	this.stride = stride;
+	this.wights = TensorFactory.tensor(outputFilters, inputFilters, kernelRows, kernelColumns);
     }
 
-    /**
-     * When some dimension changes in the output layer the weights array changes it's size
-     */
-    public void updateDimensions() {
-	ConvGridLayer i = (ConvGridLayer) getInputLayer();
-	ConvGridLayer o = (ConvGridLayer) getOutputLayer();
-	int totalWeights = getKernelColumns() * getKernelRows() * o.getFilters() * i.getFilters();
-	if (weights == null || weights.length != totalWeights) {
-	    weights = new float[totalWeights];
-	}
+    public Conv2DConnection(Layer inputLayer, Layer outputLayer, int inputFeatureMapColumns, int inputFeatureMapRows, Tensor weights,  int stride) {
+	super(inputLayer, outputLayer);
+	this.inputFeatureMapColumns = inputFeatureMapColumns;
+	this.inputFeatureMapRows = inputFeatureMapRows;
+	this.stride = stride;
+	this.wights = weights;
     }
 
-    public float[] getWeights() {
-	return weights;
-    }
-
-    public void setWeights(float[] weights) {
-	this.weights = weights;
-    }
-
-    public int getKernelColumns() {
-        ConvGridLayer i = (ConvGridLayer) getInputLayer();
-	ConvGridLayer o = (ConvGridLayer) getOutputLayer();
-	return i.getFeatureMapColumns() % o.getFeatureMapColumns() + 1;
-    }
-
-    public void setDimensions(int kernelRows, int kernelColumns, int filters) {
-        ConvGridLayer i = (ConvGridLayer) getInputLayer();
-	ConvGridLayer o = (ConvGridLayer) getOutputLayer();
-	o.setDimensions(i.getFeatureMapRows() - kernelRows + 1, i.getFeatureMapColumns() - kernelColumns + 1, filters);
+    @Override
+    public Tensor getWeights() {
+	return wights;
     }
 
     public int getKernelRows() {
-        ConvGridLayer i = (ConvGridLayer) getInputLayer();
-	ConvGridLayer o = (ConvGridLayer) getOutputLayer();
-	return i.getFeatureMapRows() % o.getFeatureMapRows() + 1;
+	return wights.getDimensions()[2];
+    }
+
+    public int getKernelColumns() {
+	return wights.getDimensions()[3];
+    }
+
+    @Override
+    public int getInputUnitCount() {
+	return inputFeatureMapRows * inputFeatureMapColumns * wights.getDimensions()[1];
+    }
+
+    @Override
+    public int getOutputUnitCount() {
+	return getOutputFeatureMapLength() * wights.getDimensions()[0];
+    }
+
+    public int getInputFeatureMapColumns() {
+        return inputFeatureMapColumns;
+    }
+
+    public int getInputFeatureMapRows() {
+        return inputFeatureMapRows;
+    }
+
+    public int getInputFeatureMapLength() {
+	return inputFeatureMapRows * inputFeatureMapColumns;
+    }
+    
+    public int getOutputFeatureMapLength() {
+	return getOutputFeatureMapRows() * getOutputFeatureMapColumns();
+    }
+
+    public int getInputFilters() {
+        return wights.getDimensions()[1];
+    }
+
+    public int getOutputFeatureMapColumns() {
+        return (inputFeatureMapRows - wights.getDimensions()[2]) / stride + 1;
+    }
+
+    public int getOutputFeatureMapRows() {
+        return (inputFeatureMapColumns - wights.getDimensions()[3]) / stride + 1;
+    }
+
+    public int getOutputFilters() {
+        return wights.getDimensions()[0];
+    }
+
+    public int getStride() {
+        return stride;
     }
 }

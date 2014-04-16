@@ -1,15 +1,15 @@
 package com.github.neuralnetworks.training.backpropagation;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
-import com.github.neuralnetworks.architecture.BiasLayer;
 import com.github.neuralnetworks.architecture.Connections;
-import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
+import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.util.Properties;
+import com.github.neuralnetworks.util.Tensor;
+import com.github.neuralnetworks.util.Util;
 
 /**
  * Backpropagation connection calculator for sigmoid layers
@@ -23,23 +23,20 @@ public class BackPropagationSigmoid extends BackPropagationConnectionCalculatorI
     }
 
     @Override
-    protected void addBackpropFunction(SortedMap<Connections, Integer> inputConnections, Map<Connections, BackpropagationConnectionCalculator> connectionCalculators, Layer targetLayer) {
-	for (Entry<Connections, Integer> e : inputConnections.entrySet()) {
-	    SortedMap<GraphConnections, Integer> m = new TreeMap<>();
-	    if (e.getKey().getInputLayer() instanceof BiasLayer && targetLayer != e.getKey().getInputLayer()) {
-		m.put((GraphConnections) e.getKey(), miniBatchSize);
-		connectionCalculators.put(e.getKey(), new AparapiBackpropSigmoid(m, miniBatchSize, e.getKey().getInputLayer()));
+    protected void addBackpropFunction(List<Connections> inputConnections, Map<Connections, BackPropagationConnectionCalculator> connectionCalculators, ValuesProvider valuesProvider, ValuesProvider activations, Layer targetLayer) {
+	for (Connections c : inputConnections) {
+	    if (Util.isBias(c.getInputLayer()) && targetLayer != c.getInputLayer()) {
+		connectionCalculators.put(c, new AparapiBackpropSigmoid(Arrays.asList(c), valuesProvider, activations, Arrays.asList(getWeightUpdates().get(c)), c.getInputLayer(), getLearningRate(), getMomentum(), getL1weightDecay(), getL2weightDecay()));
 	    } else {
-		m.put((GraphConnections) e.getKey(), e.getValue());
-		connectionCalculators.put(e.getKey(), new AparapiBackpropSigmoid(m, miniBatchSize, targetLayer));
+		connectionCalculators.put(c, new AparapiBackpropSigmoid(Arrays.asList(c), valuesProvider, activations, Arrays.asList(getWeightUpdates().get(c)), targetLayer, getLearningRate(), getMomentum(), getL1weightDecay(), getL2weightDecay()));
 	    }
 	}
     }
 
     public static class AparapiBackpropSigmoid extends AparapiBackpropagationFullyConnected {
 
-	public AparapiBackpropSigmoid(SortedMap<GraphConnections, Integer> inputConnections, int miniBatchSize, Layer targetLayer) {
-	    super(inputConnections, miniBatchSize, targetLayer);
+	public AparapiBackpropSigmoid(List<Connections> inputConnections, ValuesProvider valuesProvider, ValuesProvider activations, List<Tensor> weightUpdates, Layer targetLayer, float learningRate, float momentum, float l1weightDecay, float l2weightDecay) {
+	    super(inputConnections, valuesProvider, activations, weightUpdates, targetLayer, learningRate, momentum, l1weightDecay, l2weightDecay);
 	}
 
 	private static final long serialVersionUID = -3580345016542506932L;
@@ -47,9 +44,12 @@ public class BackPropagationSigmoid extends BackPropagationConnectionCalculatorI
 	@Override
 	protected void calcDerivative() {
 	    float activation = 0;
-	    for (int i = getGlobalId() * miniBatchSize, endIndex = (getGlobalId() + 1) * miniBatchSize; i < endIndex; i++) {
-		activation = ffActivation[i];
-		output[i] = output[i] * activation * (1 - activation);
+	    int end = outputStartPosition + getGlobalId() * outputRowStep + miniBatchSize * outputColumnStep;
+	    int outputId = outputStartPosition + getGlobalId() * outputRowStep;
+	    int activationId = activationStartPosition + getGlobalId() * activationRowStep;
+	    for (; outputId < end; outputId += outputColumnStep, activationId += activationColumnStep) {
+		activation = ffActivation[activationId];
+		output[outputId] = output[outputId] * activation * (1 - activation);
 	    }
 	}
     }

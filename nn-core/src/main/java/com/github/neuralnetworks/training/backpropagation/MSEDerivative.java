@@ -1,28 +1,35 @@
 package com.github.neuralnetworks.training.backpropagation;
 
-import com.github.neuralnetworks.architecture.Matrix;
+import java.util.Arrays;
+import java.util.Iterator;
+
+import com.github.neuralnetworks.util.Tensor;
+import com.github.neuralnetworks.util.TensorFactory;
 
 /**
  * Mean squared error derivative
  */
 public class MSEDerivative implements OutputErrorDerivative {
 
-    private Matrix result;
+    private static final long serialVersionUID = 1L;
 
     @Override
-    public Matrix getOutputErrorDerivative(Matrix activation, Matrix target) {
-	if (activation.getElements().length != target.getElements().length || activation.getColumns() != target.getColumns()) {
+    public void getOutputErrorDerivative(Tensor activation, Tensor target, Tensor result) {
+	if (!Arrays.equals(activation.getDimensions(), target.getDimensions())) {
 	    throw new IllegalArgumentException("Matrices are not the same");
 	}
 
-	if (result == null || result.getElements().length != activation.getElements().length) {
-	    result = new Matrix(activation);
+	if (result == null || !Arrays.equals(result.getDimensions(), activation.getDimensions())) {
+	    result = TensorFactory.tensor(activation.getDimensions());
 	}
 
-	for (int i = 0; i < activation.getElements().length; i++) {
-	    result.getElements()[i] = (target.getElements()[i] - activation.getElements()[i]) * activation.getElements()[i] * (1 - activation.getElements()[i]);
-	}
+	Iterator<Integer> activationIt = activation.iterator();
+	Iterator<Integer> targetIt = target.iterator();
+	Iterator<Integer> resultIt = result.iterator();
 
-	return result;
+	while (resultIt.hasNext()) {
+	    int activationId = activationIt.next();
+	    result.getElements()[resultIt.next()] = (target.getElements()[targetIt.next()] - activation.getElements()[activationId]) * activation.getElements()[activationId] * (1 - activation.getElements()[activationId]);
+	}
     }
 }

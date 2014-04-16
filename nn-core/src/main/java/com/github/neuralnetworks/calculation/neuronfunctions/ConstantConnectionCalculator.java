@@ -1,12 +1,13 @@
 package com.github.neuralnetworks.calculation.neuronfunctions;
 
-import java.util.SortedMap;
+import java.util.List;
 
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
-import com.github.neuralnetworks.util.Util;
+import com.github.neuralnetworks.calculation.memory.ValuesProvider;
+import com.github.neuralnetworks.util.Tensor;
+import com.github.neuralnetworks.util.TensorFactory;
 
 /**
  * Basic connection calculator that populates the output with a constant (for bias layers)
@@ -28,8 +29,9 @@ public class ConstantConnectionCalculator implements ConnectionCalculator {
     }
 
     @Override
-    public void calculate(SortedMap<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
-	Util.fillArray(output.getElements(), value);
+    public void calculate(List<Connections> connections, ValuesProvider valuesProvider, Layer targetLayer) {
+	Tensor t = TensorFactory.tensor(targetLayer, connections, valuesProvider);
+	t.forEach(i -> t.getElements()[i] = value);
     }
 
     public float getValue() {

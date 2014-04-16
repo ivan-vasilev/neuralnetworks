@@ -1,28 +1,30 @@
 package com.github.neuralnetworks.architecture.types;
 
+import java.util.Collection;
+import java.util.List;
+
 import com.github.neuralnetworks.architecture.Layer;
+import com.github.neuralnetworks.util.UniqueList;
 
 /**
  * Deep Belief Network
  */
-public class DBN extends DNN {
+public class DBN extends DNN<RBM> {
+
+    private static final long serialVersionUID = 1L;
 
     public DBN() {
 	super();
     }
 
-    /**
-     * For each added layer a new RBM is created with visible layer - the hidden layer of the previous network and hidden layer - the new layer
-     * @param layer
-     * @param addBias
-     * @return this
-     */
-    public DBN addLayer(Layer layer, boolean addBias) {
-	Layer currentOutputLayer = getOutputLayer();
-	if (addLayer(layer) && getLayers().size() > 1) {
-	    addNeuralNetwork(new RBM(currentOutputLayer, layer, false, addBias));
+    @Override
+    protected Collection<Layer> getRelevantLayers(RBM nn) {
+	List<Layer> result = new UniqueList<Layer>();
+	result.addAll(nn.getLayers());
+	if (nn.getVisibleBiasConnections() != null) {
+	    result.remove(nn.getVisibleBiasConnections().getInputLayer());
 	}
 
-	return this;
+	return result;
     }
 }

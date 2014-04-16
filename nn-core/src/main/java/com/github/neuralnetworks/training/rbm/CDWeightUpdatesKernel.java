@@ -1,111 +1,135 @@
 package com.github.neuralnetworks.training.rbm;
 
+import java.io.Serializable;
+
 import com.amd.aparapi.Kernel;
+import com.github.neuralnetworks.util.Matrix;
 
 /**
  * Aparapi weight udpates for the connections between the hidden and the visible layers
  */
-public class CDWeightUpdatesKernel extends Kernel {
+public class CDWeightUpdatesKernel extends Kernel implements Serializable {
 
-    private float[] posPhaseHidden;
-    private float[] posPhaseVisible;
-    private float[] negPhaseHidden;
-    private float[] negPhaseVisible;
-    private float[] weights;
-    private float[] weightUpdates;
-    private int weightColumns;
+    private static final long serialVersionUID = 1L;
+
+    // data parameters
+    private final float[] posPhaseVisible;
+    private final int posPhaseVisibleStartIndex;
+    private final int posPhaseVisibleRowStep;
+    private final int posPhaseVisibleColumnStep;
+
+    private final float[] posPhaseHidden;
+    private final int posPhaseHiddenStartIndex;
+    private final int posPhaseHiddenRowStep;
+    private final int posPhaseHiddenColumnStep;
+
+    private final float[] negPhaseVisible;
+    private final int negPhaseVisibleStartIndex;
+    private final int negPhaseVisibleRowStep;
+    private final int negPhaseVisibleColumnStep;
+
+    private final float[] negPhaseHidden;
+    private final int negPhaseHiddenStartIndex;
+    private final int negPhaseHiddenRowStep;
+    private final int negPhaseHiddenColumnStep;
+
+    private final int miniBatchSize;
+
+    // weights parameters
+    private final float[] weights;
+    private final int weightsStartIndex;
+    private final int weightsRowStep;
+    private final int weightsColumnStep;
+    private final int weightsColumns;
+    private final float[] weightUpdates;
+
+    // learning parameters
     private float learningRate;
-    private float momentum;
-    private float weightDecay;
-    private int miniBatchSize;
+    private final float momentum;
+    private final float l1weightDecay;
+    private final float l2weightDecay;
 
-    public CDWeightUpdatesKernel(float[] weights, int weightColumns) {
+    public CDWeightUpdatesKernel(Matrix posPhaseVisible, Matrix posPhaseHidden, Matrix negPhaseVisible, Matrix negPhaseHidden, Matrix weights, float learningRate, float momentum, float l1weightDecay, float l2weightDecay) {
 	super();
-	this.weights = weights;
-	this.weightUpdates = new float[weights.length];
-	this.weightColumns = weightColumns;
-    }
+	this.posPhaseVisible = posPhaseVisible.getElements();
+	this.posPhaseVisibleStartIndex = posPhaseVisible.getStartIndex();
+	this.posPhaseVisibleRowStep = posPhaseVisible.getRowElementsDistance();
+	this.posPhaseVisibleColumnStep = posPhaseVisible.getColumnElementsDistance();
 
-    public CDWeightUpdatesKernel(float[] posPhaseVisible, float[] posPhaseHidden, float[] negPhaseVisible, float[] negPhaseHidden, float[] weights, int weightColumns, float learningRate, float momentum, float weightDecay, int miniBatchSize) {
-	super();
-	this.posPhaseVisible = posPhaseVisible;
-	this.posPhaseHidden = posPhaseHidden;
-	this.negPhaseVisible = negPhaseVisible;
-	this.negPhaseHidden = negPhaseHidden;
-	this.weights = weights;
-	this.weightUpdates = new float[weights.length];
-	this.weightColumns = weightColumns;
+	this.posPhaseHidden = posPhaseHidden.getElements();
+	this.posPhaseHiddenStartIndex = posPhaseHidden.getStartIndex();
+	this.posPhaseHiddenRowStep = posPhaseHidden.getRowElementsDistance();
+	this.posPhaseHiddenColumnStep = posPhaseHidden.getColumnElementsDistance();
+
+	this.negPhaseVisible = negPhaseVisible.getElements();
+	this.negPhaseVisibleStartIndex = negPhaseVisible.getStartIndex();
+	this.negPhaseVisibleRowStep = negPhaseVisible.getRowElementsDistance();
+	this.negPhaseVisibleColumnStep = negPhaseVisible.getColumnElementsDistance();
+
+	this.negPhaseHidden = negPhaseHidden.getElements();
+	this.negPhaseHiddenStartIndex = negPhaseHidden.getStartIndex();
+	this.negPhaseHiddenRowStep = negPhaseHidden.getRowElementsDistance();
+	this.negPhaseHiddenColumnStep = negPhaseHidden.getColumnElementsDistance();
+
+	this.weights = weights.getElements();
+	this.weightsStartIndex = weights.getStartIndex();
+	this.weightsRowStep = weights.getRowElementsDistance();
+	this.weightsColumnStep = weights.getColumnElementsDistance();
+	this.weightsColumns = weights.getColumns();
+
+	this.weightUpdates = new float[weights.getSize()];
 	this.learningRate = learningRate;
 	this.momentum = momentum;
-	this.weightDecay = weightDecay;
-	this.miniBatchSize = miniBatchSize;
+	this.l1weightDecay = l1weightDecay;
+	this.l2weightDecay = l2weightDecay;
+	this.miniBatchSize = posPhaseVisible.getColumns();
     }
 
     @Override
     public void run() {
 	int id = getGlobalId();
-	int visibleId = (id % weightColumns) * miniBatchSize;
-	int hiddenId = (id / weightColumns) * miniBatchSize;
-	float weightUpdate = 0;
-	int mbs = miniBatchSize;
-	for (int i = 0; i < mbs; i++) {
-	    weightUpdate += posPhaseHidden[hiddenId + i] * posPhaseVisible[visibleId + i] - negPhaseHidden[hiddenId + i] * negPhaseVisible[visibleId + i];
-	}
 
-	weightUpdate = learningRate * (weightUpdate / miniBatchSize - weightDecay * weights[id]) + momentum * weightUpdates[id];
-	weights[id] += weightUpdate;
-	weightUpdates[id] = weightUpdate;
+	int weightId = 0, weightUpdateId = 0;
+	float weightUpdate = 0, weight = 0;
+
+	for (int i = 0; i < weightsColumns; i++) {
+	    weightUpdate = 0;
+
+	    for (int j = 0; j < miniBatchSize; j++) {
+		weightUpdate += posPhaseHidden[posPhaseHiddenStartIndex + id * posPhaseHiddenRowStep + j * posPhaseHiddenColumnStep] * posPhaseVisible[posPhaseVisibleStartIndex + i * posPhaseVisibleRowStep + j * posPhaseVisibleColumnStep] - negPhaseHidden[negPhaseHiddenStartIndex + id * negPhaseHiddenRowStep + j * negPhaseHiddenColumnStep] * negPhaseVisible[negPhaseVisibleStartIndex + i * negPhaseVisibleRowStep + j * negPhaseVisibleColumnStep];
+	    }
+
+	    weightId = weightsStartIndex + id * weightsRowStep + i * weightsColumnStep;
+	    weightUpdateId = id * weightsColumns + i;
+	    weight = weights[weightId];
+	    weightUpdate = learningRate * (weightUpdate /*/ mbs*/ - l1weightDecay * abs(weight) - l2weightDecay * weight * weight / 2) + momentum * weightUpdates[weightUpdateId];
+	    weights[weightId] += weightUpdate;
+	    weightUpdates[weightUpdateId] = weightUpdate;
+	}
     }
 
     public float[] getPosPhaseHidden() {
         return posPhaseHidden;
     }
 
-    public void setPosPhaseHidden(float[] posPhaseHidden) {
-        this.posPhaseHidden = posPhaseHidden;
-    }
-
     public float[] getPosPhaseVisible() {
         return posPhaseVisible;
-    }
-
-    public void setPosPhaseVisible(float[] posPhaseVisible) {
-        this.posPhaseVisible = posPhaseVisible;
     }
 
     public float[] getNegPhaseHidden() {
         return negPhaseHidden;
     }
 
-    public void setNegPhaseHidden(float[] negPhaseHidden) {
-        this.negPhaseHidden = negPhaseHidden;
-    }
-
     public float[] getNegPhaseVisible() {
         return negPhaseVisible;
-    }
-
-    public void setNegPhaseVisible(float[] negPhaseVisible) {
-        this.negPhaseVisible = negPhaseVisible;
     }
 
     public float[] getWeights() {
         return weights;
     }
 
-    public void setWeights(float[] weights) {
-        this.weights = weights;
-        if (this.weightUpdates == null || this.weightUpdates.length != weights.length) {
-            this.weightUpdates = new float[weights.length];
-        }
-    }
-
     public int getWeightColumns() {
-        return weightColumns;
-    }
-
-    public void setWeightColumns(int weightColumns) {
-        this.weightColumns = weightColumns;
+        return weightsColumns;
     }
 
     public float getLearningRate() {
@@ -120,23 +144,15 @@ public class CDWeightUpdatesKernel extends Kernel {
         return momentum;
     }
 
-    public void setMomentum(float momentum) {
-        this.momentum = momentum;
+    public float getl1WeightDecay() {
+        return l1weightDecay;
     }
-
-    public float getWeightDecay() {
-        return weightDecay;
-    }
-
-    public void setWeightDecay(float weightDecay) {
-        this.weightDecay = weightDecay;
+    
+    public float getl2WeightDecay() {
+	return l1weightDecay;
     }
 
     public int getMiniBatchSize() {
         return miniBatchSize;
-    }
-
-    public void setMiniBatchSize(int miniBatchSize) {
-        this.miniBatchSize = miniBatchSize;
     }
 }

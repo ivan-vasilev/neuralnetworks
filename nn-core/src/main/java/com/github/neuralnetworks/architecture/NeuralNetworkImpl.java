@@ -1,16 +1,21 @@
 package com.github.neuralnetworks.architecture;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
 import com.github.neuralnetworks.calculation.LayerCalculator;
 import com.github.neuralnetworks.util.UniqueList;
+import com.github.neuralnetworks.util.Util;
 
 /**
- * Base class for all types of neural networks.
- * A neural network is defined only by the layers it contains. The layers themselves contain the connections with the other layers.
+ * Base class for all types of neural networks. A neural network is defined only
+ * by the layers it contains. The layers themselves contain the connections with
+ * the other layers.
  */
-public abstract class NeuralNetworkImpl implements NeuralNetwork {
+public class NeuralNetworkImpl implements NeuralNetwork {
+
+    private static final long serialVersionUID = 1L;
 
     private Set<Layer> layers;
     private LayerCalculator layerCalculator;
@@ -22,11 +27,11 @@ public abstract class NeuralNetworkImpl implements NeuralNetwork {
 
     @Override
     public LayerCalculator getLayerCalculator() {
-        return layerCalculator;
+	return layerCalculator;
     }
 
     public void setLayerCalculator(LayerCalculator layerCalculator) {
-        this.layerCalculator = layerCalculator;
+	this.layerCalculator = layerCalculator;
     }
 
     @Override
@@ -34,69 +39,62 @@ public abstract class NeuralNetworkImpl implements NeuralNetwork {
 	return layers;
     }
 
-    /* (non-Javadoc)
+    public void setLayers(Set<Layer> layers) {
+	this.layers = layers;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.github.neuralnetworks.architecture.NeuralNetwork#getInputLayer()
-     * Default implementation - the input layer is that layer, which doesn't have any inbound connections
+     * Default implementation - the input layer is that layer, which doesn't
+     * have any inbound connections
      */
     @Override
     public Layer getInputLayer() {
-	hasInboundConnections:
-	for (Layer l : layers) {
-	    if (!(l instanceof BiasLayer)) {
-		for (Connections c : l.getConnections()) {
-		    if (isInnerConnection(c) && l == c.getOutputLayer()) {
-			continue hasInboundConnections;
-		    }
-		}
+	return layers.stream().filter(l -> l.getConnections(this).stream().noneMatch(c -> l == c.getOutputLayer() && !Util.isBias(c.getInputLayer()))).findFirst().orElse(null);
+    }
 
-		return l;
-	    }
-	}
-
-	return null;
+    @Override
+    public Layer getOutputLayer() {
+	return getNoOutboundConnectionsLayer();
     }
 
     protected Layer getNoOutboundConnectionsLayer() {
-	hasOutboundConnections:
-	for (Layer l : layers) {
-	    for (Connections c : l.getConnections()) {
-		if (isInnerConnection(c) && l == c.getInputLayer()) {
-		    continue hasOutboundConnections;
-		}
-	    }
-
-	    return l;
-	}
-
-	return null;
+	return layers.stream().filter(l -> l.getConnections(this).stream().noneMatch(c -> l == c.getInputLayer())).findFirst().orElse(null);
     }
 
-    /* (non-Javadoc)
-     * @see com.github.neuralnetworks.architecture.NeuralNetwork#getConnections()
-     * Returns list of all the connections within the network.
-     * The list is retrieved by iterating over all the layers. Only connections that have both layers in this network are returned.
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.github.neuralnetworks.architecture.NeuralNetwork#getConnections()
+     * Returns list of all the connections within the network. The list is
+     * retrieved by iterating over all the layers. Only connections that have
+     * both layers in this network are returned.
      */
     @Override
     public List<Connections> getConnections() {
 	List<Connections> result = new UniqueList<>();
 	if (layers != null) {
-	    for (Layer l : layers) {
-		if (l.getConnections() != null) {
-		    for (Connections c : l.getConnections()) {
-			// both layers of the connection have to be part of the neural network for this connection to be included
-			if (isInnerConnection(c)) {
-			    result.add(c);
-			}
-		    }
-		}
-	    }
+	    layers.forEach(l -> result.addAll(l.getConnections(this)));
 	}
 
 	return result;
     }
 
     /**
+     * @param inputLayer
+     * @param outputLayer
+     * @return Connection between the two layers if it exists
+     */
+    public Connections getConnection(Layer inputLayer, Layer outputLayer) {
+	return getConnections().stream().filter(c -> (c.getInputLayer() == inputLayer && c.getOutputLayer() == outputLayer) || (c.getInputLayer() == outputLayer && c.getOutputLayer() == inputLayer)).findFirst().orElse(null);
+    }
+
+    /**
      * Add layer to the network
+     * 
      * @param layer
      * @return whether the layer was added successfully
      */
@@ -105,7 +103,7 @@ public abstract class NeuralNetworkImpl implements NeuralNetwork {
 	    if (layers == null) {
 		layers = new UniqueList<>();
 	    }
-	    
+
 	    if (!layers.contains(layer)) {
 		layers.add(layer);
 		return true;
@@ -116,25 +114,47 @@ public abstract class NeuralNetworkImpl implements NeuralNetwork {
     }
 
     /**
-     * Add connection to the network - this means adding both input and output layers to the network
-     * @param connection
+     * Remove layer from the network
+     * 
+     * @param layer
      */
-    public void addConnection(Connections connection) {
-	if (connection != null) {
-	    addLayer(connection.getInputLayer());
-	    addLayer(connection.getOutputLayer());
+    public void removeLayer(Layer layer) {
+	if (layer != null) {
+	    if (layers != null) {
+		// remove layer and bias layers
+		layers.remove(layer);
+		layer.getConnections(this).stream().map(Connections::getInputLayer).filter(l -> Util.isBias(l)).forEach(l -> layers.remove(l));
+	    }
 	}
     }
 
     /**
-     * @param c
-     * @return the connection is inner when it's both layers are within the network
+     * Add layers to the network
+     * 
+     * @param newLayers
      */
-    protected boolean isInnerConnection(Connections c) {
-	if (layers != null) {
-	    return layers.contains(c.getInputLayer()) && layers.contains(c.getOutputLayer());
-	}
+    public void addLayers(Collection<Layer> newLayers) {
+	if (newLayers != null) {
+	    if (layers == null) {
+		layers = new UniqueList<>();
+	    }
 
-	return false;
+	    newLayers.stream().filter(l -> !layers.contains(l)).forEach(l -> layers.add(l));
+	}
+    }
+
+    /**
+     * Add connection to the network - this means adding both input and output
+     * layers to the network
+     * 
+     * @param connection
+     */
+    public void addConnections(Connections... connections) {
+	if (connections != null) {
+	    for (Connections c : connections) {
+		addLayer(c.getInputLayer());
+		addLayer(c.getOutputLayer());
+	    }
+	}
     }
 }

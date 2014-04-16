@@ -1,5 +1,6 @@
 package com.github.neuralnetworks.architecture;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
@@ -11,7 +12,7 @@ import com.github.neuralnetworks.calculation.LayerCalculator;
  * whole neural network taking part in committee of machines, single
  * convolutional/subsamplingo layers or even a single connection between the layers
  */
-public interface NeuralNetwork {
+public interface NeuralNetwork extends Serializable {
 
     /**
      * input layer
@@ -19,14 +20,9 @@ public interface NeuralNetwork {
     public Layer getInputLayer();
 
     /**
-     * @return the layer that is used for output when the network is "stacked"
+     * @return output layer
      */
     public Layer getOutputLayer();
-
-    /**
-     * @return the output layer for the rest of the world - this and the previous methods may return different results (in case of Autoencoders for example)
-     */
-    public Layer getDataOutputLayer();
 
     /**
      * @return all the layers in this network

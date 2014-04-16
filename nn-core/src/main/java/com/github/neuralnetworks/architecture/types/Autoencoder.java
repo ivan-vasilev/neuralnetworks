@@ -1,67 +1,31 @@
 package com.github.neuralnetworks.architecture.types;
 
-import com.github.neuralnetworks.architecture.BiasLayer;
-import com.github.neuralnetworks.architecture.FullyConnected;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
+import com.github.neuralnetworks.util.Util;
 
 /**
  * Autoencoder
  */
 public class Autoencoder extends NeuralNetworkImpl {
 
-    private Layer hiddenLayer;
-    private Layer outputLayer;
-    private boolean useHiddenLayerAsOutput = true;
+    private static final long serialVersionUID = 1L;
 
-    public Autoencoder(Layer inputLayer, Layer hiddenLayer, Layer outputLayer, boolean addBias) {
-	this.hiddenLayer = hiddenLayer;
-	this.outputLayer = outputLayer;
+    public Autoencoder() {
+	super();
+    }
 
-	// layers are added
-	addLayer(inputLayer);
-	addLayer(hiddenLayer);
-	addLayer(outputLayer);
+    public Layer getHiddenBiasLayer() {
+	Layer hiddenLayer = getHiddenLayer();
+	return hiddenLayer.getConnections().stream().map(c -> Util.getOppositeLayer(c, hiddenLayer)).filter(l -> Util.isBias(l)).findFirst().orElse(null);
+    }
 
-	// connections are created
-	new FullyConnected(inputLayer, outputLayer);
-	new FullyConnected(inputLayer, outputLayer);
-
-	// biases are added
-	if (addBias) {
-	    Layer hiddenBiasLayer = new BiasLayer();
-	    addLayer(hiddenBiasLayer);
-	    new FullyConnected(hiddenBiasLayer, hiddenLayer);
-
-	    Layer outputBiasLayer = new BiasLayer();
-	    addLayer(outputBiasLayer);
-	    new FullyConnected(outputBiasLayer, outputLayer);
-	}
+    public Layer getOutputBiasLayer() {
+	Layer outputLayer = getOutputLayer();
+	return outputLayer.getConnections().stream().map(c -> Util.getOppositeLayer(c, outputLayer)).filter(l -> Util.isBias(l)).findFirst().orElse(null);
     }
 
     public Layer getHiddenLayer() {
-        return hiddenLayer;
-    }
-
-    public void setHiddenLayer(Layer hiddenLayer) {
-        this.hiddenLayer = hiddenLayer;
-    }
-
-    @Override
-    public Layer getOutputLayer() {
-	return useHiddenLayerAsOutput ? hiddenLayer : outputLayer;
-    }
-
-    @Override
-    public Layer getDataOutputLayer() {
-	return useHiddenLayerAsOutput ? hiddenLayer : outputLayer;
-    }
-
-    public boolean getUseHiddenLayerAsOutput() {
-        return useHiddenLayerAsOutput;
-    }
-
-    public void setUseHiddenLayerAsOutput(boolean useHiddenLayerAsOutput) {
-        this.useHiddenLayerAsOutput = useHiddenLayerAsOutput;
+	return getLayers().stream().filter(l -> l != getOutputLayer() && l != getInputLayer()).findFirst().orElse(null);
     }
 }

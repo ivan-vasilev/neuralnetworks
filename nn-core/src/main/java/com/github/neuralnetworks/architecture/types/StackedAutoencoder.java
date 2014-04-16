@@ -1,27 +1,33 @@
 package com.github.neuralnetworks.architecture.types;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 import com.github.neuralnetworks.architecture.Layer;
 
 /**
  * Stacked autoencoder
  */
-public class StackedAutoencoder extends DNN {
+public class StackedAutoencoder extends DNN<Autoencoder> {
+
+    private static final long serialVersionUID = 1L;
 
     public StackedAutoencoder(Layer input) {
 	super();
 	addLayer(input);
     }
 
-    /**
-     * This method creates new Autoencoder with input layer - the hidden layer of the previous topmost autoencoder.
-     */
-    public void addLevel(Layer hidden, boolean addBias) {
-	Layer input = getOutputLayer();
+    @Override
+    protected Collection<Layer> getRelevantLayers(Autoencoder nn) {
+	Set<Layer> layers = new HashSet<Layer>();
+	layers.add(nn.getHiddenLayer());
+	layers.add(nn.getInputLayer());
 
-	if (input == null) {
-	    throw new IllegalArgumentException("At least one layer must be added before adding levels");
+	if (nn.getHiddenBiasLayer() != null) {
+	    layers.add(nn.getHiddenBiasLayer());
 	}
 
-	addNeuralNetwork(new Autoencoder(input, hidden, new Layer(input.getNeuronCount()), addBias));
+	return layers;
     }
 }

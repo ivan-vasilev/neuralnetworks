@@ -2,6 +2,8 @@ package com.github.neuralnetworks.training.random;
 
 import java.util.Random;
 
+import com.github.neuralnetworks.util.Tensor;
+
 /**
  * Default implementation of the random initializer using JDK's default Random
  */
@@ -35,10 +37,9 @@ public class RandomInitializerImpl implements RandomInitializer {
     }
 
     @Override
-    public void initialize(float[] array) {
-	for (int i = 0; i < array.length; i++) {
-	    array[i] = start + random.nextFloat() * (end - start);
-	}
+    public void initialize(Tensor t) {
+	float[] elements = t.getElements();
+	t.forEach(i -> elements[i] = start + random.nextFloat() * (end - start));
     }
  
     public Random getRandom() {

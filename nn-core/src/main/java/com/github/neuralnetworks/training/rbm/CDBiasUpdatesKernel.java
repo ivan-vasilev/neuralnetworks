@@ -1,62 +1,82 @@
 package com.github.neuralnetworks.training.rbm;
 
+import java.io.Serializable;
+
 import com.amd.aparapi.Kernel;
+import com.github.neuralnetworks.util.Matrix;
 
 /**
  * Aparapi kernerl for update of bias updates
  */
-public class CDBiasUpdatesKernel extends Kernel {
+public class CDBiasUpdatesKernel extends Kernel implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * bias weights
      */
-    private float[] biasWeights;
+    private final float[] biasWeights;
+    private final int weightsStartIndex;
+    private final int weightsRowStep;
 
     /**
      * weight updates
      */
-    private float[] biasUpdates;
+    private final float[] biasUpdates;
 
     /**
      * positive phase
      */
-    private float[] posPhase;
+    private final float[] posPhase;
+    private final int posPhaseStartIndex;
+    private final int posPhaseRowStep;
+    private final int posPhaseColumnStep;
 
     /**
      * negative phase
      */
-    private float[] negPhase;
+    private final float[] negPhase;
+    private final int negPhaseStartIndex;
+    private final int negPhaseRowStep;
+    private final int negPhaseColumnStep;
+
     private float learningRate;
-    private float momentum;
-    private int miniBatchSize;
+    private final float momentum;
+    private final int miniBatchSize;
 
-    public CDBiasUpdatesKernel(float[] hiddenBiasWeights) {
+    public CDBiasUpdatesKernel(Matrix hiddenBiasWeights, Matrix posPhase, Matrix negPhase, float learningRate, float momentum) {
 	super();
-	this.biasWeights = hiddenBiasWeights;
-	this.biasUpdates = new float[hiddenBiasWeights.length];
-    }
+	this.posPhase = posPhase.getElements();
+	this.posPhaseStartIndex = posPhase.getStartIndex();
+	this.posPhaseRowStep = posPhase.getRowElementsDistance();
+	this.posPhaseColumnStep = posPhase.getColumnElementsDistance();
 
-    public CDBiasUpdatesKernel(float[] hiddenBiasWeights, float[] posPhase, float[] negPhase, float learningRate, float momentum, int miniBatchSize) {
-	super();
-	this.biasWeights = hiddenBiasWeights;
-	this.biasUpdates = new float[hiddenBiasWeights.length];
-	this.posPhase = posPhase;
-	this.negPhase = negPhase;
+	this.negPhase = negPhase.getElements();
+	this.negPhaseStartIndex = negPhase.getStartIndex();
+	this.negPhaseRowStep = negPhase.getRowElementsDistance();
+	this.negPhaseColumnStep = negPhase.getColumnElementsDistance();
+
+	this.biasWeights = hiddenBiasWeights.getElements();
+	this.weightsStartIndex = hiddenBiasWeights.getStartIndex();
+	this.weightsRowStep = hiddenBiasWeights.getRowElementsDistance();
+	this.biasUpdates = new float[hiddenBiasWeights.getSize()];
+
 	this.learningRate = learningRate;
 	this.momentum = momentum;
-	this.miniBatchSize = miniBatchSize;
+	this.miniBatchSize = posPhase.getColumns();
     }
 
     @Override
     public void run() {
 	int id = getGlobalId();
 	float weightUpdate = 0;
+
 	for (int i = 0; i < miniBatchSize; i++) {
-	    weightUpdate += posPhase[id * miniBatchSize + i] - negPhase[id * miniBatchSize + i];
+	    weightUpdate += posPhase[posPhaseStartIndex + id * posPhaseRowStep + i * posPhaseColumnStep] - negPhase[negPhaseStartIndex + id * negPhaseRowStep + i * negPhaseColumnStep];
 	}
 
-	weightUpdate = learningRate * (weightUpdate / miniBatchSize) + momentum * biasUpdates[id];
-	biasWeights[id] += weightUpdate;
+	weightUpdate = learningRate * weightUpdate /*/ mbs */ + momentum * biasUpdates[id];
+	biasWeights[weightsStartIndex + id * weightsRowStep] += weightUpdate;
 	biasUpdates[id] = weightUpdate;
     }
 
@@ -64,35 +84,16 @@ public class CDBiasUpdatesKernel extends Kernel {
         return biasWeights;
     }
 
-    public void setHiddenBiasWeights(float[] hiddenBiasWeights) {
-        this.biasWeights = hiddenBiasWeights;
-        if (this.biasUpdates == null || this.biasUpdates.length != hiddenBiasWeights.length) {
-            this.biasUpdates = new float[biasUpdates.length];
-        }
-    }
-
     public float[] getBiasUpdates() {
         return biasUpdates;
-    }
-
-    public void setBiasUpdates(float[] biasUpdates) {
-        this.biasUpdates = biasUpdates;
     }
 
     public float[] getPosPhase() {
         return posPhase;
     }
 
-    public void setPosPhase(float[] posPhase) {
-        this.posPhase = posPhase;
-    }
-
     public float[] getNegPhase() {
         return negPhase;
-    }
-
-    public void setNegPhase(float[] negPhase) {
-        this.negPhase = negPhase;
     }
 
     public float getLearningRate() {
@@ -107,15 +108,7 @@ public class CDBiasUpdatesKernel extends Kernel {
         return momentum;
     }
 
-    public void setMomentum(float momentum) {
-        this.momentum = momentum;
-    }
-
     public int getMiniBatchSize() {
         return miniBatchSize;
-    }
-
-    public void setMiniBatchSize(int miniBatchSize) {
-        this.miniBatchSize = miniBatchSize;
     }
 }

@@ -1,20 +1,22 @@
 package com.github.neuralnetworks.calculation.neuronfunctions;
 
-import java.util.Arrays;
-import java.util.SortedMap;
+import java.util.List;
 
-import com.github.neuralnetworks.architecture.BiasLayer;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
-import com.github.neuralnetworks.architecture.ConvGridLayer;
 import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
+import com.github.neuralnetworks.calculation.memory.ValuesProvider;
+import com.github.neuralnetworks.util.Tensor;
+import com.github.neuralnetworks.util.Tensor.TensorIterator;
+import com.github.neuralnetworks.util.TensorFactory;
+import com.github.neuralnetworks.util.Util;
 
 /**
- * Default implementation of Connection calculator for convolutional/subsampling layers
+ * Default implementation of Connection calculator for convolutional/subsampling
+ * layers
  */
-public abstract class ConnectionCalculatorConv implements ConnectionCalculator {
+public class ConnectionCalculatorConv implements ConnectionCalculator {
 
     private static final long serialVersionUID = -5405654469496055017L;
 
@@ -23,13 +25,13 @@ public abstract class ConnectionCalculatorConv implements ConnectionCalculator {
     protected int miniBatchSize;
 
     @Override
-    public void calculate(SortedMap<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
+    public void calculate(List<Connections> connections, ValuesProvider valuesProvider, Layer targetLayer) {
 	Conv2DConnection c = null;
 	Conv2DConnection bias = null;
 
-	for (Connections con : connections.keySet()) {
+	for (Connections con : connections) {
 	    if (con instanceof Conv2DConnection) {
-		if (c.getInputLayer() instanceof BiasLayer) {
+		if (Util.isBias(con.getInputLayer())) {
 		    bias = (Conv2DConnection) con;
 		} else {
 		    c = (Conv2DConnection) con;
@@ -37,27 +39,40 @@ public abstract class ConnectionCalculatorConv implements ConnectionCalculator {
 	    }
 	}
 
-	calculateBias(bias, output);
-
 	if (c != null) {
 	    // currently works only as a feedforward (including bp)
+	    if (inputFunction == null || miniBatchSize != TensorFactory.batchSize(valuesProvider)) {
+		miniBatchSize = TensorFactory.batchSize(valuesProvider);
+		inputFunction = createInputFunction(c, valuesProvider, targetLayer);
+	    }
+
+	    calculateBias(bias, valuesProvider);
+
 	    if (targetLayer == c.getOutputLayer()) {
-		inputFunction.calculate(c, connections.get(c), output);
+		inputFunction.calculate(c, valuesProvider, targetLayer);
 	    } else {
-		inputFunction.calculate(c, output, connections.get(c));
+		inputFunction.calculate(c, valuesProvider, Util.getOppositeLayer(c, targetLayer));
 	    }
 	}
     }
 
-    protected abstract AparapiConv2D createInputFunction(Conv2DConnection c, int miniBatchSize, Layer targetLayer);
+    protected AparapiConv2D createInputFunction(Conv2DConnection c, ValuesProvider valuesProvider, Layer targetLayer) {
+	return new AparapiConv2DFF(c, valuesProvider, targetLayer);
+    }
 
-    protected void calculateBias(Conv2DConnection bias, Matrix output) {
+    protected void calculateBias(Conv2DConnection bias, ValuesProvider vp) {
 	if (bias != null) {
-	    float[] o = output.getElements();
-	    ConvGridLayer l = (ConvGridLayer) bias.getOutputLayer();
-	    int chunk = o.length / l.getFilters();
-	    for (int i = 0; i < l.getFilters(); i++) {
-		Arrays.fill(o, chunk * i, chunk * (i + 1), bias.getWeights()[i]);
+	    Tensor biasValue = TensorFactory.tensor(bias.getInputLayer(), bias, vp);
+	    if (biasValue.getElements()[biasValue.getStartIndex()] == 0) {
+		biasValue.forEach(i -> biasValue.getElements()[i] = 1);
+	    }
+
+	    Tensor v = TensorFactory.tensor(bias.getOutputLayer(), bias, vp);
+	    Tensor w = bias.getWeights();
+	    TensorIterator it = v.iterator();
+
+	    while (it.hasNext()) {
+		v.getElements()[it.next()] += w.get(it.getCurrentPosition()[0], 0, 0, 0);
 	    }
 	}
     }

@@ -1,105 +1,84 @@
 package com.github.neuralnetworks.training.backpropagation;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.SortedMap;
+import java.util.List;
 
 import com.github.neuralnetworks.architecture.Connections;
-import com.github.neuralnetworks.architecture.GraphConnections;
 import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.architecture.Matrix;
+import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSum;
-import com.github.neuralnetworks.util.Util;
+import com.github.neuralnetworks.util.Matrix;
+import com.github.neuralnetworks.util.Tensor;
+import com.github.neuralnetworks.util.TensorFactory;
 
 /**
  * Aparapi Backpropagation base weighted sum Supports learning rate, momentum
  * and weight decay
  */
-public class AparapiBackpropagationFullyConnected extends AparapiWeightedSum implements BackpropagationConnectionCalculator {
+public class AparapiBackpropagationFullyConnected extends AparapiWeightedSum implements BackPropagationConnectionCalculator {
 
     private static final long serialVersionUID = -5101971690861270462L;
 
     /**
      * Activation of the output layer from the feedforward phase
      */
+    @Constant
     protected float[] ffActivation;
+    protected final int activationStartPosition;
+    protected final int activationRowStep;
+    protected final int activationColumnStep;
 
     /**
      * Weight updates array
      */
-    protected float[] weightUpdates;
+    protected final float[] weightUpdates;
 
-    /**
-     * Stored weight updates for reuse
-     */
-    protected Map<Layer, float[]> storedWeightUpdates = new HashMap<>();
     protected float learningRate;
-    protected float momentum;
-    protected float weightDecay;
+    protected final float momentum;
+    protected final float l1weightDecay;
+    protected final float l2weightDecay;
 
-    /**
-     * activations from the feedforward phase
-     */
-    protected Map<Layer, Matrix> activations;
+    public AparapiBackpropagationFullyConnected(List<Connections> inputConnections, ValuesProvider valuesProvider, ValuesProvider activations, List<Tensor> weightUpdates, Layer targetLayer, float learningRate, float momentum, float l1weightDecay, float l2weightDecay) {
+	super(inputConnections, valuesProvider, targetLayer);
 
-    public AparapiBackpropagationFullyConnected(SortedMap<GraphConnections, Integer> inputConnections, int miniBatchSize, Layer targetLayer) {
-	super(inputConnections, miniBatchSize, targetLayer);
-    }
+	Matrix m = TensorFactory.tensor(targetLayer, inputConnections, activations);
+	this.ffActivation = m.getElements();
+	this.activationStartPosition = m.getStartIndex();
+	this.activationRowStep = m.getRowElementsDistance();
+	this.activationColumnStep = m.getColumnElementsDistance();
 
-    @Override
-    public void calculate(SortedMap<Connections, Matrix> inputConnections, Matrix outputMatrix, Layer targetLayer) {
-	super.calculate(inputConnections, outputMatrix, targetLayer);
-
-	if (inputConnections.size() > 2 || (inputConnections.size() > 1 && !Util.hasBias(inputConnections.keySet()))) {
-	    int i = 0;
-	    for (java.util.Map.Entry<Connections, Matrix> e : inputConnections.entrySet()) {
-		System.arraycopy(input, inputStartPositions[i], e.getValue().getElements(), 0, e.getValue().getElements().length);
-		float[] cg = ((GraphConnections) e.getKey()).getConnectionGraph().getElements();
-		System.arraycopy(weights, weightStartPositions[i], cg, 0, cg.length);
-		i++;
-	    }
-	}
-    }
-
-    @Override
-    protected void init(SortedMap<GraphConnections, Matrix> input, Matrix outputMatrix, Layer targetLayer) {
-	super.init(input, outputMatrix, targetLayer);
-
-	weightUpdates = storedWeightUpdates.get(targetLayer);
-	if (weightUpdates == null) {
-	    weightUpdates = new float[weights.length];
-	    storedWeightUpdates.put(targetLayer, weightUpdates);
-	}
-
-	ffActivation = activations.get(targetLayer).getElements();
+	this.learningRate = momentum;
+	this.momentum = momentum;
+	this.l1weightDecay = l1weightDecay;
+	this.l2weightDecay = l2weightDecay;
+	this.weightUpdates = weightUpdates.get(0).getElements();
     }
 
     @Override
     protected void after() {
-	int s = series;
-	int miniBatch = miniBatchSize;
-	int row = getGlobalId() * miniBatch;
-	float lr = learningRate;
-	float wd = weightDecay;
-	float mm = momentum;
-	float weightUpdate = 0;
-	int inputStartPosition = 0, initialWeightIndex = 0, weightStep = 0, dim = 0, weightIndex = 0;
+	int id = getGlobalId();
 
-	for (int i = 0; i < s; i++) {
-	    inputStartPosition = inputStartPositions[i];
-	    initialWeightIndex = weightStartPositions[i] + weightsInitialStep[i] * getGlobalId();
-	    weightStep = weightsStep[i];
-	    dim = weightsDimension[i];
+	int inputStartPosition = 0, inputRowsStep = 0, inputColumnsStep = 0, weightStartPosition = 0, weightStep = 0, dim = 0, weightIndex = 0;
+	float weight = 0, weightUpdate = 0, lr = learningRate;
+
+	// each input example
+	for (int k = 0; k < series; k++) {
+	    // each element in the row/column
+	    inputStartPosition = inputStartPositions[k];
+	    inputRowsStep = inputRowSteps[k];
+	    inputColumnsStep = inputColumnSteps[k];
+	    weightStartPosition = weightStartPositions[k] + weightsInitialStep[k] * id;
+	    weightStep = weightsStep[k];
+	    dim = weightsSize[k];
 
 	    for (int j = 0; j < dim; j++) {
 		weightUpdate = 0;
-		for (int column = 0; column < miniBatch; column++) {
-		    weightUpdate += input[inputStartPosition + j * miniBatch + column] * ffActivation[row + column];
+		for (int i = 0; i < miniBatchSize; i++) {
+		    weightUpdate += input[inputStartPosition + j * inputRowsStep + i * inputColumnsStep] * ffActivation[activationStartPosition + id * activationRowStep + i * activationColumnStep];
 		}
 
-		weightIndex = initialWeightIndex + j * weightStep;
-		weightUpdate /= miniBatch;
-		weightUpdate = lr * (weightUpdate / miniBatch) - wd * weights[weightIndex] + mm * weightUpdates[weightIndex];
+		weightIndex = weightStartPosition + j * weightStep;
+		weight = weights[weightIndex];
+		weightUpdate = lr * weightUpdate + momentum * weightUpdates[weightIndex] - l1weightDecay * abs(weight) - l2weightDecay * weight * weight / 2;
 		weights[weightIndex] += weightUpdate;
 		weightUpdates[weightIndex] = weightUpdate;
 	    }
@@ -131,26 +110,32 @@ public class AparapiBackpropagationFullyConnected extends AparapiWeightedSum imp
 
     @Override
     public void setMomentum(float momentum) {
-	this.momentum = momentum;
     }
 
     @Override
-    public float getWeightDecay() {
-	return weightDecay;
+    public float getL1weightDecay() {
+	return l1weightDecay;
     }
 
     @Override
-    public void setWeightDecay(float weightDecay) {
-	this.weightDecay = weightDecay;
+    public void setL1weightDecay(float weightDecay) {
     }
 
     @Override
-    public Map<Layer, Matrix> getActivations() {
-	return activations;
+    public float getL2weightDecay() {
+	return l2weightDecay;
     }
 
     @Override
-    public void setActivations(Map<Layer, Matrix> activations) {
-	this.activations = activations;
+    public void setL2weightDecay(float l2weightDecay) {
+    }
+
+    @Override
+    public ValuesProvider getActivations() {
+	return null;
+    }
+
+    @Override
+    public void setActivations(ValuesProvider activations) {
     }
 }

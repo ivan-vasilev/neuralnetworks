@@ -13,6 +13,10 @@ import com.github.neuralnetworks.util.Properties;
  */
 public abstract class OneStepTrainer<N extends NeuralNetwork> extends Trainer<N> {
 
+    private static final long serialVersionUID = 1L;
+
+    private boolean stopTraining;
+
     public OneStepTrainer() {
 	super();
     }
@@ -25,19 +29,35 @@ public abstract class OneStepTrainer<N extends NeuralNetwork> extends Trainer<N>
     public void train() {
 	triggerEvent(new TrainingStartedEvent(this));
 
-	super.train();
+	stopTraining = false;
 
-	TrainingInputData input = null;
-	while ((input = getTrainingInputProvider().getNextInput()) != null) {
-	    learnInput(input);
-	    triggerEvent(new MiniBatchFinishedEvent(this, input));
+	if (getRandomInitializer() != null) {
+	    getRandomInitializer().initialize(getNeuralNetwork());
+	}
+
+	getTrainingInputProvider().reset();
+
+	for (int i = 0, batch = 0; i < getEpochs() * getTrainingInputProvider().getInputSize() || stopTraining; i += getTrainingBatchSize(), batch++) {
+	    TrainingInputData input = getInput();
+	    getTrainingInputProvider().populateNext(input);
+	    learnInput(batch);
+	    triggerEvent(new MiniBatchFinishedEvent(this, input, null, batch));
 	}
 
 	triggerEvent(new TrainingFinishedEvent(this));
     }
 
+    public void stopTraining() {
+	stopTraining = true;
+    }
+
     /**
      * Learning of one batch of examples
      */
-    protected abstract void learnInput(TrainingInputData data);
+    protected abstract void learnInput(int batch);
+
+    /**
+     * @return the input data to be populated
+     */
+    protected abstract TrainingInputData getInput();
 }

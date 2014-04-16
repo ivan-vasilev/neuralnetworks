@@ -1,18 +1,15 @@
 package com.github.neuralnetworks.training.backpropagation;
 
-import java.util.Map;
-import java.util.SortedMap;
-
-import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.Subsampling2DConnection;
+import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSubsampling2D;
+import com.github.neuralnetworks.util.TensorFactory;
 
 /**
  * BackPropagation base function for subsampling layers
  */
-public class AparapiBackpropagationSubsampling2D extends AparapiSubsampling2D implements BackpropagationConnectionCalculator {
+public class AparapiBackpropagationSubsampling2D extends AparapiSubsampling2D implements BackPropagationConnectionCalculator {
 
     private static final long serialVersionUID = -345286029645674230L;
 
@@ -21,31 +18,9 @@ public class AparapiBackpropagationSubsampling2D extends AparapiSubsampling2D im
      */
     protected float[] ffActivation;
 
-    /**
-     * activations from the feedforward phase
-     */
-    protected Map<Layer, Matrix> activations;
-
-    @Override
-    public void calculate(SortedMap<Connections, Matrix> connections, Matrix output, Layer targetLayer) {
-	super.calculate(connections, output, targetLayer);
-    }
-
-    @Override
-    protected void init(Subsampling2DConnection c, Matrix input, Matrix output) {
-	super.init(c, input, output);
-
-	ffActivation = activations.get(c.getInputLayer()).getElements();
-    }
-
-    @Override
-    public Map<Layer, Matrix> getActivations() {
-        return activations;
-    }
-
-    @Override
-    public void setActivations(Map<Layer, Matrix> activations) {
-        this.activations = activations;
+    public AparapiBackpropagationSubsampling2D(Subsampling2DConnection c, ValuesProvider valuesProvider, ValuesProvider activations, Layer targetLayer) {
+	super(c, valuesProvider, targetLayer);
+	ffActivation = TensorFactory.tensor(c.getInputLayer(), c, activations).getElements();
     }
 
     @Override
@@ -71,13 +46,35 @@ public class AparapiBackpropagationSubsampling2D extends AparapiSubsampling2D im
     }
 
     @Override
-    public float getWeightDecay() {
+    public float getL1weightDecay() {
 	// UNUSED
 	return 0;
     }
 
     @Override
-    public void setWeightDecay(float weightDecay) {
+    public void setL1weightDecay(float weightDecay) {
+	// UNUSED
+    }
+
+    @Override
+    public float getL2weightDecay() {
+	// UNUSED
+	return 0;
+    }
+
+    @Override
+    public void setL2weightDecay(float l2weightDecay) {
+	// UNUSED
+    }
+
+    @Override
+    public ValuesProvider getActivations() {
+	// UNUSED
+	return null;
+    }
+
+    @Override
+    public void setActivations(ValuesProvider activations) {
 	// UNUSED
     }
 }

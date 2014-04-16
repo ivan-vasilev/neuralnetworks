@@ -1,41 +1,39 @@
 package com.github.neuralnetworks.training.backpropagation;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 import com.github.neuralnetworks.architecture.Layer;
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
-import com.github.neuralnetworks.calculation.LayerCalculator;
+import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.training.OneStepTrainer;
 import com.github.neuralnetworks.training.TrainingInputData;
+import com.github.neuralnetworks.training.TrainingInputDataImpl;
 import com.github.neuralnetworks.util.Constants;
+import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.Properties;
+import com.github.neuralnetworks.util.TensorFactory;
 import com.github.neuralnetworks.util.UniqueList;
 
 /**
  * Base backpropagation one step trainer
  * It has two additional parameters:
- * LayerCalculator for the feedforward phase
  * BackPropagationLayerCalculator for the backpropagation phase
+ * OutputErrorDerivative for calculating the derivative of the output error
  * This allows for various implementations of these calculators to be used (for example via GPU or other)
  */
 public class BackPropagationTrainer<N extends NeuralNetwork> extends OneStepTrainer<N> {
 
-    private Map<Layer, Matrix> activations;
-    private Map<Layer, Matrix> backpropagation;
+    private static final long serialVersionUID = 1L;
 
-    public BackPropagationTrainer() {
-	super();
-	activations = new HashMap<Layer, Matrix>();
-	backpropagation = new HashMap<Layer, Matrix>();
-    }
+    protected ValuesProvider activations;
+    protected ValuesProvider backpropagation;
+    protected TrainingInputData input;
 
     public BackPropagationTrainer(Properties properties) {
 	super(properties);
-	activations = new HashMap<Layer, Matrix>();
-	backpropagation = new HashMap<Layer, Matrix>();
+	activations = TensorFactory.tensorProvider(getNeuralNetwork(), getTrainingBatchSize(), Environment.getInstance().getUseSharedMemory());
+	activations.add(getProperties().getParameter(Constants.OUTPUT_ERROR_DERIVATIVE), activations.get(getNeuralNetwork().getOutputLayer()).getDimensions());
+	backpropagation = TensorFactory.tensorProvider(getNeuralNetwork(), getTrainingBatchSize(), Environment.getInstance().getUseSharedMemory());
     }
 
     /* (non-Javadoc)
@@ -44,21 +42,36 @@ public class BackPropagationTrainer<N extends NeuralNetwork> extends OneStepTrai
      * After that the error is backpropagated (via BackPropagationLayerCalculator blc).
      */
     @Override
-    protected void learnInput(TrainingInputData data) {
+    protected void learnInput(int batch) {
+	// forward
 	NeuralNetwork nn = getNeuralNetwork();
 	Set<Layer> calculatedLayers = new UniqueList<Layer>();
-
-	activations.put(nn.getInputLayer(), data.getInput());
 	calculatedLayers.add(nn.getInputLayer());
-	LayerCalculator lc = getLayerCalculator();
-	lc.calculate(calculatedLayers, activations, nn.getOutputLayer());
+	nn.getLayerCalculator().calculate(nn, nn.getOutputLayer(), calculatedLayers, activations);
 
+	// backward
 	OutputErrorDerivative d = getProperties().getParameter(Constants.OUTPUT_ERROR_DERIVATIVE);
-	Matrix outputErrorDerivative = d.getOutputErrorDerivative(activations.get(nn.getOutputLayer()), data.getTarget());
-	backpropagation.put(nn.getOutputLayer(), outputErrorDerivative);
+	d.getOutputErrorDerivative(activations.get(nn.getOutputLayer()), activations.get(d), backpropagation.get(nn.getOutputLayer()));
 	calculatedLayers.clear();
 	calculatedLayers.add(nn.getOutputLayer());
-	BackPropagationLayerCalculator blc = getProperties().getParameter(Constants.BACKPROPAGATION);
+	BackPropagationLayerCalculator blc = getBPLayerCalculator();
 	blc.backpropagate(nn, calculatedLayers, activations, backpropagation);
+    }
+
+    @Override
+    protected TrainingInputData getInput() {
+	if (input == null) {
+	    input = new TrainingInputDataImpl(activations.get(getNeuralNetwork().getInputLayer()), activations.get(getProperties().getParameter(Constants.OUTPUT_ERROR_DERIVATIVE)));
+	}
+
+	return input;
+    }
+
+    public BackPropagationLayerCalculator getBPLayerCalculator() {
+	return getProperties().getParameter(Constants.BACKPROPAGATION);
+    }
+
+    public void setBPLayerCalculator(BackPropagationLayerCalculator bplc) {
+	getProperties().setParameter(Constants.BACKPROPAGATION, bplc);
     }
 }

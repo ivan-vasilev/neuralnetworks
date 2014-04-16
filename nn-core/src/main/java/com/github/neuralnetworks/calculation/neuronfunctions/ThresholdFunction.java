@@ -1,16 +1,18 @@
 package com.github.neuralnetworks.calculation.neuronfunctions;
 
-import com.github.neuralnetworks.architecture.Matrix;
+import com.github.neuralnetworks.util.Tensor;
 
 /**
  * Threshold binary activation function
  */
-public class ThresholdFunction implements ActivationFunction {
+public class ThresholdFunction implements TensorFunction {
+
+    private static final long serialVersionUID = 1L;
 
     private float threshold;
 
     @Override
-    public void value(Matrix inputOutput) {
+    public void value(Tensor inputOutput) {
 	float[] elements = inputOutput.getElements();
 	for (int i = 0; i < elements.length; i++) {
 	    elements[i] = elements[i] >= threshold ? 1 : 0;

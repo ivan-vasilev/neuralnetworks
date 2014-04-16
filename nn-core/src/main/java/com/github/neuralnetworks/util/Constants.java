@@ -21,14 +21,18 @@ public class Constants {
     public static final String RANDOM_GENERATOR = "randomGenerator";
     public static final String ERROR_CALCULATOR = "errorCalculator";
     public static final String LAYER_CALCULATOR = "layerCalculator";
+    public static final String PERSISTENT_CD = "resetRBM";
     public static final String BACKPROPAGATION = "backpropagation";
     public static final String OUTPUT_ERROR_DERIVATIVE = "outputErrorDerivative";
-    public static final String VISIBLE_CONNECTION_CALCULATOR = "visibleConnectionCalculator";
-    public static final String HIDDEN_CONNECTION_CALCULATOR = "hiddenConnectionCalculator";
-    public static final String DEEP_TRAINERS = "deepTrainers";
-    public static final String WEIGHT_DECAY = "weightDecayTrainers";
+    public static final String LAYER_TRAINERS = "layerTrainers";
+    public static final String L1_WEIGHT_DECAY = "l1weightDecayTrainers";
+    public static final String L2_WEIGHT_DECAY = "l2weightDecayTrainers";
     public static final String CORRUPTION_LEVEL = "corruptionLevel";
     public static final String CORRUPTOR = "corruptionInitializer";
     public static final String INACTIVE_CORRUPTED_VALUE = "inactiveCorruptedValue";
     public static final String ACTIVE_CORRUPTED_VALUE = "activeCorruptedValue";
+    public static final String WEIGHT_UDPATES = "weightUpdates";
+    public static final String TRAINING_BATCH_SIZE = "batchSize";
+    public static final String TEST_BATCH_SIZE = "testBatchSize";
+    public static final String EPOCHS = "epochs";
 }

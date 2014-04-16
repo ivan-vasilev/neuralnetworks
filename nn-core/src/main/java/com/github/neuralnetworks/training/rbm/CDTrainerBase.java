@@ -1,12 +1,10 @@
 package com.github.neuralnetworks.training.rbm;
 
-import com.github.neuralnetworks.architecture.Matrix;
 import com.github.neuralnetworks.architecture.types.RBM;
-import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.calculation.RBMLayerCalculator;
-import com.github.neuralnetworks.events.TrainingEvent;
 import com.github.neuralnetworks.training.OneStepTrainer;
 import com.github.neuralnetworks.training.TrainingInputData;
+import com.github.neuralnetworks.training.TrainingInputDataImpl;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
 
@@ -16,115 +14,52 @@ import com.github.neuralnetworks.util.Properties;
  */
 public abstract class CDTrainerBase extends OneStepTrainer<RBM> {
 
-    /**
-     * positive phase visible layer results
-     */
-    private Matrix posPhaseVisible;
+    private static final long serialVersionUID = 1L;
 
-    /**
-     * negative phase visible layer results
-     */
-    private Matrix negPhaseVisible;
-
-    /**
-     * positive phase hidden layer results
-     */
-    private Matrix posPhaseHidden;
-
-    /**
-     * negative phase hidden layer results
-     */
-    private Matrix negPhaseHidden;
-
-    /**
-     * size of the mini batch
-     */
-    private int miniBatchSize;
+    private TrainingInputData input;
 
     public CDTrainerBase(Properties properties) {
 	super(properties);
     }
 
     @Override
-    protected void learnInput(TrainingInputData data) {
-	posPhaseVisible = data.getInput();
-
-	if (miniBatchSize != posPhaseVisible.getColumns()) {
-	    miniBatchSize = posPhaseVisible.getColumns();
-
-	    RBM nn = getNeuralNetwork();
-	    this.negPhaseVisible = new Matrix(nn.getVisibleLayer().getNeuronCount(), miniBatchSize);
-	    this.posPhaseHidden = new Matrix(nn.getHiddenLayer().getNeuronCount(), miniBatchSize);
-	    this.negPhaseHidden = new Matrix(nn.getHiddenLayer().getNeuronCount(), miniBatchSize);
+    protected TrainingInputData getInput() {
+	if (input == null) {
+	    input = new TrainingInputDataImpl(getLayerCalculator().getPositivePhaseVisible());
 	}
 
-	triggerEvent(new SamplingStepEvent(this, -1));
+	return input;
+    }
 
-	RBMLayerCalculator calculator = (RBMLayerCalculator) getLayerCalculator();
+    @Override
+    protected void learnInput(int batch) {
+	RBM nn = getNeuralNetwork();
 
-	// calculate hidden layer positive phase
-	calculator.calculateHiddenLayer(posPhaseVisible, posPhaseHidden, getHiddenConnectionCalculator(0));
-
-	triggerEvent(new SamplingStepEvent(this, 0));
-
-	// Gibbs sampling
-	for (int i = 1; i <= getGibbsSamplingCount(); i++) {
-	    calculator.calculateVisibleLayer(negPhaseVisible, negPhaseHidden, getVisibleConnectionCalculator(i));
-	    calculator.calculateHiddenLayer(negPhaseVisible, negPhaseHidden, getHiddenConnectionCalculator(i));
-	    triggerEvent(new SamplingStepEvent(this, i));
-	}
+	getLayerCalculator().gibbsSampling(nn, getGibbsSamplingCount(), batch == 0 ? true : !getIsPersistent());
 
 	// update weights
-	updateWeights(posPhaseVisible, posPhaseHidden, negPhaseVisible, negPhaseHidden);
+	updateWeights();
     }
 
-    public Matrix getPosPhaseVisible() {
-        return posPhaseVisible;
+    public RBMLayerCalculator getLayerCalculator() {
+	return properties.getParameter(Constants.LAYER_CALCULATOR);
     }
 
-    public Matrix getNegPhaseVisible() {
-        return negPhaseVisible;
+    public void setLayerCalculator(RBMLayerCalculator layerCalculator) {
+	properties.setParameter(Constants.LAYER_CALCULATOR, layerCalculator);
+    }
+    
+    public Boolean getIsPersistent() {
+	return properties.getParameter(Constants.PERSISTENT_CD);
     }
 
-    public Matrix getPosPhaseHidden() {
-        return posPhaseHidden;
-    }
-
-    public Matrix getNegPhaseHidden() {
-        return negPhaseHidden;
-    }
-
-    public int getMiniBatchSize() {
-        return miniBatchSize;
-    }
-
-    protected ConnectionCalculator getVisibleConnectionCalculator(int samplingStep) {
-	return properties.getParameter(Constants.VISIBLE_CONNECTION_CALCULATOR);
-    }
-
-    protected ConnectionCalculator getHiddenConnectionCalculator(int samplingStep) {
-	return properties.getParameter(Constants.HIDDEN_CONNECTION_CALCULATOR);
+    public void setIsPersistent(boolean isPersistent) {
+	properties.setParameter(Constants.PERSISTENT_CD, isPersistent);
     }
 
     public int getGibbsSamplingCount() {
 	return properties.containsKey(Constants.GIBBS_SAMPLING_COUNT) ? (int) properties.get(Constants.GIBBS_SAMPLING_COUNT) : 1;
     }
 
-    protected abstract void updateWeights(Matrix posPhaseVisible, Matrix posPhaseHidden, Matrix negPhaseVisible, Matrix negPhaseHidden);
-
-    public static class SamplingStepEvent extends TrainingEvent {
-
-	private static final long serialVersionUID = 1772155171480490374L;
-
-	private int samplingCount;
-
-	public SamplingStepEvent(CDTrainerBase source, int samplingCount) {
-	    super(source);
-	    this.samplingCount = samplingCount;
-	}
-
-	public int getSamplingCount() {
-	    return samplingCount;
-	}
-    }
+    protected abstract void updateWeights();
 }
