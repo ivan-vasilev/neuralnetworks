@@ -29,7 +29,7 @@ All the algorithms support GPU execution. Out of the box supported datasets are 
 All the functions support GPU execution. They can be applied to all types of networks and all training algorithms. You can also implement new activations.
 
 ##How to build the library
-* *Java 8*.
+* **Java 8**.
 * To build the project you need [gradle](http://www.gradle.org/) or [maven](http://maven.apache.org/) (to be deprecated). If you don't use any of these you can go to the project folder and execute the _gradlew_ console command, which will automatically setup gradle environment for you.
 * I'm also uploading the latest jar file (with bundled dependencies and sources) [here](https://github.com/ivan-vasilev/neuralnetworks/tree/master/build/libs).
 * Depending on your environment you might need to download the relevant aparapi .dll or .so file (located in the root of each archive) from [here](https://code.google.com/p/aparapi/downloads/list) and add it's location to the system PATH variable.
