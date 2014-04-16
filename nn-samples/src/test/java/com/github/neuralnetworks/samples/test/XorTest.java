@@ -30,13 +30,13 @@ public class XorTest {
 	XorInputProvider testingInput = new XorInputProvider();
 
 	// create backpropagation trainer for the network
-	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(mlp, trainingInput, testingInput, new XorOutputError(), new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 1f, 0.5f, 0f, 0f, 1, 1, 10000);
+	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(mlp, trainingInput, testingInput, new XorOutputError(), new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 1f, 0.5f, 0f, 0f, 1, 1, 100);
 
 	// add logging
 	bpt.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
 
 	// early stopping
-	bpt.addEventListener(new EarlyStoppingListener(testingInput, 1000, 0.1f));
+	bpt.addEventListener(new EarlyStoppingListener(testingInput, 10, 0.1f));
 
 	// train
 	bpt.train();

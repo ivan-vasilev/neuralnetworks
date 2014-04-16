@@ -21,22 +21,22 @@ public class ValuesProvider implements Serializable {
 
     private Set<Tensor> tensors;
     private Map<Object, List<Tensor>> values;
+    private boolean useSharedMemory;
 
     public ValuesProvider(boolean useSharedMemory) {
 	super();
 
 	this.values = new HashMap<>();
-
-	if (useSharedMemory) {
-	    this.tensors = new HashSet<>();
-	}
+	this.useSharedMemory = useSharedMemory;
+	this.tensors = new HashSet<>();
     }
 
-    public ValuesProvider(Set<Tensor> tensors) {
+    public ValuesProvider(ValuesProvider sibling) {
 	super();
 
 	this.values = new HashMap<>();
-	this.tensors = tensors;
+	this.tensors = sibling.getTensors();
+	this.useSharedMemory = sibling.useSharedMemory();
     }
 
     /**
@@ -76,6 +76,8 @@ public class ValuesProvider implements Serializable {
 	    values.put(key, set = new UniqueList<Tensor>());
 	}
 
+	Tensor newTensor = null;
+
 	if (useSharedMemory()) {
 	    float[] elements = getElements();
 	    if (elements == null) {
@@ -85,12 +87,13 @@ public class ValuesProvider implements Serializable {
 	    int l = elements.length;
 	    float[] newElements = Arrays.copyOf(elements, l + Arrays.stream(dimensions).reduce(1, (a, b) -> a * b));
 	    tensors.forEach(t -> t.setElements(newElements));
-	    Tensor newTensor = TensorFactory.tensor(newElements, l, dimensions);
-	    tensors.add(newTensor);
-	    set.add(newTensor);
+	    newTensor = TensorFactory.tensor(newElements, l, dimensions);
 	} else {
-	    set.add(TensorFactory.tensor(dimensions));
+	    newTensor = TensorFactory.tensor(dimensions);
 	}
+
+	tensors.add(newTensor);
+	set.add(newTensor);
     }
 
 
@@ -117,7 +120,7 @@ public class ValuesProvider implements Serializable {
     }
 
     public boolean useSharedMemory() {
-	return tensors != null;
+	return useSharedMemory;
     }
 
     private float[] getElements() {

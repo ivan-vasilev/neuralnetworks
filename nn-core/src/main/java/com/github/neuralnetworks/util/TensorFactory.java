@@ -185,7 +185,7 @@ public class TensorFactory {
     public static ValuesProvider tensorProvider(ValuesProvider sibling, NeuralNetwork nn) {
 	Map<Layer, Set<int[]>> dims = getLayersDimensions(nn, batchSize(sibling));
 	
-	ValuesProvider result = new ValuesProvider(sibling.getTensors());
+	ValuesProvider result = new ValuesProvider(sibling);
 
 	// create tensors
 	List<Layer> layers = new ArrayList<>(dims.keySet());

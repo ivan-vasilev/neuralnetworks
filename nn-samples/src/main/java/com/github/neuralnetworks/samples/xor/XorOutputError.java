@@ -11,13 +11,20 @@ public class XorOutputError implements OutputError {
 
     private float networkError;
     private int size;
+    private int errorSamples;
 
     @Override
     public void addItem(Tensor networkOutput, Tensor targetOutput) {
 	Iterator<Integer> targetIt = targetOutput.iterator();
 	Iterator<Integer> actualIt = networkOutput.iterator();
+	size += targetOutput.getDimensions()[targetOutput.getDimensions().length - 1];
+	float error = 0;
 	while (targetIt.hasNext() && actualIt.hasNext()) {
-	    networkError += Math.abs(Math.abs(networkOutput.getElements()[actualIt.next()]) - Math.abs(targetOutput.getElements()[targetIt.next()]));
+	    error += Math.abs(Math.abs(networkOutput.getElements()[actualIt.next()]) - Math.abs(targetOutput.getElements()[targetIt.next()]));
+	}
+	networkError += error;
+	if (error / targetOutput.getDimensions()[targetOutput.getDimensions().length - 1] > 0.5) {
+	    errorSamples += targetOutput.getDimensions()[targetOutput.getDimensions().length - 1];
 	}
     }
 
@@ -28,7 +35,7 @@ public class XorOutputError implements OutputError {
 
     @Override
     public int getTotalErrorSamples() {
-	return size;
+	return errorSamples;
     }
 
     @Override
@@ -39,6 +46,7 @@ public class XorOutputError implements OutputError {
     @Override
     public void reset() {
 	networkError = 0;
+	errorSamples = 0;
 	size = 0;
     }
 }

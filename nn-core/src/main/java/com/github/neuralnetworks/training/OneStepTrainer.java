@@ -37,7 +37,7 @@ public abstract class OneStepTrainer<N extends NeuralNetwork> extends Trainer<N>
 
 	getTrainingInputProvider().reset();
 
-	for (int i = 0, batch = 0; i < getEpochs() * getTrainingInputProvider().getInputSize() || stopTraining; i += getTrainingBatchSize(), batch++) {
+	for (int i = 0, batch = 0; i < getEpochs() * getTrainingInputProvider().getInputSize() && !stopTraining; i += getTrainingBatchSize(), batch++) {
 	    TrainingInputData input = getInput();
 	    getTrainingInputProvider().populateNext(input);
 	    learnInput(batch);

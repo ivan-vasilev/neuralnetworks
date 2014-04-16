@@ -2,6 +2,7 @@ package com.github.neuralnetworks.training.backpropagation;
 
 import com.github.neuralnetworks.architecture.types.Autoencoder;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiNoise;
+import com.github.neuralnetworks.training.TrainingInputData;
 import com.github.neuralnetworks.training.TrainingInputProvider;
 import com.github.neuralnetworks.training.TrainingInputProviderImpl;
 import com.github.neuralnetworks.util.Constants;
@@ -70,6 +71,24 @@ public class BackPropagationAutoencoder extends BackPropagationTrainer<Autoencod
 	    }
 
 	    return result;
+	}
+
+	@Override
+	public void before(TrainingInputData ti) {
+	    super.before(ti);
+	    base.before(ti);
+	}
+
+	@Override
+	public void after(TrainingInputData ti) {
+	    super.after(ti);
+	    base.after(ti);
+	}
+
+	@Override
+	public void reset() {
+	    super.reset();
+	    base.reset();
 	}
     }
 }

@@ -41,7 +41,7 @@ public class GeneralTest {
 	assertEquals(12, tp.get(s2).getElements().length, 0);
 	assertEquals(6, tp.get(s2).getStartIndex(), 0);
 
-	ValuesProvider tp2 = new ValuesProvider(tp.getTensors());
+	ValuesProvider tp2 = new ValuesProvider(tp);
 	tp2.add(s1, 2, 3);
 	tp2.add(s2, 2, 3);
 
