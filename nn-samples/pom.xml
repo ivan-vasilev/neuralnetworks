@@ -16,10 +16,25 @@
 
 	<dependencies>
 		<!-- Aparapi dependency -->
+        <dependency>
+            <groupId>com.amd</groupId>
+            <artifactId>aparapi</artifactId>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../nn-core/lib/aparapi.jar</systemPath>
+        </dependency>
 		<dependency>
 			<groupId>com.github.neuralnetworks</groupId>
 			<artifactId>nn-core</artifactId>
 			<version>0.1-SNAPSHOT</version>
 		</dependency>
+        <dependency>
+            <groupId>org.uncommons.maths</groupId>
+            <artifactId>uncommons-maths</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
 	</dependencies>
 </project>

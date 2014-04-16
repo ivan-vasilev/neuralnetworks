@@ -2,7 +2,7 @@ allprojects  {
   apply plugin: 'maven'
   apply plugin: 'eclipse'
   group = 'com.github'
-  version = '0.1-SNAPSHOT'
+  version = 'snapshot'
 }
 
 subprojects {
@@ -15,9 +15,19 @@ subprojects {
     mavenLocal()
     
     maven { url "http://repo.maven.apache.org/maven2" }
-  }
+  }  
+}
 
-  
-  
-  
+task wrapper(type: Wrapper) {
+  gradleVersion = '1.11'
+}
+
+task uberJar(type: Jar) {
+  subprojects.each { subproject ->
+    from { subproject.configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    from subproject.sourceSets.main.output
+    from subproject.sourceSets.main.allJava
+    from subproject.sourceSets.test.output
+    from subproject.sourceSets.test.allJava
+  }
 }
