@@ -134,9 +134,9 @@ public class TensorFactory {
      * @return Tensor provider based on neural network
      */
     public static ValuesProvider tensorProvider(NeuralNetwork nn, int miniBatchSize, boolean useSharedMemory) {
-	Map<Layer, Set<int[]>> dims = getLayersDimensions(nn, miniBatchSize);
-
 	ValuesProvider result = new ValuesProvider(useSharedMemory);
+
+	Map<Layer, Set<int[]>> dims = getLayersDimensions(nn, miniBatchSize);
 
 	// create tensors
 	List<Layer> layers = new ArrayList<>(dims.keySet());
@@ -144,6 +144,33 @@ public class TensorFactory {
 	    Layer l = layers.get(i);
 	    for (int[] d : dims.get(l)) {
 		result.add(l, d);
+	    }
+	}
+
+	return result;
+    }
+
+    /**
+     * @param miniBatchSize
+     * @param useSharedMemory
+     * @param nns
+     * @return Tensor provider based on multiple neural networks - common layers use shared tensors
+     */
+    public static ValuesProvider tensorProvider(int miniBatchSize, boolean useSharedMemory, NeuralNetwork... nns) {
+	ValuesProvider result = new ValuesProvider(useSharedMemory);
+
+	for (NeuralNetwork nn : nns) {
+	    Map<Layer, Set<int[]>> dims = getLayersDimensions(nn, miniBatchSize);
+	    
+	    // create tensors
+	    List<Layer> layers = new ArrayList<>(dims.keySet());
+	    for (int i = 0; i < layers.size(); i++) {
+		Layer l = layers.get(i);
+		for (int[] d : dims.get(l)) {
+		    if (result.get(l, d) == null) {
+			result.add(l, d);
+		    }
+		}
 	    }
 	}
 

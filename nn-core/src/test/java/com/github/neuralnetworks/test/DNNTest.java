@@ -121,9 +121,9 @@ public class DNNTest {
 	calculatedLayers.add(dbn.getInputLayer());
 
 	ValuesProvider results = TensorFactory.tensorProvider(dbn, 1, true);
-	// Environment.getInstance().getValuesProvider(dbn)
-	results.get(dbn.getInputLayer()).setElements(new float[] {1, 0, 1});
-	//results.replace(dbn.getInputLayer(), TensorFactory.matrix(new float[] {1, 0, 1}, 1));
+	results.get(dbn.getInputLayer()).set(1, 0, 0);
+	results.get(dbn.getInputLayer()).set(0, 1, 0);
+	results.get(dbn.getInputLayer()).set(1, 2, 0);
 	dbn.getLayerCalculator().calculate(dbn, dbn.getOutputLayer(), calculatedLayers, results);
 
 	assertEquals(1.06, results.get(dbn.getOutputLayer()).get(0, 0), 0.00001);
@@ -174,9 +174,10 @@ public class DNNTest {
 	calculatedLayers.add(sae.getInputLayer());
 
 	ValuesProvider results = TensorFactory.tensorProvider(sae, 1, true);
-	// Environment.getInstance().getValuesProvider(sae)
-	results.get(sae.getInputLayer()).setElements(new float[] {1, 0, 1});
-	//results.replace(dbn.getInputLayer(), TensorFactory.matrix(new float[] {1, 0, 1}, 1));
+	results.get(sae.getInputLayer()).set(1, 0, 0);
+	results.get(sae.getInputLayer()).set(0, 1, 0);
+	results.get(sae.getInputLayer()).set(1, 2, 0);
+
 	sae.getLayerCalculator().calculate(sae, sae.getOutputLayer(), calculatedLayers, results);
 
 	assertEquals(1.06, results.get(sae.getOutputLayer()).get(0, 0), 0.00001);

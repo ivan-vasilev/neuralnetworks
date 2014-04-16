@@ -19,7 +19,6 @@ public class DeepTrainerTrainingInputProvider extends TrainingInputProviderImpl 
 
     private TrainingInputProvider inputProvider;
     private TrainingInputData inputDataBase;
-    private TrainingInputData inputData;
     private DNN<?> dnn;
     private NeuralNetwork currentNN;
     private Set<Layer> calculatedLayers;
@@ -31,37 +30,24 @@ public class DeepTrainerTrainingInputProvider extends TrainingInputProviderImpl 
 	this.dnn = dnn;
 	this.currentNN = currentNN;
 	this.calculatedLayers = new HashSet<>();
-	this.layerResults = TensorFactory.tensorProvider(dnn, batchSize, Environment.getInstance().getUseSharedMemory());
+	this.layerResults = TensorFactory.tensorProvider(batchSize, Environment.getInstance().getUseSharedMemory(), dnn, currentNN);
+	this.inputDataBase = new TrainingInputDataImpl(layerResults.get(dnn.getInputLayer()));
     }
 
-//    @Override
-//    public TrainingInputData getNextInput() {
-//	TrainingInputData input = inputProvider.getNextInput();
-//
-//	if (input != null && dnn.getFirstNeuralNetwork() != currentNN) {
-//	    layerResults.replace(dnn.getInputLayer(), input.getInput());
-//	    calculatedLayers.clear();
-//	    calculatedLayers.add(dnn.getInputLayer());
-//	    dnn.getLayerCalculator().calculate(dnn, currentNN.getInputLayer(), calculatedLayers, layerResults);
-//	    input = new TrainingInputDataImpl(layerResults.get(currentNN.getInputLayer()), input.getTarget());
-//	}
-//
-//	return input;
-//    }
-
     @Override
-    public float[] getNextInput() {
-	inputProvider.populateNext(inputDataBase);
-	if (inputDataBase != null && dnn.getFirstNeuralNetwork() != currentNN) {
+    public void after(TrainingInputData ti) {
+	if (dnn.getFirstNeuralNetwork() != currentNN) {
+	    inputProvider.populateNext(inputDataBase);
 	    calculatedLayers.clear();
 	    calculatedLayers.add(dnn.getInputLayer());
 	    dnn.getLayerCalculator().calculate(dnn, currentNN.getInputLayer(), calculatedLayers, layerResults);
-	    if (inputData == null) {
-		//inputData = new TrainingInputDataImpl(layerResults.get(currentNN.getInputLayer()), inputDataBase input.getTarget());
-	    }
+	    TensorFactory.copy(layerResults.get(currentNN.getInputLayer()), ti.getInput());
 	}
+    }
 
-	return null;
+    @Override
+    public float[] getNextInput() {
+	return inputProvider.getNextInput();
     }
 
     @Override

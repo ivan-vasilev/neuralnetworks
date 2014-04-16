@@ -48,11 +48,11 @@ public class ValuesProvider implements Serializable {
      */
     @SuppressWarnings("unchecked")
     public <T extends Tensor> T get(Object key, int... dimensions) {
-	if (key != null) {
+	if (key != null && values.get(key) != null) {
 	    if (dimensions == null || dimensions.length == 0) {
-		if (values.get(key) != null && values.get(key).size() == 1) {
+		if (values.get(key).size() == 1) {
 		    return (T) values.get(key).iterator().next();
-		} else if (values.get(key) != null && values.get(key).size() > 1) {
+		} else if (values.get(key).size() > 1) {
 		    throw new IllegalArgumentException("No dimensions provided");
 		} else {
 		    return null;
