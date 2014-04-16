@@ -48,6 +48,21 @@ public class DNNLayerTrainer extends Trainer<DNN<? extends NeuralNetwork>> {
 	return properties.getParameter(Constants.LAYER_TRAINERS);
     }
 
+    @Override
+    public Integer getTrainingBatchSize() {
+	return getTrainers().values().iterator().next().getTrainingBatchSize();
+    }
+    
+    @Override
+    public Integer getTestBatchSize() {
+	return getTrainers().values().iterator().next().getTestBatchSize();
+    }
+    
+    @Override
+    public Integer getEpochs() {
+	return getTrainers().values().iterator().next().getEpochs();
+    }
+
     /**
      * Triggered when a nested neural network has finished training
      */

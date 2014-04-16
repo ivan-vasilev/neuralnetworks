@@ -171,9 +171,13 @@ public class TrainerFactory {
     }
 
     public static BackPropagationAutoencoder backPropagationAutoencoder(NeuralNetworkImpl nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, NNRandomInitializer rand, float learningRate, float momentum, float l1weightDecay, float l2weightDecay, float inputCorruptionRate, int trainingBatchSize, int testBatchSize, int epochs) {
-	BackPropagationAutoencoder t = new BackPropagationAutoencoder(backpropProperties(nn, trainingSet, testingSet, error, rand, learningRate, momentum, l1weightDecay, l2weightDecay, trainingBatchSize, testBatchSize, epochs));
+	Properties p = backpropProperties(nn, trainingSet, testingSet, error, rand, learningRate, momentum, l1weightDecay, l2weightDecay, trainingBatchSize, testBatchSize, epochs);
+	p.setParameter(Constants.CORRUPTION_LEVEL, inputCorruptionRate);
 
-	BackPropagationLayerCalculatorImpl bplc = bplc(nn, t.getProperties());
+	BackPropagationAutoencoder t = new BackPropagationAutoencoder(p);
+
+	BackPropagationLayerCalculatorImpl bplc = bplc(nn, p);
+
 	t.getProperties().setParameter(Constants.BACKPROPAGATION, bplc);
 
 	return t;
@@ -225,7 +229,7 @@ public class TrainerFactory {
 	return new AparapiCDTrainer(rbmProperties(rbm, lc, trainingSet, testingSet, error, rand, learningRate, momentum, l1weightDecay, l2weightDecay, gibbsSampling, trainingBatchSize, epochs, isPersistentCD));
     }
 
-    protected static Properties rbmProperties(RBM rbm, RBMLayerCalculator lc, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, NNRandomInitializer rand, float learningRate, float momentum, float l1weightDecay, float l2weightDecay, int gibbsSampling, int trainingBatchSize, int epochs, boolean resetRBM) {
+    protected static Properties rbmProperties(RBM rbm, RBMLayerCalculator lc, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, NNRandomInitializer rand, float learningRate, float momentum, float l1weightDecay, float l2weightDecay, int gibbsSampling, int trainingBatchSize, int epochs, boolean isPersistentCD) {
 	Properties p = new Properties();
 	p.setParameter(Constants.NEURAL_NETWORK, rbm);
 	p.setParameter(Constants.TRAINING_INPUT_PROVIDER, trainingSet);
@@ -237,7 +241,7 @@ public class TrainerFactory {
 	p.setParameter(Constants.GIBBS_SAMPLING_COUNT, gibbsSampling);
 	p.setParameter(Constants.OUTPUT_ERROR, error);
 	p.setParameter(Constants.RANDOM_INITIALIZER, rand);
-	p.setParameter(Constants.RESET_RBM, resetRBM);
+	p.setParameter(Constants.PERSISTENT_CD, isPersistentCD);
 	p.setParameter(Constants.LAYER_CALCULATOR, lc);
 	p.setParameter(Constants.TRAINING_BATCH_SIZE, trainingBatchSize);
 	p.setParameter(Constants.EPOCHS, epochs);

@@ -38,7 +38,7 @@ public class AparapiCDTrainer extends CDTrainerBase {
      * before each update the kernel update parameters are refreshed
      */
     @Override
-    protected void updateWeights(/*Matrix posPhaseVisible, Matrix posPhaseHidden, Matrix negPhaseVisible, Matrix negPhaseHidden*/) {
+    protected void updateWeights() {
 	RBM rbm = getNeuralNetwork();
 
 	RBMLayerCalculator lc = getLayerCalculator();
@@ -71,7 +71,7 @@ public class AparapiCDTrainer extends CDTrainerBase {
     protected float getLearningRate() {
 	return properties.getParameter(Constants.LEARNING_RATE);
     }
-    
+
     protected float getMomentum() {
 	return (float) (properties.getParameter(Constants.MOMENTUM) != null ? properties.getParameter(Constants.MOMENTUM) : 0f);
     }
@@ -79,7 +79,7 @@ public class AparapiCDTrainer extends CDTrainerBase {
     protected float getl1weightDecay() {
 	return (float) (properties.getParameter(Constants.L1_WEIGHT_DECAY) != null ? properties.getParameter(Constants.L1_WEIGHT_DECAY) : 0f);
     }
-    
+
     protected float getl2weightDecay() {
 	return (float) (properties.getParameter(Constants.L2_WEIGHT_DECAY) != null ? properties.getParameter(Constants.L2_WEIGHT_DECAY) : 0f);
     }

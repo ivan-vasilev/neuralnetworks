@@ -53,15 +53,15 @@ public class RBMLayerCalculator implements Serializable {
 	for (int i = 1; i <= samplingCount; i++) {
 	    connections.clear();
 	    connections.add(rbm.getMainConnections());
-	    if (rbm.getHiddenBiasConnections() != null) {
-		connections.add(rbm.getHiddenBiasConnections());
+	    if (rbm.getVisibleBiasConnections() != null) {
+		connections.add(rbm.getVisibleBiasConnections());
 	    }
 	    negPhaseHiddenToVisibleCC.calculate(connections, negPhaseVP, rbm.getVisibleLayer());
 
 	    connections.clear();
 	    connections.add(rbm.getMainConnections());
-	    if (rbm.getVisibleBiasConnections() != null) {
-		connections.add(rbm.getVisibleBiasConnections());
+	    if (rbm.getHiddenBiasConnections() != null) {
+		connections.add(rbm.getHiddenBiasConnections());
 	    }
 	    negPhaseVisibleToHiddenCC.calculate(connections, negPhaseVP, rbm.getHiddenLayer());
 	}

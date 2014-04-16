@@ -23,6 +23,9 @@ public class AETest {
      */
     @Test
     public void testAEBackpropagation() {
+	// sequential execution for debugging
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.CPU);
+
 	// autoencoder with 6 input/output and 2 hidden units
 	Autoencoder ae = NNFactory.autoencoderSigmoid(6, 2, true, true);
 
@@ -47,8 +50,8 @@ public class AETest {
 	// log data
 	t.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName(), true, false));
 
-	// sequential execution for debugging
-	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
+	// early stopping
+	//t.addEventListener(new EarlyStoppingListener(t.getTrainingInputProvider(), 1000, 0.1f));
 
 	// training
 	t.train();

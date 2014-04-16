@@ -222,7 +222,7 @@ public class RBMTest {
 
     @Test
     public void testOneStepContrastiveDivergence() {
-	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
+	//Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 
 	RBM rbm = NNFactory.rbm(3, 2, true, true);
 

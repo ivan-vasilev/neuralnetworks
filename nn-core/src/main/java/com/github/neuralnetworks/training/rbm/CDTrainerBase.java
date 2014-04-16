@@ -17,6 +17,7 @@ public abstract class CDTrainerBase extends OneStepTrainer<RBM> {
     private static final long serialVersionUID = 1L;
 
     private TrainingInputData input;
+
     public CDTrainerBase(Properties properties) {
 	super(properties);
     }
@@ -34,17 +35,10 @@ public abstract class CDTrainerBase extends OneStepTrainer<RBM> {
     protected void learnInput(int batch) {
 	RBM nn = getNeuralNetwork();
 
-//	posPhaseVisible = (Matrix) data.getInput();
-//	if (negPhaseVisible == null || negPhaseVisible.getColumns() != posPhaseVisible.getColumns()) {
-//	    negPhaseVisible = TensorFactory.tensor(posPhaseVisible.getRows(), posPhaseVisible.getColumns());
-//	    posPhaseHidden = TensorFactory.tensor(nn.getMainConnections().getWeights().getRows(), posPhaseVisible.getColumns());
-//	    negPhaseHidden = TensorFactory.tensor(nn.getMainConnections().getWeights().getRows(), posPhaseVisible.getColumns());
-//	}
-
-	getLayerCalculator().gibbsSampling(nn, /*posPhaseVisible, posPhaseHidden, negPhaseVisible, negPhaseHidden,*/ getGibbsSamplingCount(), batch == 0 ? true : getResetRBM());
+	getLayerCalculator().gibbsSampling(nn, getGibbsSamplingCount(), batch == 0 ? true : !getIsPersistent());
 
 	// update weights
-	updateWeights(/*posPhaseVisible, posPhaseHidden, negPhaseVisible, negPhaseHidden*/);
+	updateWeights();
     }
 
     public RBMLayerCalculator getLayerCalculator() {
@@ -55,17 +49,17 @@ public abstract class CDTrainerBase extends OneStepTrainer<RBM> {
 	properties.setParameter(Constants.LAYER_CALCULATOR, layerCalculator);
     }
     
-    public Boolean getResetRBM() {
-	return properties.getParameter(Constants.RESET_RBM);
+    public Boolean getIsPersistent() {
+	return properties.getParameter(Constants.PERSISTENT_CD);
     }
-    
-    public void setResetRBM(boolean resetRBM) {
-	properties.setParameter(Constants.RESET_RBM, resetRBM);
+
+    public void setIsPersistent(boolean isPersistent) {
+	properties.setParameter(Constants.PERSISTENT_CD, isPersistent);
     }
 
     public int getGibbsSamplingCount() {
 	return properties.containsKey(Constants.GIBBS_SAMPLING_COUNT) ? (int) properties.get(Constants.GIBBS_SAMPLING_COUNT) : 1;
     }
 
-    protected abstract void updateWeights(/*Matrix posPhaseVisible, Matrix posPhaseHidden, Matrix negPhaseVisible, Matrix negPhaseHidden*/);
+    protected abstract void updateWeights();
 }

@@ -32,7 +32,7 @@ public class BackPropagationTrainer<N extends NeuralNetwork> extends OneStepTrai
     public BackPropagationTrainer(Properties properties) {
 	super(properties);
 	activations = TensorFactory.tensorProvider(getNeuralNetwork(), getTrainingBatchSize(), Environment.getInstance().getUseSharedMemory());
-	activations.add(getOutputError(), activations.get(getNeuralNetwork().getOutputLayer()).getDimensions());
+	activations.add(getProperties().getParameter(Constants.OUTPUT_ERROR_DERIVATIVE), activations.get(getNeuralNetwork().getOutputLayer()).getDimensions());
 	backpropagation = TensorFactory.tensorProvider(getNeuralNetwork(), getTrainingBatchSize(), Environment.getInstance().getUseSharedMemory());
     }
 
@@ -51,7 +51,7 @@ public class BackPropagationTrainer<N extends NeuralNetwork> extends OneStepTrai
 
 	// backward
 	OutputErrorDerivative d = getProperties().getParameter(Constants.OUTPUT_ERROR_DERIVATIVE);
-	d.getOutputErrorDerivative(activations.get(nn.getOutputLayer()), activations.get(getOutputError()), backpropagation.get(nn.getOutputLayer()));
+	d.getOutputErrorDerivative(activations.get(nn.getOutputLayer()), activations.get(d), backpropagation.get(nn.getOutputLayer()));
 	calculatedLayers.clear();
 	calculatedLayers.add(nn.getOutputLayer());
 	BackPropagationLayerCalculator blc = getBPLayerCalculator();
@@ -61,40 +61,11 @@ public class BackPropagationTrainer<N extends NeuralNetwork> extends OneStepTrai
     @Override
     protected TrainingInputData getInput() {
 	if (input == null) {
-	    input = new TrainingInputDataImpl(activations.get(getNeuralNetwork().getOutputLayer()), activations.get(getOutputError()));
+	    input = new TrainingInputDataImpl(activations.get(getNeuralNetwork().getInputLayer()), activations.get(getProperties().getParameter(Constants.OUTPUT_ERROR_DERIVATIVE)));
 	}
 
 	return input;
     }
-
-//    /* (non-Javadoc)
-//     * @see com.github.neuralnetworks.training.OneStepTrainer#learnInput(com.github.neuralnetworks.training.TrainingInputData)
-//     * The training example is propagated forward through the network (via the LayerCalculator lc) and the results are stored.
-//     * After that the error is backpropagated (via BackPropagationLayerCalculator blc).
-//     */
-//    @Override
-//    protected void learnInput(TrainingInputData data, int batch) {
-//	propagateForward(data.getInput());
-//	propagateBackward(data.getTarget());
-//    }
-//
-//    public void propagateForward(Tensor input) {
-//	NeuralNetwork nn = getNeuralNetwork();
-//	Set<Layer> calculatedLayers = new UniqueList<Layer>();
-//	calculatedLayers.add(nn.getInputLayer());
-//	nn.getLayerCalculator().calculate(nn, nn.getOutputLayer(), calculatedLayers, activations);
-//    }
-//
-//    public void propagateBackward(Tensor target) {
-//	NeuralNetwork nn = getNeuralNetwork();
-//
-//	OutputErrorDerivative d = getProperties().getParameter(Constants.OUTPUT_ERROR_DERIVATIVE);
-//	d.getOutputErrorDerivative(activations.get(nn.getOutputLayer()), target, backpropagation.get(nn.getOutputLayer()));
-//	Set<Layer> calculatedLayers = new UniqueList<Layer>();
-//	calculatedLayers.add(nn.getOutputLayer());
-//	BackPropagationLayerCalculator blc = getBPLayerCalculator();
-//	blc.backpropagate(nn, calculatedLayers, activations, backpropagation);
-//    }
 
     public BackPropagationLayerCalculator getBPLayerCalculator() {
 	return getProperties().getParameter(Constants.BACKPROPAGATION);

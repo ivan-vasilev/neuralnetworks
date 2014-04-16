@@ -27,7 +27,7 @@ public interface TrainingInputProvider extends Serializable {
 	if (ti.getInput() != null) {
 	    int[] inputDims = ti.getInput().getDimensions();
 	    int[][] limits = new int[2][inputDims.length];
-	    IntStream.range(0, inputDims.length - 1).forEach(i -> limits[1][i] = inputDims[i]);
+	    IntStream.range(0, inputDims.length - 1).forEach(i -> limits[1][i] = inputDims[i] - 1);
 	    IntStream.range(0, inputDims[inputDims.length - 1]).forEach(i -> {
 		limits[0][inputDims.length - 1] = limits[1][inputDims.length - 1] = i;
 		TensorIterator it = ti.getInput().iterator(limits);
@@ -44,7 +44,7 @@ public interface TrainingInputProvider extends Serializable {
 	if (ti.getTarget() != null) {
 	    int[] targetDims = ti.getTarget().getDimensions();
 	    int[][] limits = new int[2][targetDims.length];
-	    IntStream.range(0, targetDims.length - 1).forEach(i -> limits[1][i] = targetDims[i]);
+	    IntStream.range(0, targetDims.length - 1).forEach(i -> limits[1][i] = targetDims[i] - 1);
 	    IntStream.range(0, targetDims[targetDims.length - 1]).forEach(i -> {
 		limits[0][targetDims.length - 1] = limits[1][targetDims.length - 1] = i;
 		TensorIterator it = ti.getTarget().iterator(limits);

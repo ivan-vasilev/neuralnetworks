@@ -42,6 +42,9 @@ public class IrisTest {
 
     @Test
     public void testMLPSigmoidBP() {
+	// execution mode
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
+
 	// create the network
 	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 4, 2, 3 }, true, true);
 
@@ -58,9 +61,6 @@ public class IrisTest {
 
 	// early stopping
 	//bpt.addEventListener(new EarlyStoppingListener(testInputProvider, 100, 0.015f));
-
-	// execution mode
-	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 
 	// train
 	bpt.train();

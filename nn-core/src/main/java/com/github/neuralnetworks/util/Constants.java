@@ -21,7 +21,7 @@ public class Constants {
     public static final String RANDOM_GENERATOR = "randomGenerator";
     public static final String ERROR_CALCULATOR = "errorCalculator";
     public static final String LAYER_CALCULATOR = "layerCalculator";
-    public static final String RESET_RBM = "resetRBM";
+    public static final String PERSISTENT_CD = "resetRBM";
     public static final String BACKPROPAGATION = "backpropagation";
     public static final String OUTPUT_ERROR_DERIVATIVE = "outputErrorDerivative";
     public static final String LAYER_TRAINERS = "layerTrainers";

@@ -69,8 +69,8 @@ public abstract class Trainer<N extends NeuralNetwork> implements Serializable {
 
 	    OutputError oe = getOutputError();
 	    if (oe != null) {
-		getOutputError().reset();
-		results.add(oe, results.get(n.getInputLayer()).getDimensions());
+		oe.reset();
+		results.add(oe, results.get(n.getOutputLayer()).getDimensions());
 	    }
 
 	    TrainingInputData input = new TrainingInputDataImpl(results.get(n.getInputLayer()), results.get(oe));
