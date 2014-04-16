@@ -3,6 +3,9 @@
 This is a Java implementation of some of the algorithms for training deep neural networks. GPU support is provided via the OpenCL and Aparapi.
 The architecture is designed with modularity, extensibility and pluggability in mind.
 
+####Git structure
+I'm using the [git-flow](https://github.com/nvie/gitflow) model. The most stable (but older) sources are available in the [_master_](https://github.com/ivan-vasilev/neuralnetworks/tree/master) branch, while the latest ones are in the [_develop_](https://github.com/ivan-vasilev/neuralnetworks/tree/develop) branch.
+
 ##Neural network types
 * Multilayer perceptron
 * Restricted Boltzmann Machine
