@@ -268,4 +268,47 @@ public class RBMTest {
 	assertEquals(0.1 - 0.3014404,  cg1.get(1, 1), 0.00001);
 	assertEquals(0.2 + 0.25742438, cg1.get(1, 2), 0.00001);
     }
+
+    @Test
+    public void testTwoStepContrastiveDivergence() {
+	//Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
+	Environment.getInstance().setUseWeightsSharedMemory(false);
+	Environment.getInstance().setUseDataSharedMemory(false);
+	RBM rbm = NNFactory.rbm(3, 2, true);
+
+	Matrix cg1 = rbm.getMainConnections().getWeights();
+	cg1.set(0.2f, 0, 0);
+	cg1.set(0.4f, 0, 1);
+	cg1.set(-0.5f, 0, 2);
+	cg1.set(-0.3f, 1, 0);
+	cg1.set(0.1f, 1, 1);
+	cg1.set(0.2f, 1, 2);
+
+	Matrix cgb1 = rbm.getVisibleBiasConnections().getWeights();
+	cgb1.set(0f, 0, 0);
+	cgb1.set(0f, 1, 0);
+	cgb1.set(0f, 2, 0);
+
+	Matrix cgb2 = rbm.getHiddenBiasConnections().getWeights();
+	cgb2.set(-0.4f, 0, 0);
+	cgb2.set(0.2f, 1, 0);
+
+	AparapiCDTrainer t = TrainerFactory.cdSigmoidTrainer(rbm, new SimpleInputProvider(new float[][] { { 1, 0, 1 }, { 1, 1, 0 } }, null), null, null, null, 1f, 0f, 0f, 0f, 1, 1, 1, false);
+
+	t.train();
+
+	assertEquals(0.86090606, cgb1.get(0, 0), 0.00001);
+	assertEquals(0.089616358, cgb1.get(1, 0), 0.00001);
+	assertEquals(-0.11872697, cgb1.get(2, 0), 0.00001);
+
+	assertEquals(-0.3744152, cgb2.get(0, 0), 0.00001);
+	assertEquals(0.0663045, cgb2.get(1, 0), 0.00001);
+
+	assertEquals(0.5768927, cg1.get(0, 0), 0.00001);
+	assertEquals(0.5328304,  cg1.get(0, 1), 0.00001);
+	assertEquals(-0.619481, cg1.get(0, 2), 0.00001);
+	assertEquals(0.0543526, cg1.get(1, 0), 0.00001);
+	assertEquals(0.0669599,  cg1.get(1, 1), 0.00001);
+	assertEquals(0.0833487, cg1.get(1, 2), 0.00001);
+    }
 }
