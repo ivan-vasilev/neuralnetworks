@@ -272,8 +272,8 @@ public class RBMTest {
     @Test
     public void testTwoStepContrastiveDivergence() {
 	//Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
-	Environment.getInstance().setUseWeightsSharedMemory(false);
-	Environment.getInstance().setUseDataSharedMemory(false);
+	Environment.getInstance().setUseWeightsSharedMemory(true);
+	Environment.getInstance().setUseDataSharedMemory(true);
 	RBM rbm = NNFactory.rbm(3, 2, true);
 
 	Matrix cg1 = rbm.getMainConnections().getWeights();

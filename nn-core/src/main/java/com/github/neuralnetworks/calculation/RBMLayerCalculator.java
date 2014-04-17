@@ -46,7 +46,6 @@ public class RBMLayerCalculator implements Serializable {
 
 	if (resetNetwork) {
 	    TensorFactory.copy(posPhaseVP.get(rbm.getHiddenLayer()), negPhaseVP.get(rbm.getHiddenLayer()));
-	    //System.arraycopy(posPhaseHidden.getElements(), 0, negPhaseHidden.getElements(), 0, negPhaseHidden.getElements().length);
 	}
 
 	// Gibbs sampling
