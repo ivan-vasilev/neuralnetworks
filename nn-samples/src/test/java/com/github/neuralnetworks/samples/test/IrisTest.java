@@ -46,7 +46,8 @@ public class IrisTest {
 	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 
 	// create the network
-	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 4, 2, 3 }, true, true);
+	Environment.getInstance().setUseWeightsSharedMemory(true);
+	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 4, 2, 3 }, true);
 
 	// training and testing data providers
 	IrisInputProvider trainInputProvider = new IrisInputProvider(new IrisTargetMultiNeuronOutputConverter(), false, true, false);
@@ -82,7 +83,8 @@ public class IrisTest {
     @Test
     public void testRBMCDSigmoidBP() {
 	// RBM with 4 visible and 3 hidden units
-	RBM rbm = NNFactory.rbm(4, 3, true, true);
+	Environment.getInstance().setUseWeightsSharedMemory(true);
+	RBM rbm = NNFactory.rbm(4, 3, true);
 
 	// training and testing input providers
 	TrainingInputProvider trainInputProvider = new IrisInputProvider(new IrisTargetMultiNeuronOutputConverter(), false, true, false);
@@ -114,7 +116,8 @@ public class IrisTest {
     @Test
     public void testDBN() {
 	// deep belief network with two rbms - 4-16 and 16-3 with biases
-	DBN dbn = NNFactory.dbn(new int[] {4, 4, 3}, true, true);
+	Environment.getInstance().setUseWeightsSharedMemory(true);
+	DBN dbn = NNFactory.dbn(new int[] {4, 4, 3}, true);
 	assertEquals(2, dbn.getNeuralNetworks().size(), 0);
 
 	dbn.setLayerCalculator(NNFactory.lcSigmoid(dbn, null));
@@ -156,7 +159,8 @@ public class IrisTest {
     @Test
     public void testAE() {
 	// create autoencoder with visible layer with 4 neurons and hidden layer with 3 neurons
-    	Autoencoder ae = NNFactory.autoencoderSigmoid(4, 3, true, true);
+	Environment.getInstance().setUseWeightsSharedMemory(true);
+    	Autoencoder ae = NNFactory.autoencoderSigmoid(4, 3, true);
 
     	// training, testing and error
     	TrainingInputProvider trainInputProvider = new IrisInputProvider(new IrisTargetMultiNeuronOutputConverter(), false, true, false);
@@ -186,7 +190,8 @@ public class IrisTest {
     @Test
     public void testSAE() {
 	// create stacked autoencoder with input layer of size 4, hidden layer of the first AE with size 4 and hidden layer of the second AE with size 3
-	StackedAutoencoder sae = NNFactory.saeSigmoid(new int[] { 4, 4, 3 }, true, true);
+	Environment.getInstance().setUseWeightsSharedMemory(true);
+	StackedAutoencoder sae = NNFactory.saeSigmoid(new int[] { 4, 4, 3 }, true);
 
 	// stacked networks
 	Autoencoder firstNN = sae.getFirstNeuralNetwork();

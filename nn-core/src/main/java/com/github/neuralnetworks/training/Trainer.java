@@ -65,7 +65,7 @@ public abstract class Trainer<N extends NeuralNetwork> implements Serializable {
 	    triggerEvent(new TestingStartedEvent(this));
 
 	    Set<Layer> calculatedLayers = new UniqueList<>();
-	    ValuesProvider results = TensorFactory.tensorProvider(n, getTestBatchSize(), Environment.getInstance().getUseSharedMemory());
+	    ValuesProvider results = TensorFactory.tensorProvider(n, getTestBatchSize(), Environment.getInstance().getUseDataSharedMemory());
 
 	    OutputError oe = getOutputError();
 	    if (oe != null) {

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.Matrix;
 import com.github.neuralnetworks.util.Tensor;
 import com.github.neuralnetworks.util.TensorFactory;
@@ -21,11 +22,7 @@ public class ConnectionFactory implements Serializable {
 
     public ConnectionFactory() {
 	super();
-    }
-
-    public ConnectionFactory(boolean useSharedMemory) {
-	super();
-	if (useSharedMemory) {
+	if (Environment.getInstance().getUseWeightsSharedMemory()) {
 	    this.connections = new ArrayList<>();
 	    this.sharedWeights = new float[0];
 	}

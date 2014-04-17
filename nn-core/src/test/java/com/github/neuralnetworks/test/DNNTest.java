@@ -24,6 +24,7 @@ import com.github.neuralnetworks.training.DNNLayerTrainer;
 import com.github.neuralnetworks.training.OneStepTrainer;
 import com.github.neuralnetworks.training.TrainerFactory;
 import com.github.neuralnetworks.training.rbm.AparapiCDTrainer;
+import com.github.neuralnetworks.util.Environment;
 import com.github.neuralnetworks.util.Matrix;
 import com.github.neuralnetworks.util.Tensor;
 import com.github.neuralnetworks.util.TensorFactory;
@@ -32,14 +33,16 @@ public class DNNTest {
 
     @Test
     public void testDBNConstruction() {
-	DBN dbn = NNFactory.dbn(new int[] { 4, 4, 4, 4}, false, true);
+	Environment.getInstance().setUseWeightsSharedMemory(true);
+
+	DBN dbn = NNFactory.dbn(new int[] { 4, 4, 4, 4}, false);
 	assertEquals(4, dbn.getLayers().size(), 0);
 	assertEquals(3, dbn.getNeuralNetworks().size(), 0);
 	assertEquals(2, dbn.getFirstNeuralNetwork().getLayers().size(), 0);
 	assertEquals(2, dbn.getNeuralNetwork(1).getLayers().size(), 0);
 	assertEquals(2, dbn.getLastNeuralNetwork().getLayers().size(), 0);
 
-	dbn = NNFactory.dbn(new int[] { 4, 4, 4, 4 }, true, true);
+	dbn = NNFactory.dbn(new int[] { 4, 4, 4, 4 }, true);
 	assertEquals(7, dbn.getLayers().size(), 0);
 	assertEquals(3, dbn.getNeuralNetworks().size(), 0);
 	assertEquals(4, dbn.getFirstNeuralNetwork().getLayers().size(), 0);
@@ -65,13 +68,15 @@ public class DNNTest {
 
     @Test
     public void testStackedAutoencoderConstruction() {
-	StackedAutoencoder sae = NNFactory.sae(new int[] { 5, 4, 3 }, false, true);
+	Environment.getInstance().setUseWeightsSharedMemory(true);
+
+	StackedAutoencoder sae = NNFactory.sae(new int[] { 5, 4, 3 }, false);
 	assertEquals(3, sae.getLayers().size(), 0);
 	assertEquals(2, sae.getNeuralNetworks().size(), 0);
 	assertEquals(3, sae.getFirstNeuralNetwork().getLayers().size(), 0);
 	assertEquals(3, sae.getLastNeuralNetwork().getLayers().size(), 0);
 
-	sae = NNFactory.sae(new int[] { 5, 4, 3 }, true, true);
+	sae = NNFactory.sae(new int[] { 5, 4, 3 }, true);
 	assertEquals(5, sae.getLayers().size(), 0);
 	assertEquals(2, sae.getNeuralNetworks().size(), 0);
 	assertEquals(5, sae.getFirstNeuralNetwork().getLayers().size(), 0);
@@ -86,7 +91,8 @@ public class DNNTest {
 
     @Test
     public void testDBNCalculation() {
-	DBN dbn = NNFactory.dbn(new int [] {3, 2, 2}, true, true);
+	Environment.getInstance().setUseWeightsSharedMemory(true);
+	DBN dbn = NNFactory.dbn(new int [] {3, 2, 2}, true);
 	dbn.setLayerCalculator(NNFactory.lcWeightedSum(dbn, null));
 
 	RBM firstRBM = dbn.getFirstNeuralNetwork();
@@ -132,7 +138,8 @@ public class DNNTest {
 
     @Test
     public void testSAECalculation() {
-	StackedAutoencoder sae = NNFactory.sae(new int [] {3, 2, 2}, true, true);
+	Environment.getInstance().setUseWeightsSharedMemory(true);
+	StackedAutoencoder sae = NNFactory.sae(new int [] {3, 2, 2}, true);
 	sae.setLayerCalculator(NNFactory.lcWeightedSum(sae, null));
 
 	Autoencoder firstAE = sae.getFirstNeuralNetwork();
@@ -186,7 +193,8 @@ public class DNNTest {
 
     @Test
     public void testDNNLayerTrainer() {
-	DBN dbn = NNFactory.dbn(new int [] {3, 2, 2}, true, true);
+	Environment.getInstance().setUseWeightsSharedMemory(true);
+	DBN dbn = NNFactory.dbn(new int [] {3, 2, 2}, true);
 	dbn.setLayerCalculator(NNFactory.lcSigmoid(dbn, null));
 
 	RBM firstRBM = dbn.getFirstNeuralNetwork();
@@ -240,7 +248,8 @@ public class DNNTest {
 
     @Test
     public void testDNNLayerTrainer2() {
-	DBN dbn = NNFactory.dbn(new int [] {3, 3, 2}, true, true);
+	Environment.getInstance().setUseWeightsSharedMemory(true);
+	DBN dbn = NNFactory.dbn(new int [] {3, 3, 2}, true);
 	dbn.setLayerCalculator(NNFactory.lcSigmoid(dbn, null));
 
 	LayerCalculatorImpl lc = (LayerCalculatorImpl) dbn.getLayerCalculator();

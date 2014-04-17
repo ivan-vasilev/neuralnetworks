@@ -61,7 +61,8 @@ public class GeneralTest {
 
 	nn.addLayer(i);
 
-	ConnectionFactory cf = new ConnectionFactory(true);
+	Environment.getInstance().setUseWeightsSharedMemory(true);
+	ConnectionFactory cf = new ConnectionFactory();
 	NNFactory.addFullyConnectedLayer(nn, h, cf, 2, 3, true);
 	NNFactory.addFullyConnectedLayer(nn, o, cf, 4, 1, true);
 
@@ -86,7 +87,8 @@ public class GeneralTest {
     @Test
     public void testTensorProvider3() {
 	// simple mlp test
-	NeuralNetworkImpl nn = NNFactory.mlp(new int[] { 3, 4, 2 }, true, true);
+	Environment.getInstance().setUseWeightsSharedMemory(true);
+	NeuralNetworkImpl nn = NNFactory.mlp(new int[] { 3, 4, 2 }, true);
 	ValuesProvider tp = TensorFactory.tensorProvider(nn, 2, false);
 
 	Matrix in = tp.get(nn.getInputLayer());
@@ -120,7 +122,8 @@ public class GeneralTest {
 
     @Test
     public void testConnectionFactory() {
-	ConnectionFactory f = new ConnectionFactory(true);
+	Environment.getInstance().setUseWeightsSharedMemory(true);
+	ConnectionFactory f = new ConnectionFactory();
 	FullyConnected fc1 = f.fullyConnected(null, null, 2, 3);
 	FullyConnected fc2 = f.fullyConnected(null, null, 5, 2);
 
@@ -147,7 +150,8 @@ public class GeneralTest {
 
     @Test
     public void testRandomInitializer() {
-	NeuralNetworkImpl nn = NNFactory.mlp(new int[] { 3, 2 }, true, true);
+	Environment.getInstance().setUseWeightsSharedMemory(true);
+	NeuralNetworkImpl nn = NNFactory.mlp(new int[] { 3, 2 }, true);
 	NNRandomInitializer rand = new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.1f, 0.1f), 0.5f);
 	rand.initialize(nn);
 

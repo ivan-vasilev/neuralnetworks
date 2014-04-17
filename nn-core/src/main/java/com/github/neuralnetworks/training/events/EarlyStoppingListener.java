@@ -66,7 +66,7 @@ public class EarlyStoppingListener implements TrainingEventListener {
 
 		    ValuesProvider vp = mbe.getResults();
 		    if (vp == null) {
-			vp = TensorFactory.tensorProvider(n, 1, Environment.getInstance().getUseSharedMemory());
+			vp = TensorFactory.tensorProvider(n, 1, Environment.getInstance().getUseDataSharedMemory());
 		    }
 		    if (vp.get(outputError) == null) {
 			vp.add(outputError, vp.get(n.getInputLayer()).getDimensions());

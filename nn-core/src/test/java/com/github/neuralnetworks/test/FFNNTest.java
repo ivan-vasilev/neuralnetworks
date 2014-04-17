@@ -279,7 +279,8 @@ public class FFNNTest {
     @Test
     public void testSigmoidBP() {
 	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
-	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 2, 2, 1 }, false, true);
+	Environment.getInstance().setUseWeightsSharedMemory(true);
+	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 2, 2, 1 }, false);
 
 	FullyConnected c1 = (FullyConnected) mlp.getInputLayer().getConnections().iterator().next();
 	Matrix cg1 = c1.getWeights();
@@ -310,7 +311,8 @@ public class FFNNTest {
     @Test
     public void testSigmoidBP2() {
 	//Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
-	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 3, 2, 1 }, true, true);
+	Environment.getInstance().setUseWeightsSharedMemory(true);
+	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 3, 2, 1 }, true);
 
 	List<Connections> c = mlp.getConnections();
 	FullyConnected c1 = (FullyConnected) c.get(0);
@@ -359,7 +361,8 @@ public class FFNNTest {
     public void testParallelNetworks() {
 	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 
-	ConnectionFactory cf = new ConnectionFactory(true);
+	Environment.getInstance().setUseWeightsSharedMemory(true);
+	ConnectionFactory cf = new ConnectionFactory();
 	NeuralNetworkImpl mlp = new NeuralNetworkImpl();
 	Layer input = new Layer();
 	Layer leaf1 = new Layer();
@@ -399,7 +402,8 @@ public class FFNNTest {
 
     @Test
     public void testRemoveLayer() {
-	NeuralNetworkImpl mlp = NNFactory.mlp(new int[] {3, 4, 5}, true, true);
+	Environment.getInstance().setUseWeightsSharedMemory(true);
+	NeuralNetworkImpl mlp = NNFactory.mlp(new int[] {3, 4, 5}, true);
 	assertEquals(5, mlp.getLayers().size(), 0);
 	Layer currentOutput = mlp.getOutputLayer();
 	mlp.removeLayer(mlp.getOutputLayer());
@@ -409,8 +413,10 @@ public class FFNNTest {
 
     @Test
     public void testLayerOrderStrategy() {
+	Environment.getInstance().setUseWeightsSharedMemory(true);
+
 	// MLP
-	NeuralNetworkImpl mlp = NNFactory.mlp(new int[] {3, 4, 5}, true, true);
+	NeuralNetworkImpl mlp = NNFactory.mlp(new int[] {3, 4, 5}, true);
 	
 	Set<Layer> calculated = new HashSet<Layer>();
 	calculated.add(mlp.getInputLayer());
@@ -435,7 +441,7 @@ public class FFNNTest {
 	assertTrue(ccc.get(3).connection == l.getConnections().get(1));
 
 	// Simple MLP
-	mlp = NNFactory.mlp(new int[] {3, 4}, true, true);
+	mlp = NNFactory.mlp(new int[] {3, 4}, true);
 
 	calculated = new HashSet<Layer>();
 	calculated.add(mlp.getInputLayer());
@@ -452,7 +458,7 @@ public class FFNNTest {
 	assertTrue(ccc.get(1).connection == l.getConnections().get(1));
 
 	// CNN
-	NeuralNetworkImpl cnn = NNFactory.convNN(new int[][] { { 3, 3, 2 }, { 2, 2, 1, 1 } }, true, true);
+	NeuralNetworkImpl cnn = NNFactory.convNN(new int[][] { { 3, 3, 2 }, { 2, 2, 1, 1 } }, true);
 
 	calculated = new HashSet<Layer>();
 	calculated.add(cnn.getInputLayer());

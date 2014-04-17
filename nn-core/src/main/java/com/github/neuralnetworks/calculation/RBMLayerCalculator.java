@@ -32,7 +32,7 @@ public class RBMLayerCalculator implements Serializable {
 	this.posPhaseCC = posPhaseCC;
 	this.negPhaseVisibleToHiddenCC = negPhaseVisibleToHiddenCC;
 	this.negPhaseHiddenToVisibleCC = negPhaseHiddenToVisibleCC;
-	this.posPhaseVP = TensorFactory.tensorProvider(rbm, miniBatchSize, Environment.getInstance().getUseSharedMemory());
+	this.posPhaseVP = TensorFactory.tensorProvider(rbm, miniBatchSize, Environment.getInstance().getUseDataSharedMemory());
 	this.negPhaseVP = TensorFactory.tensorProvider(posPhaseVP, rbm);
     }
 

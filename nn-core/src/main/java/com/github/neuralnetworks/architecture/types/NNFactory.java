@@ -46,7 +46,7 @@ public class NNFactory {
      * @param useSharedMemory - whether all network weights should be in a single array
      * @return neural network
      */
-    public static NeuralNetworkImpl convNN(int[][] layers, boolean addBias, boolean useSharedMemory) {
+    public static NeuralNetworkImpl convNN(int[][] layers, boolean addBias) {
 	if (layers.length <= 1) {
 	    throw new IllegalArgumentException("more than one layer is required");
 	}
@@ -56,7 +56,7 @@ public class NNFactory {
 	}
 
 	NeuralNetworkImpl result = new NeuralNetworkImpl();
-	ConnectionFactory cf = new ConnectionFactory(useSharedMemory);
+	ConnectionFactory cf = new ConnectionFactory();
 
 	Layer prev = null;
 	int prevUnitCount = layers[0][0] * layers[0][1] * layers[0][2];
@@ -131,9 +131,9 @@ public class NNFactory {
      * @param useSharedMemory - whether all network weights will be part of single array
      * @return
      */
-    public static NeuralNetworkImpl mlp(int[] layers, boolean addBias, boolean useSharedMemory) {
+    public static NeuralNetworkImpl mlp(int[] layers, boolean addBias) {
 	NeuralNetworkImpl result = new NeuralNetworkImpl();
-	mlp(result, new ConnectionFactory(useSharedMemory), layers, addBias);
+	mlp(result, new ConnectionFactory(), layers, addBias);
 	return result;
     }
 
@@ -301,63 +301,63 @@ public class NNFactory {
 	}
     }
 
-    public static NeuralNetworkImpl mlpSigmoid(int[] layers, boolean addBias, boolean useSharedMemory) {
-	NeuralNetworkImpl result = mlp(layers, addBias, useSharedMemory);
+    public static NeuralNetworkImpl mlpSigmoid(int[] layers, boolean addBias) {
+	NeuralNetworkImpl result = mlp(layers, addBias);
 	result.setLayerCalculator(lcSigmoid(result, null));
 	return result;
     }
 
-    public static NeuralNetworkImpl mlpSoftRelu(int[] layers, boolean addBias, boolean useSharedMemory, ConnectionCalculator outputCC) {
-	NeuralNetworkImpl result = mlp(layers, addBias, useSharedMemory);
+    public static NeuralNetworkImpl mlpSoftRelu(int[] layers, boolean addBias, ConnectionCalculator outputCC) {
+	NeuralNetworkImpl result = mlp(layers, addBias);
 	result.setLayerCalculator(lcSoftRelu(result, outputCC));
 	return result;
     }
 
-    public static NeuralNetworkImpl mlpRelu(int[] layers, boolean addBias, boolean useSharedMemory, ConnectionCalculator outputCC) {
-	NeuralNetworkImpl result = mlp(layers, addBias, useSharedMemory);
+    public static NeuralNetworkImpl mlpRelu(int[] layers, boolean addBias, ConnectionCalculator outputCC) {
+	NeuralNetworkImpl result = mlp(layers, addBias);
 	result.setLayerCalculator(lcRelu(result, outputCC));
 	return result;
     }
 
-    public static NeuralNetworkImpl mlpTanh(int[] layers, boolean addBias, boolean useSharedMemory, ConnectionCalculator outputCC) {
-	NeuralNetworkImpl result = mlp(layers, addBias, useSharedMemory);
+    public static NeuralNetworkImpl mlpTanh(int[] layers, boolean addBias, ConnectionCalculator outputCC) {
+	NeuralNetworkImpl result = mlp(layers, addBias);
 	result.setLayerCalculator(lcTanh(result, outputCC));
 	return result;
     }
 
-    public static Autoencoder autoencoder(int visibleCount, int hiddenCount, boolean addBias, boolean useSharedMemory) {
+    public static Autoencoder autoencoder(int visibleCount, int hiddenCount, boolean addBias) {
 	Autoencoder result = new Autoencoder();
-	mlp(result, new ConnectionFactory(useSharedMemory), new int[] {visibleCount, hiddenCount, visibleCount}, addBias);
+	mlp(result, new ConnectionFactory(), new int[] {visibleCount, hiddenCount, visibleCount}, addBias);
 	return result;
     }
 
-    public static Autoencoder autoencoderSigmoid(int visibleCount, int hiddenCount, boolean addBias, boolean useSharedMemory) {
-	Autoencoder ae = autoencoder(visibleCount, hiddenCount, addBias, useSharedMemory);
+    public static Autoencoder autoencoderSigmoid(int visibleCount, int hiddenCount, boolean addBias) {
+	Autoencoder ae = autoencoder(visibleCount, hiddenCount, addBias);
 	ae.setLayerCalculator(lcSigmoid(ae, null));
 	return ae;
     }
 
-    public static Autoencoder autoencoderSoftReLU(int visibleCount, int hiddenCount, boolean addBias, boolean useSharedMemory, ConnectionCalculator outputCC) {
-	Autoencoder ae = autoencoder(visibleCount, hiddenCount, addBias, useSharedMemory);
+    public static Autoencoder autoencoderSoftReLU(int visibleCount, int hiddenCount, boolean addBias, ConnectionCalculator outputCC) {
+	Autoencoder ae = autoencoder(visibleCount, hiddenCount, addBias);
 	ae.setLayerCalculator(lcSoftRelu(ae, outputCC));
 	return ae;
     }
     
-    public static Autoencoder autoencoderReLU(int visibleCount, int hiddenCount, boolean addBias, boolean useSharedMemory, ConnectionCalculator outputCC) {
-	Autoencoder ae = autoencoder(visibleCount, hiddenCount, addBias, useSharedMemory);
+    public static Autoencoder autoencoderReLU(int visibleCount, int hiddenCount, boolean addBias, ConnectionCalculator outputCC) {
+	Autoencoder ae = autoencoder(visibleCount, hiddenCount, addBias);
 	ae.setLayerCalculator(lcRelu(ae, outputCC));
 	return ae;
     }
 
-    public static Autoencoder autoencoderTanh(int visibleCount, int hiddenCount, boolean addBias, boolean useSharedMemory, ConnectionCalculator outputCC) {
-	Autoencoder ae = autoencoder(visibleCount, hiddenCount, addBias, useSharedMemory);
+    public static Autoencoder autoencoderTanh(int visibleCount, int hiddenCount, boolean addBias, ConnectionCalculator outputCC) {
+	Autoencoder ae = autoencoder(visibleCount, hiddenCount, addBias);
 	ae.setLayerCalculator(lcTanh(ae, outputCC));
 	return ae;
     }
 
-    public static RBM rbm(int visibleCount, int hiddenCount, boolean addBias, boolean useSharedMemory) {
+    public static RBM rbm(int visibleCount, int hiddenCount, boolean addBias) {
 	RBM result = new RBM();
-	ConnectionFactory cf = new ConnectionFactory(useSharedMemory);
+	ConnectionFactory cf = new ConnectionFactory();
 	result.addConnections(cf.fullyConnected(new Layer(), new Layer(), visibleCount, hiddenCount));
 
 	if (addBias) {
@@ -406,13 +406,13 @@ public class NNFactory {
 	return new RBMLayerCalculator(rbm, batchSize, new AparapiTanh(), new AparapiTanh(), new AparapiTanh());
     }
 
-    public static DBN dbn(int[] layers, boolean addBias, boolean useSharedMemory) {
+    public static DBN dbn(int[] layers, boolean addBias) {
 	if (layers.length <= 1) {
 	    throw new IllegalArgumentException("more than one layer is required");
 	}
 
 	DBN result = new DBN();
-	ConnectionFactory cf = new ConnectionFactory(useSharedMemory);
+	ConnectionFactory cf = new ConnectionFactory();
 	result.addLayer(new Layer());
 	for (int i = 1; i < layers.length; i++) {
 	    RBM rbm = new RBM();
@@ -429,36 +429,36 @@ public class NNFactory {
 	return result;
     }
 
-    public static DBN dbnSigmoid(int[] layers, boolean addBias, boolean useSharedMemory) {
-	DBN result = dbn(layers, addBias, useSharedMemory);
+    public static DBN dbnSigmoid(int[] layers, boolean addBias) {
+	DBN result = dbn(layers, addBias);
 	result.setLayerCalculator(lcSigmoid(result, null));
 	return result;
     }
     
-    public static DBN dbnSoftReLU(int[] layers, boolean addBias, boolean useSharedMemory) {
-	DBN result = dbn(layers, addBias, useSharedMemory);
+    public static DBN dbnSoftReLU(int[] layers, boolean addBias) {
+	DBN result = dbn(layers, addBias);
 	result.setLayerCalculator(lcSoftRelu(result, null));
 	return result;
     }
     
-    public static DBN dbnReLU(int[] layers, boolean addBias, boolean useSharedMemory) {
-	DBN result = dbn(layers, addBias, useSharedMemory);
+    public static DBN dbnReLU(int[] layers, boolean addBias) {
+	DBN result = dbn(layers, addBias);
 	result.setLayerCalculator(lcRelu(result, null));
 	return result;
     }
 
-    public static DBN dbnTanh(int[] layers, boolean addBias, boolean useSharedMemory) {
-	DBN result = dbn(layers, addBias, useSharedMemory);
+    public static DBN dbnTanh(int[] layers, boolean addBias) {
+	DBN result = dbn(layers, addBias);
 	result.setLayerCalculator(lcTanh(result, null));
 	return result;
     }
 
-    public static StackedAutoencoder sae(int[] layers, boolean addBias, boolean useSharedMemory) {
+    public static StackedAutoencoder sae(int[] layers, boolean addBias) {
 	if (layers == null || layers.length <= 1) {
 	    throw new IllegalArgumentException("more than one layer is required");
 	}
 
-	ConnectionFactory cf = new ConnectionFactory(useSharedMemory);
+	ConnectionFactory cf = new ConnectionFactory();
 	StackedAutoencoder result = new StackedAutoencoder(new Layer());
 	for (int i = 1; i < layers.length; i++) {
 	    Autoencoder ae = new Autoencoder();
@@ -472,26 +472,26 @@ public class NNFactory {
 	return result;
     }
 
-    public static StackedAutoencoder saeSigmoid(int[] layers, boolean addBias, boolean useSharedMemory) {
-	StackedAutoencoder sae = sae(layers, addBias, useSharedMemory);
+    public static StackedAutoencoder saeSigmoid(int[] layers, boolean addBias) {
+	StackedAutoencoder sae = sae(layers, addBias);
 	sae.setLayerCalculator(lcSigmoid(sae, null));
 	return sae;
     }
 
-    public static StackedAutoencoder saeSoftReLU(int[] layers, int hiddenCount, boolean addBias, boolean useSharedMemory) {
-	StackedAutoencoder sae = sae(layers, addBias, useSharedMemory);
+    public static StackedAutoencoder saeSoftReLU(int[] layers, int hiddenCount, boolean addBias) {
+	StackedAutoencoder sae = sae(layers, addBias);
 	sae.setLayerCalculator(lcSoftRelu(sae, null));
 	return sae;
     }
 
-    public static StackedAutoencoder saeReLU(int[] layers, int hiddenCount, boolean addBias, boolean useSharedMemory) {
-	StackedAutoencoder sae = sae(layers, addBias, useSharedMemory);
+    public static StackedAutoencoder saeReLU(int[] layers, int hiddenCount, boolean addBias) {
+	StackedAutoencoder sae = sae(layers, addBias);
 	sae.setLayerCalculator(lcRelu(sae, null));
 	return sae;
     }
 
-    public static StackedAutoencoder saeTanh(int[] layers, int hiddenCount, boolean addBias, boolean useSharedMemory) {
-	StackedAutoencoder sae = sae(layers, addBias, useSharedMemory);
+    public static StackedAutoencoder saeTanh(int[] layers, int hiddenCount, boolean addBias) {
+	StackedAutoencoder sae = sae(layers, addBias);
 	sae.setLayerCalculator(lcTanh(sae, null));
 	return sae;
     }

@@ -20,19 +20,19 @@ public class Environment {
     private KernelExecutionStrategy executionStrategy;
 
     /**
-     * is debug
+     * Shared memory for calculations
      */
-    private boolean debug;
+    private boolean useDataSharedMemory;
 
     /**
-     * Shared memory
+     * Shared memory for neural network connection weights
      */
-    private boolean useSharedMemory;
+    private boolean useWeightsSharedMemory;
 
     private Environment() {
 	executionStrategy = new DefaultKernelExecution();
-	debug = true;
-	useSharedMemory = true;
+	useDataSharedMemory = true;
+	useWeightsSharedMemory = false;
     }
 
     public KernelExecutionStrategy getExecutionStrategy() {
@@ -62,19 +62,19 @@ public class Environment {
 	return singleton;
     }
 
-    public boolean isDebug() {
-	return debug;
+    public boolean getUseDataSharedMemory() {
+        return useDataSharedMemory;
     }
 
-    public void setDebug(boolean debug) {
-	this.debug = debug;
+    public void setUseDataSharedMemory(boolean useDataSharedMemory) {
+        this.useDataSharedMemory = useDataSharedMemory;
     }
 
-    public boolean getUseSharedMemory() {
-        return useSharedMemory;
+    public boolean getUseWeightsSharedMemory() {
+        return useWeightsSharedMemory;
     }
 
-    public void setUseSharedMemory(boolean useSharedMemory) {
-        this.useSharedMemory = useSharedMemory;
+    public void setUseWeightsSharedMemory(boolean useWeightsSharedMemory) {
+        this.useWeightsSharedMemory = useWeightsSharedMemory;
     }
 }

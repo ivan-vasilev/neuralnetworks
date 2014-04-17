@@ -27,7 +27,8 @@ public class AETest {
 	Environment.getInstance().setExecutionMode(EXECUTION_MODE.CPU);
 
 	// autoencoder with 6 input/output and 2 hidden units
-	Autoencoder ae = NNFactory.autoencoderSigmoid(6, 2, true, true);
+	Environment.getInstance().setUseWeightsSharedMemory(true);
+	Autoencoder ae = NNFactory.autoencoderSigmoid(6, 2, true);
 
 	// We'll use a simple dataset of symptoms of a flu illness. There are 6
 	// input features and the first three are symptoms of the illness - for

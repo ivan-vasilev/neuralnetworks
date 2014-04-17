@@ -30,7 +30,7 @@ public class DeepTrainerTrainingInputProvider extends TrainingInputProviderImpl 
 	this.dnn = dnn;
 	this.currentNN = currentNN;
 	this.calculatedLayers = new HashSet<>();
-	this.layerResults = TensorFactory.tensorProvider(batchSize, Environment.getInstance().getUseSharedMemory(), dnn, currentNN);
+	this.layerResults = TensorFactory.tensorProvider(batchSize, Environment.getInstance().getUseDataSharedMemory(), dnn, currentNN);
 	this.inputDataBase = new TrainingInputDataImpl(layerResults.get(dnn.getInputLayer()));
     }
 
