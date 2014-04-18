@@ -27,15 +27,14 @@ public class XorTest {
 
 	// create multi layer perceptron with one hidden layer and bias
 	Environment.getInstance().setUseWeightsSharedMemory(true);
-	Environment.getInstance().setUseDataSharedMemory(false);
-	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 2, 4, 1 }, true);
+	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 2, 8, 1 }, true);
 
 	// create training and testing input providers
 	SimpleInputProvider trainingInput = new SimpleInputProvider(new float[][] { {0, 0}, {0, 1}, {1, 0}, {1, 1} }, new float[][] { {0}, {1}, {1}, {0} });
 	SimpleInputProvider testingInput = new SimpleInputProvider(new float[][] { {0, 0}, {0, 1}, {1, 0}, {1, 1} }, new float[][] { {0}, {1}, {1}, {0} });
 
 	// create backpropagation trainer for the network
-	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(mlp, trainingInput, testingInput, new XorOutputError(), new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.1f, 0.5f, 0f, 0f, 1, 1, 1000);
+	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(mlp, trainingInput, testingInput, new XorOutputError(), new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 1f, 0.5f, 0f, 0f, 1, 1, 2500);
 
 	// add logging
 	bpt.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
