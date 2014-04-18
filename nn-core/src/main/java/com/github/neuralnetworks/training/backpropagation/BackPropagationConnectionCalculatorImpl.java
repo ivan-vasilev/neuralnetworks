@@ -118,7 +118,7 @@ public abstract class BackPropagationConnectionCalculatorImpl implements BackPro
     public float getL2weightDecay() {
 	return properties.getParameter(Constants.L2_WEIGHT_DECAY);
     }
-    
+
     @Override
     public void setL2weightDecay(float weightDecay) {
 	properties.setParameter(Constants.L2_WEIGHT_DECAY, weightDecay);

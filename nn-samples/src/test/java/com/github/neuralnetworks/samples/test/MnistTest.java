@@ -29,6 +29,8 @@ public class MnistTest {
 
     @Test
     public void testSigmoidBP() {
+	Environment.getInstance().setUseDataSharedMemory(true);
+	Environment.getInstance().setUseWeightsSharedMemory(false);
 	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 784, 10 }, true);
 
 	MnistInputProvider trainInputProvider = new MnistInputProvider("train-images.idx3-ubyte", "train-labels.idx1-ubyte");

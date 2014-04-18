@@ -164,7 +164,7 @@ public class IrisTest {
     	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 
 	// create autoencoder with visible layer with 4 neurons and hidden layer with 3 neurons
-	Environment.getInstance().setUseWeightsSharedMemory(true);
+	Environment.getInstance().setUseWeightsSharedMemory(false);
     	Autoencoder ae = NNFactory.autoencoderSigmoid(4, 3, true);
 
     	// training, testing and error
@@ -173,7 +173,7 @@ public class IrisTest {
     	MultipleNeuronsOutputError error = new MultipleNeuronsOutputError();
 
     	// backpropagation autoencoder training
-    	BackPropagationAutoencoder bae = TrainerFactory.backPropagationAutoencoder(ae, trainInputProvider, testInputProvider, error, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.25f, 0.5f, 0f, 0f, 0f, 1, 150, 1000);
+    	BackPropagationAutoencoder bae = TrainerFactory.backPropagationAutoencoder(ae, trainInputProvider, testInputProvider, error, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.02f, 0.7f, 0f, 0f, 0f, 150, 1, 2000);
 
     	// log data to console
     	bae.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
