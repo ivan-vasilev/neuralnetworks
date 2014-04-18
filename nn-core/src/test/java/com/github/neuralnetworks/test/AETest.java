@@ -46,7 +46,7 @@ public class AETest {
 	MultipleNeuronsOutputError error = new MultipleNeuronsOutputError();
 
 	// backpropagation for autoencoders
-	BackPropagationAutoencoder t = TrainerFactory.backPropagationAutoencoder(ae, trainInputProvider, testInputProvider, error, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.1f, 0.5f, 0f, 0f, 0f, 1, 1, 100);
+	BackPropagationAutoencoder t = TrainerFactory.backPropagationAutoencoder(ae, trainInputProvider, testInputProvider, error, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.1f, 0.5f, 0f, 0f, 0f, 1, 1, 200);
 
 	// log data
 	t.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName(), true, false));

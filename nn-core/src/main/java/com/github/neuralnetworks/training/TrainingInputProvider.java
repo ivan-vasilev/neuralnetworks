@@ -61,7 +61,7 @@ public interface TrainingInputProvider extends Serializable {
 	if (ti.getTarget() != null) {
 	    targetDims = ti.getTarget().getDimensions();
 	    targetLimits = new int[2][targetDims.length];
-	    for (int i = 0; i < inputDims.length - 1; i++) {
+	    for (int i = 0; i < targetDims.length - 1; i++) {
 		targetLimits[1][i] = targetDims[i] - 1;
 	    }
 	}
