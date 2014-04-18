@@ -58,7 +58,7 @@ public class ValuesProvider implements Serializable {
 		    return null;
 		}
 	    }
-	    
+
 	    return (T) values.get(key).stream().filter(t -> Arrays.equals(t.getDimensions(), dimensions)).findFirst().orElse(null);
 	}
 

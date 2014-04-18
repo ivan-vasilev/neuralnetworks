@@ -22,8 +22,9 @@ public class ConnectionFactory implements Serializable {
 
     public ConnectionFactory() {
 	super();
+	this.connections = new ArrayList<>();
+
 	if (Environment.getInstance().getUseWeightsSharedMemory()) {
-	    this.connections = new ArrayList<>();
 	    this.sharedWeights = new float[0];
 	}
     }
@@ -44,10 +45,7 @@ public class ConnectionFactory implements Serializable {
 
     public FullyConnected fullyConnected(Layer inputLayer, Layer outputLayer, Matrix weights) {
 	FullyConnected result = new FullyConnected(inputLayer, outputLayer, weights);
-	if (useSharedWeights()) {
-	    connections.add(result);
-	}
-
+	connections.add(result);
 	return result;
     }
 
@@ -67,10 +65,7 @@ public class ConnectionFactory implements Serializable {
 
     public Conv2DConnection conv2d(Layer inputLayer, Layer outputLayer, int inputFeatureMapColumns, int inputFeatureMapRows, Tensor weights, int stride) {
 	Conv2DConnection result = new Conv2DConnection(inputLayer, outputLayer, inputFeatureMapColumns, inputFeatureMapRows, weights, stride);
-	if (useSharedWeights()) {
-	    connections.add(result);
-	}
-
+	connections.add(result);
 	return result;
     }
 
@@ -78,22 +73,15 @@ public class ConnectionFactory implements Serializable {
 	return new Subsampling2DConnection(inputLayer, outputLayer, inputFeatureMapColumns, inputFeatureMapRows, subsamplingRegionRows, subsamplingRegionCols, filters);
     }
 
-    private boolean useSharedWeights() {
+    public boolean useSharedWeights() {
 	return sharedWeights != null;
     }
 
-    private void updateSharedWeights() {
-	for (Connections c : connections) {
-	    Tensor weights = null;
-	    if (c instanceof FullyConnected) {
-		weights = ((FullyConnected) c).getWeights();
-	    } else if (c instanceof Conv2DConnection) {
-		weights = ((Conv2DConnection) c).getWeights();
-	    }
+    public List<Connections> getConnections() {
+        return connections;
+    }
 
-	    if (weights != null) {
-		weights.setElements(sharedWeights);
-	    }
-	}
+    private void updateSharedWeights() {
+	connections.stream().filter(c -> c instanceof WeightsConnections).forEach(c -> ((WeightsConnections) c).getWeights().setElements(sharedWeights));
     }
 }

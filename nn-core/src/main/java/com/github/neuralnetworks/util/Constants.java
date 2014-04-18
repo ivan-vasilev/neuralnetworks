@@ -35,4 +35,5 @@ public class Constants {
     public static final String TRAINING_BATCH_SIZE = "batchSize";
     public static final String TEST_BATCH_SIZE = "testBatchSize";
     public static final String EPOCHS = "epochs";
+    public static final String CONNECTION_FACTORY = "connectionFactory";
 }

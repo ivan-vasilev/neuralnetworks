@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.github.neuralnetworks.calculation.LayerCalculator;
+import com.github.neuralnetworks.util.Properties;
 import com.github.neuralnetworks.util.UniqueList;
 import com.github.neuralnetworks.util.Util;
 
@@ -19,6 +20,7 @@ public class NeuralNetworkImpl implements NeuralNetwork {
 
     private Set<Layer> layers;
     private LayerCalculator layerCalculator;
+    private Properties properties;
 
     public NeuralNetworkImpl() {
 	super();
@@ -41,6 +43,14 @@ public class NeuralNetworkImpl implements NeuralNetwork {
 
     public void setLayers(Set<Layer> layers) {
 	this.layers = layers;
+    }
+
+    public Properties getProperties() {
+        return properties;
+    }
+
+    public void setProperties(Properties properties) {
+        this.properties = properties;
     }
 
     /*

@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import com.github.neuralnetworks.architecture.ConnectionFactory;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
@@ -183,7 +184,7 @@ public class TrainerFactory {
 	return t;
     }
 
-    protected static Properties backpropProperties(NeuralNetwork nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, NNRandomInitializer rand, float learningRate, float momentum, float l1weightDecay, float l2weightDecay, int trainingBatchSize, int testBatchSize, int epochs) {
+    protected static Properties backpropProperties(NeuralNetworkImpl nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, NNRandomInitializer rand, float learningRate, float momentum, float l1weightDecay, float l2weightDecay, int trainingBatchSize, int testBatchSize, int epochs) {
 	Properties p = new Properties();
 	p.setParameter(Constants.NEURAL_NETWORK, nn);
 	p.setParameter(Constants.TRAINING_INPUT_PROVIDER, trainingSet);
@@ -261,22 +262,16 @@ public class TrainerFactory {
      * @param nn
      * @return Weight update tensors
      */
-    public static Map<Connections, Tensor> weightUpdates(NeuralNetwork nn) {
+    public static Map<Connections, Tensor> weightUpdates(NeuralNetworkImpl nn) {
 	Map<Connections, Tensor> result = new HashMap<>();
-	List<Connections> cs = nn.getConnections().stream().filter(c -> c instanceof WeightsConnections).collect(Collectors.toList());
-	cs.sort((c1, c2) ->  Integer.valueOf(((WeightsConnections) c1).getWeights().getStartIndex()).compareTo(((WeightsConnections) c1).getWeights().getStartIndex()));
 
-	if (cs.size() > 0) {
-	    List<int[]> ts = cs.stream().map(c -> ((WeightsConnections) c).getWeights().getDimensions()).collect(Collectors.toList());
-	    boolean useSharedMemory = cs.stream().map(c -> ((WeightsConnections) c).getWeights().getElements()).distinct().count() == 1;
+	ConnectionFactory cf = nn.getProperties().getParameter(Constants.CONNECTION_FACTORY);
+	List<Connections> connections = cf.getConnections().stream().filter(c -> c instanceof WeightsConnections).collect(Collectors.toList());
+	int[][] dimensions = new int[connections.size()][];
+	IntStream.range(0, dimensions.length).forEach(i -> dimensions[i] = ((WeightsConnections) connections.get(i)).getWeights().getDimensions());
+	Tensor[] tensors = TensorFactory.tensor(dimensions);
 
-	    if (useSharedMemory) {
-		Tensor[] tensors = TensorFactory.tensor(ts.toArray(new int[ts.size()][]));
-		IntStream.range(0, cs.size()).forEach(i -> result.put(cs.get(i), tensors[i]));
-	    } else {
-		IntStream.range(0, cs.size()).forEach(i -> result.put(cs.get(i), TensorFactory.tensor(ts.get(i))));
-	    }
-	}
+	IntStream.range(0, dimensions.length).forEach(i -> result.put(connections.get(i), tensors[i]));
 
 	return result;
     }

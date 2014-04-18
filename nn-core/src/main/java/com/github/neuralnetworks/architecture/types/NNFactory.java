@@ -27,6 +27,8 @@ import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculato
 import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculatorFullyConnected;
 import com.github.neuralnetworks.calculation.neuronfunctions.ConstantConnectionCalculator;
 import com.github.neuralnetworks.calculation.neuronfunctions.SoftmaxFunction;
+import com.github.neuralnetworks.util.Constants;
+import com.github.neuralnetworks.util.Properties;
 import com.github.neuralnetworks.util.Util;
 
 /**
@@ -57,6 +59,8 @@ public class NNFactory {
 
 	NeuralNetworkImpl result = new NeuralNetworkImpl();
 	ConnectionFactory cf = new ConnectionFactory();
+	result.setProperties(new Properties());
+	result.getProperties().setParameter(Constants.CONNECTION_FACTORY, cf);
 
 	Layer prev = null;
 	int prevUnitCount = layers[0][0] * layers[0][1] * layers[0][2];
@@ -141,6 +145,11 @@ public class NNFactory {
 	if (layers.length <= 1) {
 	    throw new IllegalArgumentException("more than one layer is required");
 	}
+
+	if (nn.getProperties() == null) {
+	    nn.setProperties(new Properties());
+	}
+	nn.getProperties().setParameter(Constants.CONNECTION_FACTORY, cf);
 
 	addFullyConnectedLayer(nn, new Layer(), cf, layers[0], layers[0], addBias);
 	for (int i = 1; i < layers.length; i++) {
@@ -413,9 +422,13 @@ public class NNFactory {
 
 	DBN result = new DBN();
 	ConnectionFactory cf = new ConnectionFactory();
+	result.setProperties(new Properties());
+	result.getProperties().setParameter(Constants.CONNECTION_FACTORY, cf);
+
 	result.addLayer(new Layer());
 	for (int i = 1; i < layers.length; i++) {
 	    RBM rbm = new RBM();
+	    rbm.setProperties(result.getProperties());
 	    rbm.addConnections(cf.fullyConnected(result.getOutputLayer(), new Layer(), layers[i - 1], layers[i]));
 
 	    if (addBias) {
@@ -459,10 +472,15 @@ public class NNFactory {
 	}
 
 	ConnectionFactory cf = new ConnectionFactory();
+	Properties properties = new Properties();
+	properties.setParameter(Constants.CONNECTION_FACTORY, cf);
 	StackedAutoencoder result = new StackedAutoencoder(new Layer());
+	result.setProperties(properties);
+
 	for (int i = 1; i < layers.length; i++) {
 	    Autoencoder ae = new Autoencoder();
 	    ae.addLayer(result.getOutputLayer());
+	    ae.setProperties(properties);
 	    NNFactory.addFullyConnectedLayer(ae, new Layer(), cf, layers[i - 1], layers[i], addBias);
 	    NNFactory.addFullyConnectedLayer(ae, new Layer(), cf, layers[i], layers[i - 1], addBias);
 
