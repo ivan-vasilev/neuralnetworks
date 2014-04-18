@@ -35,7 +35,7 @@ public class DeepTrainerTrainingInputProvider extends TrainingInputProviderImpl 
     }
 
     @Override
-    public void after(TrainingInputData ti) {
+    public void afterBatch(TrainingInputData ti) {
 	if (dnn.getFirstNeuralNetwork() != currentNN) {
 	    inputProvider.populateNext(inputDataBase);
 	    calculatedLayers.clear();

@@ -74,15 +74,27 @@ public class BackPropagationAutoencoder extends BackPropagationTrainer<Autoencod
 	}
 
 	@Override
-	public void before(TrainingInputData ti) {
-	    super.before(ti);
-	    base.before(ti);
+	public void beforeBatch(TrainingInputData ti) {
+	    super.beforeBatch(ti);
+	    base.beforeBatch(ti);
 	}
 
 	@Override
-	public void after(TrainingInputData ti) {
-	    super.after(ti);
-	    base.after(ti);
+	public void afterBatch(TrainingInputData ti) {
+	    super.afterBatch(ti);
+	    base.afterBatch(ti);
+	}
+	
+	@Override
+	public void beforeSample() {
+	    super.beforeSample();
+	    base.beforeSample();
+	}
+	
+	@Override
+	public void afterSample() {
+	    super.afterSample();
+	    base.afterSample();
 	}
 
 	@Override

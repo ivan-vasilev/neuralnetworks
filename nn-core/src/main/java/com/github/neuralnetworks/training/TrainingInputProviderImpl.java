@@ -62,16 +62,20 @@ public abstract class TrainingInputProviderImpl implements TrainingInputProvider
     }
 
     @Override
-    public void before(TrainingInputData ti) {
+    public void beforeBatch(TrainingInputData ti) {
     }
 
     @Override
-    public void after(TrainingInputData ti) {
-	if (ti.getInput() != null) {
-	    currentInput += ti.getInput().getDimensions()[ti.getInput().getDimensions().length - 1];
-	} else if (ti.getTarget() != null) {
-	    currentInput += ti.getTarget().getDimensions()[ti.getTarget().getDimensions().length - 1];
-	}
+    public void afterBatch(TrainingInputData ti) {
+    }
+
+    @Override
+    public void afterSample() {
+	currentInput++;
+    }
+
+    @Override
+    public void beforeSample() {
     }
 
     @Override
