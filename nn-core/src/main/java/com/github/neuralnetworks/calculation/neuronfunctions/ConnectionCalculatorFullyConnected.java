@@ -50,6 +50,12 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator,
      */
     protected List<TensorFunction> activationFunctions;
 
+    /**
+     * Dropout properties
+     */
+    protected float dropoutRate;
+    protected TensorFunction dropoutFunction;
+
     public ConnectionCalculatorFullyConnected() {
 	super();
 	inputFunctions = new HashSet<>();
@@ -81,6 +87,14 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator,
 
 		if (activationFunctions != null) {
 		    activationFunctions.forEach(f -> f.value(TensorFactory.tensor(targetLayer, notBias, valuesProvider)));
+		}
+
+		if (dropoutRate > 0) {
+		    if (dropoutFunction == null) {
+			dropoutFunction = createDropoutFunction(notBias, valuesProvider, targetLayer);
+		    }
+
+		    dropoutFunction.value(TensorFactory.tensor(targetLayer, notBias, valuesProvider));
 		}
 	    }
 	}
@@ -125,6 +139,14 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator,
 	}
     }
 
+    public float getDropoutRate() {
+        return dropoutRate;
+    }
+
+    public void setDropoutRate(float dropoutRate) {
+        this.dropoutRate = dropoutRate;
+    }
+
     protected void calculateBias(Connections bias, ValuesProvider valuesProvider) {
 	if (bias != null) {
 	    Tensor biasValue = TensorFactory.tensor(bias.getInputLayer(), bias, valuesProvider);
@@ -153,6 +175,11 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator,
 
     protected ConnectionCalculator createInputFunction(List<Connections> inputConnections, ValuesProvider valuesProvider, Layer targetLayer) {
 	return new AparapiWeightedSum(inputConnections, valuesProvider, targetLayer);
+    }
+
+    protected TensorFunction createDropoutFunction(List<Connections> inputConnections, ValuesProvider valuesProvider, Layer targetLayer) {
+	Tensor t = TensorFactory.tensor(targetLayer, inputConnections, valuesProvider);
+	return new AparapiNoise(t, t.getSize(), dropoutRate, 0);
     }
 
     private ConnectionCalculator getConnectionCalculator(List<Connections> connections, ValuesProvider valuesProvider, Layer targetLayer) {

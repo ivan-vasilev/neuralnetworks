@@ -80,13 +80,12 @@ public class TrainerFactory {
      * @param l1weightDecay
      * @return
      */
-    public static BackPropagationTrainer<?> backPropagation(NeuralNetworkImpl nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, NNRandomInitializer rand, float learningRate, float momentum, float l1weightDecay, float l2weightDecay, int trainingBatchSize, int testBatchSize, int epochs) {
-	BackPropagationTrainer<?> t = new BackPropagationTrainer<NeuralNetwork>(backpropProperties(nn, trainingSet, testingSet, error, rand, learningRate, momentum, l1weightDecay, l2weightDecay, trainingBatchSize, testBatchSize, epochs));
+    public static BackPropagationTrainer<?> backPropagation(NeuralNetworkImpl nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, NNRandomInitializer rand, float learningRate, float momentum, float l1weightDecay, float l2weightDecay, float dropoutRate, int trainingBatchSize, int testBatchSize, int epochs) {
+	Properties p = backpropProperties(nn, trainingSet, testingSet, error, rand, learningRate, momentum, l1weightDecay, l2weightDecay, trainingBatchSize, testBatchSize, epochs);
+	p.setParameter(Constants.BACKPROPAGATION, bplc(nn, p));
+	p.setParameter(Constants.DROPOUT_RATE, dropoutRate);
 
-	BackPropagationLayerCalculatorImpl bplc = bplc(nn, t.getProperties());
-	t.getProperties().setParameter(Constants.BACKPROPAGATION, bplc);
-
-	return t;
+	return new BackPropagationTrainer<NeuralNetwork>(p);
     }
 
     private static BackPropagationLayerCalculatorImpl bplc(NeuralNetworkImpl nn, Properties p) {
@@ -174,14 +173,9 @@ public class TrainerFactory {
     public static BackPropagationAutoencoder backPropagationAutoencoder(NeuralNetworkImpl nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, NNRandomInitializer rand, float learningRate, float momentum, float l1weightDecay, float l2weightDecay, float inputCorruptionRate, int trainingBatchSize, int testBatchSize, int epochs) {
 	Properties p = backpropProperties(nn, trainingSet, testingSet, error, rand, learningRate, momentum, l1weightDecay, l2weightDecay, trainingBatchSize, testBatchSize, epochs);
 	p.setParameter(Constants.CORRUPTION_LEVEL, inputCorruptionRate);
+	p.setParameter(Constants.BACKPROPAGATION, bplc(nn, p));
 
-	BackPropagationAutoencoder t = new BackPropagationAutoencoder(p);
-
-	BackPropagationLayerCalculatorImpl bplc = bplc(nn, p);
-
-	t.getProperties().setParameter(Constants.BACKPROPAGATION, bplc);
-
-	return t;
+	return new BackPropagationAutoencoder(p);
     }
 
     protected static Properties backpropProperties(NeuralNetworkImpl nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, NNRandomInitializer rand, float learningRate, float momentum, float l1weightDecay, float l2weightDecay, int trainingBatchSize, int testBatchSize, int epochs) {

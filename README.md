@@ -15,7 +15,7 @@ I'm using the [git-flow](https://github.com/nvie/gitflow) model. The most stable
 * Convolutional networks with max pooling, average poolng and [stochastic pooling](http://techtalks.tv/talks/stochastic-pooling-for-regularization-of-deep-convolutional-neural-networks/58106/).
 
 ##Training algorithms
-* Backpropagation - supports multilayer perceptrons and convolutional networks.
+* Backpropagation - supports multilayer perceptrons, convolutional networks and [dropout](http://arxiv.org/pdf/1207.0580.pdf).
 * Contrastive divergence and persistent contrastive divergence implemented using [these](http://www.iro.umontreal.ca/~lisa/publications2/index.php/publications/show/239) and [these](http://www.cs.toronto.edu/~hinton/absps/guideTR.pdf) guidelines.
 * Greedy layer-wise training for deep networks - works for stacked autoencoders and DBNs, but supports any kind of training.
 

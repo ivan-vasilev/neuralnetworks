@@ -62,7 +62,7 @@ public class BackPropagationAutoencoder extends BackPropagationTrainer<Autoencod
 	    if (corruptionRate != null && corruptionRate > 0) {
 		if (noise == null) {
 		    noiseTensor = TensorFactory.tensor(base.getNextInput().length);
-		    noise = new AparapiNoise(noiseTensor, base.getNextInput().length, corruptionRate);
+		    noise = new AparapiNoise(noiseTensor, base.getNextInput().length, corruptionRate, 0);
 		}
 
 		System.arraycopy(result, 0, noiseTensor.getElements(), 0, result.length);

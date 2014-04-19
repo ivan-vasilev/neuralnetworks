@@ -13,12 +13,14 @@ public class AparapiNoise extends XORShiftKernel implements TensorFunction {
     private final float corruptionLevel;
     private final int startIndex;
     private float[] inputOutput;
+    private final float corruptedValue;
 
-    public AparapiNoise(Tensor inputOutput, int maximumRange, float corruptionLevel) {
+    public AparapiNoise(Tensor inputOutput, int maximumRange, float corruptionLevel, float corruptedValue) {
 	super(maximumRange);
 	this.inputOutput = inputOutput.getElements();
 	this.startIndex = inputOutput.getStartIndex();
 	this.corruptionLevel = corruptionLevel;
+	this.corruptedValue = corruptedValue;
     }
 
     @Override
@@ -38,7 +40,7 @@ public class AparapiNoise extends XORShiftKernel implements TensorFunction {
     public void run() {
 	int id = getGlobalId();
 	if (random01() < corruptionLevel) {
-	    inputOutput[startIndex + id] = 0;
+	    inputOutput[startIndex + id] = corruptedValue;
 	}
     }
 }

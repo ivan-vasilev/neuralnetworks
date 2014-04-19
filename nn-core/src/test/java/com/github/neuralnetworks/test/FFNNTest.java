@@ -294,7 +294,7 @@ public class FFNNTest {
 	cg2.set(0.3f, 0, 0);
 	cg2.set(0.9f, 0, 1);
 
-	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(mlp, new SimpleInputProvider(new float[][] { { 0.35f, 0.9f } }, new float[][] { { 0.5f } }), new SimpleInputProvider(new float[][] { { 0.35f, 0.9f } }, new float[][] { { 0.5f } }), null, null, 1f, 0f, 0f, 0f, 1, 1, 1);
+	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(mlp, new SimpleInputProvider(new float[][] { { 0.35f, 0.9f } }, new float[][] { { 0.5f } }), new SimpleInputProvider(new float[][] { { 0.35f, 0.9f } }, new float[][] { { 0.5f } }), null, null, 1f, 0f, 0f, 0f, 0f, 1, 1, 1);
 	bpt.train();
 
 	assertEquals(0.09916, cg1.get(0, 0), 0.01);
@@ -338,7 +338,7 @@ public class FFNNTest {
 	Matrix cgb2 = cb2.getWeights();
 	cgb2.set(0.1f, 0, 0);
 
-	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(mlp, new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, new float[][] { { 1 } }), new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, new float[][] { { 1 } }), null, null, 0.9f, 0f, 0f, 0f, 1, 1, 1);
+	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(mlp, new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, new float[][] { { 1 } }), new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, new float[][] { { 1 } }), null, null, 0.9f, 0f, 0f, 0f, 0f, 1, 1, 1);
 	bpt.train();
 
 	assertEquals(0.192, cg1.get(0, 0), 0.001);
@@ -350,6 +350,58 @@ public class FFNNTest {
 
 	assertEquals(-0.261, cg2.get(0, 0), 0.001);
 	assertEquals(-0.138, cg2.get(0, 1), 0.001);
+
+	assertEquals(-0.408, cgb1.get(0, 0), 0.001);
+	assertEquals(0.194, cgb1.get(1, 0), 0.001);
+
+	assertEquals(0.218, cgb2.get(0, 0), 0.001);
+    }
+
+    /**
+     * BP with dropout
+     */
+    @Test
+    public void testSigmoidBPDropout() {
+	//Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
+	Environment.getInstance().setUseWeightsSharedMemory(true);
+	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 3, 2, 1 }, true);
+
+	List<Connections> c = mlp.getConnections();
+	FullyConnected c1 = (FullyConnected) c.get(0);
+	Matrix cg1 = c1.getWeights();
+	cg1.set(0.2f, 0, 0);
+	cg1.set(0.4f, 0, 1);
+	cg1.set(-0.5f, 0, 2);
+	cg1.set(-0.3f, 1, 0);
+	cg1.set(0.1f, 1, 1);
+	cg1.set(0.2f, 1, 2);
+
+	FullyConnected cb1 = (FullyConnected) c.get(1);
+	Matrix cgb1 = cb1.getWeights();
+	cgb1.set(-0.4f, 0, 0);
+	cgb1.set(0.2f, 1, 0);
+
+	FullyConnected c2 = (FullyConnected) c.get(2);
+	Matrix cg2 = c2.getWeights();
+	cg2.set(-0.3f, 0, 0);
+	cg2.set(-0.2f, 0, 1);
+
+	FullyConnected cb2 = (FullyConnected) c.get(3);
+	Matrix cgb2 = cb2.getWeights();
+	cgb2.set(0.1f, 0, 0);
+
+	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(mlp, new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, new float[][] { { 1 } }), new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, new float[][] { { 1 } }), null, null, 0.9f, 0f, 0f, 0f, 0.01f, 1, 1, 1);
+	bpt.train();
+
+	assertEquals(0.192, cg1.get(0, 0), 0.001);
+	assertEquals(0.4, cg1.get(0, 1), 0.001);
+	assertEquals(-0.508, cg1.get(0, 2), 0.001);
+	assertEquals(-0.306, cg1.get(1, 0), 0.001);
+	assertEquals(0.1, cg1.get(1, 1), 0.001);
+	assertEquals(0.194, cg1.get(1, 2), 0.001);
+
+	assertEquals(-0.261 * 0.99, cg2.get(0, 0), 0.001);
+	assertEquals(-0.138 * 0.99, cg2.get(0, 1), 0.001);
 
 	assertEquals(-0.408, cgb1.get(0, 0), 0.001);
 	assertEquals(0.194, cgb1.get(1, 0), 0.001);
@@ -388,7 +440,7 @@ public class FFNNTest {
 	Matrix cgb2 = cb2.getWeights();
 	cgb2.set(0.1f, 0, 0);
 
-	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(mlp, new SimpleInputProvider(new float[][] { { 1, 0, 1 }, { 1, 1, 0 } }, new float[][] { { 1 }, { 1 } }), null, null, null, 0.9f, 0f, 0f, 0f, 1, 1, 1);
+	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(mlp, new SimpleInputProvider(new float[][] { { 1, 0, 1 }, { 1, 1, 0 } }, new float[][] { { 1 }, { 1 } }), null, null, null, 0.9f, 0f, 0f, 0f, 0f, 1, 1, 1);
 	bpt.train();
 
 	assertEquals(0.1849, cg1.get(0, 0), 0.0001);

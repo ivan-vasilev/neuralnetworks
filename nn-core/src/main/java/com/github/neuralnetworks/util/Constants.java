@@ -36,4 +36,5 @@ public class Constants {
     public static final String TEST_BATCH_SIZE = "testBatchSize";
     public static final String EPOCHS = "epochs";
     public static final String CONNECTION_FACTORY = "connectionFactory";
+    public static final String DROPOUT_RATE = "dropoutRate";
 }
