@@ -211,6 +211,17 @@ public class TensorFactory {
 	}
     }
 
+    public static Tensor duplicate(Tensor src, float[] elements) {
+	int[][] gdl = new int[src.globalDimensionsLimit.length][src.globalDimensionsLimit[0].length];
+	IntStream.range(0, gdl.length).forEach(i -> IntStream.range(0, gdl[i].length).forEach(j -> gdl[i][j] = src.globalDimensionsLimit[i][j]));
+
+	if (elements == null) {
+	    elements = new float[src.elements.length];
+	}
+
+	return new Tensor(src.startOffset, elements, Arrays.copyOf(src.globalDimensions, src.globalDimensions.length), gdl);
+    }
+
     /**
      * @return mini batch size for TensorProvider
      */

@@ -29,7 +29,7 @@ public class MnistTest {
 
     @Test
     public void testSigmoidBP() {
-	Environment.getInstance().setUseDataSharedMemory(true);
+	Environment.getInstance().setUseDataSharedMemory(false);
 	Environment.getInstance().setUseWeightsSharedMemory(false);
 	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 784, 10 }, true);
 
@@ -90,7 +90,6 @@ public class MnistTest {
 	assertEquals(0, t.getOutputError().getTotalNetworkError(), 0.1);
     }
 
-
     @Test
     public void testAE() {
 	Autoencoder nn = NNFactory.autoencoderSigmoid(784, 10, true);
@@ -113,6 +112,9 @@ public class MnistTest {
 
     @Test
     public void testLeNetSmall() {
+	// cpu execution mode
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.CPU);
+
 	// Convolutional network
 	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 28, 28, 1 }, { 5, 5, 20, 1 }, { 2, 2 }, { 5, 5, 50, 1 }, { 2, 2 }, {512}, {10} }, true);
 	nn.setLayerCalculator(NNFactory.lcSigmoid(nn, null));
@@ -129,9 +131,6 @@ public class MnistTest {
 
 	// log data
 	bpt.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName(), false, true));
-
-	// cpu execution mode
-	Environment.getInstance().setExecutionMode(EXECUTION_MODE.CPU);
 
 	// training
 	bpt.train();

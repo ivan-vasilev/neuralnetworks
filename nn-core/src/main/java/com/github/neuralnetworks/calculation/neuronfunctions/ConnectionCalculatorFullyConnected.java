@@ -14,7 +14,6 @@ import com.github.neuralnetworks.events.PropagationEvent;
 import com.github.neuralnetworks.events.PropagationEventListener;
 import com.github.neuralnetworks.util.Matrix;
 import com.github.neuralnetworks.util.Tensor;
-import com.github.neuralnetworks.util.Tensor.TensorIterator;
 import com.github.neuralnetworks.util.TensorFactory;
 import com.github.neuralnetworks.util.UniqueList;
 import com.github.neuralnetworks.util.Util;
@@ -135,11 +134,19 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator,
 
 	    Matrix weights = ((FullyConnected) bias).getWeights();;
 	    Matrix output = TensorFactory.tensor(bias.getOutputLayer(), bias, valuesProvider);
-	    TensorIterator it = output.iterator();
 
-	    while (it.hasNext()) {
-		int i = it.next();
-		output.getElements()[i] = weights.get(it.getCurrentPosition()[0], 0);
+	    // for performance reasons no
+	    int rows = weights.getRows();
+	    int cols = output.getColumns();
+	    int weightsStartIndex = weights.getStartIndex();
+	    int outputStartIndex = output.getStartIndex();
+	    float[] wElements= weights.getElements();
+	    float[] oElements= output.getElements();
+
+	    for (int i = 0; i < rows; i++) {
+		for (int j = 0; j < cols; j++) {
+		    oElements[outputStartIndex + i * cols + j] = wElements[weightsStartIndex + i];
+		}
 	    }
 	}
     }

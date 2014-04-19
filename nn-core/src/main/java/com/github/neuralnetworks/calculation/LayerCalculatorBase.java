@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
@@ -38,7 +39,8 @@ public class LayerCalculatorBase implements Serializable {
 		    ConnectionCalculator cc = getConnectionCalculator(c.target);
 		    if (cc != null) {
 			Tensor t = TensorFactory.tensor(c.target, chunk, valuesProvider);
-			t.forEach(j -> t.getElements()[j] = 0);
+			float[] elements = t.getElements();
+			IntStream.range(t.getStartIndex(), t.getStartIndex() + t.getSize()).forEach(j -> elements[j] = 0);
 			cc.calculate(chunk, valuesProvider, c.target);
 		    }
 

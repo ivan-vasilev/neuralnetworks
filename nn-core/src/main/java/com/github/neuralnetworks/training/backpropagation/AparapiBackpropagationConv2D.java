@@ -8,7 +8,6 @@ import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2D;
 import com.github.neuralnetworks.util.Tensor;
-import com.github.neuralnetworks.util.Tensor.TensorIterator;
 import com.github.neuralnetworks.util.TensorFactory;
 import com.github.neuralnetworks.util.Util;
 
@@ -50,6 +49,10 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements BackP
     public AparapiBackpropagationConv2D(Conv2DConnection c, ValuesProvider valuesProvider, ValuesProvider activations, Tensor weightUpdates, Layer targetLayer) {
 	super(c, valuesProvider, targetLayer);
 
+	if (c.getWeights().getSize() != weightUpdates.getSize()) {
+	    throw new IllegalArgumentException("weights and weightUpdates must have the same size");
+	}
+
 	Tensor t = TensorFactory.tensor(targetLayer, c, activations);
 	this.ffActivation = t.getElements();
 	this.activationStartIndex = t.getStartIndex();
@@ -58,7 +61,7 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements BackP
 
 	this.weightUpdatesTensor = weightUpdates;
 	this.weightUpdates = weightUpdates.getElements();
-	this.weightUpdatesMomentum = new float[c.getWeights().getSize()];
+	this.weightUpdatesMomentum = new float[weightUpdates.getSize()];
     }
 
     @Override
@@ -106,9 +109,7 @@ public class AparapiBackpropagationConv2D extends AparapiConv2D implements BackP
      */
     protected void updateWeights() {
 	float weightUpdate = 0;
-	TensorIterator it = weightUpdatesTensor.iterator();
-	for (int i = 0, j = 0; it.hasNext(); j++) {
-	    i = it.next();
+	for (int i = weightsStartIndex, j = 0, size = weightUpdatesTensor.getSize(); j < size; j++, i++) {
 	    weightUpdate = learningRate * weightUpdates[i] + momentum * weightUpdatesMomentum[j] - l1weightDecay * Math.abs(weights[i]) - l2weightDecay * weights[i] * weights[i] / 2;
 	    weights[i] += weightUpdate;
 	    weightUpdatesMomentum[j] = weightUpdates[i];

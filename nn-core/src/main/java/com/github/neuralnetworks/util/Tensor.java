@@ -33,6 +33,11 @@ public class Tensor implements Serializable {
     protected int[] dimensions;
 
     /**
+     * size
+     */
+    protected int size;
+
+    /**
      * sub-tensor position limits for each dimension
      */
     protected int[][] globalDimensionsLimit;
@@ -57,6 +62,8 @@ public class Tensor implements Serializable {
 		dimensions[j++] = dimensionsLimit[1][i] - dimensionsLimit[0][i] + 1;
 	    }
 	}
+
+	size = IntStream.range(0, dimensions.length).map(i -> dimensions[i]).reduce(1, (a, b) -> a * b);
     }
 
     public Tensor(int startOffset, float[] elements, int[] globalDimensions, int[][] globalDimensionsLimit) {
@@ -85,6 +92,8 @@ public class Tensor implements Serializable {
 	    dimMultiplicators[i] = 1;
 	    Arrays.stream(dimensions).skip(i + 1).limit(dimensions.length).forEach(j -> dimMultiplicators[i] *= j);
 	});
+
+	size = IntStream.range(0, dimensions.length).map(i -> dimensions[i]).reduce(1, (a, b) -> a * b);
     }
 
     public float get(int... d) {
@@ -99,7 +108,7 @@ public class Tensor implements Serializable {
      * @return Number of elements (may be different than elements.length)
      */
     public int getSize() {
-	return IntStream.range(0, dimensions.length).map(i -> dimensions[i]).reduce(1, (a, b) -> a * b);
+	return size;
     }
  
     /**
@@ -176,10 +185,6 @@ public class Tensor implements Serializable {
     }
 
     protected int getIndex(int... d) {
-	if (d == null || d.length == 0 || d.length > globalDimensions.length) {
-	    throw new IllegalArgumentException("Please provide indices");
-	}
-
 	int id = 0;
 	for (int i = 0, j = 0; i < globalDimensions.length; i++) {
 	    if (globalDimensionsLimit[0][i] != globalDimensionsLimit[1][i] || d.length - j >= globalDimensions.length - i) {

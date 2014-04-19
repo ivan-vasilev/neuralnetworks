@@ -266,12 +266,10 @@ public class TrainerFactory {
 	Map<Connections, Tensor> result = new HashMap<>();
 
 	ConnectionFactory cf = nn.getProperties().getParameter(Constants.CONNECTION_FACTORY);
-	List<Connections> connections = cf.getConnections().stream().filter(c -> c instanceof WeightsConnections).collect(Collectors.toList());
-	int[][] dimensions = new int[connections.size()][];
-	IntStream.range(0, dimensions.length).forEach(i -> dimensions[i] = ((WeightsConnections) connections.get(i)).getWeights().getDimensions());
-	Tensor[] tensors = TensorFactory.tensor(dimensions);
 
-	IntStream.range(0, dimensions.length).forEach(i -> result.put(connections.get(i), tensors[i]));
+	List<Connections> connections = cf.getConnections().stream().filter(c -> c instanceof WeightsConnections).collect(Collectors.toList());
+	float[] elements = cf.useSharedWeights() ? new float[((WeightsConnections) connections.get(0)).getWeights().getElements().length] : null;
+	IntStream.range(0, connections.size()).forEach(i -> result.put(connections.get(i), TensorFactory.duplicate(((WeightsConnections) connections.get(i)).getWeights(), elements)));
 
 	return result;
     }

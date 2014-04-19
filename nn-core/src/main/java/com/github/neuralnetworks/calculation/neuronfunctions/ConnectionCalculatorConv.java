@@ -72,7 +72,7 @@ public class ConnectionCalculatorConv implements ConnectionCalculator {
 	    TensorIterator it = v.iterator();
 
 	    while (it.hasNext()) {
-		v.getElements()[it.next()] += w.get(it.getCurrentPosition()[0], 0, 0, 0);
+		v.getElements()[it.next()] = w.get(it.getCurrentPosition()[0], 0, 0, 0);
 	    }
 	}
     }
