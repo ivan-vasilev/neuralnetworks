@@ -21,6 +21,7 @@ import com.github.neuralnetworks.calculation.BreadthFirstOrderStrategy;
 import com.github.neuralnetworks.calculation.LayerOrderStrategy.ConnectionCandidate;
 import com.github.neuralnetworks.calculation.TargetLayerOrderStrategy;
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
+import com.github.neuralnetworks.calculation.neuronfunctions.AparapiMaxout;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSumConnectionCalculator;
 import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculatorFullyConnected;
 import com.github.neuralnetworks.training.TrainerFactory;
@@ -407,6 +408,45 @@ public class FFNNTest {
 	assertEquals(0.194, cgb1.get(1, 0), 0.001);
 
 	assertEquals(0.218, cgb2.get(0, 0), 0.001);
+    }
+
+    /**
+     * maxout ff
+     */
+    @Test
+    public void testMaxoutFF() {
+	//Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
+	Environment.getInstance().setUseWeightsSharedMemory(true);
+	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 2, 2 }, true);
+
+	List<Connections> c = mlp.getConnections();
+	FullyConnected c1 = (FullyConnected) c.get(0);
+	Matrix cg1 = c1.getWeights();
+	cg1.set(0.1f, 0, 0);
+	cg1.set(0.5f, 0, 1);
+	cg1.set(0.1f, 1, 0);
+	cg1.set(0.5f, 1, 1);
+
+	FullyConnected cb1 = (FullyConnected) c.get(1);
+	Matrix cgb1 = cb1.getWeights();
+	cgb1.set(0.1f, 0, 0);
+	cgb1.set(0.2f, 1, 0);
+
+	ValuesProvider results = TensorFactory.tensorProvider(mlp, 2, true);
+	Matrix in = results.get(mlp.getInputLayer());
+	in.set(8, 0, 0);
+	in.set(2, 1, 0);
+	in.set(1, 0, 1);
+	in.set(7, 1, 1);
+
+	AparapiMaxout maxout = new AparapiMaxout();
+	maxout.calculate(mlp.getOutputLayer().getConnections(), results, mlp.getOutputLayer());
+
+	Matrix out = results.get(mlp.getOutputLayer());
+	assertEquals(1.1f, out.get(0, 0), 0f);
+	assertEquals(1.2f, out.get(1, 0), 0f);
+	assertEquals(3.6f, out.get(0, 1), 0f);
+	assertEquals(3.7f, out.get(1, 1), 0f);
     }
 
     @Test

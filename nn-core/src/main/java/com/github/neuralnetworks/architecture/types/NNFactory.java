@@ -24,7 +24,6 @@ import com.github.neuralnetworks.calculation.neuronfunctions.AparapiStochasticPo
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiTanh;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSumConnectionCalculator;
 import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculatorConv;
-import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculatorFullyConnected;
 import com.github.neuralnetworks.calculation.neuronfunctions.ConstantConnectionCalculator;
 import com.github.neuralnetworks.calculation.neuronfunctions.SoftmaxFunction;
 import com.github.neuralnetworks.util.Constants;
@@ -185,7 +184,7 @@ public class NNFactory {
 		} else if (Util.isConvolutional(l)) {
 		    lc.addConnectionCalculator(l, new ConnectionCalculatorConv());
 		} else {
-		    lc.addConnectionCalculator(l, new ConnectionCalculatorFullyConnected());
+		    lc.addConnectionCalculator(l, new AparapiWeightedSumConnectionCalculator());
 		}
 	    } else {
 		lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
