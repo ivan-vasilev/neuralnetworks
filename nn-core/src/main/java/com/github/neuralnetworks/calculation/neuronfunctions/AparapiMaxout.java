@@ -6,6 +6,7 @@ import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
+import com.github.neuralnetworks.util.TensorFactory;
 
 /**
  * Maxout activation
@@ -21,18 +22,24 @@ public class AparapiMaxout extends ConnectionCalculatorFullyConnected {
 
     public static class AparapiMaxoutFunction extends AparapiFullyConnected {
 
+	private static final long serialVersionUID = 2572354641295173835L;
+
+	private final int[] winnersStartPositions;
+	private final int[] maxoutWinners;
+
 	public AparapiMaxoutFunction(List<Connections> inputConnections, ValuesProvider valuesProvider, Layer targetLayer) {
 	    super(inputConnections, valuesProvider, targetLayer);
+	    MaxoutWinners.getInstance().setBatchSize(TensorFactory.batchSize(valuesProvider));
+	    winnersStartPositions = MaxoutWinners.getInstance().getStartPositions(inputConnections);
+	    maxoutWinners = MaxoutWinners.getInstance().getWinners();
 	}
-
-	private static final long serialVersionUID = 2572354641295173835L;
 
 	@Override
 	public void run() {
 	    int id = getGlobalId();
 
-	    int inputStartPosition = 0, inputRowsStep = 0, inputColumnsStep = 0, weightStartPosition = 0, weightStep = 0, dim = 0;
-	    float max = 0;
+	    int inputStartPosition = 0, inputRowsStep = 0, inputColumnsStep = 0, weightStartPosition = 0, weightStep = 0, dim = 0, maxIndex = 0;
+	    float max = 0, current = 0;;
 
 	    // each input example
 	    for (int i = 0; i < miniBatchSize; i++) {
@@ -46,10 +53,17 @@ public class AparapiMaxout extends ConnectionCalculatorFullyConnected {
 		    weightStep = weightsStep[k];
 		    dim = weightsSize[k];
 
-		    max = input[inputStartPosition + i * inputColumnsStep] * weights[weightStartPosition];
-		    for (int j = 0; j < dim; j++) {
-			max = max(max, input[inputStartPosition + j * inputRowsStep + i * inputColumnsStep] * weights[weightStartPosition + j * weightStep]);
+		    maxIndex = 0;
+		    current = max = input[inputStartPosition + i * inputColumnsStep] * weights[weightStartPosition];
+		    for (int j = 1; j < dim; j++) {
+			current = input[inputStartPosition + j * inputRowsStep + i * inputColumnsStep] * weights[weightStartPosition + j * weightStep];
+			if (current > max) {
+			    max = current;
+			    maxIndex = j;
+			}
 		    }
+
+		    maxoutWinners[winnersStartPositions[k] + i] = maxIndex;
 		}
 
 		output[outputStartPosition + id * outputRowStep + i * outputColumnStep] += max;

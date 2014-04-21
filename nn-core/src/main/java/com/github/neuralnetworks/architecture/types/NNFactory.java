@@ -17,6 +17,7 @@ import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2DSigmoi
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2DSoftReLU;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2DTanh;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiMaxPooling2D;
+import com.github.neuralnetworks.calculation.neuronfunctions.AparapiMaxout;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiReLU;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSigmoid;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSoftReLU;
@@ -25,6 +26,7 @@ import com.github.neuralnetworks.calculation.neuronfunctions.AparapiTanh;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSumConnectionCalculator;
 import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculatorConv;
 import com.github.neuralnetworks.calculation.neuronfunctions.ConstantConnectionCalculator;
+import com.github.neuralnetworks.calculation.neuronfunctions.MaxoutWinners;
 import com.github.neuralnetworks.calculation.neuronfunctions.SoftmaxFunction;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
@@ -213,6 +215,23 @@ public class NNFactory {
 	return lc;
     }
 
+    public static LayerCalculatorImpl lcMaxout(NeuralNetworkImpl nn, ConnectionCalculator outputCC) {
+	LayerCalculatorImpl lc = new LayerCalculatorImpl();
+	for (Layer l : nn.getLayers()) {
+	    if (!Util.isBias(l)) {
+		if (outputCC != null && nn.getOutputLayer() == l) {
+		    lc.addConnectionCalculator(l, outputCC);
+		} else if (!Util.isSubsampling(l) && !Util.isConvolutional(l)) {
+		    lc.addConnectionCalculator(l, new AparapiMaxout());
+		}
+	    } else {
+		lc.addConnectionCalculator(l, new ConstantConnectionCalculator());
+	    }
+	}
+
+	return lc;
+    }
+
     public static LayerCalculatorImpl lcSoftRelu(NeuralNetworkImpl nn, ConnectionCalculator outputCC) {
 	LayerCalculatorImpl lc = new LayerCalculatorImpl();
 	for (Layer l : nn.getLayers()) {
@@ -330,6 +349,16 @@ public class NNFactory {
     public static NeuralNetworkImpl mlpTanh(int[] layers, boolean addBias, ConnectionCalculator outputCC) {
 	NeuralNetworkImpl result = mlp(layers, addBias);
 	result.setLayerCalculator(lcTanh(result, outputCC));
+	return result;
+    }
+
+    public static NeuralNetworkImpl maxout(int[] layers, boolean addBias, ConnectionCalculator outputCC) {
+	NeuralNetworkImpl result = mlp(layers, addBias);
+	result.setLayerCalculator(lcMaxout(result, outputCC));
+	result.getConnections().stream().filter(c -> c instanceof FullyConnected && !Util.isBias(c.getInputLayer())).forEach(c -> {
+	    MaxoutWinners.getInstance().addConnections(c);
+	});
+
 	return result;
     }
 

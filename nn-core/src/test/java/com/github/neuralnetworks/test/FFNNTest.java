@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,9 +22,9 @@ import com.github.neuralnetworks.calculation.BreadthFirstOrderStrategy;
 import com.github.neuralnetworks.calculation.LayerOrderStrategy.ConnectionCandidate;
 import com.github.neuralnetworks.calculation.TargetLayerOrderStrategy;
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
-import com.github.neuralnetworks.calculation.neuronfunctions.AparapiMaxout;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSumConnectionCalculator;
 import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculatorFullyConnected;
+import com.github.neuralnetworks.calculation.neuronfunctions.MaxoutWinners;
 import com.github.neuralnetworks.training.TrainerFactory;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationTrainer;
 import com.github.neuralnetworks.util.Environment;
@@ -417,9 +418,9 @@ public class FFNNTest {
     public void testMaxoutFF() {
 	//Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 	Environment.getInstance().setUseWeightsSharedMemory(true);
-	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 2, 2 }, true);
+	NeuralNetworkImpl nn = NNFactory.maxout(new int[] { 2, 2 }, true, null);
 
-	List<Connections> c = mlp.getConnections();
+	List<Connections> c = nn.getConnections();
 	FullyConnected c1 = (FullyConnected) c.get(0);
 	Matrix cg1 = c1.getWeights();
 	cg1.set(0.1f, 0, 0);
@@ -432,21 +433,27 @@ public class FFNNTest {
 	cgb1.set(0.1f, 0, 0);
 	cgb1.set(0.2f, 1, 0);
 
-	ValuesProvider results = TensorFactory.tensorProvider(mlp, 2, true);
-	Matrix in = results.get(mlp.getInputLayer());
+	ValuesProvider results = TensorFactory.tensorProvider(nn, 2, true);
+	Matrix in = results.get(nn.getInputLayer());
 	in.set(8, 0, 0);
 	in.set(2, 1, 0);
 	in.set(1, 0, 1);
 	in.set(7, 1, 1);
 
-	AparapiMaxout maxout = new AparapiMaxout();
-	maxout.calculate(mlp.getOutputLayer().getConnections(), results, mlp.getOutputLayer());
+	Set<Layer> calculated = new HashSet<>();
+	calculated.add(nn.getInputLayer());
+	nn.getLayerCalculator().calculate(nn, nn.getOutputLayer(), calculated, results);
 
-	Matrix out = results.get(mlp.getOutputLayer());
+	Matrix out = results.get(nn.getOutputLayer());
 	assertEquals(1.1f, out.get(0, 0), 0f);
 	assertEquals(1.2f, out.get(1, 0), 0f);
 	assertEquals(3.6f, out.get(0, 1), 0f);
 	assertEquals(3.7f, out.get(1, 1), 0f);
+
+	int[] winners = MaxoutWinners.getInstance().getWinners();
+	int startIndex = MaxoutWinners.getInstance().getStartPositions(Arrays.asList(new Connections[] {c.get(0)}))[0];
+	assertEquals(1, winners[startIndex], 0);
+	assertEquals(1, winners[startIndex + 1], 0);
     }
 
     @Test
