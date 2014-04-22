@@ -48,7 +48,7 @@ public class MaxoutWinners implements Serializable {
     public void addConnections(Connections... connections) {
 	IntStream.range(0, connections.length).forEach(i -> {
 	    startPositions.put(connections[i], winners.length);
-	    winners = Arrays.copyOf(winners, winners.length + connections[i].getInputUnitCount() * batchSize);
+	    winners = Arrays.copyOf(winners, winners.length + connections[i].getOutputUnitCount() * batchSize);
 	});
     }
 

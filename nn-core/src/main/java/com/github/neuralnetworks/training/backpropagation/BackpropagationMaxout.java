@@ -25,8 +25,20 @@ public class BackpropagationMaxout extends BackPropagationConnectionCalculatorIm
     @Override
     protected void addBackpropFunction(List<Connections> inputConnections, Map<Connections, BackPropagationConnectionCalculator> connectionCalculators, ValuesProvider valuesProvider, ValuesProvider activations, Layer targetLayer) {
 	for (Connections c : inputConnections) {
-	    connectionCalculators.put(c, new AparapiBackpropMaxout(inputConnections, valuesProvider, activations, Arrays.asList(getWeightUpdates().get(c)), targetLayer, getLearningRate(), getMomentum(), getL1weightDecay(), getL2weightDecay()));
+	    connectionCalculators.put(c, new AparapiBackpropMaxout(inputConnections, valuesProvider, activations, Arrays.asList(getWeightUpdates().get(c)), c.getOutputLayer(), getLearningRate(), getMomentum(), getL1weightDecay(), getL2weightDecay()));
 	}
+    }
+
+    @Override
+    public void calculate(List<Connections> connections, ValuesProvider valuesProvider, Layer targetLayer) {
+	targetLayer = connections.get(0).getOutputLayer();
+	for (Connections c : connections) {
+	    if (targetLayer != c.getOutputLayer()) {
+		throw new IllegalArgumentException("No common target layer");
+	    }
+	}
+
+	super.calculate(connections, valuesProvider, targetLayer);
     }
 
     public static class AparapiBackpropMaxout extends AparapiFullyConnected implements BackPropagationConnectionCalculator {
@@ -57,6 +69,14 @@ public class BackpropagationMaxout extends BackPropagationConnectionCalculatorIm
 
 	public AparapiBackpropMaxout(List<Connections> inputConnections, ValuesProvider valuesProvider, ValuesProvider activations, List<Tensor> weightUpdates, Layer targetLayer, float learningRate, float momentum, float l1weightDecay, float l2weightDecay) {
 	    super(inputConnections, valuesProvider, targetLayer);
+
+	    targetLayer = inputConnections.get(0).getOutputLayer();
+	    for (Connections c : inputConnections) {
+		if (targetLayer != c.getOutputLayer()) {
+		    throw new IllegalArgumentException("No common target layer");
+		}
+	    }
+
 	    Matrix m = TensorFactory.tensor(targetLayer, inputConnections, activations);
 	    this.ffActivation = m.getElements();
 	    this.activationStartPosition = m.getStartIndex();
@@ -75,40 +95,27 @@ public class BackpropagationMaxout extends BackPropagationConnectionCalculatorIm
 
 	@Override
 	public void run() {
-//	    int id = getGlobalId();
-//
-//	    int inputStartPosition = 0, inputRowsStep = 0, inputColumnsStep = 0, weightStartPosition = 0, weightStep = 0, dim = 0;
-//	    float weight = 0, weightUpdate = 0;
+	    int id = getGlobalId();
+
+	    int maxoutId = 0, weightId = 0;
+	    float weight = 0, weightUpdate = 0;
 
 	    // each input example
-//	    for (int i = 0; i < miniBatchSize; i++) {
-//		// each connection (of the combined connections)
-//		for (int k = 0; k < series; k++) {
-//		    // each element in the row/column
-//		    inputStartPosition = inputStartPositions[k];
-//		    inputRowsStep = inputRowSteps[k];
-//		    inputColumnsStep = inputColumnSteps[k];
-//		    weightStartPosition = weightStartPositions[k] + weightsInitialStep[k] * id;
-//		    weightStep = weightsStep[k];
-//		    dim = weightsSize[k];
-//
-//		    weight = weights[weightStartPosition + maxoutWinners[winnersStartPositions[k]] * weightStep];
-//		    weightUpdate += input[inputStartPosition + maxoutWinners[winnersStartPositions[k]] * inputRowsStep + i * inputColumnsStep] * ffActivation[activationStartPosition + id * activationRowStep + i * activationColumnStep];
-//		    weightUpdate = learningRate * weightUpdate + momentum * weightUpdates[weightStartPosition + maxoutWinners[winnersStartPositions[k]] * weightStep] - l1weightDecay * abs(weight) - l2weightDecay * weight * weight / 2;
-//		    for (int j = 0; j < dim; j++) {
-//			for (int i = 0; i < miniBatchSize; i++) {
-//			}
-//
-//			weightIndex = weightStartPosition + j * weightStep;
-//			weight = weights[weightIndex];
-//			weights[weightIndex] += weightUpdate;
-//			weightUpdates[weightIndex] = weightUpdate;
-//		    }
-//
-//		}
-//
-//		output[outputStartPosition + id * outputRowStep + i * outputColumnStep] += max;
-//	    }
+	    for (int i = 0; i < miniBatchSize; i++) {
+		// each connection (of the combined connections)
+		for (int k = 0; k < series; k++) {
+		    maxoutId = maxoutWinners[winnersStartPositions[k] + id * miniBatchSize + i];
+		    weightId = weightStartPositions[k] + weightsInitialStep[k] * id + maxoutId * weightsStep[k];
+		    weight = weights[weightId];
+
+		    weightUpdate += output[outputStartPosition + id * outputRowStep + i * outputColumnStep] * ffActivation[activationStartPosition + maxoutId * activationRowStep + i * activationColumnStep];
+		    weightUpdate = learningRate * weightUpdate + momentum * weightUpdates[weightId] - l1weightDecay * abs(weight) - l2weightDecay * weight * weight / 2;
+		    weights[weightId] += weightUpdate;
+		    weightUpdates[weightId] = weightUpdate;
+
+		    input[activationStartPosition + maxoutId * activationRowStep + i * activationColumnStep] += output[outputStartPosition + id * outputRowStep + i * outputColumnStep];
+		}
+	    }
 	}
 
 	@Override

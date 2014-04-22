@@ -48,11 +48,7 @@ public class ConnectionCalculatorConv implements ConnectionCalculator {
 
 	    calculateBias(bias, valuesProvider);
 
-	    if (targetLayer == c.getOutputLayer()) {
-		inputFunction.calculate(c, valuesProvider, targetLayer);
-	    } else {
-		inputFunction.calculate(c, valuesProvider, Util.getOppositeLayer(c, targetLayer));
-	    }
+	    inputFunction.calculate(c, valuesProvider, c.getOutputLayer());
 	}
     }
 
