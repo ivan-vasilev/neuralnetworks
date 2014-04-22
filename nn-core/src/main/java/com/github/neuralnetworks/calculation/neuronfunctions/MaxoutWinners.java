@@ -34,11 +34,8 @@ public class MaxoutWinners implements Serializable {
     public void setBatchSize(int batchSize) {
 	if (this.batchSize == 0) {
 	    this.batchSize = batchSize;
-	    this.winners = new int[startPositions.size() * batchSize];
-	    int i = 0;
-	    for (Connections c : startPositions.keySet()) {
-		startPositions.put(c, i++ * batchSize);
-	    }
+	    this.winners = new int[0];
+	    addConnections(startPositions.keySet().toArray(new Connections[0]));
 	} else if (batchSize != this.batchSize) {
 	    throw new IllegalArgumentException("This won't work");
 	}
@@ -51,7 +48,7 @@ public class MaxoutWinners implements Serializable {
     public void addConnections(Connections... connections) {
 	IntStream.range(0, connections.length).forEach(i -> {
 	    startPositions.put(connections[i], winners.length);
-	    winners = Arrays.copyOf(winners, winners.length + batchSize);
+	    winners = Arrays.copyOf(winners, winners.length + connections[i].getInputUnitCount() * batchSize);
 	});
     }
 

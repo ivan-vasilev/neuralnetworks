@@ -30,6 +30,7 @@ import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2DSigmoi
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2DSoftReLU;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2DTanh;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiMaxPooling2D;
+import com.github.neuralnetworks.calculation.neuronfunctions.AparapiMaxout;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiReLU;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSigmoid;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSoftReLU;
@@ -52,6 +53,7 @@ import com.github.neuralnetworks.training.backpropagation.BackPropagationTanh;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationTrainer;
 import com.github.neuralnetworks.training.backpropagation.BackpropagationAveragePooling2D;
 import com.github.neuralnetworks.training.backpropagation.BackpropagationMaxPooling2D;
+import com.github.neuralnetworks.training.backpropagation.BackpropagationMaxout;
 import com.github.neuralnetworks.training.backpropagation.MSEDerivative;
 import com.github.neuralnetworks.training.random.NNRandomInitializer;
 import com.github.neuralnetworks.training.rbm.AparapiCDTrainer;
@@ -135,6 +137,8 @@ public class TrainerFactory {
 			result = new BackPropagationSoftReLU(p);
 		    } else if (ffcc instanceof AparapiReLU) {
 			result = new BackPropagationReLU(p);
+		    } else if (ffcc instanceof AparapiMaxout) {
+			result = new BackpropagationMaxout(p);
 		    } else if (ffcc instanceof AparapiMaxPooling2D || ffcc instanceof AparapiStochasticPooling2D) {
 			result = new BackpropagationMaxPooling2D();
 		    } else if (ffcc instanceof AparapiAveragePooling2D) {

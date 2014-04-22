@@ -154,7 +154,7 @@ public class ConnectionCalculatorFullyConnected implements ConnectionCalculator,
 		biasValue.forEach(i -> biasValue.getElements()[i] = 1);
 	    }
 
-	    Matrix weights = ((FullyConnected) bias).getWeights();;
+	    Matrix weights = ((FullyConnected) bias).getWeights();
 	    Matrix output = TensorFactory.tensor(bias.getOutputLayer(), bias, valuesProvider);
 
 	    // for performance reasons no

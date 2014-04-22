@@ -39,7 +39,7 @@ public class AparapiMaxout extends ConnectionCalculatorFullyConnected {
 	    int id = getGlobalId();
 
 	    int inputStartPosition = 0, inputRowsStep = 0, inputColumnsStep = 0, weightStartPosition = 0, weightStep = 0, dim = 0, maxIndex = 0;
-	    float max = 0, current = 0;;
+	    float max = 0, current = 0;
 
 	    // each input example
 	    for (int i = 0; i < miniBatchSize; i++) {
@@ -63,7 +63,7 @@ public class AparapiMaxout extends ConnectionCalculatorFullyConnected {
 			}
 		    }
 
-		    maxoutWinners[winnersStartPositions[k] + i] = maxIndex;
+		    maxoutWinners[winnersStartPositions[k] + id * miniBatchSize + i] = maxIndex;
 		}
 
 		output[outputStartPosition + id * outputRowStep + i * outputColumnStep] += max;
