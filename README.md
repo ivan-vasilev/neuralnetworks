@@ -13,6 +13,7 @@ I'm using the [git-flow](https://github.com/nvie/gitflow) model. The most stable
 * Deep belief network
 * Stacked autoencodeer
 * Convolutional networks with max pooling, average poolng and [stochastic pooling](http://techtalks.tv/talks/stochastic-pooling-for-regularization-of-deep-convolutional-neural-networks/58106/).
+* Maxout networks
 
 ##Training algorithms
 * Backpropagation - supports multilayer perceptrons, convolutional networks and [dropout](http://arxiv.org/pdf/1207.0580.pdf).
