@@ -456,6 +456,47 @@ public class FFNNTest {
 	assertEquals(1, winners[startIndex + 1], 0);
     }
 
+    /**
+     * maxout backpropagation
+     */
+    @Test
+    public void testMaxoutBP() {
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
+	Environment.getInstance().setUseWeightsSharedMemory(true);
+	NeuralNetworkImpl nn = NNFactory.maxout(new int[] { 2, 2 }, true, null);
+
+	List<Connections> c = nn.getConnections();
+	FullyConnected c1 = (FullyConnected) c.get(0);
+	Matrix cg1 = c1.getWeights();
+	cg1.set(0.1f, 0, 0);
+	cg1.set(0.5f, 0, 1);
+	cg1.set(0.1f, 1, 0);
+	cg1.set(0.5f, 1, 1);
+
+	FullyConnected cb1 = (FullyConnected) c.get(1);
+	Matrix cgb1 = cb1.getWeights();
+	cgb1.set(0.1f, 0, 0);
+	cgb1.set(0.2f, 1, 0);
+
+	ValuesProvider results = TensorFactory.tensorProvider(nn, 2, true);
+	Matrix in = results.get(nn.getInputLayer());
+	in.set(8, 0, 0);
+	in.set(2, 1, 0);
+	in.set(1, 0, 1);
+	in.set(7, 1, 1);
+
+	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(nn, new SimpleInputProvider(new float[][] { { 8, 2 } }, new float[][] { { 1 } }), null, null, null, 0.9f, 0f, 0f, 0f, 0f, 1, 1, 1);
+	bpt.train();
+
+	assertEquals(0.1f, cg1.get(0, 0), 0f);
+	assertEquals(0.5198f, cg1.get(0, 1), 0f);
+	assertEquals(0.1f, cg1.get(1, 0), 0f);
+	assertEquals(1.0184002f, cg1.get(1, 1), 0f);
+
+	assertEquals(0.109900005f, cgb1.get(0, 0), 0f);
+	assertEquals(0.45920008f, cgb1.get(1, 0), 0f);
+    }
+
     @Test
     public void testSigmoidBP3() {
 	Environment.getInstance().setUseDataSharedMemory(true);

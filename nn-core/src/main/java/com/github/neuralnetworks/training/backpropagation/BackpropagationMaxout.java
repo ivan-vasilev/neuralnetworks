@@ -25,7 +25,7 @@ public class BackpropagationMaxout extends BackPropagationConnectionCalculatorIm
     @Override
     protected void addBackpropFunction(List<Connections> inputConnections, Map<Connections, BackPropagationConnectionCalculator> connectionCalculators, ValuesProvider valuesProvider, ValuesProvider activations, Layer targetLayer) {
 	for (Connections c : inputConnections) {
-	    connectionCalculators.put(c, new AparapiBackpropMaxout(inputConnections, valuesProvider, activations, Arrays.asList(getWeightUpdates().get(c)), c.getOutputLayer(), getLearningRate(), getMomentum(), getL1weightDecay(), getL2weightDecay()));
+	    connectionCalculators.put(c, new AparapiBackpropMaxout(c, valuesProvider, activations, Arrays.asList(getWeightUpdates().get(c)), getLearningRate(), getMomentum(), getL1weightDecay(), getL2weightDecay()));
 	}
     }
 
@@ -67,17 +67,10 @@ public class BackpropagationMaxout extends BackPropagationConnectionCalculatorIm
 	private final int[] winnersStartPositions;
 	private final int[] maxoutWinners;
 
-	public AparapiBackpropMaxout(List<Connections> inputConnections, ValuesProvider valuesProvider, ValuesProvider activations, List<Tensor> weightUpdates, Layer targetLayer, float learningRate, float momentum, float l1weightDecay, float l2weightDecay) {
-	    super(inputConnections, valuesProvider, targetLayer);
+	public AparapiBackpropMaxout(Connections inputConnection, ValuesProvider valuesProvider, ValuesProvider activations, List<Tensor> weightUpdates, float learningRate, float momentum, float l1weightDecay, float l2weightDecay) {
+	    super(Arrays.asList(new Connections[] {inputConnection}), valuesProvider, inputConnection.getOutputLayer());
 
-	    targetLayer = inputConnections.get(0).getOutputLayer();
-	    for (Connections c : inputConnections) {
-		if (targetLayer != c.getOutputLayer()) {
-		    throw new IllegalArgumentException("No common target layer");
-		}
-	    }
-
-	    Matrix m = TensorFactory.tensor(targetLayer, inputConnections, activations);
+	    Matrix m = TensorFactory.tensor(inputConnection.getInputLayer(), inputConnection, activations);
 	    this.ffActivation = m.getElements();
 	    this.activationStartPosition = m.getStartIndex();
 	    this.activationRowStep = m.getRowElementsDistance();
@@ -89,8 +82,8 @@ public class BackpropagationMaxout extends BackPropagationConnectionCalculatorIm
 	    this.l2weightDecay = l2weightDecay;
 	    this.weightUpdates = weightUpdates.get(0).getElements();
 
-	    winnersStartPositions = MaxoutWinners.getInstance().getStartPositions(inputConnections);
-	    maxoutWinners = MaxoutWinners.getInstance().getWinners();
+	    this.winnersStartPositions = MaxoutWinners.getInstance().getStartPositions(Arrays.asList(new Connections[] {inputConnection}));
+	    this.maxoutWinners = MaxoutWinners.getInstance().getWinners();
 	}
 
 	@Override

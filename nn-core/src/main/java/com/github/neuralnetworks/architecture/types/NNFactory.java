@@ -355,7 +355,7 @@ public class NNFactory {
     public static NeuralNetworkImpl maxout(int[] layers, boolean addBias, ConnectionCalculator outputCC) {
 	NeuralNetworkImpl result = mlp(layers, addBias);
 	result.setLayerCalculator(lcMaxout(result, outputCC));
-	result.getConnections().stream().filter(c -> c instanceof FullyConnected && !Util.isBias(c.getInputLayer())).forEach(c -> {
+	result.getConnections().stream().filter(c -> c instanceof FullyConnected).forEach(c -> {
 	    MaxoutWinners.getInstance().addConnections(c);
 	});
 

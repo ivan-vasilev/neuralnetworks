@@ -12,6 +12,7 @@ import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
+import com.github.neuralnetworks.training.backpropagation.BackpropagationMaxout.AparapiBackpropMaxout;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
 import com.github.neuralnetworks.util.Tensor;
@@ -58,7 +59,7 @@ public abstract class BackPropagationConnectionCalculatorImpl implements BackPro
 	    for (Connections c : connections) {
 		if (connectionCalculators.get(c) == bc) {
 		    chunkCalc.add(c);
-		    if (Util.isBias(c.getInputLayer()) && c.getInputLayer() != targetLayer) {
+		    if (Util.isBias(c.getInputLayer()) && c.getInputLayer() != targetLayer && !(bc instanceof AparapiBackpropMaxout)) {
 			target = c.getInputLayer();
 		    }
 		}
