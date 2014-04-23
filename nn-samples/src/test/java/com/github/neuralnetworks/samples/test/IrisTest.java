@@ -85,6 +85,8 @@ public class IrisTest {
     public void testRBMCDSigmoidBP() {
 	// execution mode
 	Environment.getInstance().setExecutionMode(EXECUTION_MODE.CPU);
+	Environment.getInstance().setUseDataSharedMemory(true);
+	Environment.getInstance().setUseWeightsSharedMemory(true);
 
 	// RBM with 4 visible and 3 hidden units
 	RBM rbm = NNFactory.rbm(4, 3, true);
@@ -165,7 +167,8 @@ public class IrisTest {
 	Environment.getInstance().setExecutionMode(EXECUTION_MODE.CPU);
 
 	// create autoencoder with visible layer with 4 neurons and hidden layer with 3 neurons
-	Environment.getInstance().setUseWeightsSharedMemory(false);
+	Environment.getInstance().setUseWeightsSharedMemory(true);
+	Environment.getInstance().setUseDataSharedMemory(true);
     	Autoencoder ae = NNFactory.autoencoderSigmoid(4, 3, true);
 
     	// training, testing and error

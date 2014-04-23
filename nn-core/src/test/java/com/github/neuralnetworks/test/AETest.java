@@ -25,9 +25,10 @@ public class AETest {
     public void testAEBackpropagation() {
 	// sequential execution for debugging
 	Environment.getInstance().setExecutionMode(EXECUTION_MODE.CPU);
+	Environment.getInstance().setUseDataSharedMemory(true);
+	Environment.getInstance().setUseWeightsSharedMemory(true);
 
 	// autoencoder with 6 input/output and 2 hidden units
-	Environment.getInstance().setUseWeightsSharedMemory(true);
 	Autoencoder ae = NNFactory.autoencoderSigmoid(6, 2, true);
 
 	// We'll use a simple dataset of symptoms of a flu illness. There are 6
@@ -46,7 +47,7 @@ public class AETest {
 	MultipleNeuronsOutputError error = new MultipleNeuronsOutputError();
 
 	// backpropagation for autoencoders
-	BackPropagationAutoencoder t = TrainerFactory.backPropagationAutoencoder(ae, trainInputProvider, testInputProvider, error, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.1f, 0.5f, 0f, 0f, 0f, 1, 1, 200);
+	BackPropagationAutoencoder t = TrainerFactory.backPropagationAutoencoder(ae, trainInputProvider, testInputProvider, error, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.02f, 0.7f, 0f, 0f, 0f, 1, 1, 100);
 
 	// log data
 	t.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName(), true, false));
