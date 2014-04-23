@@ -32,12 +32,10 @@ public class MaxoutWinners implements Serializable {
     }
 
     public void setBatchSize(int batchSize) {
-	if (this.batchSize == 0) {
+	if (batchSize != this.batchSize) {
 	    this.batchSize = batchSize;
 	    this.winners = new int[0];
 	    addConnections(startPositions.keySet().toArray(new Connections[0]));
-	} else if (batchSize != this.batchSize) {
-	    throw new IllegalArgumentException("This won't work");
 	}
     }
 
