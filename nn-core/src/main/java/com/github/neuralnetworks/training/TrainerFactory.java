@@ -83,9 +83,8 @@ public class TrainerFactory {
      * @return
      */
     public static BackPropagationTrainer<?> backPropagation(NeuralNetworkImpl nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, NNRandomInitializer rand, float learningRate, float momentum, float l1weightDecay, float l2weightDecay, float dropoutRate, int trainingBatchSize, int testBatchSize, int epochs) {
-	Properties p = backpropProperties(nn, trainingSet, testingSet, error, rand, learningRate, momentum, l1weightDecay, l2weightDecay, trainingBatchSize, testBatchSize, epochs);
+	Properties p = backpropProperties(nn, trainingSet, testingSet, error, rand, learningRate, momentum, l1weightDecay, l2weightDecay, dropoutRate, trainingBatchSize, testBatchSize, epochs);
 	p.setParameter(Constants.BACKPROPAGATION, bplc(nn, p));
-	p.setParameter(Constants.DROPOUT_RATE, dropoutRate);
 
 	return new BackPropagationTrainer<NeuralNetwork>(p);
     }
@@ -175,14 +174,14 @@ public class TrainerFactory {
     }
 
     public static BackPropagationAutoencoder backPropagationAutoencoder(NeuralNetworkImpl nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, NNRandomInitializer rand, float learningRate, float momentum, float l1weightDecay, float l2weightDecay, float inputCorruptionRate, int trainingBatchSize, int testBatchSize, int epochs) {
-	Properties p = backpropProperties(nn, trainingSet, testingSet, error, rand, learningRate, momentum, l1weightDecay, l2weightDecay, trainingBatchSize, testBatchSize, epochs);
+	Properties p = backpropProperties(nn, trainingSet, testingSet, error, rand, learningRate, momentum, l1weightDecay, l2weightDecay, 0F, trainingBatchSize, testBatchSize, epochs);
 	p.setParameter(Constants.CORRUPTION_LEVEL, inputCorruptionRate);
 	p.setParameter(Constants.BACKPROPAGATION, bplc(nn, p));
 
 	return new BackPropagationAutoencoder(p);
     }
 
-    protected static Properties backpropProperties(NeuralNetworkImpl nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, NNRandomInitializer rand, float learningRate, float momentum, float l1weightDecay, float l2weightDecay, int trainingBatchSize, int testBatchSize, int epochs) {
+    protected static Properties backpropProperties(NeuralNetworkImpl nn, TrainingInputProvider trainingSet, TrainingInputProvider testingSet, OutputError error, NNRandomInitializer rand, float learningRate, float momentum, float l1weightDecay, float l2weightDecay, float dropoutRate, int trainingBatchSize, int testBatchSize, int epochs) {
 	Properties p = new Properties();
 	p.setParameter(Constants.NEURAL_NETWORK, nn);
 	p.setParameter(Constants.TRAINING_INPUT_PROVIDER, trainingSet);
@@ -198,6 +197,7 @@ public class TrainerFactory {
 	p.setParameter(Constants.TRAINING_BATCH_SIZE, trainingBatchSize);
 	p.setParameter(Constants.TEST_BATCH_SIZE, testBatchSize);
 	p.setParameter(Constants.EPOCHS, epochs);
+	p.setParameter(Constants.DROPOUT_RATE, dropoutRate);
 
 	return p;
     }

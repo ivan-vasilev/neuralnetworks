@@ -83,7 +83,7 @@ public class IrisTest {
     @Test
     public void testRBMCDSigmoidBP() {
 	// execution mode
-	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.CPU);
 
 	// RBM with 4 visible and 3 hidden units
 	RBM rbm = NNFactory.rbm(4, 3, true);
@@ -94,7 +94,7 @@ public class IrisTest {
 	MultipleNeuronsOutputError error = new MultipleNeuronsOutputError();
 
 	// trainers
-	AparapiCDTrainer t = TrainerFactory.cdSigmoidBinaryTrainer(rbm, trainInputProvider, testInputProvider, error, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.01f, 0.5f, 0f, 0f, 1, 1, 2000, true);
+	AparapiCDTrainer t = TrainerFactory.cdSigmoidBinaryTrainer(rbm, trainInputProvider, testInputProvider, error, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.01f, 0.5f, 0f, 0f, 1, 1, 100, true);
 
 	// log data
 	t.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
@@ -115,7 +115,7 @@ public class IrisTest {
     @Test
     public void testDBN() {
     	// execution mode
-    	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.CPU);
 
 	// deep belief network with two rbms - 4-16 and 16-3 with biases
 	Environment.getInstance().setUseWeightsSharedMemory(true);
@@ -161,7 +161,7 @@ public class IrisTest {
     @Test
     public void testAE() {
     	// execution mode
-    	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.CPU);
 
 	// create autoencoder with visible layer with 4 neurons and hidden layer with 3 neurons
 	Environment.getInstance().setUseWeightsSharedMemory(false);
@@ -173,7 +173,7 @@ public class IrisTest {
     	MultipleNeuronsOutputError error = new MultipleNeuronsOutputError();
 
     	// backpropagation autoencoder training
-    	BackPropagationAutoencoder bae = TrainerFactory.backPropagationAutoencoder(ae, trainInputProvider, testInputProvider, error, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.02f, 0.7f, 0f, 0f, 0f, 150, 1, 2000);
+    	BackPropagationAutoencoder bae = TrainerFactory.backPropagationAutoencoder(ae, trainInputProvider, testInputProvider, error, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.02f, 0.7f, 0f, 0f, 0f, 1, 1, 100);
 
     	// log data to console
     	bae.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
@@ -192,7 +192,7 @@ public class IrisTest {
     @Test
     public void testSAE() {
 	// execution mode
-	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.CPU);
 
 	// create stacked autoencoder with input layer of size 4, hidden layer of the first AE with size 4 and hidden layer of the second AE with size 3
 	Environment.getInstance().setUseWeightsSharedMemory(true);
@@ -206,8 +206,8 @@ public class IrisTest {
 	lastNN.setLayerCalculator(NNFactory.lcSigmoid(lastNN, null));
 
 	// trainers for each of the stacked networks
-	BackPropagationAutoencoder firstTrainer = TrainerFactory.backPropagationAutoencoder(firstNN, null, null, null, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.001f, 0.5f, 0f, 0f, 0f, 150, 1, 2000);
-	BackPropagationAutoencoder secondTrainer = TrainerFactory.backPropagationAutoencoder(lastNN, null, null, null, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.001f, 0.5f, 0f, 0f, 0f, 150, 1, 2000);
+	BackPropagationAutoencoder firstTrainer = TrainerFactory.backPropagationAutoencoder(firstNN, null, null, null, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.01f, 0.5f, 0f, 0f, 0f, 1, 1, 100);
+	BackPropagationAutoencoder secondTrainer = TrainerFactory.backPropagationAutoencoder(lastNN, null, null, null, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.01f, 0.5f, 0f, 0f, 0f, 1, 1, 100);
 
 	Map<NeuralNetwork, OneStepTrainer<?>> map = new HashMap<>();
 	map.put(firstNN, firstTrainer);
@@ -225,7 +225,7 @@ public class IrisTest {
 	deepTrainer.train();
 
 	// fine tuning backpropagation
-	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(sae, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.01f, 0.5f, 0f, 0f, 0f, 150, 1, 2000);
+	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(sae, trainInputProvider, testInputProvider, new MultipleNeuronsOutputError(), new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.01f, 0.5f, 0f, 0f, 0f, 1, 1, 100);
 
 	// log data
 	bpt.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
