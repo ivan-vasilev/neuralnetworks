@@ -87,7 +87,7 @@ public class MnistTest {
 	t.train();
 	t.test();
 
-	assertEquals(0, t.getOutputError().getTotalNetworkError(), 0.1);
+	assertEquals(0, t.getOutputError().getTotalNetworkError(), 0.8);
     }
 
     @Test
@@ -143,6 +143,9 @@ public class MnistTest {
 
     @Test
     public void testLeNetTiny() {
+	Environment.getInstance().setUseDataSharedMemory(false);
+	Environment.getInstance().setUseWeightsSharedMemory(false);
+
 	// very simple convolutional network with a single 2x2 max pooling layer
 	NeuralNetworkImpl nn = NNFactory.convNN(new int[][] { { 28, 28, 1 }, { 2, 2 }, {10} }, true);
 	nn.setLayerCalculator(NNFactory.lcSigmoid(nn, null));
@@ -171,7 +174,6 @@ public class MnistTest {
 
 	assertEquals(0, bpt.getOutputError().getTotalNetworkError(), 0.1);
     }
-
 
     /**
      * MNIST small LeNet network

@@ -252,8 +252,9 @@ public class DNNTest {
 	DBN dbn = NNFactory.dbn(new int [] {3, 3, 2}, true);
 	dbn.setLayerCalculator(NNFactory.lcSigmoid(dbn, null));
 
-	LayerCalculatorImpl lc = (LayerCalculatorImpl) dbn.getLayerCalculator();
 	RBM firstRBM = dbn.getFirstNeuralNetwork();
+
+	LayerCalculatorImpl lc = (LayerCalculatorImpl) dbn.getLayerCalculator();
 	lc.addConnectionCalculator(firstRBM.getHiddenLayer(), new AparapiWeightedSumConnectionCalculator());
 
 	Matrix m1 = firstRBM.getMainConnections().getWeights();
@@ -285,17 +286,17 @@ public class DNNTest {
 	Matrix cgb2 = secondRBM.getHiddenBiasConnections().getWeights();
 	cgb2.set(-0.4f, 0, 0);
 	cgb2.set(0.2f, 1, 0);
-	
+
 	SimpleInputProvider inputProvider = new SimpleInputProvider(new float[][] { { 1, 0, 1 } }, null);
 
-	AparapiCDTrainer firstTrainer = TrainerFactory.cdSigmoidTrainer(firstRBM, null, null, null, null, 0f, 0f, 0f, 0f, 1, 1, 1, true);
+	AparapiCDTrainer firstTrainer = TrainerFactory.cdSigmoidTrainer(firstRBM, null, null, null, null, 0f, 0f, 0f, 0f, 0, 1, 1, true);
 
 	AparapiCDTrainer secondTrainer = TrainerFactory.cdSigmoidTrainer(secondRBM, null, null, null, null, 1f, 0f, 0f, 0f, 1, 1, 1, true);
 
 	Map<NeuralNetwork, OneStepTrainer<?>> layerTrainers = new HashMap<>();
 	layerTrainers.put(firstRBM, firstTrainer);
 	layerTrainers.put(secondRBM, secondTrainer);
-	
+
 	DNNLayerTrainer trainer = TrainerFactory.dnnLayerTrainer(dbn, layerTrainers, inputProvider, null, null);
 	trainer.train();
 	

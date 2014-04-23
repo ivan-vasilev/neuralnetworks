@@ -456,7 +456,9 @@ public class NNFactory {
 	result.addLayer(new Layer());
 	for (int i = 1; i < layers.length; i++) {
 	    RBM rbm = new RBM();
-	    rbm.setProperties(result.getProperties());
+	    rbm.setProperties(new Properties());
+	    rbm.getProperties().setParameter(Constants.CONNECTION_FACTORY, cf);
+
 	    rbm.addConnections(cf.fullyConnected(result.getOutputLayer(), new Layer(), layers[i - 1], layers[i]));
 
 	    if (addBias) {
@@ -507,8 +509,10 @@ public class NNFactory {
 
 	for (int i = 1; i < layers.length; i++) {
 	    Autoencoder ae = new Autoencoder();
+	    ae.setProperties(new Properties());
+	    ae.getProperties().setParameter(Constants.CONNECTION_FACTORY, cf);
+
 	    ae.addLayer(result.getOutputLayer());
-	    ae.setProperties(properties);
 	    NNFactory.addFullyConnectedLayer(ae, new Layer(), cf, layers[i - 1], layers[i], addBias);
 	    NNFactory.addFullyConnectedLayer(ae, new Layer(), cf, layers[i], layers[i - 1], addBias);
 
