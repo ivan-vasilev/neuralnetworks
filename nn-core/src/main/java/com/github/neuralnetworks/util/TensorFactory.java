@@ -143,7 +143,7 @@ public class TensorFactory {
 	for (int i = 0; i < layers.size(); i++) {
 	    Layer l = layers.get(i);
 	    for (int[] d : dims.get(l)) {
-		result.add(l, d);
+		result.add(l, true, d);
 	    }
 	}
 
@@ -168,7 +168,7 @@ public class TensorFactory {
 		Layer l = layers.get(i);
 		for (int[] d : dims.get(l)) {
 		    if (result.get(l, d) == null) {
-			result.add(l, d);
+			result.add(l, true, d);
 		    }
 		}
 	    }
@@ -192,7 +192,7 @@ public class TensorFactory {
 	for (int i = 0; i < layers.size(); i++) {
 	    Layer l = layers.get(i);
 	    for (int[] d : dims.get(l)) {
-		result.add(l, d);
+		result.add(l, true, d);
 	    }
 	}
 	

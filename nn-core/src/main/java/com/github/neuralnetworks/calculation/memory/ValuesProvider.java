@@ -71,48 +71,54 @@ public class ValuesProvider implements Serializable {
      * @param dimensions
      */
     public void add(Object key, int... dimensions) {
+	add(key, false, dimensions);
+    }
+
+    /**
+     * Add tensor t with dimensions
+     * @param key
+     * @param useSharedMemory - will use the same underlying elements array, if size is the same
+     * @param dimensions
+     */
+    public void add(Object key, boolean useSharedMemory, int... dimensions) {
 	List<Tensor> set = values.get(key);
 	if (set == null) {
 	    values.put(key, set = new UniqueList<Tensor>());
+	}
+
+	int size = Arrays.stream(dimensions).reduce(1, (a, b) -> a * b);
+	float[] elements = null;
+	int offset = 0;
+
+	if (useSharedMemory) {
+	    Tensor sibling = set.stream().filter(t -> t.getSize() == size).findFirst().orElse(null);
+	    if (sibling != null) {
+		elements = sibling.getElements();
+		offset = sibling.getStartOffset();
+	    }
+	}
+
+	if (elements == null && useSharedMemory()) {
+	    float[] oldElements = getElements();
+	    if (oldElements == null) {
+		oldElements = new float[0];
+	    }
+
+	    offset = oldElements.length;
+	    elements = Arrays.copyOf(oldElements, offset + size);
+	    for (Tensor t : tensors)
+		t.setElements(elements);
 	}
 
 	Tensor newTensor = null;
 
-	if (useSharedMemory()) {
-	    float[] elements = getElements();
-	    if (elements == null) {
-		elements = new float[0];
-	    }
+    	if (elements != null) {
+    	    tensors.add(newTensor = TensorFactory.tensor(elements, offset, dimensions));
+    	} else {
+    	    tensors.add(newTensor = TensorFactory.tensor(dimensions));
+    	}
 
-	    int l = elements.length;
-	    float[] newElements = Arrays.copyOf(elements, l + Arrays.stream(dimensions).reduce(1, (a, b) -> a * b));
-	    tensors.forEach(t -> t.setElements(newElements));
-	    newTensor = TensorFactory.tensor(newElements, l, dimensions);
-	} else {
-	    newTensor = TensorFactory.tensor(dimensions);
-	}
-
-	tensors.add(newTensor);
-	set.add(newTensor);
-    }
-
-
-    /**
-     * Add tensor t
-     * @param key
-     * @param t
-     */
-    public void add(Object key, Tensor t) {
-	if (useSharedMemory() && t.getElements() != getElements()) {
-	    throw new IllegalArgumentException("Tensor doesn't use the same base array");
-	}
-
-	List<Tensor> set = values.get(key);
-	if (set == null) {
-	    values.put(key, set = new UniqueList<Tensor>());
-	}
-
-	set.add(t);
+    	set.add(newTensor);
     }
 
     public Set<Tensor> getTensors() {
