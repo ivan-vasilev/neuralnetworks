@@ -677,35 +677,4 @@ public class CNNTest {
 
 	assertTrue(Arrays.equals(cnnvp.get(cnn.getOutputLayer()).getElements(), mlpvp.get(mlp.getOutputLayer()).getElements()));
     }
-
-    @Test
-    public void testCNNMLPBP() {
-	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
-
-	Environment.getInstance().setUseDataSharedMemory(false);
-
-	// CNN
-	NeuralNetworkImpl cnn = NNFactory.convNN(new int[][] { { 2, 1, 1 }, { 1, 1 }, {1} }, false);
-	cnn.setLayerCalculator(NNFactory.lcSigmoid(cnn, null));
-	NNFactory.lcMaxPooling(cnn);
-	FullyConnected cnnfc = (FullyConnected) cnn.getOutputLayer().getConnections().get(0);
-	cnnfc.getWeights().set(0.05f, 0, 0);
-	cnnfc.getWeights().set(0.08f, 0, 1);
-
-	// MLP
-	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 2, 1 }, false);
-	FullyConnected mlpfc = (FullyConnected) mlp.getOutputLayer().getConnections().get(0);
-	mlpfc.getWeights().set(0.05f, 0, 0);
-	mlpfc.getWeights().set(0.08f, 0, 1);
-
-	// compare bp
-	SimpleInputProvider inputProvider = new SimpleInputProvider(new float[][] { { 0.35f, 0.9f }, { 0.8f, 0.2f } }, new float[][] { { 0.5f }, { 0.8f } });
-	BackPropagationTrainer<?> cnnbpt = TrainerFactory.backPropagation(cnn, inputProvider, null, null, null, 1f, 0f, 0f, 0f, 0f, 1, 1, 20);
-	cnnbpt.train();
-
-	BackPropagationTrainer<?> mlpbpt = TrainerFactory.backPropagation(mlp, inputProvider, null, null, null, 1f, 0f, 0f, 0f, 0f, 1, 1, 20);
-	mlpbpt.train();
-
-	assertTrue(Arrays.equals(cnnfc.getWeights().getElements(), mlpfc.getWeights().getElements()));
-    }
 }

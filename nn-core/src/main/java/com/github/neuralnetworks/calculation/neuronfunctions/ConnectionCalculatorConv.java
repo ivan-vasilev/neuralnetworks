@@ -13,8 +13,7 @@ import com.github.neuralnetworks.util.TensorFactory;
 import com.github.neuralnetworks.util.Util;
 
 /**
- * Default implementation of Connection calculator for convolutional/subsampling
- * layers
+ * Default implementation of Connection calculator for convolutional/subsampling layers
  */
 public class ConnectionCalculatorConv implements ConnectionCalculator {
 
@@ -41,7 +40,7 @@ public class ConnectionCalculatorConv implements ConnectionCalculator {
 
 	if (c != null) {
 	    // currently works only as a feedforward (including bp)
-	    if (inputFunction == null || miniBatchSize != TensorFactory.batchSize(valuesProvider)) {
+	    if (inputFunction == null || !inputFunction.accept(c, valuesProvider)) {
 		miniBatchSize = TensorFactory.batchSize(valuesProvider);
 		inputFunction = createInputFunction(c, valuesProvider, targetLayer);
 	    }

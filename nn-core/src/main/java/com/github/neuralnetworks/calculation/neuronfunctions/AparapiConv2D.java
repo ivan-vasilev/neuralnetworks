@@ -135,6 +135,22 @@ public abstract class AparapiConv2D extends Kernel implements Serializable {
 		outputStartIndex + (id / outputFeatureMapLength) * outputFeatureMapsDistance + ((id % outputFeatureMapLength) / outputColumns) * outputFeatureMapRowsDistance + (id % outputColumns) * outputFeatureMapColumnsDistance);
     }
 
+    public boolean accept(Conv2DConnection c, ValuesProvider valuesProvider) {
+	if (TensorFactory.batchSize(valuesProvider) != miniBatchSize) {
+	    return false;
+	}
+
+	if (TensorFactory.tensor(c.getOutputLayer(), c, valuesProvider).getElements() != output) {
+	    return false;
+	}
+
+	if (TensorFactory.tensor(Util.getOppositeLayer(c, c.getOutputLayer()), c, valuesProvider).getElements() != input) {
+	    return false;
+	}
+
+	return true;
+    }
+
     /**
      * the actual convolution
      * @param weightsStartId

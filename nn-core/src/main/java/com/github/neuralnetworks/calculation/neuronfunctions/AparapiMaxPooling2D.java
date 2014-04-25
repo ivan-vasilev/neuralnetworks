@@ -7,7 +7,6 @@ import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Subsampling2DConnection;
 import com.github.neuralnetworks.calculation.ConnectionCalculator;
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
-import com.github.neuralnetworks.util.TensorFactory;
 
 /**
  * Max pooling
@@ -20,7 +19,7 @@ public class AparapiMaxPooling2D implements ConnectionCalculator {
 
     @Override
     public void calculate(List<Connections> connections, ValuesProvider valuesProvider, Layer targetLayer) {
-	if (cc == null || cc.getMiniBatchSize() != TensorFactory.batchSize(valuesProvider)) {
+	if (cc == null || !cc.accept((Subsampling2DConnection) connections.get(0), valuesProvider)) {
 	    cc = new AparapiMaxPooling2DCC((Subsampling2DConnection) connections.get(0), valuesProvider, targetLayer);
 	}
 

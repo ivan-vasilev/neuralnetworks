@@ -154,6 +154,22 @@ public abstract class AparapiSubsampling2D extends Kernel implements ConnectionC
 		outputStartIndex + fm * outputFeatureMapsDistance + fmRow * outputFeatureMapRowsDistance + fmCol * outputFeatureMapColumnsDistance);
     }
 
+    public boolean accept(Subsampling2DConnection c, ValuesProvider valuesProvider) {
+	if (TensorFactory.batchSize(valuesProvider) != miniBatchSize) {
+	    return false;
+	}
+
+	if (TensorFactory.tensor(c.getOutputLayer(), c, valuesProvider).getElements() != output) {
+	    return false;
+	}
+
+	if (TensorFactory.tensor(Util.getOppositeLayer(c, c.getOutputLayer()), c, valuesProvider).getElements() != input) {
+	    return false;
+	}
+
+	return true;
+    }
+
     /**
      * This is where the subsampling happens
      */

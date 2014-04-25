@@ -65,7 +65,7 @@ public class LogTrainingListener implements TrainingEventListener {
 
 	    StringBuilder sb = new StringBuilder();
 	    sb.append(((finishTime - startTime) / 1000f) + " s  total time" + s);
-	    sb.append((miniBatchTotalTime / (miniBatches * 1000f)) + " s  per minibatch of " + miniBatches + " mini batches" + s);
+	    sb.append((miniBatchTotalTime / (miniBatches * 1000f)) + " s  per minibatch of " + miniBatches + " batches" + s);
 	    if (event instanceof TestingFinishedEvent) {
 		Trainer<?> t = (Trainer<?>) event.getSource();
 		OutputError oe = t.getOutputError();
@@ -83,7 +83,7 @@ public class LogTrainingListener implements TrainingEventListener {
 	    String s = System.getProperty("line.separator");
 
 	    if (miniBatchTime / 5000 > 0 && (logMiniBatches || (isTesting && logTestResults))) {
-		sb.append(miniBatches + " minibatches in " + (miniBatchTotalTime / 1000f) + " s" + s);
+		sb.append(miniBatches + " batches in " + (miniBatchTotalTime / 1000f) + " s" + s);
 		miniBatchTime = 0;
 	    }
 
