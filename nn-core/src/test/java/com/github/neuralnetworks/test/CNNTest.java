@@ -654,7 +654,7 @@ public class CNNTest {
 	ValuesProvider cnnvp = TensorFactory.tensorProvider(cnn, 1, Environment.getInstance().getUseDataSharedMemory());
 	Tensor cnnin = cnnvp.get(cnn.getInputLayer());
 	cnnin.set(0.2f, 0, 0, 0, 0);
-	cnnin.set(0.6f, 0, 0, 1, 0);
+	cnnin.set(0.6f, 0, 1, 0, 0);
 
 	// MLP
 	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 2, 1 }, false);

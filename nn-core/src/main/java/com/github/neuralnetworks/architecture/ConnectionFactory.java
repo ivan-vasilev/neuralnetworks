@@ -69,8 +69,8 @@ public class ConnectionFactory implements Serializable {
 	return result;
     }
 
-    public Subsampling2DConnection subsampling2D(Layer inputLayer, Layer outputLayer, int inputFeatureMapColumns, int inputFeatureMapRows, int subsamplingRegionRows, int subsamplingRegionCols, int filters) {
-	return new Subsampling2DConnection(inputLayer, outputLayer, inputFeatureMapColumns, inputFeatureMapRows, subsamplingRegionRows, subsamplingRegionCols, filters);
+    public Subsampling2DConnection subsampling2D(Layer inputLayer, Layer outputLayer, int inputFeatureMapRows, int inputFeatureMapColumns, int subsamplingRegionRows, int subsamplingRegionCols, int filters) {
+	return new Subsampling2DConnection(inputLayer, outputLayer, inputFeatureMapRows, inputFeatureMapColumns, subsamplingRegionRows, subsamplingRegionCols, filters);
     }
 
     public boolean useSharedWeights() {

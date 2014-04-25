@@ -14,10 +14,10 @@ public class Subsampling2DConnection extends ConnectionsImpl {
     protected int outputFeatureMapRows;
     protected int filters;
 
-    public Subsampling2DConnection(Layer inputLayer, Layer outputLayer, int inputFeatureMapColumns, int inputFeatureMapRows, int subsamplingRegionRows, int subsamplingRegionCols, int filters) {
+    public Subsampling2DConnection(Layer inputLayer, Layer outputLayer, int inputFeatureMapRows, int inputFeatureMapColumns, int subsamplingRegionRows, int subsamplingRegionCols, int filters) {
 	super(inputLayer, outputLayer);
-	this.inputFeatureMapColumns = inputFeatureMapColumns;
 	this.inputFeatureMapRows = inputFeatureMapRows;
+	this.inputFeatureMapColumns = inputFeatureMapColumns;
 	this.filters = filters;
 	setDimensions(subsamplingRegionRows, subsamplingRegionCols);
     }
