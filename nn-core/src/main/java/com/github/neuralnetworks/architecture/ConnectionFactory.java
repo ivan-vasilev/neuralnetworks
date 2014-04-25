@@ -49,7 +49,7 @@ public class ConnectionFactory implements Serializable {
 	return result;
     }
 
-    public Conv2DConnection conv2d(Layer inputLayer, Layer outputLayer, int inputFeatureMapColumns, int inputFeatureMapRows, int inputFilters, int kernelRows, int kernelColumns, int outputFilters, int stride) {
+    public Conv2DConnection conv2d(Layer inputLayer, Layer outputLayer, int inputFeatureMapRows, int inputFeatureMapColumns, int inputFilters, int kernelRows, int kernelColumns, int outputFilters, int stride) {
 	Tensor weights = null;
 	if (useSharedWeights()) {
 	    int l = sharedWeights.length;
@@ -60,11 +60,11 @@ public class ConnectionFactory implements Serializable {
 	    weights = TensorFactory.tensor(outputFilters, inputFilters, kernelRows, kernelColumns);
 	}
 
-	return conv2d(inputLayer, outputLayer, inputFeatureMapColumns, inputFeatureMapRows, weights, stride);
+	return conv2d(inputLayer, outputLayer, inputFeatureMapRows, inputFeatureMapColumns, weights, stride);
     }
 
-    public Conv2DConnection conv2d(Layer inputLayer, Layer outputLayer, int inputFeatureMapColumns, int inputFeatureMapRows, Tensor weights, int stride) {
-	Conv2DConnection result = new Conv2DConnection(inputLayer, outputLayer, inputFeatureMapColumns, inputFeatureMapRows, weights, stride);
+    public Conv2DConnection conv2d(Layer inputLayer, Layer outputLayer, int inputFeatureMapRows, int inputFeatureMapColumns, Tensor weights, int stride) {
+	Conv2DConnection result = new Conv2DConnection(inputLayer, outputLayer, inputFeatureMapRows, inputFeatureMapColumns, weights, stride);
 	connections.add(result);
 	return result;
     }

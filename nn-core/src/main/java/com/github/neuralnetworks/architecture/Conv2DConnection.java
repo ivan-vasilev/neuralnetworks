@@ -26,10 +26,10 @@ public class Conv2DConnection extends ConnectionsImpl implements WeightsConnecti
 	this.wights = TensorFactory.tensor(outputFilters, inputFilters, kernelRows, kernelColumns);
     }
 
-    public Conv2DConnection(Layer inputLayer, Layer outputLayer, int inputFeatureMapColumns, int inputFeatureMapRows, Tensor weights,  int stride) {
+    public Conv2DConnection(Layer inputLayer, Layer outputLayer, int inputFeatureMapRows, int inputFeatureMapColumns, Tensor weights,  int stride) {
 	super(inputLayer, outputLayer);
-	this.inputFeatureMapColumns = inputFeatureMapColumns;
 	this.inputFeatureMapRows = inputFeatureMapRows;
+	this.inputFeatureMapColumns = inputFeatureMapColumns;
 	this.stride = stride;
 	this.wights = weights;
     }

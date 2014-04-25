@@ -700,10 +700,10 @@ public class CNNTest {
 
 	// compare bp
 	SimpleInputProvider inputProvider = new SimpleInputProvider(new float[][] { { 0.35f, 0.9f }, { 0.8f, 0.2f } }, new float[][] { { 0.5f }, { 0.8f } });
-	BackPropagationTrainer<?> cnnbpt = TrainerFactory.backPropagation(cnn, inputProvider, null, null, null, 1f, 0f, 0f, 0f, 0f, 1, 1, 2);
+	BackPropagationTrainer<?> cnnbpt = TrainerFactory.backPropagation(cnn, inputProvider, null, null, null, 1f, 0f, 0f, 0f, 0f, 1, 1, 20);
 	cnnbpt.train();
 
-	BackPropagationTrainer<?> mlpbpt = TrainerFactory.backPropagation(mlp, inputProvider, null, null, null, 1f, 0f, 0f, 0f, 0f, 1, 1, 2);
+	BackPropagationTrainer<?> mlpbpt = TrainerFactory.backPropagation(mlp, inputProvider, null, null, null, 1f, 0f, 0f, 0f, 0f, 1, 1, 20);
 	mlpbpt.train();
 
 	assertTrue(Arrays.equals(cnnfc.getWeights().getElements(), mlpfc.getWeights().getElements()));
