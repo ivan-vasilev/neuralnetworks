@@ -6,7 +6,7 @@ The architecture is designed with modularity, extensibility and pluggability in 
 ####Git structure
 I'm using the [git-flow](https://github.com/nvie/gitflow) model. The most stable (but older) sources are available in the [_master_](https://github.com/ivan-vasilev/neuralnetworks/tree/master) branch, while the latest ones are in the [_develop_](https://github.com/ivan-vasilev/neuralnetworks/tree/develop) branch.
 
-**If you want to use the previous Java 7 compatible version you can checkout [this](https://github.com/ivan-vasilev/neuralnetworks/releases/tag/v0.1.0-alpha) release.**
+**If you want to use the previous Java 7 compatible version you can check out [this](https://github.com/ivan-vasilev/neuralnetworks/releases/tag/v0.1.0-alpha) release.**
 
 ##Neural network types
 * Multilayer perceptron
