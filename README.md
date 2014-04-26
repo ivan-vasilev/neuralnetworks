@@ -6,6 +6,8 @@ The architecture is designed with modularity, extensibility and pluggability in 
 ####Git structure
 I'm using the [git-flow](https://github.com/nvie/gitflow) model. The most stable (but older) sources are available in the [_master_](https://github.com/ivan-vasilev/neuralnetworks/tree/master) branch, while the latest ones are in the [_develop_](https://github.com/ivan-vasilev/neuralnetworks/tree/develop) branch.
 
+**If you want to use the previous Java 7 compatible version you can checkout [this](https://github.com/ivan-vasilev/neuralnetworks/releases/tag/v0.1.0-alpha) release.**
+
 ##Neural network types
 * Multilayer perceptron
 * Restricted Boltzmann Machine
@@ -13,7 +15,7 @@ I'm using the [git-flow](https://github.com/nvie/gitflow) model. The most stable
 * Deep belief network
 * Stacked autoencodeer
 * Convolutional networks with max pooling, average poolng and [stochastic pooling](http://techtalks.tv/talks/stochastic-pooling-for-regularization-of-deep-convolutional-neural-networks/58106/).
-* Maxout networks
+* Maxout networks (work-in-progress)
 
 ##Training algorithms
 * Backpropagation - supports multilayer perceptrons, convolutional networks and [dropout](http://arxiv.org/pdf/1207.0580.pdf).
