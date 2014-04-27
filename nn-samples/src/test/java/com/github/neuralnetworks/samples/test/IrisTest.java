@@ -15,10 +15,7 @@ import com.github.neuralnetworks.architecture.types.DBN;
 import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.architecture.types.RBM;
 import com.github.neuralnetworks.architecture.types.StackedAutoencoder;
-import com.github.neuralnetworks.calculation.LayerCalculatorImpl;
 import com.github.neuralnetworks.calculation.OutputError;
-import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculatorFullyConnected;
-import com.github.neuralnetworks.calculation.neuronfunctions.SoftmaxFunction;
 import com.github.neuralnetworks.input.MultipleNeuronsOutputError;
 import com.github.neuralnetworks.samples.iris.IrisInputProvider;
 import com.github.neuralnetworks.samples.iris.IrisTargetMultiNeuronOutputConverter;
@@ -67,11 +64,6 @@ public class IrisTest {
 	// train
 	bpt.train();
 
-	// add softmax function
-	LayerCalculatorImpl lc = (LayerCalculatorImpl) mlp.getLayerCalculator();
-	ConnectionCalculatorFullyConnected cc = (ConnectionCalculatorFullyConnected) lc.getConnectionCalculator(mlp.getOutputLayer());
-	cc.addActivationFunction(new SoftmaxFunction());
-
 	// test
 	bpt.test();
 
@@ -85,7 +77,7 @@ public class IrisTest {
 //	Environment.getInstance().setUseWeightsSharedMemory(true);
 //
 //	// create the network
-//	NeuralNetworkImpl mlp = NNFactory.maxout(new int[] { 4, 2, 3 }, true, null);
+//	NeuralNetworkImpl mlp = NNFactory.maxout(new int[] { 4, 2, 3 }, false, new AparapiSoftmax());
 //
 //	// training and testing data providers
 //	IrisInputProvider trainInputProvider = new IrisInputProvider(new IrisTargetMultiNeuronOutputConverter(), false, true);
@@ -93,7 +85,7 @@ public class IrisTest {
 //	OutputError outputError = new MultipleNeuronsOutputError();
 //
 //	// trainer
-//	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(mlp, trainInputProvider, testInputProvider, outputError, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.5f), 0.02f, 0.7f, 0f, 0f, 0f, 1, 1, 2000);
+//	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(mlp, trainInputProvider, testInputProvider, outputError, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.5f), 0.1f, 0.7f, 0f, 0f, 0f, 1, 1, 200);
 //
 //	// log data
 //	bpt.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
@@ -103,11 +95,6 @@ public class IrisTest {
 //
 //	// train
 //	bpt.train();
-//
-//	// add softmax function
-//	LayerCalculatorImpl lc = (LayerCalculatorImpl) mlp.getLayerCalculator();
-//	ConnectionCalculatorFullyConnected cc = (ConnectionCalculatorFullyConnected) lc.getConnectionCalculator(mlp.getOutputLayer());
-//	cc.addActivationFunction(new SoftmaxFunction());
 //
 //	// test
 //	bpt.test();
