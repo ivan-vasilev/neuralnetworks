@@ -38,7 +38,6 @@ public class XorTest {
 	mlp.setLayerCalculator(NNFactory.lcSigmoid(mlp, null));
 	NNFactory.lcMaxPooling(mlp);
 
-
 	// create training and testing input providers
 	SimpleInputProvider input = new SimpleInputProvider(new float[][] { {0, 0}, {0, 1}, {1, 0}, {1, 1} }, new float[][] { {0}, {1}, {1}, {0} });
 

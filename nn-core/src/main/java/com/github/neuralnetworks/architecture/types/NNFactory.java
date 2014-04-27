@@ -27,7 +27,6 @@ import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSumC
 import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculatorConv;
 import com.github.neuralnetworks.calculation.neuronfunctions.ConstantConnectionCalculator;
 import com.github.neuralnetworks.calculation.neuronfunctions.MaxoutWinners;
-import com.github.neuralnetworks.calculation.neuronfunctions.SoftmaxFunction;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
 import com.github.neuralnetworks.util.Util;
@@ -240,9 +239,7 @@ public class NNFactory {
 		    if (outputCC != null) {
 			lc.addConnectionCalculator(l, outputCC);
 		    } else {
-			AparapiSoftReLU c = new AparapiSoftReLU();
-			c.addActivationFunction(new SoftmaxFunction());
-			lc.addConnectionCalculator(l, c);
+			lc.addConnectionCalculator(l, new AparapiSoftReLU());
 		    }
 		} else if (Util.isConvolutional(l)) {
 		    lc.addConnectionCalculator(l, new AparapiConv2DSoftReLU());
@@ -265,9 +262,7 @@ public class NNFactory {
 		    if (outputCC != null) {
 			lc.addConnectionCalculator(l, outputCC);
 		    } else {
-			AparapiReLU c = new AparapiReLU();
-			c.addActivationFunction(new SoftmaxFunction());
-			lc.addConnectionCalculator(l, c);
+			lc.addConnectionCalculator(l, new AparapiReLU());
 		    }
 		} else if (Util.isConvolutional(l)) {
 		    lc.addConnectionCalculator(l, new AparapiConv2DReLU());
@@ -415,26 +410,20 @@ public class NNFactory {
 
     public static RBMLayerCalculator rbmSoftReluSoftRelu(RBM rbm, int batchSize) {
 	AparapiSoftReLU c1 = new AparapiSoftReLU();
-	c1.addActivationFunction(new SoftmaxFunction());
 
 	AparapiSoftReLU c2 = new AparapiSoftReLU();
-	c2.addActivationFunction(new SoftmaxFunction());
 
 	AparapiSoftReLU c3 = new AparapiSoftReLU();
-	c3.addActivationFunction(new SoftmaxFunction());
 
 	return new RBMLayerCalculator(rbm, batchSize, c1, c2, c3);
     }
     
     public static RBMLayerCalculator rbmReluRelu(RBM rbm, int batchSize) {
 	AparapiReLU c1 = new AparapiReLU();
-	c1.addActivationFunction(new SoftmaxFunction());
 
 	AparapiReLU c2 = new AparapiReLU();
-	c2.addActivationFunction(new SoftmaxFunction());
 
 	AparapiReLU c3 = new AparapiReLU();
-	c3.addActivationFunction(new SoftmaxFunction());
 
 	return new RBMLayerCalculator(rbm, batchSize, c1, c2, c3);
     }
