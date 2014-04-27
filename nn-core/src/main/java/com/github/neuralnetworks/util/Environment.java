@@ -31,7 +31,7 @@ public class Environment {
 
     private Environment() {
 	executionStrategy = new DefaultKernelExecution();
-	useDataSharedMemory = true;
+	useDataSharedMemory = false;
 	useWeightsSharedMemory = false;
     }
 

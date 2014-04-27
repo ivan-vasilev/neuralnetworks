@@ -57,7 +57,7 @@ public abstract class Trainer<N extends NeuralNetwork> implements Serializable {
      */
     public void test() {
 	TrainingInputProvider ip = getTestingInputProvider();
-	NeuralNetwork n = getNeuralNetwork();
+	N n = getNeuralNetwork();
 
 	if (ip != null && n != null && n.getLayerCalculator() != null) {
 	    ip.reset();
