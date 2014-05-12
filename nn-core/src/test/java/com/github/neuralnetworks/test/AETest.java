@@ -8,6 +8,7 @@ import com.amd.aparapi.Kernel.EXECUTION_MODE;
 import com.github.neuralnetworks.architecture.types.Autoencoder;
 import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.input.MultipleNeuronsOutputError;
+import com.github.neuralnetworks.input.SimpleInputProvider;
 import com.github.neuralnetworks.training.TrainerFactory;
 import com.github.neuralnetworks.training.TrainingInputProvider;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationAutoencoder;

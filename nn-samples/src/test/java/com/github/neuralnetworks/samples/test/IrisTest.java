@@ -16,6 +16,7 @@ import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.architecture.types.RBM;
 import com.github.neuralnetworks.architecture.types.StackedAutoencoder;
 import com.github.neuralnetworks.calculation.OutputError;
+import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSoftmax;
 import com.github.neuralnetworks.input.MultipleNeuronsOutputError;
 import com.github.neuralnetworks.samples.iris.IrisInputProvider;
 import com.github.neuralnetworks.samples.iris.IrisTargetMultiNeuronOutputConverter;
@@ -70,37 +71,37 @@ public class IrisTest {
 	assertEquals(0, bpt.getOutputError().getTotalNetworkError(), 0.1);
     }
 
-//    @Test
-//    public void testMaxout() {
-//	// execution mode
-//	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
-//	Environment.getInstance().setUseWeightsSharedMemory(true);
-//
-//	// create the network
-//	NeuralNetworkImpl mlp = NNFactory.maxout(new int[] { 4, 2, 3 }, false, new AparapiSoftmax());
-//
-//	// training and testing data providers
-//	IrisInputProvider trainInputProvider = new IrisInputProvider(new IrisTargetMultiNeuronOutputConverter(), false, true);
-//	IrisInputProvider testInputProvider = new IrisInputProvider(new IrisTargetMultiNeuronOutputConverter(), false, true);
-//	OutputError outputError = new MultipleNeuronsOutputError();
-//
-//	// trainer
-//	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(mlp, trainInputProvider, testInputProvider, outputError, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.5f), 0.1f, 0.7f, 0f, 0f, 0f, 1, 1, 200);
-//
-//	// log data
-//	bpt.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
-//
-//	// early stopping
-//	bpt.addEventListener(new EarlyStoppingListener(testInputProvider, 100, 0.015f));
-//
-//	// train
-//	bpt.train();
-//
-//	// test
-//	bpt.test();
-//
-//	assertEquals(0, bpt.getOutputError().getTotalNetworkError(), 0.1);
-//    }
+    @Test
+    public void testMaxout() {
+	// execution mode
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
+	Environment.getInstance().setUseWeightsSharedMemory(true);
+
+	// create the network
+	NeuralNetworkImpl mlp = NNFactory.maxout(new int[] { 4, 2, 3 }, false, new AparapiSoftmax());
+
+	// training and testing data providers
+	IrisInputProvider trainInputProvider = new IrisInputProvider(new IrisTargetMultiNeuronOutputConverter(), false, true);
+	IrisInputProvider testInputProvider = new IrisInputProvider(new IrisTargetMultiNeuronOutputConverter(), false, true);
+	OutputError outputError = new MultipleNeuronsOutputError();
+
+	// trainer
+	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(mlp, trainInputProvider, testInputProvider, outputError, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.001f, 0.001f), 0.5f), 0.01f, 0.7f, 0f, 0f, 0f, 1, 1, 1000);
+
+	// log data
+	bpt.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
+
+	// early stopping
+	//bpt.addEventListener(new EarlyStoppingListener(testInputProvider, 100, 0.015f));
+
+	// train
+	bpt.train();
+
+	// test
+	bpt.test();
+
+	assertEquals(0, bpt.getOutputError().getTotalNetworkError(), 0.1);
+    }
 
     /**
      * Contrastive Divergence testing

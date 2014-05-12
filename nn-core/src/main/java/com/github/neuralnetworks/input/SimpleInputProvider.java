@@ -1,4 +1,4 @@
-package com.github.neuralnetworks.test;
+package com.github.neuralnetworks.input;
 
 import com.github.neuralnetworks.training.TrainingInputProviderImpl;
 
