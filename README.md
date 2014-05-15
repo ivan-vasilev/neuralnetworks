@@ -38,7 +38,7 @@ All the functions support GPU execution. They can be applied to all types of net
 * **Java 8**.
 * To build the project you need [gradle](http://www.gradle.org/) or [maven](http://maven.apache.org/). If you don't use any of these you can go to the project folder and execute the _gradlew_ console command, which will automatically setup gradle environment for you.
 * I'm also uploading the latest jar file (with bundled dependencies and sources) [here](https://github.com/ivan-vasilev/neuralnetworks/tree/master/build/libs).
-* Depending on your environment you might need to download the relevant aparapi .dll or .so file (located in the root of each archive) from [here](https://code.google.com/p/aparapi/downloads/list) and add it's location to the system PATH variable. [https://code.google.com/p/aparapi/wiki/DevelopersGuideLinux](Here) is a guide on how to set up OpenCL in linux environment.
+* Depending on your environment you might need to download the relevant aparapi .dll or .so file (located in the root of each archive) from [here](https://code.google.com/p/aparapi/downloads/list) and add it's location to the system PATH variable. (This)[https://code.google.com/p/aparapi/wiki/DevelopersGuideLinux] is a guide on how to set up OpenCL in linux environment.
 
 ##How to run the samples
 The samples are organized as unit tests. If you want see examples on various popular datasets you can go to [nn-samples/src/test/java/com/github/neuralnetworks/samples/](https://github.com/ivan-vasilev/neuralnetworks/tree/9e569aa7c9a4d724cf3c1aed8a8036af272ec58f/nn-samples/src/test/java/com/github/neuralnetworks/samples/test).
