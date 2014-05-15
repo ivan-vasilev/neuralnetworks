@@ -17,27 +17,12 @@ public class IrisInputProvider extends TrainingInputProviderImpl {
     private Random random;
     private int currentIndex;
 
-    public IrisInputProvider(InputConverter targetConverter, boolean useRandom, boolean scale) {
+    public IrisInputProvider(InputConverter targetConverter, boolean useRandom) {
 	super();
 	this.targetConverter = targetConverter;
 	this.random = useRandom ? new Random() : null;
 	this.target = new float[3];
 	reset();
-
-	if (scale) {
-	    for (int i = 0; i < irisData[0].length; i++) {
-		float max = irisData[0][i];
-		for (int j = 0; j < irisData.length; j++) {
-		    if (irisData[j][i] > max) {
-			max = irisData[j][i];
-		    }
-		}
-
-		for (int j = 0; j < irisData.length; j++) {
-		    irisData[j][i] /= max;
-		}
-	    }
-	}
     }
 
     @Override

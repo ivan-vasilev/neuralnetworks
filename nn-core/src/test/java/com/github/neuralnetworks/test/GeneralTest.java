@@ -17,6 +17,8 @@ import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.calculation.neuronfunctions.SoftmaxFunction;
+import com.github.neuralnetworks.input.ScalingInputFunction;
+import com.github.neuralnetworks.input.SimpleInputProvider;
 import com.github.neuralnetworks.training.random.MersenneTwisterRandomInitializer;
 import com.github.neuralnetworks.training.random.NNRandomInitializer;
 import com.github.neuralnetworks.util.Environment;
@@ -352,5 +354,18 @@ public class GeneralTest {
 	assertEquals(7, m2.get(0, 1), 0);
 	assertEquals(10, m2.get(1, 0), 0);
 	assertEquals(11, m2.get(1, 1), 0);
+    }
+
+    @Test
+    public void testScaling() {
+	float[][] input = new float[][] { {1, 3}, { -2, 1.5f } };
+	ScalingInputFunction si = new ScalingInputFunction(new SimpleInputProvider(input));
+	Matrix m = TensorFactory.matrix(input);
+	si.value(m);
+
+	assertEquals(0.5f, m.get(0, 0), 0);
+	assertEquals(-1f, m.get(0, 1), 0);
+	assertEquals(1f, m.get(1, 0), 0);
+	assertEquals(0.5f, m.get(1, 1), 0);
     }
 }

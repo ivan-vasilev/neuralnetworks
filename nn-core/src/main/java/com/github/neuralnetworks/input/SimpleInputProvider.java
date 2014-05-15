@@ -13,9 +13,13 @@ public class SimpleInputProvider extends TrainingInputProviderImpl {
     private float[][] input;
     private float[][] target;
 
+    public SimpleInputProvider(float[][] input) {
+	super();
+	this.input  = input;
+    }
+
     public SimpleInputProvider(float[][] input, float[][] target) {
 	super();
-
 	this.input  = input;
 	this.target = target;
     }
