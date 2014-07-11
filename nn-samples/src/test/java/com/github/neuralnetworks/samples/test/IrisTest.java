@@ -16,6 +16,7 @@ import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.architecture.types.RBM;
 import com.github.neuralnetworks.architecture.types.StackedAutoencoder;
 import com.github.neuralnetworks.calculation.OutputError;
+import com.github.neuralnetworks.input.CSVInputProvider;
 import com.github.neuralnetworks.input.MultipleNeuronsOutputError;
 import com.github.neuralnetworks.input.ScalingInputFunction;
 import com.github.neuralnetworks.samples.iris.IrisInputProvider;
@@ -23,6 +24,7 @@ import com.github.neuralnetworks.samples.iris.IrisTargetMultiNeuronOutputConvert
 import com.github.neuralnetworks.training.DNNLayerTrainer;
 import com.github.neuralnetworks.training.OneStepTrainer;
 import com.github.neuralnetworks.training.TrainerFactory;
+import com.github.neuralnetworks.training.TrainingInputProviderImpl;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationAutoencoder;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationTrainer;
 import com.github.neuralnetworks.training.events.EarlyStoppingListener;
@@ -51,6 +53,40 @@ public class IrisTest {
 	IrisInputProvider trainInputProvider = new IrisInputProvider(new IrisTargetMultiNeuronOutputConverter(), false);
 	trainInputProvider.addInputModifier(new ScalingInputFunction(trainInputProvider));
 	IrisInputProvider testInputProvider = new IrisInputProvider(new IrisTargetMultiNeuronOutputConverter(), false);
+	testInputProvider.addInputModifier(new ScalingInputFunction(testInputProvider));
+	OutputError outputError = new MultipleNeuronsOutputError();
+
+	// trainer
+	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(mlp, trainInputProvider, testInputProvider, outputError, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f), 0.5f), 0.02f, 0.7f, 0f, 0f, 0f, 150, 1, 2000);
+
+	// log data
+	bpt.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
+
+	// early stopping
+	bpt.addEventListener(new EarlyStoppingListener(testInputProvider, 100, 0.015f));
+
+	// train
+	bpt.train();
+
+	// test
+	bpt.test();
+
+	assertEquals(0, bpt.getOutputError().getTotalNetworkError(), 0.1);
+    }
+
+    @Test
+    public void testMLPSigmoidBPCSVReader() {
+	// execution mode
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.CPU);
+	Environment.getInstance().setUseWeightsSharedMemory(true);
+
+	// create the network
+	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 4, 2, 3 }, true);
+
+	// training and testing data providers
+	TrainingInputProviderImpl trainInputProvider = new CSVInputProvider("IRISinput.txt", "IRIStarget.txt");
+	trainInputProvider.addInputModifier(new ScalingInputFunction(trainInputProvider));
+	TrainingInputProviderImpl testInputProvider = new CSVInputProvider("IRISinput.txt", "IRIStarget.txt");
 	testInputProvider.addInputModifier(new ScalingInputFunction(testInputProvider));
 	OutputError outputError = new MultipleNeuronsOutputError();
 

@@ -74,7 +74,7 @@ public class EarlyStoppingListener implements TrainingEventListener {
 		    TrainingInputData input = new TrainingInputDataImpl(vp.get(n.getInputLayer()), vp.get(outputError));
 
 		    Set<Layer> calculatedLayers = new UniqueList<>();
-		    for (int i = 0; i < inputProvider.getInputSize(); i ++) {
+		    for (int i = 0; i < inputProvider.getInputSize(); i++) {
 			inputProvider.populateNext(input);
 			calculatedLayers.clear();
 			calculatedLayers.add(n.getInputLayer());
