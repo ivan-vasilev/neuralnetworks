@@ -44,7 +44,7 @@ public class IrisTest {
     public void testMLPSigmoidBP() {
 	// execution mode
 	Environment.getInstance().setExecutionMode(EXECUTION_MODE.CPU);
-	Environment.getInstance().setUseWeightsSharedMemory(true);
+	Environment.getInstance().setUseWeightsSharedMemory(false);
 
 	// create the network
 	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 4, 2, 3 }, true);

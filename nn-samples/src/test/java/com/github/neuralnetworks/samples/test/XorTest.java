@@ -27,22 +27,22 @@ public class XorTest {
      */
     @Test
     public void testMLPSigmoidBP() {
-	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.CPU);
 
 	// create multi layer perceptron with one hidden layer and bias
 	Environment.getInstance().setUseWeightsSharedMemory(false);
 	Environment.getInstance().setUseDataSharedMemory(false);
-	//NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 2, 4, 1 }, false);
-	NeuralNetworkImpl mlp = NNFactory.convNN(new int[][] { { 2, 1, 1 }, { 1, 1 }, { 4 }, {1} }, false);
+	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 2, 2, 1 }, false);
+	//NeuralNetworkImpl mlp = NNFactory.convNN(new int[][] { { 2, 1, 1 }, { 1, 1 }, { 4 }, {1} }, false);
 	//NeuralNetworkImpl mlp = NNFactory.convNN(new int[][] { {2, 1, 1}, {4}, {1} }, false);
 	mlp.setLayerCalculator(NNFactory.lcSigmoid(mlp, null));
-	NNFactory.lcMaxPooling(mlp);
+	//NNFactory.lcMaxPooling(mlp);
 
 	// create training and testing input providers
 	SimpleInputProvider input = new SimpleInputProvider(new float[][] { {0, 0}, {0, 1}, {1, 0}, {1, 1} }, new float[][] { {0}, {1}, {1}, {0} });
 
 	// create backpropagation trainer for the network
-	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(mlp, input, input, new XorOutputError(), new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 1f, 0.5f, 0f, 0f, 0f, 1, 1, 50000);
+	BackPropagationTrainer<?> bpt = TrainerFactory.backPropagation(mlp, input, input, new XorOutputError(), new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 1f, 0.5f, 0f, 0f, 0f, 1, 1, 10000);
 
 	// add logging
 	bpt.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName()));
