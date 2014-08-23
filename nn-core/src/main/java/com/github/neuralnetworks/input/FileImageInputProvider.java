@@ -23,7 +23,7 @@ public class FileImageInputProvider extends ImageInputProvider {
     private Random random;
 
     public FileImageInputProvider(File directory) {
-	this(null, null);
+	this(null, directory);
     }
 
     public FileImageInputProvider(InputConverter inputConverter, File directory) {

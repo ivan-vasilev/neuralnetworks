@@ -3,6 +3,7 @@ package com.github.neuralnetworks.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.util.Iterator;
 import java.util.stream.IntStream;
 
@@ -17,6 +18,7 @@ import com.github.neuralnetworks.architecture.NeuralNetworkImpl;
 import com.github.neuralnetworks.architecture.types.NNFactory;
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.calculation.neuronfunctions.SoftmaxFunction;
+import com.github.neuralnetworks.input.FileImageInputProvider;
 import com.github.neuralnetworks.input.ScalingInputFunction;
 import com.github.neuralnetworks.input.SimpleInputProvider;
 import com.github.neuralnetworks.tensor.Matrix;
@@ -367,5 +369,15 @@ public class GeneralTest {
 	assertEquals(-1f, m.get(0, 1), 0);
 	assertEquals(1f, m.get(1, 0), 0);
 	assertEquals(0.5f, m.get(1, 1), 0);
+    }
+
+    @Test
+    public void testImageInputProvider() {
+	FileImageInputProvider ip = new FileImageInputProvider(new File("D:\\git_local\\github\\neuralnetworks\\nn-core\\src\\test\\resources\\images"));
+	float[] image1 = ip.getNextInput();
+	assertEquals(0f, image1[0], 0f);
+
+	float[] image2 = ip.getNextInput();
+	assertEquals(0f, image1[0], 0f);
     }
 }

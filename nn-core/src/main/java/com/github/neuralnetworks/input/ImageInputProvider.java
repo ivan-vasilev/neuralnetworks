@@ -60,7 +60,7 @@ public abstract class ImageInputProvider extends TrainingInputProviderImpl {
 	    if (isGrayscale == null) {
 		isGrayscale = true;
 		for (int i = 0; i < pixels.length; i += pixelDataLength) {
-		    if (pixels[i + pixelDataLength - 1] != pixels[i + pixelDataLength - 2] || pixels[i + pixelDataLength - 2] != pixels[i + pixelDataLength - 3] || pixels[i + pixelDataLength - 3] != pixels[i + pixelDataLength - 4]) {
+		    if (pixels[i + pixelDataLength - 1] != pixels[i + pixelDataLength - 2] || pixels[i + pixelDataLength - 2] != pixels[i + pixelDataLength - 3]) {
 			isGrayscale = false;
 			break;
 		    }
@@ -76,15 +76,19 @@ public abstract class ImageInputProvider extends TrainingInputProviderImpl {
 	    int scaleFactor = scaleColors ? 255 : 1;
 	    if (isGrayscale) {
 		for (int i = 0; i < size; i++) {
-		    nextInput[i] = (pixels[i * pixelDataLength + 1] & 0xFF) / scaleFactor;
+		    nextInput[i] = (pixels[i * pixelDataLength + 1] & 0xFF) / (float) scaleFactor;
+		}
+	    } else if (groupByChannel) {
+		for (int i = 0; i < size; i++) {
+		    nextInput[i] = (pixels[i * pixelDataLength] & 0xFF) / (float) scaleFactor;
+		    nextInput[i + size] = (pixels[i * pixelDataLength + 1] & 0xFF) / (float) scaleFactor;
+		    nextInput[i + size * 2] = (pixels[i * pixelDataLength + 2] & 0xFF) / (float) scaleFactor;
 		}
 	    } else {
-		// check pixel groups
-		int pixelDistance = groupByChannel ? size : 1;
 		for (int i = 0; i < size; i++) {
-		    nextInput[i] = (pixels[i * pixelDataLength] & 0xFF) / scaleFactor;
-		    nextInput[i + pixelDistance] = (pixels[i * pixelDataLength + 1] & 0xFF) / scaleFactor;
-		    nextInput[i + pixelDistance] = (pixels[i * pixelDataLength + 2] & 0xFF) / scaleFactor;
+		    nextInput[i * 3] = (pixels[i * pixelDataLength] & 0xFF) / (float) scaleFactor;
+		    nextInput[i * 3 + 1] = (pixels[i * pixelDataLength + 1] & 0xFF) / (float) scaleFactor;
+		    nextInput[i * 3 + 2] = (pixels[i * pixelDataLength + 2] & 0xFF) / (float) scaleFactor;
 		}
 	    }
 	}
