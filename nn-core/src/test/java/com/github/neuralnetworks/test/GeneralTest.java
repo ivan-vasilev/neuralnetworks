@@ -360,7 +360,7 @@ public class GeneralTest {
 
     @Test
     public void testScaling() {
-	float[][] input = new float[][] { {1, 3}, { -2, 1.5f } };
+	float[][] input = new float[][] { { 1, 3 }, { -2, 1.5f } };
 	ScalingInputFunction si = new ScalingInputFunction(new SimpleInputProvider(input));
 	Matrix m = TensorFactory.matrix(input);
 	si.value(m);
@@ -373,11 +373,36 @@ public class GeneralTest {
 
     @Test
     public void testImageInputProvider() {
-	FileImageInputProvider ip = new FileImageInputProvider(new File("D:\\git_local\\github\\neuralnetworks\\nn-core\\src\\test\\resources\\images"));
+	String imagesPath = Thread.currentThread().getContextClassLoader().getResource("images").getPath();
+
+	FileImageInputProvider ip = new FileImageInputProvider(new File(imagesPath));
+	ip.setScaleColors(false);
+	ip.setGroupByChannel(false);
+
 	float[] image1 = ip.getNextInput();
-	assertEquals(0f, image1[0], 0f);
+	assertEquals(36f, image1[3], 0f);
+	assertEquals(28f, image1[4], 0f);
+	assertEquals(237f, image1[5], 0f);
 
 	float[] image2 = ip.getNextInput();
-	assertEquals(0f, image1[0], 0f);
+	assertEquals(36f, image2[3], 0f);
+	assertEquals(28f, image2[4], 0f);
+	assertEquals(237f, image2[5], 0f);
+
+	ip.getNextInput();
+
+	ip = new FileImageInputProvider(new File(imagesPath));
+	ip.setScaleColors(false);
+	ip.setGroupByChannel(true);
+
+	image1 = ip.getNextInput();
+	assertEquals(237f, image1[1], 0f);
+	assertEquals(28f, image1[5], 0f);
+	assertEquals(36f, image1[9], 0f);
+
+	image2 = ip.getNextInput();
+	assertEquals(237f, image2[1], 0f);
+	assertEquals(28f, image2[5], 0f);
+	assertEquals(36f, image2[9], 0f);
     }
 }

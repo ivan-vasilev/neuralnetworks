@@ -10,7 +10,7 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 
 /**
- * ImageInputProvider that retrieves images from a file directory
+ * ImageInputProvider that retrieves all images from a directory (it have to contain only images and no subdirectories)
  */
 public class FileImageInputProvider extends ImageInputProvider {
 

@@ -22,7 +22,7 @@ public abstract class ImageInputProvider extends TrainingInputProviderImpl {
     /**
      * scale colors in the [0,1] range
      */
-    private boolean scaleColors;
+    private float scaleColors;
 
     /**
      * repeat the same image several times (when image transformations are
@@ -43,7 +43,7 @@ public abstract class ImageInputProvider extends TrainingInputProviderImpl {
 
     public ImageInputProvider(InputConverter inputConverter) {
 	super(inputConverter);
-	scaleColors = true;
+	setScaleColors(true);
 	repeatImage = 1;
 	currentRepetition = 0;
     }
@@ -73,22 +73,21 @@ public abstract class ImageInputProvider extends TrainingInputProviderImpl {
 	// if the current repetitions are over proceed with the next image
 	if (repeatImage == ++currentRepetition) {
 	    currentRepetition = 0;
-	    int scaleFactor = scaleColors ? 255 : 1;
 	    if (isGrayscale) {
 		for (int i = 0; i < size; i++) {
-		    nextInput[i] = (pixels[i * pixelDataLength + 1] & 0xFF) / (float) scaleFactor;
+		    nextInput[i] = (pixels[i * pixelDataLength + pixelDataLength - 1] & 0xFF) / scaleColors;
 		}
 	    } else if (groupByChannel) {
 		for (int i = 0; i < size; i++) {
-		    nextInput[i] = (pixels[i * pixelDataLength] & 0xFF) / (float) scaleFactor;
-		    nextInput[i + size] = (pixels[i * pixelDataLength + 1] & 0xFF) / (float) scaleFactor;
-		    nextInput[i + size * 2] = (pixels[i * pixelDataLength + 2] & 0xFF) / (float) scaleFactor;
+		    nextInput[i] = (pixels[i * pixelDataLength + pixelDataLength - 1] & 0xFF) / scaleColors;
+		    nextInput[i + size] = (pixels[i * pixelDataLength + pixelDataLength - 2] & 0xFF) / scaleColors;
+		    nextInput[i + size * 2] = (pixels[i * pixelDataLength + pixelDataLength - 3] & 0xFF) / scaleColors;
 		}
 	    } else {
 		for (int i = 0; i < size; i++) {
-		    nextInput[i * 3] = (pixels[i * pixelDataLength] & 0xFF) / (float) scaleFactor;
-		    nextInput[i * 3 + 1] = (pixels[i * pixelDataLength + 1] & 0xFF) / (float) scaleFactor;
-		    nextInput[i * 3 + 2] = (pixels[i * pixelDataLength + 2] & 0xFF) / (float) scaleFactor;
+		    nextInput[i * 3] = (pixels[i * pixelDataLength + pixelDataLength - 3] & 0xFF) / scaleColors;
+		    nextInput[i * 3 + 1] = (pixels[i * pixelDataLength + pixelDataLength - 2] & 0xFF) / scaleColors;
+		    nextInput[i * 3 + 2] = (pixels[i * pixelDataLength + pixelDataLength - 1] & 0xFF) / scaleColors;
 		}
 	    }
 	}
@@ -110,11 +109,11 @@ public abstract class ImageInputProvider extends TrainingInputProviderImpl {
     }
 
     public boolean getScaleColors() {
-	return scaleColors;
+	return scaleColors == 255 ? true : false;
     }
 
     public void setScaleColors(boolean scaleColors) {
-	this.scaleColors = scaleColors;
+	this.scaleColors = scaleColors ? 255 : 1;
     }
 
     public int getRepeatImage() {
