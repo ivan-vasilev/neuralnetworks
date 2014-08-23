@@ -13,13 +13,11 @@ public class IrisInputProvider extends TrainingInputProviderImpl {
     private static final long serialVersionUID = 1L;
 
     private float[] target;
-    private InputConverter targetConverter;
     private Random random;
     private int currentIndex;
 
     public IrisInputProvider(InputConverter targetConverter, boolean useRandom) {
-	super();
-	this.targetConverter = targetConverter;
+	super(targetConverter);
 	this.random = useRandom ? new Random() : null;
 	this.target = new float[3];
 	reset();
@@ -38,11 +36,11 @@ public class IrisInputProvider extends TrainingInputProviderImpl {
     @Override
     public float[] getNextTarget() {
 	if (currentIndex < 50) {
-	    targetConverter.convert(0, target);
+	    getTargetConverter().convert(0, target);
 	} else if (currentIndex < 100) {
-	    targetConverter.convert(1, target);
+	    getTargetConverter().convert(1, target);
 	} else {
-	    targetConverter.convert(2, target);
+	    getTargetConverter().convert(2, target);
 	}
 
 	return target;

@@ -26,12 +26,12 @@ import com.github.neuralnetworks.calculation.neuronfunctions.AparapiWeightedSumC
 import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculatorFullyConnected;
 import com.github.neuralnetworks.calculation.neuronfunctions.MaxoutWinners;
 import com.github.neuralnetworks.input.SimpleInputProvider;
+import com.github.neuralnetworks.tensor.Matrix;
+import com.github.neuralnetworks.tensor.Tensor;
+import com.github.neuralnetworks.tensor.TensorFactory;
 import com.github.neuralnetworks.training.TrainerFactory;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationTrainer;
 import com.github.neuralnetworks.util.Environment;
-import com.github.neuralnetworks.util.Matrix;
-import com.github.neuralnetworks.util.Tensor;
-import com.github.neuralnetworks.util.TensorFactory;
 
 /**
  * General feedforward neural networks tests

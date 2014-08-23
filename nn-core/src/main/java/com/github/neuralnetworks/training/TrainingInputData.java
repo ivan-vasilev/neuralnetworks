@@ -2,7 +2,7 @@ package com.github.neuralnetworks.training;
 
 import java.io.Serializable;
 
-import com.github.neuralnetworks.util.Tensor;
+import com.github.neuralnetworks.tensor.Tensor;
 
 /**
  * Training input data with target value

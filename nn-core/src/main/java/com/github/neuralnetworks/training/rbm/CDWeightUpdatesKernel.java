@@ -3,7 +3,7 @@ package com.github.neuralnetworks.training.rbm;
 import java.io.Serializable;
 
 import com.amd.aparapi.Kernel;
-import com.github.neuralnetworks.util.Matrix;
+import com.github.neuralnetworks.tensor.Matrix;
 
 /**
  * Aparapi weight udpates for the connections between the hidden and the visible layers

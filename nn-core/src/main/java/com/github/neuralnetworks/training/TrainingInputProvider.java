@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import com.github.neuralnetworks.calculation.neuronfunctions.TensorFunction;
-import com.github.neuralnetworks.util.Tensor.TensorIterator;
+import com.github.neuralnetworks.tensor.Tensor.TensorIterator;
 
 /**
  * Input provider for training data

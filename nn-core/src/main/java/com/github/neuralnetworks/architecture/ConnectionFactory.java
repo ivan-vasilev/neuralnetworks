@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.github.neuralnetworks.tensor.Matrix;
+import com.github.neuralnetworks.tensor.Tensor;
+import com.github.neuralnetworks.tensor.TensorFactory;
 import com.github.neuralnetworks.util.Environment;
-import com.github.neuralnetworks.util.Matrix;
-import com.github.neuralnetworks.util.Tensor;
-import com.github.neuralnetworks.util.TensorFactory;
 
 /**
  * Factory for connections. In order to use shared weights it cannot be static.

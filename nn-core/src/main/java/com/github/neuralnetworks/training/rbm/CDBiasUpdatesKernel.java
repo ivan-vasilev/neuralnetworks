@@ -3,7 +3,7 @@ package com.github.neuralnetworks.training.rbm;
 import java.io.Serializable;
 
 import com.amd.aparapi.Kernel;
-import com.github.neuralnetworks.util.Matrix;
+import com.github.neuralnetworks.tensor.Matrix;
 
 /**
  * Aparapi kernerl for update of bias updates

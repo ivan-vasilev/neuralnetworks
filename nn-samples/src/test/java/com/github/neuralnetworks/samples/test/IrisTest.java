@@ -43,7 +43,7 @@ public class IrisTest {
     @Test
     public void testMLPSigmoidBP() {
 	// execution mode
-	Environment.getInstance().setExecutionMode(EXECUTION_MODE.CPU);
+	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 	Environment.getInstance().setUseWeightsSharedMemory(false);
 
 	// create the network

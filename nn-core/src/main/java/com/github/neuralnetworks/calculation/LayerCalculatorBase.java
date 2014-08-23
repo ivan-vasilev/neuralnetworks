@@ -14,8 +14,8 @@ import com.github.neuralnetworks.calculation.LayerOrderStrategy.ConnectionCandid
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.events.PropagationEvent;
 import com.github.neuralnetworks.events.PropagationEventListener;
-import com.github.neuralnetworks.util.Tensor;
-import com.github.neuralnetworks.util.TensorFactory;
+import com.github.neuralnetworks.tensor.Tensor;
+import com.github.neuralnetworks.tensor.TensorFactory;
 
 /**
  * Base class for implementations of the LayerCalculator interface

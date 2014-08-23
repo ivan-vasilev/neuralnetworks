@@ -32,8 +32,8 @@ public class CSVInputProvider extends TrainingInputProviderImpl {
 	inputSize = (int) getInputReader().lines().count();
     }
 
-    public CSVInputProvider(InputConverter inputConverter, String inputFile, String targetFile) {
-	super(inputConverter);
+    public CSVInputProvider(InputConverter targetConverter, String inputFile, String targetFile) {
+	super(targetConverter);
 	this.inputFile = inputFile;
 	this.targetFile = targetFile;
 

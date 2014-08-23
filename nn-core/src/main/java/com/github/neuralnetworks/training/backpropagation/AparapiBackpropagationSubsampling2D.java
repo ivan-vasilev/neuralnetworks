@@ -4,7 +4,7 @@ import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Subsampling2DConnection;
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiSubsampling2D;
-import com.github.neuralnetworks.util.TensorFactory;
+import com.github.neuralnetworks.tensor.TensorFactory;
 
 /**
  * BackPropagation base function for subsampling layers

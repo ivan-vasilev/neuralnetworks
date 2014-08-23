@@ -7,8 +7,8 @@ import com.github.neuralnetworks.architecture.Conv2DConnection;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiConv2D;
-import com.github.neuralnetworks.util.Tensor;
-import com.github.neuralnetworks.util.TensorFactory;
+import com.github.neuralnetworks.tensor.Tensor;
+import com.github.neuralnetworks.tensor.TensorFactory;
 import com.github.neuralnetworks.util.Util;
 
 /**

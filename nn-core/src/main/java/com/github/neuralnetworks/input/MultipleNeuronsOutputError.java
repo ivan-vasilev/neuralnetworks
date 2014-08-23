@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.github.neuralnetworks.calculation.OutputError;
-import com.github.neuralnetworks.util.Matrix;
-import com.github.neuralnetworks.util.Tensor;
+import com.github.neuralnetworks.tensor.Matrix;
+import com.github.neuralnetworks.tensor.Tensor;
 
 public class MultipleNeuronsOutputError implements OutputError {
 

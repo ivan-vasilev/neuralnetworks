@@ -1,6 +1,6 @@
 package com.github.neuralnetworks.architecture;
 
-import com.github.neuralnetworks.util.Tensor;
+import com.github.neuralnetworks.tensor.Tensor;
 
 /**
  * Weight connections

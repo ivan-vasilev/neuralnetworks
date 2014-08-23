@@ -34,6 +34,10 @@ import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculato
 import com.github.neuralnetworks.calculation.neuronfunctions.ConnectionCalculatorFullyConnected;
 import com.github.neuralnetworks.input.MultipleNeuronsOutputError;
 import com.github.neuralnetworks.input.SimpleInputProvider;
+import com.github.neuralnetworks.tensor.Matrix;
+import com.github.neuralnetworks.tensor.Tensor;
+import com.github.neuralnetworks.tensor.TensorFactory;
+import com.github.neuralnetworks.tensor.Tensor.TensorIterator;
 import com.github.neuralnetworks.training.TrainerFactory;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationConv2D;
 import com.github.neuralnetworks.training.backpropagation.BackPropagationConv2DSigmoid;
@@ -43,10 +47,6 @@ import com.github.neuralnetworks.training.backpropagation.BackPropagationTrainer
 import com.github.neuralnetworks.training.backpropagation.BackpropagationAveragePooling2D;
 import com.github.neuralnetworks.training.backpropagation.BackpropagationMaxPooling2D;
 import com.github.neuralnetworks.util.Environment;
-import com.github.neuralnetworks.util.Matrix;
-import com.github.neuralnetworks.util.Tensor;
-import com.github.neuralnetworks.util.Tensor.TensorIterator;
-import com.github.neuralnetworks.util.TensorFactory;
 
 /**
  * Tests for convolutional networks

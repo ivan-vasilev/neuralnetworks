@@ -2,7 +2,7 @@ package com.github.neuralnetworks.training.random;
 
 import java.io.Serializable;
 
-import com.github.neuralnetworks.util.Tensor;
+import com.github.neuralnetworks.tensor.Tensor;
 
 /**
  * Base interface for random initialization of arrays

@@ -9,10 +9,10 @@ import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiFullyConnected;
 import com.github.neuralnetworks.calculation.neuronfunctions.MaxoutWinners;
-import com.github.neuralnetworks.util.Matrix;
+import com.github.neuralnetworks.tensor.Matrix;
+import com.github.neuralnetworks.tensor.Tensor;
+import com.github.neuralnetworks.tensor.TensorFactory;
 import com.github.neuralnetworks.util.Properties;
-import com.github.neuralnetworks.util.Tensor;
-import com.github.neuralnetworks.util.TensorFactory;
 
 public class BackpropagationMaxout extends BackPropagationConnectionCalculatorImpl {
 

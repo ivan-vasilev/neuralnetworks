@@ -3,7 +3,7 @@ package com.github.neuralnetworks.samples.xor;
 import java.util.Iterator;
 
 import com.github.neuralnetworks.calculation.OutputError;
-import com.github.neuralnetworks.util.Tensor;
+import com.github.neuralnetworks.tensor.Tensor;
 
 public class XorOutputError implements OutputError {
 

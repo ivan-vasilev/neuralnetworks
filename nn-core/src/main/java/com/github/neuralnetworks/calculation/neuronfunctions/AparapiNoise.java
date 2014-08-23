@@ -1,7 +1,7 @@
 package com.github.neuralnetworks.calculation.neuronfunctions;
 
+import com.github.neuralnetworks.tensor.Tensor;
 import com.github.neuralnetworks.training.random.XORShiftKernel;
-import com.github.neuralnetworks.util.Tensor;
 
 /**
  * Random noise

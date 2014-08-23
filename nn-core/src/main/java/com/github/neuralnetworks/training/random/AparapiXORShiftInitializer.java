@@ -3,8 +3,8 @@ package com.github.neuralnetworks.training.random;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.github.neuralnetworks.tensor.Tensor;
 import com.github.neuralnetworks.util.Environment;
-import com.github.neuralnetworks.util.Tensor;
 
 public class AparapiXORShiftInitializer implements RandomInitializer {
 

@@ -7,8 +7,8 @@ import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.architecture.types.DNN;
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
+import com.github.neuralnetworks.tensor.TensorFactory;
 import com.github.neuralnetworks.util.Environment;
-import com.github.neuralnetworks.util.TensorFactory;
 
 /**
  * Training Input Provider for deep network trainers

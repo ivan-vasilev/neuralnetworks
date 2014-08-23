@@ -18,7 +18,7 @@ public abstract class TrainingInputProviderImpl implements TrainingInputProvider
     /**
      * Converter for the target
      */
-    private InputConverter inputConverter;
+    private InputConverter targetConverter;
 
     /**
      * Counter
@@ -29,9 +29,9 @@ public abstract class TrainingInputProviderImpl implements TrainingInputProvider
 	super();
     }
 
-    public TrainingInputProviderImpl(InputConverter inputConverter) {
+    public TrainingInputProviderImpl(InputConverter targetConverter) {
 	super();
-	this.inputConverter = inputConverter;
+	this.targetConverter = targetConverter;
     }
 
     @Override
@@ -53,12 +53,12 @@ public abstract class TrainingInputProviderImpl implements TrainingInputProvider
 	}
     }
 
-    public InputConverter getInputConverter() {
-        return inputConverter;
+    public InputConverter getTargetConverter() {
+        return targetConverter;
     }
 
-    public void setInputConverter(InputConverter inputConverter) {
-        this.inputConverter = inputConverter;
+    public void setTargetConverter(InputConverter targetConverter) {
+        this.targetConverter = targetConverter;
     }
 
     @Override

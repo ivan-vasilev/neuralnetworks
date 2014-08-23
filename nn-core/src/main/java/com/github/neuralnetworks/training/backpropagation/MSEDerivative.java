@@ -3,8 +3,8 @@ package com.github.neuralnetworks.training.backpropagation;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import com.github.neuralnetworks.util.Tensor;
-import com.github.neuralnetworks.util.TensorFactory;
+import com.github.neuralnetworks.tensor.Tensor;
+import com.github.neuralnetworks.tensor.TensorFactory;
 
 /**
  * Mean squared error derivative

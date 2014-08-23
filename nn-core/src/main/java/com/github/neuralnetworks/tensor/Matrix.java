@@ -1,4 +1,4 @@
-package com.github.neuralnetworks.util;
+package com.github.neuralnetworks.tensor;
 
 
 /**

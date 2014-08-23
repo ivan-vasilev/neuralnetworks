@@ -6,9 +6,9 @@ import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.architecture.types.RBM;
 import com.github.neuralnetworks.events.TrainingEvent;
 import com.github.neuralnetworks.events.TrainingEventListener;
+import com.github.neuralnetworks.tensor.TensorFactory;
 import com.github.neuralnetworks.training.DNNLayerTrainer;
 import com.github.neuralnetworks.util.Properties;
-import com.github.neuralnetworks.util.TensorFactory;
 
 /**
  * Default implementation for training of Deep Belief Networks

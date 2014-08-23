@@ -1,9 +1,11 @@
-package com.github.neuralnetworks.util;
+package com.github.neuralnetworks.tensor;
 
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.function.IntConsumer;
 import java.util.stream.IntStream;
+
+import com.github.neuralnetworks.util.Util;
 
 /**
  * N-dimensional tensor. For example 2-dim tensor is a matrix

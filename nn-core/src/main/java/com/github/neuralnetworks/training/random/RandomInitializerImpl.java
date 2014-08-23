@@ -2,7 +2,7 @@ package com.github.neuralnetworks.training.random;
 
 import java.util.Random;
 
-import com.github.neuralnetworks.util.Tensor;
+import com.github.neuralnetworks.tensor.Tensor;
 
 /**
  * Default implementation of the random initializer using JDK's default Random

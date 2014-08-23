@@ -2,13 +2,13 @@ package com.github.neuralnetworks.training.backpropagation;
 
 import com.github.neuralnetworks.architecture.types.Autoencoder;
 import com.github.neuralnetworks.calculation.neuronfunctions.AparapiNoise;
+import com.github.neuralnetworks.tensor.Tensor;
+import com.github.neuralnetworks.tensor.TensorFactory;
 import com.github.neuralnetworks.training.TrainingInputData;
 import com.github.neuralnetworks.training.TrainingInputProvider;
 import com.github.neuralnetworks.training.TrainingInputProviderImpl;
 import com.github.neuralnetworks.util.Constants;
 import com.github.neuralnetworks.util.Properties;
-import com.github.neuralnetworks.util.Tensor;
-import com.github.neuralnetworks.util.TensorFactory;
 
 /**
  * BackPropagation for autoencoders (input and target are the same). Supports

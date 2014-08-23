@@ -1,8 +1,8 @@
 package com.github.neuralnetworks.input;
 
 import com.github.neuralnetworks.calculation.neuronfunctions.TensorFunction;
+import com.github.neuralnetworks.tensor.Tensor;
 import com.github.neuralnetworks.training.TrainingInputProvider;
-import com.github.neuralnetworks.util.Tensor;
 
 /**
  * Scaling input function

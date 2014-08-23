@@ -7,9 +7,9 @@ import java.util.List;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.types.RBM;
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
+import com.github.neuralnetworks.tensor.Matrix;
+import com.github.neuralnetworks.tensor.TensorFactory;
 import com.github.neuralnetworks.util.Environment;
-import com.github.neuralnetworks.util.Matrix;
-import com.github.neuralnetworks.util.TensorFactory;
 
 /**
  * Implementation of LayerCalculatorImpl for RBMs

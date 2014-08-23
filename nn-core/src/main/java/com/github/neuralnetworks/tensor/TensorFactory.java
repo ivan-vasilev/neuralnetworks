@@ -1,4 +1,4 @@
-package com.github.neuralnetworks.util;
+package com.github.neuralnetworks.tensor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,7 +17,7 @@ import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.architecture.Subsampling2DConnection;
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;
-import com.github.neuralnetworks.util.Tensor.TensorIterator;
+import com.github.neuralnetworks.tensor.Tensor.TensorIterator;
 
 public class TensorFactory {
 

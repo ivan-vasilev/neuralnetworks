@@ -1,9 +1,9 @@
 package com.github.neuralnetworks.calculation.neuronfunctions;
 
 import com.amd.aparapi.Kernel;
+import com.github.neuralnetworks.tensor.Matrix;
+import com.github.neuralnetworks.tensor.Tensor;
 import com.github.neuralnetworks.util.Environment;
-import com.github.neuralnetworks.util.Matrix;
-import com.github.neuralnetworks.util.Tensor;
 
 /**
  * Softmax activation function

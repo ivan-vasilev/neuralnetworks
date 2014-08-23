@@ -1,7 +1,7 @@
 package com.github.neuralnetworks.architecture;
 
-import com.github.neuralnetworks.util.Tensor;
-import com.github.neuralnetworks.util.TensorFactory;
+import com.github.neuralnetworks.tensor.Tensor;
+import com.github.neuralnetworks.tensor.TensorFactory;
 
 /**
  * Convolutional connection between layers (for 2d input data)
