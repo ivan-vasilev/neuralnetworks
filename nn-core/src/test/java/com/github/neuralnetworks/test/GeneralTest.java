@@ -3,6 +3,7 @@ package com.github.neuralnetworks.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.util.Iterator;
 import java.util.stream.IntStream;
@@ -375,9 +376,11 @@ public class GeneralTest {
     public void testImageInputProvider() {
 	String imagesPath = Thread.currentThread().getContextClassLoader().getResource("images").getPath();
 
+	// group by pixel
 	FileImageInputProvider ip = new FileImageInputProvider(new File(imagesPath));
-	ip.setScaleColors(false);
-	ip.setGroupByChannel(false);
+	ip.getProperties().setScaleColors(false);
+	ip.getProperties().setGroupByChannel(false);
+	ip.getProperties().setParallelPreprocessing(true);
 
 	float[] image1 = ip.getNextInput();
 	assertEquals(36f, image1[3], 0f);
@@ -391,9 +394,11 @@ public class GeneralTest {
 
 	ip.getNextInput();
 
+	// gropu by channel
 	ip = new FileImageInputProvider(new File(imagesPath));
-	ip.setScaleColors(false);
-	ip.setGroupByChannel(true);
+	ip.getProperties().setScaleColors(false);
+	ip.getProperties().setGroupByChannel(true);
+	ip.getProperties().setParallelPreprocessing(true);
 
 	image1 = ip.getNextInput();
 	assertEquals(237f, image1[1], 0f);
@@ -404,5 +409,28 @@ public class GeneralTest {
 	assertEquals(237f, image2[1], 0f);
 	assertEquals(28f, image2[5], 0f);
 	assertEquals(36f, image2[9], 0f);
+
+	// image crop
+	ip = new FileImageInputProvider(new File(imagesPath));
+	ip.getProperties().setScaleColors(false);
+	ip.getProperties().setGroupByChannel(true);
+	ip.getProperties().setCropX(1);
+	ip.getProperties().setCropY(1);
+	ip.getProperties().setParallelPreprocessing(true);
+
+	image1 = ip.getNextInput();
+	assertEquals(3, image1.length, 0);
+
+	// scale
+	ip = new FileImageInputProvider(new File(imagesPath));
+	ip.getProperties().setScaleColors(false);
+	ip.getProperties().setGroupByChannel(true);
+	ip.getProperties().setParallelPreprocessing(true);
+	AffineTransform af = new AffineTransform();
+	af.scale(2, 2);
+	ip.getProperties().setAffineTransform(af);
+
+	image1 = ip.getNextInput();
+	assertEquals(3, image1.length, 0);
     }
 }

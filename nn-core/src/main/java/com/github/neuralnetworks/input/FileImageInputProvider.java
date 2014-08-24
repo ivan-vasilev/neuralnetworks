@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import javax.imageio.ImageIO;
 
@@ -20,7 +19,6 @@ public class FileImageInputProvider extends ImageInputProvider {
     private String[] files;
     private List<Integer> elementsOrder;
     private int currentEl;
-    private Random random;
 
     public FileImageInputProvider(File directory) {
 	this(null, directory);
@@ -34,7 +32,7 @@ public class FileImageInputProvider extends ImageInputProvider {
 
     @Override
     public int getInputSize() {
-	return files.length * getRepeatImage();
+	return files.length;
     }
 
     @Override
@@ -60,7 +58,7 @@ public class FileImageInputProvider extends ImageInputProvider {
 	    resetOrder();
 	}
 
-	currentEl = elementsOrder.remove(random.nextInt(elementsOrder.size()));
+	currentEl = elementsOrder.remove(getProperties().getRandom().nextInt(elementsOrder.size()));
     }
 
     @Override
