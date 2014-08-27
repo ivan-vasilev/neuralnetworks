@@ -15,6 +15,7 @@ import com.github.neuralnetworks.util.Util;
 /**
  * Input provider for the CIFAR-10 and CIFAR-100 datasets. Requires location of the CIFAR images
  * files (not included in the library). Do not use this class directly, but use the subclasses instead
+ * Experimental
  */
 public abstract class CIFARInputProvider extends ImageInputProvider {
 
@@ -52,7 +53,7 @@ public abstract class CIFARInputProvider extends ImageInputProvider {
 		nextInput = new float[3072];
 	    }
 
-	    int scaleColors = getProperties().getScaleColors() ? 255 : 1;
+	    float scaleColors = getProperties().getScaleColors() ? 255 : 1;
 	    for (int i = 0; i < nextInput.length; i++) {
 		nextInput[i] = (nextInputRaw[i] & 0xFF) / scaleColors;
 	    }
