@@ -22,9 +22,9 @@ public abstract class ImageInputProvider extends TrainingInputProviderImpl {
 
     private static final long serialVersionUID = 1L;
 
-    private float[] nextInput;
+    protected float[] nextInput;
 
-    private ImageInputProviderProperties properties;
+    protected ImageInputProviderProperties properties;
 
     /**
      * raw images
@@ -72,7 +72,7 @@ public abstract class ImageInputProvider extends TrainingInputProviderImpl {
 	    nextInput = new float[size * (properties.getIsGrayscale() ? 1 : 3)];
 	}
 
-	int scaleColors = properties.getScaleColors() ? 255 : 1;
+	float scaleColors = properties.getScaleColors() ? 255 : 1;
 	if (properties.getIsGrayscale()) {
 	    for (int i = 0; i < size; i++) {
 		nextInput[i] = (pixels[i * pixelDataLength + pixelDataLength - 1] & 0xFF) / scaleColors;
@@ -150,7 +150,7 @@ public abstract class ImageInputProvider extends TrainingInputProviderImpl {
     /**
      * @return whether a transformation is required based on the properties
      */
-    private boolean requireAugmentation() {
+    protected boolean requireAugmentation() {
 	return properties.getCropX() != 0 || properties.getCropY() != 0 || properties.getAffineTransform() != null;
     }
 
@@ -191,11 +191,13 @@ public abstract class ImageInputProvider extends TrainingInputProviderImpl {
 
 	private void init() {
 	    setScaleColors(true);
+	    setGroupByChannel(true);
 	    setAugmentedImagesBufferSize(1);
 	    setParallelPreprocessing(false);
 	    setCropX(0);
 	    setCropY(0);
 	    setMaxRotationAngle(0);
+	    setUseRandomOrder(true);
 	    setRandom(new Random());
 	}
 
@@ -294,6 +296,14 @@ public abstract class ImageInputProvider extends TrainingInputProviderImpl {
 
 	public void setMaxRotationAngle(double maxRotationAngle) {
 	    setParameter("maxRotationAngle", maxRotationAngle);
+	}
+
+	public boolean getUseRandomOrder() {
+	    return getParameter("useRandomOrder");
+	}
+
+	public void setUseRandomOrder(boolean useRandomOrder) {
+	    setParameter("useRandomOrder", useRandomOrder);
 	}
 
 	public Random getRandom() {

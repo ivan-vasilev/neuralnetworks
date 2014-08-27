@@ -16,15 +16,15 @@ public class CSVInputProvider extends TrainingInputProviderImpl {
 
     private static final long serialVersionUID = 5067933748794269003L;
 
-    private String inputFile;
-    private String targetFile;
+    private File inputFile;
+    private File targetFile;
     private BufferedReader inputReader;
     private BufferedReader targetReader;
     private float[] nextInput;
     private float[] nextTarget;
     private int inputSize;
 
-    public CSVInputProvider(String inputFile, String targetFile) {
+    public CSVInputProvider(File inputFile, File targetFile) {
 	super();
 	this.inputFile = inputFile;
 	this.targetFile = targetFile;
@@ -32,7 +32,7 @@ public class CSVInputProvider extends TrainingInputProviderImpl {
 	inputSize = (int) getInputReader().lines().count();
     }
 
-    public CSVInputProvider(InputConverter targetConverter, String inputFile, String targetFile) {
+    public CSVInputProvider(InputConverter targetConverter, File inputFile, File targetFile) {
 	super(targetConverter);
 	this.inputFile = inputFile;
 	this.targetFile = targetFile;
@@ -53,14 +53,6 @@ public class CSVInputProvider extends TrainingInputProviderImpl {
     @Override
     public float[] getNextTarget() {
 	return nextTarget;
-    }
-
-    public String getInputFile() {
-	return inputFile;
-    }
-
-    public String getTargetFile() {
-	return targetFile;
     }
 
     @Override
@@ -136,7 +128,7 @@ public class CSVInputProvider extends TrainingInputProviderImpl {
     private BufferedReader getInputReader() {
 	if (inputReader == null) {
 	    try {
-		inputReader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(inputFile))));
+		inputReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile)));
 	    } catch (IOException e) {
 		e.printStackTrace();
 	    }
@@ -144,11 +136,11 @@ public class CSVInputProvider extends TrainingInputProviderImpl {
 
 	return inputReader;
     }
-    
+
     private BufferedReader getTargetReader() {
 	if (targetReader == null && targetFile != null) {
 	    try {
-		targetReader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(targetFile))));
+		targetReader = new BufferedReader(new InputStreamReader(new FileInputStream(targetFile)));
 	    } catch (IOException e) {
 		e.printStackTrace();
 	    }

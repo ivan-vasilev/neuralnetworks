@@ -2,6 +2,7 @@ package com.github.neuralnetworks.samples.test;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -84,10 +85,15 @@ public class IrisTest {
 	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 4, 2, 3 }, true);
 
 	// training and testing data providers
-	TrainingInputProviderImpl trainInputProvider = new CSVInputProvider("IRISinput.txt", "IRIStarget.txt");
+	String inputPath = Thread.currentThread().getContextClassLoader().getResource("IRISinput.txt").getPath();
+	String targetPath = Thread.currentThread().getContextClassLoader().getResource("IRIStarget.txt").getPath();
+
+	TrainingInputProviderImpl trainInputProvider = new CSVInputProvider(new File(inputPath), new File(targetPath));
 	trainInputProvider.addInputModifier(new ScalingInputFunction(trainInputProvider));
-	TrainingInputProviderImpl testInputProvider = new CSVInputProvider("IRISinput.txt", "IRIStarget.txt");
+
+	TrainingInputProviderImpl testInputProvider = new CSVInputProvider(new File(inputPath), new File(targetPath));
 	testInputProvider.addInputModifier(new ScalingInputFunction(testInputProvider));
+
 	OutputError outputError = new MultipleNeuronsOutputError();
 
 	// trainer

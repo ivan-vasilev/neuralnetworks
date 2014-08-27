@@ -392,8 +392,6 @@ public class GeneralTest {
 	assertEquals(28f, image2[4], 0f);
 	assertEquals(237f, image2[5], 0f);
 
-	ip.getNextInput();
-
 	// gropu by channel
 	ip = new FileImageInputProvider(new File(imagesPath));
 	ip.getProperties().setScaleColors(false);
@@ -432,5 +430,21 @@ public class GeneralTest {
 
 	image1 = ip.getNextInput();
 	assertEquals(3, image1.length, 0);
+
+	// scale input
+	ip = new FileImageInputProvider(new File(imagesPath));
+	ip.getProperties().setScaleColors(true);
+	ip.getProperties().setGroupByChannel(false);
+	ip.getProperties().setParallelPreprocessing(true);
+
+	image1 = ip.getNextInput();
+	assertEquals(36 / 255f, image1[3], 0f);
+	assertEquals(28 / 255f, image1[4], 0f);
+	assertEquals(237 / 255f, image1[5], 0f);
+
+	image2 = ip.getNextInput();
+	assertEquals(36 / 255f, image2[3], 0f);
+	assertEquals(28 / 255f, image2[4], 0f);
+	assertEquals(237 / 255f, image2[5], 0f);
     }
 }

@@ -58,7 +58,7 @@ public class FileImageInputProvider extends ImageInputProvider {
 	    resetOrder();
 	}
 
-	currentEl = elementsOrder.remove(getProperties().getRandom().nextInt(elementsOrder.size()));
+	currentEl = elementsOrder.remove(getProperties().getUseRandomOrder() ? getProperties().getRandom().nextInt(elementsOrder.size()) : 0);
     }
 
     @Override

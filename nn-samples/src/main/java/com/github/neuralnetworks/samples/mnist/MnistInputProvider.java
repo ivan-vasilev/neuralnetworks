@@ -11,6 +11,7 @@ import com.github.neuralnetworks.util.Util;
 
 /**
  * MNIST data set with random order
+ * Requires location of the MNIST images files (not included in the library)
  */
 public class MnistInputProvider extends TrainingInputProviderImpl {
 
