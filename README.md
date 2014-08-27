@@ -22,7 +22,9 @@ I'm using the [git-flow](https://github.com/nvie/gitflow) model. The most stable
 * Contrastive divergence and persistent contrastive divergence implemented using [these](http://www.iro.umontreal.ca/~lisa/publications2/index.php/publications/show/239) and [these](http://www.cs.toronto.edu/~hinton/absps/guideTR.pdf) guidelines.
 * Greedy layer-wise training for deep networks - works for stacked autoencoders and DBNs, but supports any kind of training.
 
-All the algorithms support GPU execution. Out of the box supported datasets are [MNIST](http://yann.lecun.com/exdb/mnist/), [IRIS](http://archive.ics.uci.edu/ml/datasets/Iris) and XOR, but you can easily implement your own.
+All the algorithms support GPU execution. Out of the box supported datasets are [MNIST](http://yann.lecun.com/exdb/mnist/), [CIFAR-10/CIFAR-100](http://www.cs.toronto.edu/~kriz/cifar.html) (not tested extensively), [IRIS](http://archive.ics.uci.edu/ml/datasets/Iris) and XOR, but you can easily implement your own.
+
+Experimental support of RGB image preprocessing operations - affine transformations, cropping, input scaling (see Generaltest.java -> testImageInputProvider).
 
 ##Activation functions
 * Logistic
