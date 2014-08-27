@@ -24,7 +24,7 @@ I'm using the [git-flow](https://github.com/nvie/gitflow) model. The most stable
 
 All the algorithms support GPU execution. 
 
-Out of the box supported datasets are [MNIST](http://yann.lecun.com/exdb/mnist/), [CIFAR-10/CIFAR-100](http://www.cs.toronto.edu/~kriz/cifar.html) (experimental), [IRIS](http://archive.ics.uci.edu/ml/datasets/Iris) and XOR, but you can easily implement your own.
+Out of the box supported datasets are [MNIST](http://yann.lecun.com/exdb/mnist/), [CIFAR-10/CIFAR-100](http://www.cs.toronto.edu/~kriz/cifar.html) (experimental, not much testing), [IRIS](http://archive.ics.uci.edu/ml/datasets/Iris) and XOR, but you can easily implement your own.
 
 Experimental support of RGB image preprocessing operations - affine transformations, cropping, and color scaling (see Generaltest.java -> testImageInputProvider).
 
