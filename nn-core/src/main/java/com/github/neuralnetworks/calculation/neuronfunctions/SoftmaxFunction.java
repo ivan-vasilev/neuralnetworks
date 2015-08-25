@@ -41,7 +41,8 @@ public class SoftmaxFunction extends Kernel implements TensorFunction {
 	int id = getGlobalId();
 
 	for (int i = 0; i < r; i++) {
-	    sum += values[start + i * nr + id * nc];
+            values[start + i * nr + id * nc] = exp(values[start + i * nr + id * nc]);
+	    sum += values[start + i * nr + id * nc];	
 	}
 
 	for (int i = 0; i < r; i++) {

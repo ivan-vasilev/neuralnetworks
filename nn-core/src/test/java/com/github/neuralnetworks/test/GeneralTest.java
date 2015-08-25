@@ -203,13 +203,21 @@ public class GeneralTest {
 	SoftmaxFunction sf = new SoftmaxFunction();
 	Environment.getInstance().setExecutionMode(EXECUTION_MODE.SEQ);
 	sf.value(m);
+        
+        assertEquals(0.09003057f, m.get(0, 0), 0f);
+        assertEquals(0.24472848f, m.get(1, 0), 0);
+        assertEquals(0.66524094f, m.get(2, 0), 0);
 
-	assertEquals(1 / 6f, m.get(0, 0), 0);
-	assertEquals(2 / 6f, m.get(1, 0), 0);
-	assertEquals(3 / 6f, m.get(2, 0), 0);
-	assertEquals(4 / 15f, m.get(0, 1), 0);
-	assertEquals(5 / 15f, m.get(1, 1), 0);
-	assertEquals(6 / 15f, m.get(2, 1), 0);
+        assertEquals(0.090030566f, m.get(0, 1), 0);
+        assertEquals(0.24472846f, m.get(1, 1), 0);
+        assertEquals(0.66524094f, m.get(2, 1), 0);
+	
+	//assertEquals(1 / 6f, m.get(0, 0), 0);
+	//assertEquals(2 / 6f, m.get(1, 0), 0);
+	//assertEquals(3 / 6f, m.get(2, 0), 0);
+        //assertEquals(4 / 15f, m.get(0, 1), 0);
+	//assertEquals(5 / 15f, m.get(1, 1), 0);
+	//assertEquals(6 / 15f, m.get(2, 1), 0);
     }
 
     @Test

@@ -31,8 +31,22 @@ public class AparapiTanh extends ConnectionCalculatorFullyConnected {
 	protected void after() {
 	    int end = outputStartPosition + getGlobalId() * outputRowStep + miniBatchSize * outputColumnStep;
 	    for (int i = outputStartPosition + getGlobalId() * outputRowStep; i < end; i += outputColumnStep) {
-		output[i] = tan(output[i]);
+		output[i] = tanH(output[i]);
 	    }
 	}
+	private float tanH(float input) {
+            if (input == 0f) {
+                return 0f;
+            } else if (input >= 20.f) {
+                return 1.0f;
+            } else if (input <= 20.0f) {
+                return -1.0f;
+            }
+
+            float pos = exp(input);
+            float neg = exp(-input);
+
+            return (pos - neg) / (pos + neg);
+        }
     }
 }
