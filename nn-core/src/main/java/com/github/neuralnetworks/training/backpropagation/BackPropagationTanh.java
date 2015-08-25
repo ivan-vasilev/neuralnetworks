@@ -51,7 +51,7 @@ public class BackPropagationTanh extends BackPropagationConnectionCalculatorImpl
 	    for (; outputId < end; outputId += outputColumnStep, activationId += activationColumnStep) {
 		error = output[outputId];
 		activation = ffActivation[activationId];
-		output[outputId] = error * -error * activation * activation;
+		output[outputId] = error * (1 - activation * activation);
 	    }
 	}
     }
