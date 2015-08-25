@@ -121,6 +121,9 @@ public abstract class CIFARInputProvider extends ImageInputProvider {
 
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * @param directory - the folder where the CIFAR files are located
+	 */
 	public CIFAR10TrainingInputProvider(String directory) {
 	    super();
 
@@ -149,6 +152,9 @@ public abstract class CIFARInputProvider extends ImageInputProvider {
 
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * @param directory - the folder where the CIFAR files are located
+	 */
 	public CIFAR10TestingInputProvider(String directory) {
 	    super();
 
@@ -173,6 +179,9 @@ public abstract class CIFARInputProvider extends ImageInputProvider {
 
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * @param directory - the folder where the CIFAR files are located
+	 */
 	public CIFAR100TrainingInputProvider(String directory) {
 	    super();
 
@@ -200,7 +209,10 @@ public abstract class CIFARInputProvider extends ImageInputProvider {
     public static class CIFAR100TestingInputProvider extends CIFARInputProvider {
 	
 	private static final long serialVersionUID = 1L;
-	
+
+	/**
+	 * @param directory - the folder where the CIFAR files are located
+	 */
 	public CIFAR100TestingInputProvider(String directory) {
 	    super();
 

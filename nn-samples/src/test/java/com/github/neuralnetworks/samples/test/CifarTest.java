@@ -32,12 +32,13 @@ public class CifarTest {
 	Environment.getInstance().setUseWeightsSharedMemory(false);
 	NeuralNetworkImpl mlp = NNFactory.mlpSigmoid(new int[] { 3072, 10 }, true);
 
-	CIFAR10TrainingInputProvider trainInputProvider = new CIFAR10TrainingInputProvider("D:\\temp\\cifar-10-batches-bin");
+	CIFAR10TrainingInputProvider trainInputProvider = new CIFAR10TrainingInputProvider("cifar-10-batches-bin"); // specify your own path
 	trainInputProvider.getProperties().setGroupByChannel(true);
 	trainInputProvider.getProperties().setScaleColors(true);
 	trainInputProvider.addInputModifier(new ScalingInputFunction(255));
 
-	CIFAR10TestingInputProvider testInputProvider = new CIFAR10TestingInputProvider("D:\\temp\\cifar-10-batches-bin");
+	// specify your own path
+	CIFAR10TestingInputProvider testInputProvider = new CIFAR10TestingInputProvider("cifar-10-batches-bin"); // specify your own path
 	testInputProvider.getProperties().setGroupByChannel(true);
 	testInputProvider.getProperties().setScaleColors(true);
 	testInputProvider.addInputModifier(new ScalingInputFunction(255));
