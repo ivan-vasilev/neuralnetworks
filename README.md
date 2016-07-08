@@ -78,7 +78,7 @@ Most of the data is represented as one-dimensional array by default (for example
 All the trainers are using the _Trainer_ base class. They are optimized to run on the GPU, but you can plug-in other implementations and new training algorithms. The training procedure has training and testing phases. Each Trainer receives parameters (for example learning rate, momentum, etc) via _Properties_ (a _HashMap_). For the supported properties for each trainer please check the _TrainerFactory_ class.
 
 ###Input data
-Input is provided to the neural network by the trainers via _TrainingInputProvider_ interface. Eeach _TrainingInputProvider_ provides training samples in the form of _TrainingInputData_ (default implementation is _TrainingInputDataImpl_). The input can be modified by a list of modifiers - for example _MeanInputFunction_ (for subtracting the mean value) and _ScalingInputFunction_ (scaling within a range). Currently _MnistInputProvider_ and _IrisInputProvider_ are implemented.
+Input is provided to the neural network by the trainers via _TrainingInputProvider_ interface. Each _TrainingInputProvider_ provides training samples in the form of _TrainingInputData_ (default implementation is _TrainingInputDataImpl_). The input can be modified by a list of modifiers - for example _MeanInputFunction_ (for subtracting the mean value) and _ScalingInputFunction_ (scaling within a range). Currently _MnistInputProvider_ and _IrisInputProvider_ are implemented.
 
 ####Author
 Ivan Vasilev (ivanvasilev [at] gmail (dot) com)
