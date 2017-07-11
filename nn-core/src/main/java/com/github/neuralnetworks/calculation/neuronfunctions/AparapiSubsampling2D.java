@@ -2,7 +2,7 @@ package com.github.neuralnetworks.calculation.neuronfunctions;
 
 import java.util.List;
 
-import com.amd.aparapi.Kernel;
+import com.aparapi.Kernel;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.Subsampling2DConnection;
@@ -137,7 +137,7 @@ public abstract class AparapiSubsampling2D extends Kernel implements ConnectionC
     }
 
     /* (non-Javadoc)
-     * @see com.amd.aparapi.Kernel#run()
+     * @see com.aparapi.Kernel#run()
      * input start index is calculated and passed to the pooling method
      */
     @Override

@@ -3,7 +3,7 @@ package com.github.neuralnetworks.training.random;
 import org.uncommons.maths.binary.BinaryUtils;
 import org.uncommons.maths.random.DefaultSeedGenerator;
 
-import com.amd.aparapi.Range;
+import com.aparapi.Range;
 
 /**
  * PRNG implementing XORShiftRNG from Uncommons Maths library (

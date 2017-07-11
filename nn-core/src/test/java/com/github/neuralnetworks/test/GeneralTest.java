@@ -10,7 +10,7 @@ import java.util.stream.IntStream;
 
 import org.junit.Test;
 
-import com.amd.aparapi.Kernel.EXECUTION_MODE;
+import com.aparapi.Kernel.EXECUTION_MODE;
 import com.github.neuralnetworks.architecture.ConnectionFactory;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
 import com.github.neuralnetworks.architecture.FullyConnected;

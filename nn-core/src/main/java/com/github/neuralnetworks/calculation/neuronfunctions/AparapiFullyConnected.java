@@ -3,7 +3,7 @@ package com.github.neuralnetworks.calculation.neuronfunctions;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import com.amd.aparapi.Kernel;
+import com.aparapi.Kernel;
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.FullyConnected;
 import com.github.neuralnetworks.architecture.Layer;
