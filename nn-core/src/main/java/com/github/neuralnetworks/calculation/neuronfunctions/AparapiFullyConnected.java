@@ -167,7 +167,7 @@ public abstract class AparapiFullyConnected extends Kernel implements Connection
 	    return false;
 	}
 
-	if (connections.stream().filter(c -> TensorFactory.tensor(Util.getOppositeLayer(c, targetLayer), c, valuesProvider).getElements() != input).findAny().isPresent()) {
+	if (connections.stream().anyMatch(c -> TensorFactory.tensor(Util.getOppositeLayer(c, targetLayer), c, valuesProvider).getElements() != input)) {
 	    return false;
 	}
 

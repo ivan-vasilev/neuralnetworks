@@ -18,12 +18,9 @@ public class BernoulliDistribution implements TensorFunction {
 
     @Override
     public void value(Tensor inputOutput) {
-	BernoulliKernel kernel = kernels.get(inputOutput.getElements().length);
-	if (kernel == null) {
-	    kernels.put(inputOutput.getElements().length, kernel = new BernoulliKernel(inputOutput.getElements().length));
-	}
+		BernoulliKernel kernel = kernels.computeIfAbsent(inputOutput.getElements().length, k -> new BernoulliKernel(inputOutput.getElements().length));
 
-	kernel.values = inputOutput.getElements();
+		kernel.values = inputOutput.getElements();
 
 	Environment.getInstance().getExecutionStrategy().execute(kernel, inputOutput.getElements().length);
     }

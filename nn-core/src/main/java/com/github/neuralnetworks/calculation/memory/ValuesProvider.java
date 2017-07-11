@@ -42,8 +42,8 @@ public class ValuesProvider implements Serializable {
     /**
      * Get values for object based on provided dimensions
      * 
-     * @param targetLayer
-     * @param unitCount
+     * @param key
+     * @param dimensions
      * @return
      */
     @SuppressWarnings("unchecked")
@@ -81,12 +81,9 @@ public class ValuesProvider implements Serializable {
      * @param dimensions
      */
     public void add(Object key, boolean useSharedMemory, int... dimensions) {
-	List<Tensor> set = values.get(key);
-	if (set == null) {
-	    values.put(key, set = new UniqueList<Tensor>());
-	}
+		List<Tensor> set = values.computeIfAbsent(key, k -> new UniqueList<Tensor>());
 
-	int size = Arrays.stream(dimensions).reduce(1, (a, b) -> a * b);
+		int size = Arrays.stream(dimensions).reduce(1, (a, b) -> a * b);
 	float[] elements = null;
 	int offset = 0;
 

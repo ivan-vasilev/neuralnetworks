@@ -21,14 +21,8 @@ public interface LayerCalculator extends Serializable {
      *            - existing results
      * @param layer
      *            - the layer to be calculated
-     */
-    /**
-     * @param calculatedLayers
-     *            - calculated layers that are provided as input
      * @param results
      *            - where the results are stored
-     * @param layer
-     *            - current layer
      * @param neuralNetwork
      *            - the network of context for calculation
      */

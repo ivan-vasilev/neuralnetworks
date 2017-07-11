@@ -137,7 +137,7 @@ public class NeuralNetworkImpl implements NeuralNetwork {
 	    if (layers != null) {
 		// remove layer and bias layers
 		layers.remove(layer);
-		layer.getConnections(this).stream().map(Connections::getInputLayer).filter(l -> Util.isBias(l)).forEach(l -> layers.remove(l));
+		layer.getConnections(this).stream().map(Connections::getInputLayer).filter(Util::isBias).forEach(l -> layers.remove(l));
 	    }
 	}
     }
@@ -161,7 +161,7 @@ public class NeuralNetworkImpl implements NeuralNetwork {
      * Add connection to the network - this means adding both input and output
      * layers to the network
      * 
-     * @param connection
+     * @param connections
      */
     public void addConnections(Connections... connections) {
 	if (connections != null) {

@@ -35,7 +35,7 @@ public abstract class CDTrainerBase extends OneStepTrainer<RBM> {
     protected void learnInput(int batch) {
 	RBM nn = getNeuralNetwork();
 
-	getLayerCalculator().gibbsSampling(nn, getGibbsSamplingCount(), batch == 0 ? true : !getIsPersistent());
+	getLayerCalculator().gibbsSampling(nn, getGibbsSamplingCount(), batch == 0 || !getIsPersistent());
 
 	// update weights
 	updateWeights();

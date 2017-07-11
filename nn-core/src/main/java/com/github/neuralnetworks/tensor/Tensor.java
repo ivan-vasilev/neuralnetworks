@@ -65,7 +65,7 @@ public class Tensor implements Serializable {
 	    }
 	}
 
-	size = IntStream.range(0, dimensions.length).map(i -> dimensions[i]).reduce(1, (a, b) -> a * b);
+	size = Arrays.stream(dimensions).reduce(1, (a, b) -> a * b);
     }
 
     public Tensor(int startOffset, float[] elements, int[] globalDimensions, int[][] globalDimensionsLimit) {
@@ -95,7 +95,7 @@ public class Tensor implements Serializable {
 	    Arrays.stream(dimensions).skip(i + 1).limit(dimensions.length).forEach(j -> dimMultiplicators[i] *= j);
 	});
 
-	size = IntStream.range(0, dimensions.length).map(i -> dimensions[i]).reduce(1, (a, b) -> a * b);
+	size = Arrays.stream(dimensions).reduce(1, (a, b) -> a * b);
     }
 
     public float get(int... d) {

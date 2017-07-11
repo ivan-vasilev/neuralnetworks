@@ -30,12 +30,9 @@ public class AparapiXORShiftInitializer implements RandomInitializer {
     public void initialize(Tensor t) {
 	float[] array = t.getElements();
 
-	XORShift kernel = kernels.get(array.length);
-	if (kernel == null) {
-	    kernels.put(array.length, kernel = new XORShift(array.length, start, range, t.getStartIndex()));
-	}
+		XORShift kernel = kernels.computeIfAbsent(array.length, k -> new XORShift(array.length, start, range, t.getStartIndex()));
 
-	kernel.array = array;
+		kernel.array = array;
 
 	Environment.getInstance().getExecutionStrategy().execute(kernel, t.getSize());
     }
