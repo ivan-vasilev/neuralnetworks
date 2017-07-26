@@ -3,7 +3,7 @@ package com.github.neuralnetworks.training.random;
 import org.uncommons.maths.binary.BinaryUtils;
 import org.uncommons.maths.random.DefaultSeedGenerator;
 
-import com.amd.aparapi.Range;
+import com.aparapi.Range;
 
 /**
  * PRNG implementing XORShiftRNG from Uncommons Maths library (
@@ -49,8 +49,7 @@ public abstract class XORShiftKernel extends PRNGKernel {
 	if (SEED_SIZE * maxThreads != seeds.length)
 	    throw new IllegalArgumentException(String.format("Wrong size of seeds for threads! Expected %d, got %d, for %d threads.", SEED_SIZE * maxThreads, seeds.length, maxThreads));
 
-	for (int n = 0; n < states.length; n++)
-	    states[n] = seeds[n];
+		System.arraycopy(seeds, 0, states, 0, states.length);
     }
 
     /**

@@ -1,6 +1,6 @@
 package com.github.neuralnetworks.util;
 
-import com.amd.aparapi.Kernel.EXECUTION_MODE;
+import com.aparapi.Kernel.EXECUTION_MODE;
 import com.github.neuralnetworks.util.KernelExecutionStrategy.CPUKernelExecution;
 import com.github.neuralnetworks.util.KernelExecutionStrategy.DefaultKernelExecution;
 import com.github.neuralnetworks.util.KernelExecutionStrategy.GPUKernelExecution;

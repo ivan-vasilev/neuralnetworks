@@ -114,7 +114,7 @@ public class Util {
      * @return whether there is a bias connection in the list
      */
     public static boolean hasBias(Collection<Connections> connections) {
-	return connections.stream().filter(c -> isBias(c.getInputLayer())).findAny().isPresent();
+	return connections.stream().anyMatch(c -> isBias(c.getInputLayer()));
     }
 
     public static void printMatrix(float[] array, int rows, int columns) {

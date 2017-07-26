@@ -43,9 +43,9 @@ public class NNFactory {
      * Convolutional connections must have 4 parameters - kernelRows, kernelColumns, filters and stride. The first layer must be convolutional.
      * Subsampling connections must have 2 parameters - subsamplingRegionRows, subsamplingRegionCols
      * Regular layers must have 1 parameter - neuron count
-     * 
+     *
+	 * @param layers
      * @param addBias
-     * @param useSharedMemory - whether all network weights should be in a single array
      * @return neural network
      */
     public static NeuralNetworkImpl convNN(int[][] layers, boolean addBias) {
@@ -132,7 +132,6 @@ public class NNFactory {
      * Multi layer perceptron with fully connected layers
      * @param layers - neuron count for each layer
      * @param addBias
-     * @param useSharedMemory - whether all network weights will be part of single array
      * @return
      */
     public static NeuralNetworkImpl mlp(int[] layers, boolean addBias) {
@@ -299,7 +298,7 @@ public class NNFactory {
     public static void lcMaxPooling(NeuralNetworkImpl nn) {
 	if (nn.getLayerCalculator() instanceof LayerCalculatorImpl) {
 	    LayerCalculatorImpl lc = (LayerCalculatorImpl) nn.getLayerCalculator();
-	    nn.getLayers().stream().filter(l -> Util.isSubsampling(l)).forEach(l -> lc.addConnectionCalculator(l, new AparapiMaxPooling2D()));
+	    nn.getLayers().stream().filter(Util::isSubsampling).forEach(l -> lc.addConnectionCalculator(l, new AparapiMaxPooling2D()));
 	} else {
 	    throw new IllegalArgumentException("LayerCalculator type not supported");
 	}
@@ -308,7 +307,7 @@ public class NNFactory {
     public static void lcAveragePooling(NeuralNetworkImpl nn) {
 	if (nn.getLayerCalculator() instanceof LayerCalculatorImpl) {
 	    LayerCalculatorImpl lc = (LayerCalculatorImpl) nn.getLayerCalculator();
-	    nn.getLayers().stream().filter(l -> Util.isSubsampling(l)).forEach(l -> lc.addConnectionCalculator(l, new AparapiAveragePooling2D()));
+	    nn.getLayers().stream().filter(Util::isSubsampling).forEach(l -> lc.addConnectionCalculator(l, new AparapiAveragePooling2D()));
 	} else {
 	    throw new IllegalArgumentException("LayerCalculator type not supported");
 	}
@@ -317,7 +316,7 @@ public class NNFactory {
     public static void lcStochasticPooling(NeuralNetworkImpl nn) {
 	if (nn.getLayerCalculator() instanceof LayerCalculatorImpl) {
 	    LayerCalculatorImpl lc = (LayerCalculatorImpl) nn.getLayerCalculator();
-	    nn.getLayers().stream().filter(l -> Util.isSubsampling(l)).forEach(l -> lc.addConnectionCalculator(l, new AparapiStochasticPooling2D()));
+	    nn.getLayers().stream().filter(Util::isSubsampling).forEach(l -> lc.addConnectionCalculator(l, new AparapiStochasticPooling2D()));
 	} else {
 	    throw new IllegalArgumentException("LayerCalculator type not supported");
 	}
@@ -350,9 +349,7 @@ public class NNFactory {
     public static NeuralNetworkImpl maxout(int[] layers, boolean addBias, ConnectionCalculator outputCC) {
 	NeuralNetworkImpl result = mlp(layers, addBias);
 	result.setLayerCalculator(lcMaxout(result, outputCC));
-	result.getConnections().stream().filter(c -> c instanceof FullyConnected).forEach(c -> {
-	    MaxoutWinners.getInstance().addConnections(c);
-	});
+	result.getConnections().stream().filter(c -> c instanceof FullyConnected).forEach(c -> MaxoutWinners.getInstance().addConnections(c));
 
 	return result;
     }
@@ -536,6 +533,6 @@ public class NNFactory {
     }
 
     public static void populateBiasLayers(LayerCalculatorImpl lc, NeuralNetwork nn) {
-	nn.getLayers().stream().filter(l -> Util.isBias(l)).forEach(l -> lc.addConnectionCalculator(l, new ConstantConnectionCalculator()));
+	nn.getLayers().stream().filter(Util::isBias).forEach(l -> lc.addConnectionCalculator(l, new ConstantConnectionCalculator()));
     }
 }

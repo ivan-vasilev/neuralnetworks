@@ -10,6 +10,6 @@ public class IrisTargetMultiNeuronOutputConverter implements InputConverter {
     @Override
     public void convert(Object input, float[] output) {
 	Util.fillArray(output, 0);
-	output[((Integer) input).intValue()] = 1;
+	output[(Integer) input] = 1;
     }
 }

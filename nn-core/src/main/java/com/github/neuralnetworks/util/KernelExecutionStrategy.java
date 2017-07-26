@@ -1,8 +1,8 @@
 package com.github.neuralnetworks.util;
 
-import com.amd.aparapi.Kernel;
-import com.amd.aparapi.Kernel.EXECUTION_MODE;
-import com.amd.aparapi.Range;
+import com.aparapi.Kernel;
+import com.aparapi.Kernel.EXECUTION_MODE;
+import com.aparapi.Range;
 
 /**
  * Implementations provide execution mode for Aparapi kernel

@@ -3,7 +3,7 @@ package com.github.neuralnetworks.calculation.neuronfunctions;
 import java.io.Serializable;
 import java.util.Arrays;
 
-import com.amd.aparapi.Kernel;
+import com.aparapi.Kernel;
 import com.github.neuralnetworks.architecture.Conv2DConnection;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.calculation.memory.ValuesProvider;

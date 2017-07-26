@@ -82,9 +82,7 @@ public class TensorFactory {
      */
     public static Tensor[] tensor(int[]... dimensions) {
 	Tensor[] result = new Tensor[dimensions.length];
-	float[] elements = new float[Arrays.stream(dimensions).map(d -> {
-	    return IntStream.of(d).reduce(1, (a, b) -> a * b);
-	}).reduce(0, (a, b) -> a + b)];
+	float[] elements = new float[Arrays.stream(dimensions).map(d -> IntStream.of(d).reduce(1, (a, b) -> a * b)).reduce(0, (a, b) -> a + b)];
 
 	for (int i = 0, offset = 0; i < dimensions.length; i++) {
 	    int[] d = dimensions[i];
@@ -109,9 +107,7 @@ public class TensorFactory {
      */
     public static Matrix matrix(float[][] elements) {
 	Matrix result = tensor(elements[0].length, elements.length);
-	IntStream.range(0, elements.length).forEach(i -> IntStream.range(0, elements[i].length).forEach(j -> {
-	    result.set(elements[i][j], j, i);
-	}));
+	IntStream.range(0, elements.length).forEach(i -> IntStream.range(0, elements[i].length).forEach(j -> result.set(elements[i][j], j, i)));
 
 	return result;
     }
@@ -140,12 +136,11 @@ public class TensorFactory {
 
 	// create tensors
 	List<Layer> layers = new ArrayList<>(dims.keySet());
-	for (int i = 0; i < layers.size(); i++) {
-	    Layer l = layers.get(i);
-	    for (int[] d : dims.get(l)) {
-		result.add(l, true, d);
-	    }
-	}
+		for (Layer l : layers) {
+			for (int[] d : dims.get(l)) {
+				result.add(l, true, d);
+			}
+		}
 
 	return result;
     }
@@ -164,14 +159,13 @@ public class TensorFactory {
 	    
 	    // create tensors
 	    List<Layer> layers = new ArrayList<>(dims.keySet());
-	    for (int i = 0; i < layers.size(); i++) {
-		Layer l = layers.get(i);
-		for (int[] d : dims.get(l)) {
-		    if (result.get(l, d) == null) {
-			result.add(l, true, d);
-		    }
+		for (Layer l : layers) {
+			for (int[] d : dims.get(l)) {
+				if (result.get(l, d) == null) {
+					result.add(l, true, d);
+				}
+			}
 		}
-	    }
 	}
 
 	return result;
@@ -189,12 +183,11 @@ public class TensorFactory {
 
 	// create tensors
 	List<Layer> layers = new ArrayList<>(dims.keySet());
-	for (int i = 0; i < layers.size(); i++) {
-	    Layer l = layers.get(i);
-	    for (int[] d : dims.get(l)) {
-		result.add(l, true, d);
-	    }
-	}
+		for (Layer l : layers) {
+			for (int[] d : dims.get(l)) {
+				result.add(l, true, d);
+			}
+		}
 	
 	return result;
     }
@@ -291,47 +284,41 @@ public class TensorFactory {
 	Map<Layer, Set<int[]>> result = new HashMap<>();
 
 	for (Connections c : neuralNetwork.getConnections()) {
-	    Set<int[]> din = result.get(c.getInputLayer());
-	    if (din == null) {
-		result.put(c.getInputLayer(), din = new HashSet<>());
-	    }
+		Set<int[]> din = result.computeIfAbsent(c.getInputLayer(), k -> new HashSet<>());
 
-	    Set<int[]> dout = result.get(c.getOutputLayer());
-	    if (dout == null) {
-		result.put(c.getOutputLayer(), dout = new HashSet<>());
-	    }
+		Set<int[]> dout = result.computeIfAbsent(c.getOutputLayer(), k -> new HashSet<>());
 
-	    if (c instanceof FullyConnected) {
+		if (c instanceof FullyConnected) {
 		FullyConnected fc = (FullyConnected) c;
 		int[] inputDim = new int[] { fc.getInputUnitCount(), miniBatchSize };
 		int[] outputDim = new int[] { fc.getOutputUnitCount(), miniBatchSize };
 		inputDim[0] = fc.getInputUnitCount();
 		outputDim[0] = fc.getOutputUnitCount();
 
-		if (!din.stream().anyMatch(i -> Arrays.equals(i, inputDim))) {
+		if (din.stream().noneMatch(i -> Arrays.equals(i, inputDim))) {
 		    din.add(inputDim);
 		}
-		if (!dout.stream().anyMatch(i -> Arrays.equals(i, outputDim))) {
+		if (dout.stream().noneMatch(i -> Arrays.equals(i, outputDim))) {
 		    dout.add(outputDim);
 		}
 	    } else if (c instanceof Conv2DConnection) {
 		Conv2DConnection cc = (Conv2DConnection) c;
 		int[] inputDim = new int[] { cc.getInputFilters(), cc.getInputFeatureMapRows(), cc.getInputFeatureMapColumns(), miniBatchSize };
 		int[] outputDim = new int[] { cc.getOutputFilters(), cc.getOutputFeatureMapRows(), cc.getOutputFeatureMapColumns(), miniBatchSize };
-		if (!din.stream().anyMatch(i -> Arrays.equals(i, inputDim))) {
+		if (din.stream().noneMatch(i -> Arrays.equals(i, inputDim))) {
 		    din.add(inputDim);
 		}
-		if (!dout.stream().anyMatch(i -> Arrays.equals(i, outputDim))) {
+		if (dout.stream().noneMatch(i -> Arrays.equals(i, outputDim))) {
 		    dout.add(outputDim);
 		}
 	    } else if (c instanceof Subsampling2DConnection) {
 		Subsampling2DConnection cc = (Subsampling2DConnection) c;
 		int[] inputDim = new int[] { cc.getFilters(), cc.getInputFeatureMapRows(), cc.getInputFeatureMapColumns(), miniBatchSize };
 		int[] outputDim = new int[] { cc.getFilters(), cc.getOutputFeatureMapRows(), cc.getOutputFeatureMapColumns(), miniBatchSize };
-		if (!din.stream().anyMatch(i -> Arrays.equals(i, inputDim))) {
+		if (din.stream().noneMatch(i -> Arrays.equals(i, inputDim))) {
 		    din.add(inputDim);
 		}
-		if (!dout.stream().anyMatch(i -> Arrays.equals(i, outputDim))) {
+		if (dout.stream().noneMatch(i -> Arrays.equals(i, outputDim))) {
 		    dout.add(outputDim);
 		}
 	    }
