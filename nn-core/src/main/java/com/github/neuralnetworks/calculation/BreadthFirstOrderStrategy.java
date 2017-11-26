@@ -15,56 +15,84 @@ import com.github.neuralnetworks.util.Util;
 /**
  * Breadth first order strategy
  */
-public class BreadthFirstOrderStrategy implements LayerOrderStrategy {
+public class BreadthFirstOrderStrategy implements LayerOrderStrategy
+{
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    private NeuralNetwork neuralNetwork;
-    private Layer startLayer;
+	private NeuralNetwork neuralNetwork;
+	private Layer startLayer;
+	private Set<Layer> calculatedLayers;
 
-    public BreadthFirstOrderStrategy(NeuralNetwork neuralNetwork, Layer startLayer) {
-	super();
-	this.neuralNetwork = neuralNetwork;
-	this.startLayer = startLayer;
-    }
-
-    @Override
-    public List<ConnectionCandidate> order() {
-	List<ConnectionCandidate> result = new ArrayList<>();
-
-	Layer currentLayer = startLayer;
-
-	Queue<Layer> layersQueue = new LinkedList<>();
-	layersQueue.add(currentLayer);
-	Set<Connections> visitedConnections = new HashSet<>();
-
-	while (layersQueue.size() > 0) {
-	    Layer l = layersQueue.poll();
-
-	    l.getConnections(neuralNetwork).stream().filter(c -> !visitedConnections.contains(c)).forEach(c -> {
-		Layer opposite = Util.getOppositeLayer(c, l);
-		result.add(new ConnectionCandidate(c, opposite));
-		layersQueue.add(opposite);
-		visitedConnections.add(c);
-	    });
+	public BreadthFirstOrderStrategy(NeuralNetwork neuralNetwork, Layer startLayer)
+	{
+		super();
+		this.neuralNetwork = neuralNetwork;
+		this.startLayer = startLayer;
+		this.calculatedLayers = new HashSet<>();
 	}
 
-	return result;
-    }
+	public BreadthFirstOrderStrategy(NeuralNetwork neuralNetwork, Layer startLayer, Set<Layer> calculatedLayers)
+	{
+		super();
+		this.neuralNetwork = neuralNetwork;
+		this.startLayer = startLayer;
+		this.calculatedLayers = calculatedLayers;
+	}
 
-    public NeuralNetwork getNeuralNetwork() {
-	return neuralNetwork;
-    }
+	@Override
+	public List<ConnectionCandidate> order()
+	{
+		List<ConnectionCandidate> result = new ArrayList<>();
 
-    public void setNeuralNetwork(NeuralNetwork neuralNetwork) {
-	this.neuralNetwork = neuralNetwork;
-    }
+		Layer currentLayer = startLayer;
 
-    public Layer getStartLayer() {
-	return startLayer;
-    }
+		Queue<Layer> queue = new LinkedList<>();
+		queue.clear();
+		queue.add(startLayer);
+		while (!queue.isEmpty())
+		{
+			currentLayer = queue.remove();
+			for (Connections c : currentLayer.getConnections(neuralNetwork))
+			{
+				if (!result.stream().filter(cc -> cc.connection == c).findAny().isPresent() && !(calculatedLayers.contains(c.getInputLayer()) && calculatedLayers.contains(c.getOutputLayer())))
+				{
+					result.add(new ConnectionCandidate(c, currentLayer));
+					queue.add(Util.getOppositeLayer(c, currentLayer));
+				}
+			}
+		}
 
-    public void setStartLayer(Layer startLayer) {
-	this.startLayer = startLayer;
-    }
+		return result;
+	}
+
+	public NeuralNetwork getNeuralNetwork()
+	{
+		return neuralNetwork;
+	}
+
+	public void setNeuralNetwork(NeuralNetwork neuralNetwork)
+	{
+		this.neuralNetwork = neuralNetwork;
+	}
+
+	public Layer getStartLayer()
+	{
+		return startLayer;
+	}
+
+	public void setStartLayer(Layer startLayer)
+	{
+		this.startLayer = startLayer;
+	}
+
+	public Set<Layer> getCalculatedLayers()
+	{
+		return calculatedLayers;
+	}
+
+	public void setCalculatedLayers(Set<Layer> calculatedLayers)
+	{
+		this.calculatedLayers = calculatedLayers;
+	}
 }

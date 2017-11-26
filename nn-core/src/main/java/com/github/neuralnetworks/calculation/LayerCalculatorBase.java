@@ -5,86 +5,107 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.IntStream;
 
 import com.github.neuralnetworks.architecture.Connections;
 import com.github.neuralnetworks.architecture.Layer;
 import com.github.neuralnetworks.architecture.NeuralNetwork;
 import com.github.neuralnetworks.calculation.LayerOrderStrategy.ConnectionCandidate;
-import com.github.neuralnetworks.calculation.memory.ValuesProvider;
+import com.github.neuralnetworks.calculation.operations.TensorFunction;
 import com.github.neuralnetworks.events.PropagationEvent;
 import com.github.neuralnetworks.events.PropagationEventListener;
 import com.github.neuralnetworks.tensor.Tensor;
-import com.github.neuralnetworks.tensor.TensorFactory;
+import com.github.neuralnetworks.tensor.ValuesProvider;
 
 /**
  * Base class for implementations of the LayerCalculator interface
  */
-public class LayerCalculatorBase implements Serializable {
+public class LayerCalculatorBase implements Serializable
+{
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    protected List<PropagationEventListener> listeners;
-    protected Map<Layer, ConnectionCalculator> calculators = new HashMap<>();
+	protected Map<Tensor, TensorFunction> clearOutput = new HashMap<>();
+	protected List<PropagationEventListener> listeners;
+	protected Map<Layer, ConnectionCalculator> calculators = new HashMap<>();
 
-    protected void calculate(ValuesProvider valuesProvider, List<ConnectionCandidate> connections, NeuralNetwork nn) {
-	if (connections.size() > 0) {
-	    List<Connections> chunk = new ArrayList<>();
+	protected void calculate(ValuesProvider valuesProvider, List<ConnectionCandidate> connections, NeuralNetwork nn)
+	{
+		if (connections.size() > 0)
+		{
+			List<Connections> chunk = new ArrayList<>();
 
-	    for (int i = 0; i < connections.size(); i++) {
-		ConnectionCandidate c = connections.get(i);
-		chunk.add(c.connection);
+			for (int i = 0; i < connections.size(); i++)
+			{
+				ConnectionCandidate c = connections.get(i);
+				chunk.add(c.connection);
 
-		if (i == connections.size() - 1 || connections.get(i + 1).target != c.target) {
-		    ConnectionCalculator cc = getConnectionCalculator(c.target);
-		    if (cc != null) {
-			Tensor t = TensorFactory.tensor(c.target, chunk, valuesProvider);
-			float[] elements = t.getElements();
-			IntStream.range(t.getStartIndex(), t.getStartIndex() + t.getSize()).forEach(j -> elements[j] = 0);
-			cc.calculate(chunk, valuesProvider, c.target);
-		    }
+				if (i == connections.size() - 1 || connections.get(i + 1).target != c.target)
+				{
+					ConnectionCalculator cc = getConnectionCalculator(c.target);
+					if (cc != null)
+					{
+// TODO remove
+//						Tensor t = TensorFactory.tensor(c.target, chunk, valuesProvider);
+//						TensorFunction clear = clearOutput.get(t);
+//						if (clear == null) {
+//							clearOutput.put(t, clear = OperationsFactory.clear());
+//						}
+//						clear.value(TensorFactory.tensor(c.target, chunk, valuesProvider));
 
-		    chunk.clear();
+						cc.calculate(chunk, valuesProvider, c.target);
+					}
 
-		    triggerEvent(new PropagationEvent(c.target, chunk, nn, valuesProvider));
+					triggerEvent(new PropagationEvent(c.target, chunk, nn, valuesProvider));
+
+					chunk.clear();
+				}
+			}
 		}
-	    }
-	}
-    }
-
-    public void addConnectionCalculator(Layer layer, ConnectionCalculator calculator) {
-	calculators.put(layer, calculator);
-    }
-
-    public ConnectionCalculator getConnectionCalculator(Layer layer) {
-	return calculators.get(layer);
-    }
-
-    public void removeConnectionCalculator(Layer layer) {
-	calculators.remove(layer);
-    }
-
-    public void addEventListener(PropagationEventListener listener) {
-	if (listeners == null) {
-	    listeners = new ArrayList<>();
 	}
 
-	listeners.add(listener);
-    }
-
-    public void removeEventListener(PropagationEventListener listener) {
-	if (listeners != null) {
-	    listeners.remove(listener);
-	}
-    }
-
-    protected void triggerEvent(PropagationEvent event) {
-	if (listeners != null) {
-	    listeners.forEach(l -> l.handleEvent(event));
+	public void addConnectionCalculator(Layer layer, ConnectionCalculator calculator)
+	{
+		calculators.put(layer, calculator);
 	}
 
-	if (calculators != null) {
-	    calculators.values().stream().filter(cc -> cc instanceof PropagationEventListener).forEach(cc -> ((PropagationEventListener) cc).handleEvent(event));
+	public ConnectionCalculator getConnectionCalculator(Layer layer)
+	{
+		return calculators.get(layer);
 	}
-    }
+
+	public void removeConnectionCalculator(Layer layer)
+	{
+		calculators.remove(layer);
+	}
+
+	public void addEventListener(PropagationEventListener listener)
+	{
+		if (listeners == null)
+		{
+			listeners = new ArrayList<>();
+		}
+
+		listeners.add(listener);
+	}
+
+	public void removeEventListener(PropagationEventListener listener)
+	{
+		if (listeners != null)
+		{
+			listeners.remove(listener);
+		}
+	}
+
+	protected void triggerEvent(PropagationEvent event)
+	{
+		if (listeners != null)
+		{
+			listeners.forEach(l -> l.handleEvent(event));
+		}
+
+		if (calculators != null)
+		{
+			calculators.values().stream().filter(cc -> cc instanceof PropagationEventListener).forEach(cc -> ((PropagationEventListener) cc).handleEvent(event));
+		}
+	}
 }

@@ -2,11 +2,19 @@ package com.github.neuralnetworks.test;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Test;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
-import com.aparapi.Kernel.EXECUTION_MODE;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
+
+import com.amd.aparapi.Kernel.EXECUTION_MODE;
 import com.github.neuralnetworks.architecture.types.Autoencoder;
-import com.github.neuralnetworks.architecture.types.NNFactory;
+import com.github.neuralnetworks.calculation.CalculationFactory;
 import com.github.neuralnetworks.input.MultipleNeuronsOutputError;
 import com.github.neuralnetworks.input.SimpleInputProvider;
 import com.github.neuralnetworks.training.TrainerFactory;
@@ -16,55 +24,94 @@ import com.github.neuralnetworks.training.events.LogTrainingListener;
 import com.github.neuralnetworks.training.random.MersenneTwisterRandomInitializer;
 import com.github.neuralnetworks.training.random.NNRandomInitializer;
 import com.github.neuralnetworks.util.Environment;
+import com.github.neuralnetworks.util.RuntimeConfiguration;
 
-public class AETest {
+@RunWith(Parameterized.class)
+public class AETest
+{
 
-    /**
-     * Autoencoder backpropagation
-     */
-    @Test
-    public void testAEBackpropagation() {
-	// sequential execution for debugging
-	Environment.getInstance().setExecutionMode(EXECUTION_MODE.CPU);
-	Environment.getInstance().setUseDataSharedMemory(true);
-	Environment.getInstance().setUseWeightsSharedMemory(true);
+	public AETest(RuntimeConfiguration conf)
+	{
+		Environment.getInstance().setRuntimeConfiguration(conf);
+	}
 
-	// autoencoder with 6 input/output and 2 hidden units
-	Autoencoder ae = NNFactory.autoencoderSigmoid(6, 2, true);
+	@Parameters
+	public static Collection<RuntimeConfiguration[]> runtimeConfigurations()
+	{
+		List<RuntimeConfiguration[]> configurations = new ArrayList<>();
 
-	// We'll use a simple dataset of symptoms of a flu illness. There are 6
-	// input features and the first three are symptoms of the illness - for
-	// example 1 0 0 0 0 0 means that a patient has high temperature, 0 1
-	// 0 0 0 0 - coughing, 1 1 0 0 0 0 - coughing and high temperature
-	// and so on. The second three features are "counter" symptomps - when a
-	// patient has one of those it is less likely that he's sick. For
-	// example 0 0 0 1 0 0 means that he has a flu vaccine. It's possible
-	// to have combinations between both - for exmample 0 1 0 1 0 0 means
-	// that the patient is vaccinated, but he's also coughing. We will
-	// consider a patient to be sick when he has at least two of the first
-	// three and healthy if he has two of the second three
-	TrainingInputProvider trainInputProvider = new SimpleInputProvider(new float[][] { { 1, 1, 1, 0, 0, 0 }, { 1, 0, 1, 0, 0, 0 }, { 1, 1, 0, 0, 0, 0 }, { 0, 1, 1, 0, 0, 0 }, { 0, 1, 1, 1, 0, 0 }, { 0, 0, 0, 1, 1, 1 }, { 0, 0, 1, 1, 1, 0 }, { 0, 0, 0, 1, 0, 1 }, { 0, 0, 0, 0, 1, 1 }, { 0, 0, 0, 1, 1, 0 } }, null);
-	TrainingInputProvider testInputProvider = new SimpleInputProvider(new float[][] { { 1, 1, 1, 0, 0, 0 }, { 1, 0, 1, 0, 0, 0 }, { 1, 1, 0, 0, 0, 0 }, { 0, 1, 1, 0, 0, 0 }, { 0, 1, 1, 1, 0, 0 }, { 0, 0, 0, 1, 1, 1 }, { 0, 0, 1, 1, 1, 0 }, { 0, 0, 0, 1, 0, 1 }, { 0, 0, 0, 0, 1, 1 }, { 0, 0, 0, 1, 1, 0 } }, new float[][] { { 1, 0 }, { 1, 0 }, { 1, 0 }, { 1, 0 }, { 1, 0 }, { 0, 1 }, { 0, 1 }, { 0, 1 }, { 0, 1 }, { 0, 1 } });
-	MultipleNeuronsOutputError error = new MultipleNeuronsOutputError();
+		RuntimeConfiguration conf1 = new RuntimeConfiguration();
+		conf1.getAparapiConfiguration().setExecutionMode(EXECUTION_MODE.SEQ);
+		conf1.setUseDataSharedMemory(false);
+		conf1.setUseWeightsSharedMemory(false);
+		configurations.add(new RuntimeConfiguration[] { conf1 });
 
-	// backpropagation for autoencoders
-	BackPropagationAutoencoder t = TrainerFactory.backPropagationAutoencoder(ae, trainInputProvider, testInputProvider, error, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f, 0.01f)), 0.02f, 0.7f, 0f, 0f, 0f, 1, 1, 100);
+		RuntimeConfiguration conf2 = new RuntimeConfiguration();
+		conf2.getAparapiConfiguration().setExecutionMode(EXECUTION_MODE.SEQ);
+		conf2.setUseDataSharedMemory(true);
+		conf2.setUseWeightsSharedMemory(true);
+		configurations.add(new RuntimeConfiguration[] { conf2 });
 
-	// log data
-	t.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName(), true, false));
+//		RuntimeConfiguration conf3 = new RuntimeConfiguration();
+//		conf3.setCalculationProvider(CalculationProvider.OPENCL);
+//		conf3.setUseDataSharedMemory(false);
+//		conf3.setUseWeightsSharedMemory(false);
+//		conf3.getOpenCLConfiguration().setAggregateOperations(false);
+//		conf3.getOpenCLConfiguration().setSynchronizeAfterOpertation(true);
+//		conf3.getAparapiConfiguration().setExecutionMode(EXECUTION_MODE.SEQ);
+//		configurations.add(new RuntimeConfiguration[] { conf3 });
 
-	// early stopping
-	//t.addEventListener(new EarlyStoppingListener(t.getTrainingInputProvider(), 1000, 0.1f));
+		return configurations;
+	}
 
-	// training
-	t.train();
+	/**
+	 * Autoencoder backpropagation
+	 */
+	@Test
+	@Ignore
+	@Deprecated
+	public void testAEBackpropagation()
+	{
+		// autoencoder with 6 input/output and 2 hidden units
+		Autoencoder ae = CalculationFactory.autoencoderSigmoid(6, 2, true);
 
-	// the output layer is removed, thus making the hidden layer the new output
-	ae.removeLayer(ae.getOutputLayer());
+		// We'll use a simple dataset of symptoms of a flu illness. There are 6
+		// input features and the first three are symptoms of the illness - for
+		// example 1 0 0 0 0 0 means that a patient has high temperature, 0 1
+		// 0 0 0 0 - coughing, 1 1 0 0 0 0 - coughing and high temperature
+		// and so on. The second three features are "counter" symptomps - when a
+		// patient has one of those it is less likely that he's sick. For
+		// example 0 0 0 1 0 0 means that he has a flu vaccine. It's possible
+		// to have combinations between both - for exmample 0 1 0 1 0 0 means
+		// that the patient is vaccinated, but he's also coughing. We will
+		// consider a patient to be sick when he has at least two of the first
+		// three and healthy if he has two of the second three
+		TrainingInputProvider trainInputProvider = new SimpleInputProvider(new float[][] { { 1, 1, 1, 0, 0, 0 }, { 1, 0, 1, 0, 0, 0 }, { 1, 1, 0, 0, 0, 0 }, { 0, 1, 1, 0, 0, 0 }, { 0, 1, 1, 1, 0, 0 },
+				{ 0, 0, 0, 1, 1, 1 }, { 0, 0, 1, 1, 1, 0 }, { 0, 0, 0, 1, 0, 1 }, { 0, 0, 0, 0, 1, 1 }, { 0, 0, 0, 1, 1, 0 } });
+		TrainingInputProvider testInputProvider = new SimpleInputProvider(new float[][] { { 1, 1, 1, 0, 0, 0 }, { 1, 0, 1, 0, 0, 0 }, { 1, 1, 0, 0, 0, 0 }, { 0, 1, 1, 0, 0, 0 }, { 0, 1, 1, 1, 0, 0 },
+				{ 0, 0, 0, 1, 1, 1 }, { 0, 0, 1, 1, 1, 0 }, { 0, 0, 0, 1, 0, 1 }, { 0, 0, 0, 0, 1, 1 }, { 0, 0, 0, 1, 1, 0 } }, new float[][] { { 1, 0 }, { 1, 0 }, { 1, 0 }, { 1, 0 }, { 1, 0 }, { 0, 1 },
+				{ 0, 1 }, { 0, 1 }, { 0, 1 }, { 0, 1 } });
+		MultipleNeuronsOutputError error = new MultipleNeuronsOutputError();
 
-	// testing
-	t.test();
+		// backpropagation for autoencoders
+		BackPropagationAutoencoder t = TrainerFactory.backPropagationAutoencoder(ae, trainInputProvider, testInputProvider, error, new NNRandomInitializer(new MersenneTwisterRandomInitializer(-0.01f,
+				0.01f)), 0.02f, 0.7f, 0f, 0f, 0.00001f, 1, 1, 200);
 
-	assertEquals(0, t.getOutputError().getTotalNetworkError(), 0);
-    }
+		// log data
+		t.addEventListener(new LogTrainingListener(Thread.currentThread().getStackTrace()[1].getMethodName(), true, false));
+
+		// early stopping
+		// t.addEventListener(new EarlyStoppingListener(t.getTrainingInputProvider(), 1000, 0.1f));
+
+		// training
+		t.train();
+
+		// the output layer is removed, thus making the hidden layer the new output
+		ae.removeLayer(ae.getOutputLayer());
+
+		// testing
+		t.test();
+
+		assertEquals(0, t.getOutputError().getTotalNetworkError(), 0.1);
+	}
 }

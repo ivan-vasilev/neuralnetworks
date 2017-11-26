@@ -1,71 +1,75 @@
 package com.github.neuralnetworks.input;
 
-import com.github.neuralnetworks.calculation.neuronfunctions.TensorFunction;
+import com.github.neuralnetworks.calculation.operations.TensorFunction;
 import com.github.neuralnetworks.tensor.Tensor;
-import com.github.neuralnetworks.training.TrainingInputProvider;
 
 /**
  * Scaling input function
  */
-public class ScalingInputFunction implements TensorFunction {
+public class ScalingInputFunction implements TensorFunction
+{
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    private Float scale;
-    private float[] inputScales;
+	private Float scale;
 
-    /**
-     * All inputs are scaled according to the scale value
-     */
-    public ScalingInputFunction(float scale) {
-	super();
-	this.scale = scale;
-    }
-
-    /**
-     * All inputs are scaled according to the scale value
-     */
-    public ScalingInputFunction(TrainingInputProvider input) {
-	super();
-
-	input.reset();
-
-	for (int i = 0; i < input.getInputSize(); i++) {
-	    input.beforeSample();
-	    float[] in = input.getNextInput();
-	    if (inputScales == null) {
-		inputScales = new float[in.length];
-	    }
-	    input.afterSample();
-
-	    for (int j = 0; j < in.length; j++) {
-		inputScales[j] = Math.abs(in[j]) > inputScales[j] ? Math.abs(in[j]) : inputScales[j];
-	    }
+	public ScalingInputFunction()
+	{
+		super();
 	}
 
-	input.reset();
-    }
+	/**
+	 * All inputs are scaled according to the scale value
+	 */
+	public ScalingInputFunction(float scale)
+	{
+		super();
+		this.scale = scale;
+	}
 
-    public float getScale() {
-        return scale;
-    }
+	public float getScale()
+	{
+		return scale;
+	}
 
-    public void setScale(float scale) {
-        this.scale = scale;
-    }
+	public void setScale(float scale)
+	{
+		this.scale = scale;
+	}
 
-    @Override
-    public void value(Tensor inputOutput) {
-	float[] elements = inputOutput.getElements();
-	if (inputScales != null) {
-	    int s = inputOutput.getSize() / inputScales.length;
-	    for (int i = 0; i < inputOutput.getSize(); i++) {
-		elements[inputOutput.getStartOffset() + i] /= inputScales[i / s];
-	    }
-	} else {
-	    for (int i = inputOutput.getStartOffset(); i < inputOutput.getStartOffset() + inputOutput.getSize(); i++) {
-		elements[i] /= scale;
-	    }
-	};
-    }
+	@Override
+	public void value(Tensor inputOutput)
+	{
+		int mb = inputOutput.getDimensions()[0];
+		int length = inputOutput.getSize() / inputOutput.getDimensions()[0];
+
+		if (scale == null)
+		{
+			for (int i = 0; i < mb; i++)
+			{
+				float max = Float.MIN_VALUE;
+				float min = Float.MAX_VALUE;
+				for (int j = 0; j < length; j++)
+				{
+					max = Math.max(max, inputOutput.getElements()[inputOutput.getStartIndex() + i * length + j]);
+					min = Math.min(min, inputOutput.getElements()[inputOutput.getStartIndex() + i * length + j]);
+				}
+
+				for (int j = 0; j < length; j++)
+				{
+					inputOutput.getElements()[inputOutput.getStartIndex() + i * length + j] = (inputOutput.getElements()[inputOutput.getStartIndex() + i * length + j] - min) / (max - min);
+				}
+			}
+		} else
+		{
+			for (int i = 0; i < mb; i++)
+			{
+
+				for (int j = 0; j < length; j++)
+				{
+					inputOutput.getElements()[inputOutput.getStartIndex() + i * length + j] /= scale;
+				}
+			}
+		}
+	}
 }

@@ -6,6 +6,7 @@ import java.util.EventListener;
 /**
  * Event listener for propagation events
  */
-public interface PropagationEventListener extends EventListener, Serializable {
-    public void handleEvent(PropagationEvent event);
+public interface PropagationEventListener extends EventListener, Serializable
+{
+	public void handleEvent(PropagationEvent event);
 }

@@ -1,6 +1,0 @@
-rootProject.name = 'neuralnetworks'
-include ':nn-core'
-include ':nn-samples'
-
-project(':nn-core').projectDir = "$rootDir/nn-core" as File
-project(':nn-samples').projectDir = "$rootDir/nn-samples" as File

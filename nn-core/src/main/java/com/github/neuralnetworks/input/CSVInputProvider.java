@@ -6,146 +6,202 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import com.github.neuralnetworks.tensor.Tensor;
 import com.github.neuralnetworks.training.TrainingInputProviderImpl;
 
 /**
  * Input provider for CSV files. Values should be real numbers only. The separator is comma. Target file is not required.
- * !!! Important - the target values are provided to the network as they are read from the file. This means, that when you have actual target values 1, 2, 3 it is your responsibility to convert them into 1,0,0; 0,1,0 and 0,0,1, if your network requires this.
+ * !!! Important - the target values are provided to the network as they are read from the file. This means, that when you have actual target values 1, 2, 3 it is your responsibility to convert them
+ * into 1,0,0; 0,1,0 and 0,0,1, if your network requires this.
  */
-public class CSVInputProvider extends TrainingInputProviderImpl {
+public class CSVInputProvider extends TrainingInputProviderImpl
+{
 
-    private static final long serialVersionUID = 5067933748794269003L;
+	private static final long serialVersionUID = 5067933748794269003L;
 
-    private File inputFile;
-    private File targetFile;
-    private BufferedReader inputReader;
-    private BufferedReader targetReader;
-    private float[] nextInput;
-    private float[] nextTarget;
-    private int inputSize;
+	private File inputFile;
+	private File targetFile;
+	private BufferedReader inputReader;
+	private BufferedReader targetReader;
+	private int inputSize;
+	private int inputDimensions;
+	private int targetDimensions;
 
-    public CSVInputProvider(File inputFile, File targetFile) {
-	super();
-	this.inputFile = inputFile;
-	this.targetFile = targetFile;
+	public CSVInputProvider(File inputFile, File targetFile)
+	{
+		super();
+		this.inputFile = inputFile;
+		this.targetFile = targetFile;
 
-	inputSize = (int) getInputReader().lines().count();
-    }
+		inputSize = (int) getInputReader().lines().count();
+		inputDimensions = getInputReader().lines().findFirst().get().split(",").length;
 
-    public CSVInputProvider(InputConverter targetConverter, File inputFile, File targetFile) {
-	super(targetConverter);
-	this.inputFile = inputFile;
-	this.targetFile = targetFile;
-
-	inputSize = (int) getInputReader().lines().count();
-    }
-
-    @Override
-    public int getInputSize() {
-	return inputSize;
-    }
-
-    @Override
-    public float[] getNextInput() {
-	return nextInput;
-    }
-
-    @Override
-    public float[] getNextTarget() {
-	return nextTarget;
-    }
-
-    @Override
-    public void beforeSample() {
-	try {
-	    // input
-	    BufferedReader ir = getInputReader();
-	    String line = ir.readLine();
-	    if (line == null) {
-		inputReader.close();
-		inputReader = null;
-		ir = getInputReader();
-		line = ir.readLine();
-	    }
-
-	    String[] split = line.split(",");
-	    if (nextInput == null) {
-		nextInput = new float[split.length];
-	    }
-
-	    for (int i = 0; i < nextInput.length; i++) {
-		nextInput[i] = Float.parseFloat(split[i]);
-	    }
-
-	    // target
-	    if (targetFile != null) {
-		BufferedReader tr = getTargetReader();
-		line = tr.readLine();
-		if (line == null) {
-		    targetReader.close();
-		    targetReader = null;
-		    tr = getTargetReader();
-		    line = tr.readLine();
+		if (getTargetReader() != null) 
+		{
+			targetDimensions = getTargetReader().lines().findFirst().get().split(",").length;
 		}
-		
-		split = line.split(",");
-		if (nextTarget == null) {
-		    nextTarget = new float[split.length];
+	}
+
+	public CSVInputProvider(InputConverter targetConverter, File inputFile, File targetFile)
+	{
+		super(targetConverter);
+		this.inputFile = inputFile;
+		this.targetFile = targetFile;
+
+		inputSize = (int) getInputReader().lines().count();
+		inputDimensions = getInputReader().lines().findFirst().get().split(",").length;
+	}
+
+	@Override
+	public int getInputSize()
+	{
+		return inputSize;
+	}
+
+	@Override
+	public int getInputDimensions()
+	{
+		return inputDimensions;
+	}
+
+	@Override
+	public int getTargetDimensions()
+	{
+		return targetDimensions;
+	}
+
+	@SuppressWarnings("resource")
+	@Override
+	public void getNextInput(Tensor input)
+	{
+		try
+		{
+			// input
+			BufferedReader ir = getInputReader();
+			int mb = input.getDimensions()[0];
+			float[] elements = input.getElements();
+
+			for (int i = 0; i < mb; i++)
+			{
+				String line = ir.readLine();
+				if (line == null)
+				{
+					inputReader.close();
+					inputReader = null;
+					ir = getInputReader();
+					line = ir.readLine();
+				}
+
+				String[] split = line.split(",");
+
+				for (int j = 0; j < elements.length; j++)
+				{
+					elements[input.getStartIndex() + i * getInputDimensions() + j] = Float.parseFloat(split[j]);
+				}
+			}
+		} catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	@SuppressWarnings("resource")
+	@Override
+	public void getNextTarget(Tensor target)
+	{
+		if (targetReader != null && target != null)
+		{
+			try
+			{
+				// input
+				BufferedReader ir = getTargetReader();
+				int mb = target.getDimensions()[0];
+				float[] elements = target.getElements();
+
+				for (int i = 0; i < mb; i++)
+				{
+					String line = ir.readLine();
+					if (line == null)
+					{
+						targetReader.close();
+						targetReader = null;
+						ir = getTargetReader();
+						line = ir.readLine();
+					}
+
+					String[] split = line.split(",");
+
+					for (int j = 0; j < elements.length; j++)
+					{
+						elements[target.getStartIndex() + i * split.length + j] = Float.parseFloat(split[j]);
+					}
+				}
+			} catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+		}
+	}
+
+	@Override
+	public void reset()
+	{
+		super.reset();
+
+		if (inputReader != null)
+		{
+			try
+			{
+				inputReader.close();
+				inputReader = null;
+			} catch (IOException e)
+			{
+				e.printStackTrace();
+			}
 		}
 
-		for (int i = 0; i < nextTarget.length; i++) {
-		    nextTarget[i] = Float.parseFloat(split[i]);
+		if (targetReader != null)
+		{
+			try
+			{
+				targetReader.close();
+				targetReader = null;
+			} catch (IOException e)
+			{
+				e.printStackTrace();
+			}
 		}
-	    }
-	} catch (IOException e) {
-	    e.printStackTrace();
-	}
-    }
-
-    @Override
-    public void reset() {
-	super.reset();
-
-	if (inputReader != null) {
-	    try {
-		inputReader.close();
-		inputReader = null;
-	    } catch (IOException e) {
-		e.printStackTrace();
-	    }
 	}
 
-	if (targetReader != null) {
-	    try {
-		targetReader.close();
-		targetReader = null;
-	    } catch (IOException e) {
-		e.printStackTrace();
-	    }
-	}
-    }
+	private BufferedReader getInputReader()
+	{
+		if (inputReader == null)
+		{
+			try
+			{
+				inputReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile)));
+			} catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+		}
 
-    private BufferedReader getInputReader() {
-	if (inputReader == null) {
-	    try {
-		inputReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile)));
-	    } catch (IOException e) {
-		e.printStackTrace();
-	    }
+		return inputReader;
 	}
 
-	return inputReader;
-    }
+	private BufferedReader getTargetReader()
+	{
+		if (targetReader == null && targetFile != null)
+		{
+			try
+			{
+				targetReader = new BufferedReader(new InputStreamReader(new FileInputStream(targetFile)));
+			} catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+		}
 
-    private BufferedReader getTargetReader() {
-	if (targetReader == null && targetFile != null) {
-	    try {
-		targetReader = new BufferedReader(new InputStreamReader(new FileInputStream(targetFile)));
-	    } catch (IOException e) {
-		e.printStackTrace();
-	    }
+		return targetReader;
 	}
-
-	return targetReader;
-    }
 }

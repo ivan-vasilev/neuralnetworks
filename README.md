@@ -1,5 +1,8 @@
 # Deep Neural Networks with GPU support
 
+**Update**
+_This is a newer version of the framework, that I developed while working at ExB Research. If you want to access the previous version it's available in the [old branch](https://github.com/ivan-vasilev/neuralnetworks/tree/old)._
+
 This is a Java implementation of some of the algorithms for training deep neural networks. GPU support is provided via the OpenCL and Aparapi.
 The architecture is designed with modularity, extensibility and pluggability in mind.
 
@@ -10,12 +13,11 @@ I'm using the [git-flow](https://github.com/nvie/gitflow) model. The most stable
 
 ## Neural network types
 * Multilayer perceptron
+* Convolutional networks with max pooling, average poolng and [stochastic pooling](http://techtalks.tv/talks/stochastic-pooling-for-regularization-of-deep-convolutional-neural-networks/58106/).
 * Restricted Boltzmann Machine
 * Autoencoder
 * Deep belief network
 * Stacked autoencodeer
-* Convolutional networks with max pooling, average poolng and [stochastic pooling](http://techtalks.tv/talks/stochastic-pooling-for-regularization-of-deep-convolutional-neural-networks/58106/).
-* Maxout networks (work-in-progress)
 
 ## Training algorithms
 * Backpropagation - supports multilayer perceptrons, convolutional networks and [dropout](http://arxiv.org/pdf/1207.0580.pdf).
@@ -24,34 +26,35 @@ I'm using the [git-flow](https://github.com/nvie/gitflow) model. The most stable
 
 All the algorithms support GPU execution. 
 
-Out of the box supported datasets are [MNIST](http://yann.lecun.com/exdb/mnist/), [CIFAR-10/CIFAR-100](http://www.cs.toronto.edu/~kriz/cifar.html) (experimental, not much testing), [IRIS](http://archive.ics.uci.edu/ml/datasets/Iris) and XOR, but you can easily implement your own.
+Out of the box supported datasets are [MNIST](http://yann.lecun.com/exdb/mnist/), [CIFAR-10/CIFAR-100](http://www.cs.toronto.edu/~kriz/cifar.html), [IRIS](http://archive.ics.uci.edu/ml/datasets/Iris) and XOR, but you can easily implement your own.
 
 Experimental support of RGB image preprocessing operations - affine transformations, cropping, and color scaling (see Generaltest.java -> testImageInputProvider).
 
 ## Activation functions
-* Logistic
+* Sigmoid
 * Tanh
-* Rectifiers
+* ReLU
+* LRN
 * Softplus
 * Softmax
-* Weighted sum
 
 All the functions support GPU execution. They can be applied to all types of networks and all training algorithms. You can also implement new activations.
 
 ## How to build the library
 * **Java 8**.
-* To build the project you need [gradle](http://www.gradle.org/) or [maven](http://maven.apache.org/). If you don't use any of these you can go to the project folder and execute the _gradlew_ console command, which will automatically setup gradle environment for you.
-* I'm also uploading the latest jar file (with bundled dependencies and sources) [here](https://github.com/ivan-vasilev/neuralnetworks/tree/master/build/libs).
+* To build the project you need [maven](http://maven.apache.org/).
 * Depending on your environment you might need to download the relevant aparapi .dll or .so file (located in the root of each archive) from [here](https://code.google.com/p/aparapi/downloads/list) and add it's location to the system PATH variable. (This)[https://code.google.com/p/aparapi/wiki/DevelopersGuideLinux] is a guide on how to set up OpenCL in linux environment.
 
 ## How to run the samples
-The samples are organized as unit tests. If you want see examples on various popular datasets you can go to [nn-samples/src/test/java/com/github/neuralnetworks/samples/](https://github.com/ivan-vasilev/neuralnetworks/tree/9e569aa7c9a4d724cf3c1aed8a8036af272ec58f/nn-samples/src/test/java/com/github/neuralnetworks/samples/test).
+The samples are organized as unit tests. If you want see examples on various popular datasets you can go to [nn-samples/src/test/java/com/github/neuralnetworks/samples/](https://github.com/ivan-vasilev/neuralnetworks/tree/master/nn-samples/src/test/java/com/github/neuralnetworks/samples/test).
 
 ## Library structure
 There are two projects:
 
 * nn-core - contains the full implementation.
 * nn-samples - contains implementations of popular datasets and 
+* nn-performance - some performance metrics.
+* nn-userinterface - unfinished work on visual network representation.
 
 The software design is tiered, each tier depending on the previous ones.
 
@@ -66,13 +69,15 @@ This tier is propagating data through the network. It takes advantage of it's gr
 * _ConnectionCalculator_ - base class for all neuron types (sigmoid, rectifiers, convolutional etc.). After the order of calculation of the layers is determined by the _LayerCalculator_, then the list of input connections for each layer is calculated by the _ConnectionCalculator_.
 
 #### GPU
-Most of the ConnectionCalculator implementations are optimized for GPU execution. Aparapi imposes some important restrictions on the code that can be executed on the GPU. The most significant are:
+Most of the ConnectionCalculator implementations are optimized for GPU execution. There are two implementations - **Native OpenCL** and **Aparapi**. Aparapi imposes some important restrictions on the code that can be executed on the GPU. The most significant are:
 
 * only one-dimensional arrays (and variables) of primitive data types are allowed. It is not possible to use complex objects.
 * only member-methods of the Aparapi Kernel class itself are allowed to be called from the GPU executable code. 
 
 Therefore before each GPU calculation all the data is converted to one-dim arrays and primitive type variables. Because of this all Aparapi neuron types are using either _AparapiWeightedSum_ (for fully connected layers and weighted sum input functions), _AparapiSubsampling2D_ (for subsampling layers) or _AparapiConv2D_ (for convolutional layers). 
 Most of the data is represented as one-dimensional array by default (for example Matrix).
+
+The native OpenCL implementation does not have these restrictions.
 
 ### Training
 All the trainers are using the _Trainer_ base class. They are optimized to run on the GPU, but you can plug-in other implementations and new training algorithms. The training procedure has training and testing phases. Each Trainer receives parameters (for example learning rate, momentum, etc) via _Properties_ (a _HashMap_). For the supported properties for each trainer please check the _TrainerFactory_ class.

@@ -1,9 +1,0 @@
-group = 'com.github.neuralnetworks'
-description = 'Neural networks for Java - Samples'
-dependencies {
-  compile project(':nn-core')
-}
-
-test {
-    maxParallelForks = 4
-}

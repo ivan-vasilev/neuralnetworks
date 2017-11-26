@@ -4,96 +4,149 @@ package com.github.neuralnetworks.architecture;
  * Subsampling connections. Contains information about the size of the
  * subsampling region
  */
-public class Subsampling2DConnection extends ConnectionsImpl {
+public class Subsampling2DConnection extends ConnectionsImpl
+{
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    protected int inputFeatureMapColumns;
-    protected int inputFeatureMapRows;
-    protected int outputFeatureMapColumns;
-    protected int outputFeatureMapRows;
-    protected int filters;
+	protected int inputFeatureMapColumns;
+	protected int inputFeatureMapRows;
+	protected int filters;
+	protected int subsamplingRegionRows;
+	protected int subsamplingRegionColumns;
+	protected int rowStride;
+	protected int columnStride;
+	protected int outputRowPadding;
+	protected int outputColumnPadding;
 
-    public Subsampling2DConnection(Layer inputLayer, Layer outputLayer, int inputFeatureMapRows, int inputFeatureMapColumns, int subsamplingRegionRows, int subsamplingRegionCols, int filters) {
-	super(inputLayer, outputLayer);
-	this.inputFeatureMapRows = inputFeatureMapRows;
-	this.inputFeatureMapColumns = inputFeatureMapColumns;
-	this.filters = filters;
-	setDimensions(subsamplingRegionRows, subsamplingRegionCols);
-    }
+	public Subsampling2DConnection(Layer inputLayer, Layer outputLayer, int inputFeatureMapRows, int inputFeatureMapColumns, int subsamplingRegionRows, int subsamplingRegionColumns, int filters, int rowStride, int columnStride, int outputRowPadding, int outputColumnPadding)
+	{
+		super(inputLayer, outputLayer);
+		this.inputFeatureMapRows = inputFeatureMapRows;
+		this.inputFeatureMapColumns = inputFeatureMapColumns;
+		this.filters = filters;
+		this.subsamplingRegionRows = subsamplingRegionRows;
+		this.subsamplingRegionColumns = subsamplingRegionColumns;
+		this.rowStride = rowStride;
+		this.columnStride = columnStride;
+		this.outputRowPadding = outputRowPadding;
+		this.outputColumnPadding = outputColumnPadding;
+	}
 
-    public void setDimensions(int subsamplingRegionRows, int subsamplingRegionCols) {
-	setOutputFeatureMapRows(inputFeatureMapRows / subsamplingRegionRows);
-	setOutputFeatureMapColumns(inputFeatureMapColumns / subsamplingRegionCols);
-    }
+	public int getSubsamplingRegionRows()
+	{
+		return subsamplingRegionRows;
+	}
 
-    public int getSubsamplingRegionRows() {
-	return inputFeatureMapRows / outputFeatureMapRows;
-    }
+	public int getSubsamplingRegionCols()
+	{
+		return subsamplingRegionColumns;
+	}
 
-    public int getSubsamplingRegionCols() {
-	return inputFeatureMapColumns / outputFeatureMapColumns;
-    }
+	public int getSubsamplingRegionLength()
+	{
+		return getSubsamplingRegionRows() * getSubsamplingRegionCols();
+	}
 
-    public int getSubsamplingRegionLength() {
-	return getSubsamplingRegionRows() * getSubsamplingRegionCols();
-    }
+	@Override
+	public int getInputUnitCount()
+	{
+		return inputFeatureMapRows * inputFeatureMapColumns * filters;
+	}
 
-    @Override
-    public int getInputUnitCount() {
-	return inputFeatureMapRows * inputFeatureMapColumns * filters;
-    }
+	@Override
+	public int getOutputUnitCount()
+	{
+		return getOutputFeatureMapLength() * filters;
+	}
 
-    @Override
-    public int getOutputUnitCount() {
-	return outputFeatureMapRows * outputFeatureMapColumns * filters;
-    }
+	public int getOutputUnitCountWithPadding()
+	{
+		return getOutputFeatureMapLengthWithPadding() * filters;
+	}
 
-    public int getInputFeatureMapColumns() {
-        return inputFeatureMapColumns;
-    }
+	public int getInputFeatureMapColumns()
+	{
+		return inputFeatureMapColumns;
+	}
 
-    public void setInputFeatureMapColumns(int inputFeatureMapColumns) {
-        this.inputFeatureMapColumns = inputFeatureMapColumns;
-    }
+	public void setInputFeatureMapColumns(int inputFeatureMapColumns)
+	{
+		this.inputFeatureMapColumns = inputFeatureMapColumns;
+	}
 
-    public int getInputFeatureMapRows() {
-        return inputFeatureMapRows;
-    }
+	public int getInputFeatureMapRows()
+	{
+		return inputFeatureMapRows;
+	}
 
-    public void setInputFeatureMapRows(int inputFeatureMapRows) {
-        this.inputFeatureMapRows = inputFeatureMapRows;
-    }
+	public void setInputFeatureMapRows(int inputFeatureMapRows)
+	{
+		this.inputFeatureMapRows = inputFeatureMapRows;
+	}
 
-    public int getOutputFeatureMapColumns() {
-        return outputFeatureMapColumns;
-    }
+	public int getOutputFeatureMapRows()
+	{
+		return (inputFeatureMapRows - subsamplingRegionRows) / rowStride + 1;
+	}
 
-    public void setOutputFeatureMapColumns(int outputFeatureMapColumns) {
-        this.outputFeatureMapColumns = outputFeatureMapColumns;
-    }
+	public int getOutputFeatureMapRowsWithPadding()
+	{
+		return getOutputFeatureMapRows() + 2 * outputRowPadding;
+	}
 
-    public int getOutputFeatureMapRows() {
-        return outputFeatureMapRows;
-    }
+	public int getOutputFeatureMapColumns()
+	{
+		return (inputFeatureMapColumns - subsamplingRegionColumns) / columnStride + 1;
+	}
+	
+	public int getOutputFeatureMapColumnsWithPadding()
+	{
+		return getOutputFeatureMapColumns() + 2 * outputColumnPadding;
+	}
 
-    public void setOutputFeatureMapRows(int outputFeatureMapRows) {
-        this.outputFeatureMapRows = outputFeatureMapRows;
-    }
+	public int getFilters()
+	{
+		return filters;
+	}
 
-    public int getFilters() {
-        return filters;
-    }
+	public void setFilters(int filters)
+	{
+		this.filters = filters;
+	}
 
-    public void setFilters(int filters) {
-        this.filters = filters;
-    }
+	public int getInputFeatureMapLength()
+	{
+		return inputFeatureMapRows * inputFeatureMapColumns;
+	}
 
-    public int getInputFeatureMapLength() {
-	return inputFeatureMapRows * inputFeatureMapColumns;
-    }
-    
-    public int getOutputFeatureMapLength() {
-	return outputFeatureMapRows * outputFeatureMapColumns;
-    }
+	public int getOutputFeatureMapLength()
+	{
+		return getOutputFeatureMapRows() * getOutputFeatureMapColumns();
+	}
+
+	public int getOutputFeatureMapLengthWithPadding()
+	{
+		return getOutputFeatureMapRowsWithPadding() * getOutputFeatureMapColumnsWithPadding();
+	}
+
+	public int getRowStride()
+	{
+		return rowStride;
+	}
+
+	public int getColumnStride()
+	{
+		return columnStride;
+	}
+
+	public int getOutputRowPadding()
+	{
+		return outputRowPadding;
+	}
+
+	public int getOutputColumnPadding()
+	{
+		return outputColumnPadding;
+	}
 }
