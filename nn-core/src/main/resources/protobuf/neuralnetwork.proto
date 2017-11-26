@@ -1,0 +1,133 @@
+
+option java_package = "de.exb.neuralnetworks.builder.designio.protobuf.nn";
+
+option java_outer_classname = "NNProtoBufWrapper";
+
+message NetConfiguration {
+    optional string name = 1; // consider giving the network a name
+    repeated LayerParameter layers = 2; // a bunch of layers.
+
+    optional string input_name = 3;
+    // The dim of the input blobs. For each input blob there should be four
+    // values specifying the num, channels, height and width of the input blob.
+    // Thus, there should be a total of (3 * #input) numbers.
+    repeated int32 input_dim = 4;
+
+    optional LearnParameter default_learn_param = 5;
+}
+
+message LayerParameter {
+
+    optional string name = 1;
+    repeated string input = 2;
+
+    optional LayerType type = 3;
+
+    repeated Phase phase = 4; // if empty then this layer will be used everywhere
+
+    optional ConvolutionParameter conv_param = 5;
+    optional PoolParameter pool_param = 6;
+    optional FullyConnectedParameter fully_param = 7;
+
+    optional float dropout_rate = 8;
+
+    enum LayerType {
+        FULLY = 1;
+        CONVOLUTIONAL = 2;
+        POOLING = 3;
+        LRN = 4;
+        RELU = 5;
+        DROPOUT = 6;
+        SIGMOID = 7;
+        SOFTMAX = 8;
+    }
+
+    enum Phase{
+        TRAIN = 1;
+        TEST = 2;
+    }
+
+}
+
+message ConvolutionParameter {
+    optional uint32 num_kernel = 1; // The number of kernels for the layer
+    optional bool bias_term = 2 [default = true]; // whether to have bias terms
+    optional KernelParameter kernel_param = 3;
+
+    optional FillerParameter weight_filler = 4; // The filler for the weight
+    optional FillerParameter bias_filler = 5; // The filler for the bias
+    optional LearnParameter learn_param = 6;
+    optional LearnParameter bias_learn_param = 7;
+
+
+}
+
+message PoolParameter {
+
+    optional PoolMethod type = 1;
+    optional KernelParameter kernel_param = 2;
+
+    enum PoolMethod {
+        MAX = 0;
+        AVE = 1;
+    }
+
+}
+
+message FullyConnectedParameter {
+    optional uint32 num_neurons = 1; // The number of neurons/output for the layer
+    optional bool bias_term = 2 [default = true]; // whether to have bias terms
+
+    optional FillerParameter weight_filler = 3; // The filler for the weight
+    optional FillerParameter bias_filler = 4; // The filler for the bias
+
+    optional LearnParameter learn_param = 6;
+    optional LearnParameter bias_learn_param = 7;
+}
+
+message KernelParameter {
+    optional uint32 kernel_size = 1; // The kernel size (square)
+    optional uint32 kernel_h = 2; // The kernel height
+    optional uint32 kernel_w = 3; // The kernel width
+    optional uint32 stride = 4 [default = 1]; // The stride (equal in Y, X)
+    optional uint32 stride_h = 5 [default = 1]; // The stride height
+    optional uint32 stride_w = 6 [default = 1]; // The stride width
+    optional uint32 padding = 7 [default = 0]; // The padding size (equal in Y, X)
+    optional uint32 padding_h = 8 [default = 0]; // The padding height
+    optional uint32 padding_w = 9 [default = 0]; // The padding width
+}
+
+message FillerParameter {
+    // The filler type.
+    optional FillerType type = 1;
+    optional float value = 2 [default = 0]; // the value in constant filler
+    optional int64 seed = 3;
+    optional RangeParameter rang = 4;
+    optional GaussDistrParameter gauss_param = 5;
+
+    enum FillerType {
+        CONSTANT = 0;
+        GAUSSIAN = 1;
+        RANGE = 2;
+    }
+
+}
+
+message LearnParameter {
+    optional bool absoluteValues = 4 [default = false]; // if the values should be interpreted in an absolute value and not relative to the default values
+    optional float lr = 1; // The base learning rate
+    optional float momentum = 2; // The momentum value.
+    optional float weight_decay = 3; // The weight decay.
+}
+
+message RangeParameter {
+    optional float min = 1 [default = 0]; // the min value in uniform filler
+    optional float max = 2 [default = 1]; // the max value in uniform filler
+}
+
+message GaussDistrParameter {
+    optional float mean = 1 [default = 0]; // the mean value in Gaussian filler
+    optional float std = 2 [default = 0.1]; // the std value in Gaussian filler
+}
+
+

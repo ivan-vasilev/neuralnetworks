@@ -1,0 +1,80 @@
+import "neuralnetwork.proto";
+import "input.proto";
+
+option java_package = "de.exb.neuralnetworks.builder.designio.protobuf.nn";
+
+option java_outer_classname = "TrainerProtoBufWrapper";
+
+message TrainParameter {
+    optional int32 batch_size = 1 [default = 1];
+    optional int32 max_epochs = 2 [default = 1]; // the maximum number of iterations
+    optional LearnParameter learn_param = 3;
+    optional LearnRateDecrParam lr_decr = 4;
+    // regularization types supported: L1 and L2
+    // controlled by weight_decay
+    optional string regularization_type = 5 [default = "L2"];
+    // If true, print information about the state of the net that may help with
+    // debugging learning problems.
+    optional bool debug_info = 6 [default = false];
+
+    optional InputData train_input = 7;
+
+    optional ValidationParameter validation_param = 10;
+    optional TestParameter test_param = 11;
+    optional SnapShotParameter snapshot_param = 12;
+    optional RuntimeOptions runtime_param = 14;
+    optional LoggingParameter logging_param = 15;
+
+}
+
+message LearnRateDecrParam {
+    optional LearningRatePolicy lr_policy = 1; // The learning rate decay policy.
+    optional float gamma = 2; // The parameter to compute the learning rate.
+    optional float power = 3; // The parameter to compute the learning rate.
+    optional int32 updateInterval = 4 [default = 1]; // in epochs
+
+    enum LearningRatePolicy{
+        LINEAR = 1;
+        WHATEVER = 2;
+    }
+}
+
+message ValidationParameter {
+    optional int32 batch_size = 1 [default = 1];
+    optional int32 test_interval = 2 [default = 0]; // interval of epochs to start a test
+    optional InputData validation_input = 3;
+    optional float acceptance_error = 4 [default = 0];
+}
+
+message TestParameter {
+    optional int32 batch_size = 1 [default = 1];
+    optional InputData test_input = 2;
+}
+
+message SnapShotParameter {
+    optional int32 interval = 1 [default = 1]; // The snapshot interval in epochs
+    optional string snapshot_prefix = 2; // The prefix for the snapshot.
+
+    // If false, don't save a snapshot after training finishes.
+    optional bool snapshot_during_train = 3 [default = true];
+    optional string path = 4;
+}
+
+message LoggingParameter {
+    optional bool batch_loss = 1;
+    optional int32 interval = 2; // seconds
+    optional bool epoch = 3; // if there should be an ouptut after each epoch
+    optional bool weights = 4; // if the average weights and so on should be printed after training
+}
+
+message RuntimeOptions {
+    optional int32 device_id = 1 [default = 0];
+    optional ProcessorMode processor_mode = 2 [default = OPENCL];
+    optional bool precompilation = 3;
+
+    enum ProcessorMode {
+        CPU = 0;
+        OPENCL = 1;
+        JAVA = 2;
+    }
+}

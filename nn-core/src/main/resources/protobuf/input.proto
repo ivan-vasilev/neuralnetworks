@@ -1,0 +1,76 @@
+
+option java_package = "de.exb.neuralnetworks.builder.designio.protobuf.nn";
+
+option java_outer_classname = "InputProtoBufWrapper";
+
+
+message InputData {
+
+    optional Type type = 1;
+
+    optional TransformationParameter transformation = 2;
+
+    optional string path = 3;
+
+    enum Type {
+        CIFAR = 1;
+        MNIST = 2;
+        DIRECTORY = 3;
+        IMAGENET = 4;
+        TXT_FILE = 5;
+    }
+}
+
+message TransformationParameter {
+
+    //optional uint32 crop_size = 1 [default = 0]; is part of resize strategy
+    optional bool scale_color = 2 [default = true];
+    optional bool substract_mean = 3 [default = true];
+
+    optional AugmentationStrategy augmentation_strategy = 4;
+    optional ImageResizeStrategy resize_strategy = 5;
+
+    optional int32 img_bulk_size = 6 [default = 1];
+    optional int32 augm_img_buf_size = 7 [default = 1];
+    optional bool background_thread =  8 [default = true];
+    optional bool parallel_preprocessing = 9 [default = false];
+
+}
+
+message AugmentationStrategy{
+    optional bool horizontal_flip = 1 [default = false];
+    optional bool vertical_flip = 2 [default = false];
+    optional bool random_crop = 3 [default = false];
+    optional bool rotate_complete = 4 [default = false];
+
+    optional int32 subsampling_number = 5 [default = 1];
+    optional int32 subsampling_width = 6;
+    optional int32 subsampling_height = 7;
+}
+
+message ImageResizeStrategy{
+    optional ResizeType type = 1 [default = SMALLEST_DIMENSION_SQUARE_CROP_MIDDLE];
+    optional int32 smallest_dimension = 2;
+    optional bool step_resize = 3 [default = true]; // to use steps to resize the image
+
+    enum ResizeType{
+            SMALLEST_DIMENSION_RECT = 1;
+            SMALLEST_DIMENSION_SQUARE_SIZE = 2;
+            SMALLEST_DIMENSION_SQUARE_CROP_MIDDLE = 3;
+        }
+}
+
+
+
+//message TransformationParameter {
+//
+//    optional uint32 crop_size = 1 [default = 0];
+//    optional float scale = 2 [default = 1];
+//    // Specify if we want to randomly mirror data.
+//    optional float mean = 3;
+//    optional bool substract_mean = 4;
+//    optional bool relative_scale = 5;
+//
+//    optional bool mirror = 6 [default = false];
+//    optional bool random_crop = 7;
+//}

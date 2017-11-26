@@ -1,0 +1,104 @@
+input_name: "data" # optional
+input_dim: 3
+input_dim: 227
+input_dim: 227
+
+default_learn_param{
+    lr: 0.5
+    momentum: 0
+    weight_decay: 0
+}
+
+
+layers {
+
+    type: CONVOLUTIONAL
+
+    conv_param {
+        num_kernel: 96
+
+        kernel_param{
+            kernel_size: 11
+            stride: 4
+            padding: 0
+        }
+
+        weight_filler {
+            type: GAUSSIAN
+            gauss_param{
+                std: 0.01
+                mean: 0
+            }
+        }
+        bias_filler {
+            type: CONSTANT
+            value: 0
+        }
+    }
+}
+
+layers {
+    name: "MyPoolingLayer" # to give a specific and not auto generated name
+    type: POOLING
+
+    pool_param {
+        type: MAX
+        kernel_param{
+            kernel_size: 3
+            stride: 2
+        }
+    }
+}
+
+layers {
+    name: "FirstReluOutput" # new name of the output vector
+    type: RELU
+    input: "MyPoolingLayer" # to use a specific layer as input
+}
+
+
+layers {
+    type: FULLY
+    input: "MyPoolingLayer" # to use a specific layer as input and not only the last layer
+
+    fully_param {
+        num_neurons: 1000
+
+        weight_filler {
+            type: GAUSSIAN
+             gauss_param{
+                   std: 0.01
+             }
+        }
+        bias_filler {
+            type: CONSTANT
+            value: 0
+        }
+
+        learn_param {
+            lr: 0.1
+            momentum: 0.1
+            weight_decay: 0.1
+        }
+        bias_learn_param {
+             lr: 2
+             momentum: 2
+             weight_decay: 0
+        }
+    }
+}
+
+layers {
+    type: DROPOUT
+    dropout_rate: 0.5
+}
+
+layers {
+    type: SOFTMAX
+    phase: TRAIN # inclusive, if no phase defined then in train and test (everywhere)
+}
+
+layers {
+    type: RELU
+    phase: TEST
+}

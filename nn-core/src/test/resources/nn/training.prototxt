@@ -1,0 +1,103 @@
+
+# train parameter
+batch_size : 256
+max_epochs : 1
+learn_param{
+    lr: 0.01
+    momentum: 0.9
+    weight_decay: 0.1
+}
+
+lr_decr{
+    lr_policy: LINEAR
+    gamma: 0.1
+    power: 2
+}
+
+#input
+train_input{
+    type: DIRECTORY
+    path: "somewhere/else/"
+    transformation{
+
+        substract_mean: true # optional, default true
+        scale_color: true # optional, default true
+
+
+        resize_strategy{
+            type: SMALLEST_DIMENSION_SQUARE_CROP_MIDDLE # optional, this is the default value
+            smallest_dimension: 227
+        }
+
+        augmentation_strategy{
+            vertical_flip: true
+            random_crop: true
+
+            subsampling_width: 227
+            subsampling_height: 227
+            subsampling_number: 10
+        }
+
+        img_bulk_size: 128 # default 1
+        augm_img_buf_size: 256 # default 1
+        parallel_preprocessing: true # default false
+    }
+}
+
+# final test and tests in between options
+validation_param{
+    batch_size: 512
+    test_interval: 5
+
+    validation_input{
+        type: DIRECTORY
+        path: "somewhere/is/image_net/"
+        transformation{
+
+                substract_mean: true
+                scale_color: true
+
+                resize_strategy{
+                    smallest_dimension: 227
+                }
+        }
+    }
+}
+
+test_param{
+    batch_size: 512 # optional
+
+    test_input{
+        type: DIRECTORY
+        path: "somewhere/is/image_net/"
+        transformation{
+
+                substract_mean: true
+                scale_color: true
+
+                resize_strategy{
+                    smallest_dimension: 227
+                }
+        }
+    }
+}
+
+# saves during training
+snapshot_param{
+     interval: 5 #epochs
+     snapshot_prefix: "snapshot"
+}
+
+#logging
+logging_param{
+    batch_loss: true
+    interval: 5 #seconds
+    epoch: true
+    weights: true
+}
+
+# GPU, optimization etc. option
+runtime_param{
+    device_id: 2
+    processor_mode: OPENCL
+}
